@@ -69,6 +69,7 @@
 		913EF09720669DA700AF99BE /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05720669DA700AF99BE /* GCDAsyncSocket.m */; };
 		913EF09820669DA700AF99BE /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 913EF05820669DA700AF99BE /* GCDAsyncUdpSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		913EF09920669DA700AF99BE /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 913EF05920669DA700AF99BE /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		913F7F8C2066F05B00F35E9B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 913F7F8B2066F05B00F35E9B /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -136,6 +137,7 @@
 		913EF05720669DA700AF99BE /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
 		913EF05820669DA700AF99BE /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
 		913EF05920669DA700AF99BE /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
+		913F7F8B2066F05B00F35E9B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,6 +154,7 @@
 		913EEFFC20669D6400AF99BE = {
 			isa = PBXGroup;
 			children = (
+				913F7F8B2066F05B00F35E9B /* README.md */,
 				913EF00820669D6400AF99BE /* xLib6000-master */,
 				913EF00720669D6400AF99BE /* Products */,
 			);
@@ -379,6 +382,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				913F7F8C2066F05B00F35E9B /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
