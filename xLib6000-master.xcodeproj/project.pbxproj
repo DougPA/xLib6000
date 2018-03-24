@@ -7,13 +7,137 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		913EF00B20669D6400AF99BE /* xLib6000_master.h in Headers */ = {isa = PBXBuildFile; fileRef = 913EF00920669D6400AF99BE /* xLib6000_master.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		913EF05A20669DA700AF99BE /* Xvtr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01220669DA700AF99BE /* Xvtr.swift */; };
+		913EF05B20669DA700AF99BE /* UsbCable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01320669DA700AF99BE /* UsbCable.swift */; };
+		913EF05C20669DA700AF99BE /* Tnf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01420669DA700AF99BE /* Tnf.swift */; };
+		913EF05D20669DA700AF99BE /* Panadapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01520669DA700AF99BE /* Panadapter.swift */; };
+		913EF05E20669DA700AF99BE /* IqStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01620669DA700AF99BE /* IqStream.swift */; };
+		913EF05F20669DA700AF99BE /* MicAudioStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01720669DA700AF99BE /* MicAudioStream.swift */; };
+		913EF06020669DA700AF99BE /* Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01820669DA700AF99BE /* Memory.swift */; };
+		913EF06120669DA700AF99BE /* Amplifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01920669DA700AF99BE /* Amplifier.swift */; };
+		913EF06220669DA700AF99BE /* Waterfall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01A20669DA700AF99BE /* Waterfall.swift */; };
+		913EF06320669DA700AF99BE /* Meter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01B20669DA700AF99BE /* Meter.swift */; };
+		913EF06420669DA700AF99BE /* Slice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01C20669DA700AF99BE /* Slice.swift */; };
+		913EF06520669DA700AF99BE /* TxAudioStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01D20669DA700AF99BE /* TxAudioStream.swift */; };
+		913EF06620669DA700AF99BE /* Opus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01E20669DA700AF99BE /* Opus.swift */; };
+		913EF06720669DA700AF99BE /* Equalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01F20669DA700AF99BE /* Equalizer.swift */; };
+		913EF06820669DA700AF99BE /* AudioStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02020669DA700AF99BE /* AudioStream.swift */; };
+		913EF06A20669DA700AF99BE /* xLib6000.h in Headers */ = {isa = PBXBuildFile; fileRef = 913EF02220669DA700AF99BE /* xLib6000.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		913EF06B20669DA700AF99BE /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 913EF02320669DA700AF99BE /* README.md */; };
+		913EF06C20669DA700AF99BE /* AppExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02420669DA700AF99BE /* AppExtensions.swift */; };
+		913EF06D20669DA700AF99BE /* Radio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02620669DA700AF99BE /* Radio.swift */; };
+		913EF06E20669DA700AF99BE /* Waveform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02820669DA700AF99BE /* Waveform.swift */; };
+		913EF06F20669DA700AF99BE /* Wan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02920669DA700AF99BE /* Wan.swift */; };
+		913EF07020669DA700AF99BE /* Gps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02A20669DA700AF99BE /* Gps.swift */; };
+		913EF07120669DA700AF99BE /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02B20669DA700AF99BE /* Profile.swift */; };
+		913EF07220669DA700AF99BE /* Transmit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02C20669DA700AF99BE /* Transmit.swift */; };
+		913EF07320669DA700AF99BE /* Cwx.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02D20669DA700AF99BE /* Cwx.swift */; };
+		913EF07420669DA700AF99BE /* Interlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02E20669DA700AF99BE /* Interlock.swift */; };
+		913EF07520669DA700AF99BE /* Atu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02F20669DA700AF99BE /* Atu.swift */; };
+		913EF07620669DA700AF99BE /* UsbCableCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03120669DA700AF99BE /* UsbCableCommands.swift */; };
+		913EF07720669DA700AF99BE /* ProfileCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03220669DA700AF99BE /* ProfileCommands.swift */; };
+		913EF07820669DA700AF99BE /* IqStreamCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03320669DA700AF99BE /* IqStreamCommands.swift */; };
+		913EF07920669DA700AF99BE /* WaterfallCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03420669DA700AF99BE /* WaterfallCommands.swift */; };
+		913EF07A20669DA700AF99BE /* AmplifierCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03520669DA700AF99BE /* AmplifierCommands.swift */; };
+		913EF07B20669DA700AF99BE /* SliceCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03620669DA700AF99BE /* SliceCommands.swift */; };
+		913EF07C20669DA700AF99BE /* AudioStreamCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03720669DA700AF99BE /* AudioStreamCommands.swift */; };
+		913EF07D20669DA700AF99BE /* TnfCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03820669DA700AF99BE /* TnfCommands.swift */; };
+		913EF07E20669DA700AF99BE /* AtuCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03920669DA700AF99BE /* AtuCommands.swift */; };
+		913EF07F20669DA700AF99BE /* TxAudioStreamCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03A20669DA700AF99BE /* TxAudioStreamCommands.swift */; };
+		913EF08020669DA700AF99BE /* TransmitCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03B20669DA700AF99BE /* TransmitCommands.swift */; };
+		913EF08120669DA700AF99BE /* MeterCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03C20669DA700AF99BE /* MeterCommands.swift */; };
+		913EF08220669DA700AF99BE /* RadioCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03D20669DA700AF99BE /* RadioCommands.swift */; };
+		913EF08320669DA700AF99BE /* CwxCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03E20669DA700AF99BE /* CwxCommands.swift */; };
+		913EF08420669DA700AF99BE /* EqualizerCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF03F20669DA700AF99BE /* EqualizerCommands.swift */; };
+		913EF08520669DA700AF99BE /* MicAudioStreamCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04020669DA700AF99BE /* MicAudioStreamCommands.swift */; };
+		913EF08620669DA700AF99BE /* MemoryCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04120669DA700AF99BE /* MemoryCommands.swift */; };
+		913EF08720669DA700AF99BE /* XvtrCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04220669DA700AF99BE /* XvtrCommands.swift */; };
+		913EF08820669DA700AF99BE /* InterlockCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04320669DA700AF99BE /* InterlockCommands.swift */; };
+		913EF08920669DA700AF99BE /* OpusCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04420669DA700AF99BE /* OpusCommands.swift */; };
+		913EF08A20669DA700AF99BE /* PanadapterCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04520669DA700AF99BE /* PanadapterCommands.swift */; };
+		913EF08B20669DA700AF99BE /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04820669DA700AF99BE /* Log.swift */; };
+		913EF08C20669DA700AF99BE /* RadioParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04920669DA700AF99BE /* RadioParameters.swift */; };
+		913EF08D20669DA700AF99BE /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04A20669DA700AF99BE /* Notifications.swift */; };
+		913EF08E20669DA700AF99BE /* FlexErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04B20669DA700AF99BE /* FlexErrors.swift */; };
+		913EF08F20669DA700AF99BE /* UdpManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04D20669DA700AF99BE /* UdpManager.swift */; };
+		913EF09020669DA700AF99BE /* TcpManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04E20669DA700AF99BE /* TcpManager.swift */; };
+		913EF09120669DA700AF99BE /* Vita.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04F20669DA700AF99BE /* Vita.swift */; };
+		913EF09220669DA700AF99BE /* Pinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05020669DA700AF99BE /* Pinger.swift */; };
+		913EF09320669DA700AF99BE /* WanServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05120669DA700AF99BE /* WanServer.swift */; };
+		913EF09420669DA700AF99BE /* RadioFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05320669DA700AF99BE /* RadioFactory.swift */; };
+		913EF09520669DA700AF99BE /* Api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05420669DA700AF99BE /* Api.swift */; };
+		913EF09620669DA700AF99BE /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05620669DA700AF99BE /* GCDAsyncUdpSocket.m */; };
+		913EF09720669DA700AF99BE /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05720669DA700AF99BE /* GCDAsyncSocket.m */; };
+		913EF09820669DA700AF99BE /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 913EF05820669DA700AF99BE /* GCDAsyncUdpSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		913EF09920669DA700AF99BE /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 913EF05920669DA700AF99BE /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		913EF00620669D6400AF99BE /* xLib6000_master.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = xLib6000_master.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		913EF00920669D6400AF99BE /* xLib6000_master.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xLib6000_master.h; sourceTree = "<group>"; };
-		913EF00A20669D6400AF99BE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		913EF00620669D6400AF99BE /* xLib6000.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = xLib6000.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		913EF01220669DA700AF99BE /* Xvtr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Xvtr.swift; sourceTree = "<group>"; };
+		913EF01320669DA700AF99BE /* UsbCable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsbCable.swift; sourceTree = "<group>"; };
+		913EF01420669DA700AF99BE /* Tnf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tnf.swift; sourceTree = "<group>"; };
+		913EF01520669DA700AF99BE /* Panadapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Panadapter.swift; sourceTree = "<group>"; };
+		913EF01620669DA700AF99BE /* IqStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IqStream.swift; sourceTree = "<group>"; };
+		913EF01720669DA700AF99BE /* MicAudioStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicAudioStream.swift; sourceTree = "<group>"; };
+		913EF01820669DA700AF99BE /* Memory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Memory.swift; sourceTree = "<group>"; };
+		913EF01920669DA700AF99BE /* Amplifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Amplifier.swift; sourceTree = "<group>"; };
+		913EF01A20669DA700AF99BE /* Waterfall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Waterfall.swift; sourceTree = "<group>"; };
+		913EF01B20669DA700AF99BE /* Meter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Meter.swift; sourceTree = "<group>"; };
+		913EF01C20669DA700AF99BE /* Slice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Slice.swift; sourceTree = "<group>"; };
+		913EF01D20669DA700AF99BE /* TxAudioStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TxAudioStream.swift; sourceTree = "<group>"; };
+		913EF01E20669DA700AF99BE /* Opus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Opus.swift; sourceTree = "<group>"; };
+		913EF01F20669DA700AF99BE /* Equalizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Equalizer.swift; sourceTree = "<group>"; };
+		913EF02020669DA700AF99BE /* AudioStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioStream.swift; sourceTree = "<group>"; };
+		913EF02120669DA700AF99BE /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		913EF02220669DA700AF99BE /* xLib6000.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xLib6000.h; sourceTree = "<group>"; };
+		913EF02320669DA700AF99BE /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		913EF02420669DA700AF99BE /* AppExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppExtensions.swift; sourceTree = "<group>"; };
+		913EF02620669DA700AF99BE /* Radio.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Radio.swift; sourceTree = "<group>"; };
+		913EF02820669DA700AF99BE /* Waveform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Waveform.swift; sourceTree = "<group>"; };
+		913EF02920669DA700AF99BE /* Wan.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Wan.swift; sourceTree = "<group>"; };
+		913EF02A20669DA700AF99BE /* Gps.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gps.swift; sourceTree = "<group>"; };
+		913EF02B20669DA700AF99BE /* Profile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
+		913EF02C20669DA700AF99BE /* Transmit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Transmit.swift; sourceTree = "<group>"; };
+		913EF02D20669DA700AF99BE /* Cwx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cwx.swift; sourceTree = "<group>"; };
+		913EF02E20669DA700AF99BE /* Interlock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Interlock.swift; sourceTree = "<group>"; };
+		913EF02F20669DA700AF99BE /* Atu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Atu.swift; sourceTree = "<group>"; };
+		913EF03120669DA700AF99BE /* UsbCableCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsbCableCommands.swift; sourceTree = "<group>"; };
+		913EF03220669DA700AF99BE /* ProfileCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileCommands.swift; sourceTree = "<group>"; };
+		913EF03320669DA700AF99BE /* IqStreamCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IqStreamCommands.swift; sourceTree = "<group>"; };
+		913EF03420669DA700AF99BE /* WaterfallCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaterfallCommands.swift; sourceTree = "<group>"; };
+		913EF03520669DA700AF99BE /* AmplifierCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmplifierCommands.swift; sourceTree = "<group>"; };
+		913EF03620669DA700AF99BE /* SliceCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SliceCommands.swift; sourceTree = "<group>"; };
+		913EF03720669DA700AF99BE /* AudioStreamCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioStreamCommands.swift; sourceTree = "<group>"; };
+		913EF03820669DA700AF99BE /* TnfCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TnfCommands.swift; sourceTree = "<group>"; };
+		913EF03920669DA700AF99BE /* AtuCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AtuCommands.swift; sourceTree = "<group>"; };
+		913EF03A20669DA700AF99BE /* TxAudioStreamCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TxAudioStreamCommands.swift; sourceTree = "<group>"; };
+		913EF03B20669DA700AF99BE /* TransmitCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransmitCommands.swift; sourceTree = "<group>"; };
+		913EF03C20669DA700AF99BE /* MeterCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MeterCommands.swift; sourceTree = "<group>"; };
+		913EF03D20669DA700AF99BE /* RadioCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadioCommands.swift; sourceTree = "<group>"; };
+		913EF03E20669DA700AF99BE /* CwxCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CwxCommands.swift; sourceTree = "<group>"; };
+		913EF03F20669DA700AF99BE /* EqualizerCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EqualizerCommands.swift; sourceTree = "<group>"; };
+		913EF04020669DA700AF99BE /* MicAudioStreamCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MicAudioStreamCommands.swift; sourceTree = "<group>"; };
+		913EF04120669DA700AF99BE /* MemoryCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemoryCommands.swift; sourceTree = "<group>"; };
+		913EF04220669DA700AF99BE /* XvtrCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XvtrCommands.swift; sourceTree = "<group>"; };
+		913EF04320669DA700AF99BE /* InterlockCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterlockCommands.swift; sourceTree = "<group>"; };
+		913EF04420669DA700AF99BE /* OpusCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpusCommands.swift; sourceTree = "<group>"; };
+		913EF04520669DA700AF99BE /* PanadapterCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PanadapterCommands.swift; sourceTree = "<group>"; };
+		913EF04820669DA700AF99BE /* Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
+		913EF04920669DA700AF99BE /* RadioParameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadioParameters.swift; sourceTree = "<group>"; };
+		913EF04A20669DA700AF99BE /* Notifications.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
+		913EF04B20669DA700AF99BE /* FlexErrors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlexErrors.swift; sourceTree = "<group>"; };
+		913EF04D20669DA700AF99BE /* UdpManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UdpManager.swift; sourceTree = "<group>"; };
+		913EF04E20669DA700AF99BE /* TcpManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TcpManager.swift; sourceTree = "<group>"; };
+		913EF04F20669DA700AF99BE /* Vita.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vita.swift; sourceTree = "<group>"; };
+		913EF05020669DA700AF99BE /* Pinger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pinger.swift; sourceTree = "<group>"; };
+		913EF05120669DA700AF99BE /* WanServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WanServer.swift; sourceTree = "<group>"; };
+		913EF05320669DA700AF99BE /* RadioFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadioFactory.swift; sourceTree = "<group>"; };
+		913EF05420669DA700AF99BE /* Api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Api.swift; sourceTree = "<group>"; };
+		913EF05620669DA700AF99BE /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
+		913EF05720669DA700AF99BE /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
+		913EF05820669DA700AF99BE /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
+		913EF05920669DA700AF99BE /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,7 +162,7 @@
 		913EF00720669D6400AF99BE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				913EF00620669D6400AF99BE /* xLib6000_master.framework */,
+				913EF00620669D6400AF99BE /* xLib6000.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -46,10 +170,144 @@
 		913EF00820669D6400AF99BE /* xLib6000-master */ = {
 			isa = PBXGroup;
 			children = (
-				913EF00920669D6400AF99BE /* xLib6000_master.h */,
-				913EF00A20669D6400AF99BE /* Info.plist */,
+				913EF02420669DA700AF99BE /* AppExtensions.swift */,
+				913EF02120669DA700AF99BE /* Info.plist */,
+				913EF02320669DA700AF99BE /* README.md */,
+				913EF02220669DA700AF99BE /* xLib6000.h */,
+				913EF02520669DA700AF99BE /* Radio */,
+				913EF01120669DA700AF99BE /* Dynamic Models */,
+				913EF02720669DA700AF99BE /* Static Models */,
+				913EF03020669DA700AF99BE /* Commands */,
+				913EF04620669DA700AF99BE /* CommonCode */,
 			);
 			path = "xLib6000-master";
+			sourceTree = "<group>";
+		};
+		913EF01120669DA700AF99BE /* Dynamic Models */ = {
+			isa = PBXGroup;
+			children = (
+				913EF01920669DA700AF99BE /* Amplifier.swift */,
+				913EF02020669DA700AF99BE /* AudioStream.swift */,
+				913EF01F20669DA700AF99BE /* Equalizer.swift */,
+				913EF01620669DA700AF99BE /* IqStream.swift */,
+				913EF01820669DA700AF99BE /* Memory.swift */,
+				913EF01B20669DA700AF99BE /* Meter.swift */,
+				913EF01720669DA700AF99BE /* MicAudioStream.swift */,
+				913EF01E20669DA700AF99BE /* Opus.swift */,
+				913EF01520669DA700AF99BE /* Panadapter.swift */,
+				913EF01C20669DA700AF99BE /* Slice.swift */,
+				913EF01420669DA700AF99BE /* Tnf.swift */,
+				913EF01D20669DA700AF99BE /* TxAudioStream.swift */,
+				913EF01320669DA700AF99BE /* UsbCable.swift */,
+				913EF01A20669DA700AF99BE /* Waterfall.swift */,
+				913EF01220669DA700AF99BE /* Xvtr.swift */,
+			);
+			path = "Dynamic Models";
+			sourceTree = "<group>";
+		};
+		913EF02520669DA700AF99BE /* Radio */ = {
+			isa = PBXGroup;
+			children = (
+				913EF02620669DA700AF99BE /* Radio.swift */,
+			);
+			path = Radio;
+			sourceTree = "<group>";
+		};
+		913EF02720669DA700AF99BE /* Static Models */ = {
+			isa = PBXGroup;
+			children = (
+				913EF02F20669DA700AF99BE /* Atu.swift */,
+				913EF02D20669DA700AF99BE /* Cwx.swift */,
+				913EF02A20669DA700AF99BE /* Gps.swift */,
+				913EF02E20669DA700AF99BE /* Interlock.swift */,
+				913EF02B20669DA700AF99BE /* Profile.swift */,
+				913EF02C20669DA700AF99BE /* Transmit.swift */,
+				913EF02920669DA700AF99BE /* Wan.swift */,
+				913EF02820669DA700AF99BE /* Waveform.swift */,
+			);
+			path = "Static Models";
+			sourceTree = "<group>";
+		};
+		913EF03020669DA700AF99BE /* Commands */ = {
+			isa = PBXGroup;
+			children = (
+				913EF03520669DA700AF99BE /* AmplifierCommands.swift */,
+				913EF03920669DA700AF99BE /* AtuCommands.swift */,
+				913EF03720669DA700AF99BE /* AudioStreamCommands.swift */,
+				913EF03E20669DA700AF99BE /* CwxCommands.swift */,
+				913EF03F20669DA700AF99BE /* EqualizerCommands.swift */,
+				913EF04320669DA700AF99BE /* InterlockCommands.swift */,
+				913EF03320669DA700AF99BE /* IqStreamCommands.swift */,
+				913EF04120669DA700AF99BE /* MemoryCommands.swift */,
+				913EF03C20669DA700AF99BE /* MeterCommands.swift */,
+				913EF04020669DA700AF99BE /* MicAudioStreamCommands.swift */,
+				913EF04420669DA700AF99BE /* OpusCommands.swift */,
+				913EF04520669DA700AF99BE /* PanadapterCommands.swift */,
+				913EF03220669DA700AF99BE /* ProfileCommands.swift */,
+				913EF03D20669DA700AF99BE /* RadioCommands.swift */,
+				913EF03620669DA700AF99BE /* SliceCommands.swift */,
+				913EF03820669DA700AF99BE /* TnfCommands.swift */,
+				913EF03B20669DA700AF99BE /* TransmitCommands.swift */,
+				913EF03A20669DA700AF99BE /* TxAudioStreamCommands.swift */,
+				913EF03120669DA700AF99BE /* UsbCableCommands.swift */,
+				913EF03420669DA700AF99BE /* WaterfallCommands.swift */,
+				913EF04220669DA700AF99BE /* XvtrCommands.swift */,
+			);
+			path = Commands;
+			sourceTree = "<group>";
+		};
+		913EF04620669DA700AF99BE /* CommonCode */ = {
+			isa = PBXGroup;
+			children = (
+				913EF05220669DA700AF99BE /* Api */,
+				913EF05520669DA700AF99BE /* CocoaAsyncSocket */,
+				913EF04720669DA700AF99BE /* Misc */,
+				913EF04C20669DA700AF99BE /* Networking */,
+			);
+			path = CommonCode;
+			sourceTree = "<group>";
+		};
+		913EF04720669DA700AF99BE /* Misc */ = {
+			isa = PBXGroup;
+			children = (
+				913EF04B20669DA700AF99BE /* FlexErrors.swift */,
+				913EF04820669DA700AF99BE /* Log.swift */,
+				913EF04A20669DA700AF99BE /* Notifications.swift */,
+				913EF04920669DA700AF99BE /* RadioParameters.swift */,
+			);
+			path = Misc;
+			sourceTree = "<group>";
+		};
+		913EF04C20669DA700AF99BE /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				913EF05020669DA700AF99BE /* Pinger.swift */,
+				913EF04E20669DA700AF99BE /* TcpManager.swift */,
+				913EF04D20669DA700AF99BE /* UdpManager.swift */,
+				913EF04F20669DA700AF99BE /* Vita.swift */,
+				913EF05120669DA700AF99BE /* WanServer.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		913EF05220669DA700AF99BE /* Api */ = {
+			isa = PBXGroup;
+			children = (
+				913EF05420669DA700AF99BE /* Api.swift */,
+				913EF05320669DA700AF99BE /* RadioFactory.swift */,
+			);
+			path = Api;
+			sourceTree = "<group>";
+		};
+		913EF05520669DA700AF99BE /* CocoaAsyncSocket */ = {
+			isa = PBXGroup;
+			children = (
+				913EF05920669DA700AF99BE /* GCDAsyncSocket.h */,
+				913EF05720669DA700AF99BE /* GCDAsyncSocket.m */,
+				913EF05820669DA700AF99BE /* GCDAsyncUdpSocket.h */,
+				913EF05620669DA700AF99BE /* GCDAsyncUdpSocket.m */,
+			);
+			path = CocoaAsyncSocket;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -59,16 +317,18 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				913EF00B20669D6400AF99BE /* xLib6000_master.h in Headers */,
+				913EF06A20669DA700AF99BE /* xLib6000.h in Headers */,
+				913EF09820669DA700AF99BE /* GCDAsyncUdpSocket.h in Headers */,
+				913EF09920669DA700AF99BE /* GCDAsyncSocket.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		913EF00520669D6400AF99BE /* xLib6000-master */ = {
+		913EF00520669D6400AF99BE /* xLib6000 */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 913EF00E20669D6400AF99BE /* Build configuration list for PBXNativeTarget "xLib6000-master" */;
+			buildConfigurationList = 913EF00E20669D6400AF99BE /* Build configuration list for PBXNativeTarget "xLib6000" */;
 			buildPhases = (
 				913EF00120669D6400AF99BE /* Sources */,
 				913EF00220669D6400AF99BE /* Frameworks */,
@@ -79,9 +339,9 @@
 			);
 			dependencies = (
 			);
-			name = "xLib6000-master";
+			name = xLib6000;
 			productName = "xLib6000-master";
-			productReference = 913EF00620669D6400AF99BE /* xLib6000_master.framework */;
+			productReference = 913EF00620669D6400AF99BE /* xLib6000.framework */;
 			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
@@ -95,6 +355,7 @@
 				TargetAttributes = {
 					913EF00520669D6400AF99BE = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -111,7 +372,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				913EF00520669D6400AF99BE /* xLib6000-master */,
+				913EF00520669D6400AF99BE /* xLib6000 */,
 			);
 		};
 /* End PBXProject section */
@@ -121,6 +382,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				913EF06B20669DA700AF99BE /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +393,65 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				913EF08B20669DA700AF99BE /* Log.swift in Sources */,
+				913EF06220669DA700AF99BE /* Waterfall.swift in Sources */,
+				913EF09620669DA700AF99BE /* GCDAsyncUdpSocket.m in Sources */,
+				913EF05F20669DA700AF99BE /* MicAudioStream.swift in Sources */,
+				913EF09520669DA700AF99BE /* Api.swift in Sources */,
+				913EF08C20669DA700AF99BE /* RadioParameters.swift in Sources */,
+				913EF06F20669DA700AF99BE /* Wan.swift in Sources */,
+				913EF05C20669DA700AF99BE /* Tnf.swift in Sources */,
+				913EF07C20669DA700AF99BE /* AudioStreamCommands.swift in Sources */,
+				913EF08020669DA700AF99BE /* TransmitCommands.swift in Sources */,
+				913EF08520669DA700AF99BE /* MicAudioStreamCommands.swift in Sources */,
+				913EF08420669DA700AF99BE /* EqualizerCommands.swift in Sources */,
+				913EF05E20669DA700AF99BE /* IqStream.swift in Sources */,
+				913EF07F20669DA700AF99BE /* TxAudioStreamCommands.swift in Sources */,
+				913EF08F20669DA700AF99BE /* UdpManager.swift in Sources */,
+				913EF07820669DA700AF99BE /* IqStreamCommands.swift in Sources */,
+				913EF07420669DA700AF99BE /* Interlock.swift in Sources */,
+				913EF06520669DA700AF99BE /* TxAudioStream.swift in Sources */,
+				913EF06120669DA700AF99BE /* Amplifier.swift in Sources */,
+				913EF08620669DA700AF99BE /* MemoryCommands.swift in Sources */,
+				913EF06720669DA700AF99BE /* Equalizer.swift in Sources */,
+				913EF09120669DA700AF99BE /* Vita.swift in Sources */,
+				913EF09420669DA700AF99BE /* RadioFactory.swift in Sources */,
+				913EF06020669DA700AF99BE /* Memory.swift in Sources */,
+				913EF07B20669DA700AF99BE /* SliceCommands.swift in Sources */,
+				913EF08220669DA700AF99BE /* RadioCommands.swift in Sources */,
+				913EF09720669DA700AF99BE /* GCDAsyncSocket.m in Sources */,
+				913EF06820669DA700AF99BE /* AudioStream.swift in Sources */,
+				913EF09220669DA700AF99BE /* Pinger.swift in Sources */,
+				913EF08D20669DA700AF99BE /* Notifications.swift in Sources */,
+				913EF07120669DA700AF99BE /* Profile.swift in Sources */,
+				913EF07220669DA700AF99BE /* Transmit.swift in Sources */,
+				913EF07E20669DA700AF99BE /* AtuCommands.swift in Sources */,
+				913EF06420669DA700AF99BE /* Slice.swift in Sources */,
+				913EF06D20669DA700AF99BE /* Radio.swift in Sources */,
+				913EF08720669DA700AF99BE /* XvtrCommands.swift in Sources */,
+				913EF05B20669DA700AF99BE /* UsbCable.swift in Sources */,
+				913EF08820669DA700AF99BE /* InterlockCommands.swift in Sources */,
+				913EF09320669DA700AF99BE /* WanServer.swift in Sources */,
+				913EF07A20669DA700AF99BE /* AmplifierCommands.swift in Sources */,
+				913EF07720669DA700AF99BE /* ProfileCommands.swift in Sources */,
+				913EF08E20669DA700AF99BE /* FlexErrors.swift in Sources */,
+				913EF06320669DA700AF99BE /* Meter.swift in Sources */,
+				913EF08920669DA700AF99BE /* OpusCommands.swift in Sources */,
+				913EF08320669DA700AF99BE /* CwxCommands.swift in Sources */,
+				913EF05A20669DA700AF99BE /* Xvtr.swift in Sources */,
+				913EF08120669DA700AF99BE /* MeterCommands.swift in Sources */,
+				913EF06E20669DA700AF99BE /* Waveform.swift in Sources */,
+				913EF07D20669DA700AF99BE /* TnfCommands.swift in Sources */,
+				913EF05D20669DA700AF99BE /* Panadapter.swift in Sources */,
+				913EF07320669DA700AF99BE /* Cwx.swift in Sources */,
+				913EF06620669DA700AF99BE /* Opus.swift in Sources */,
+				913EF09020669DA700AF99BE /* TcpManager.swift in Sources */,
+				913EF07620669DA700AF99BE /* UsbCableCommands.swift in Sources */,
+				913EF07520669DA700AF99BE /* Atu.swift in Sources */,
+				913EF07020669DA700AF99BE /* Gps.swift in Sources */,
+				913EF08A20669DA700AF99BE /* PanadapterCommands.swift in Sources */,
+				913EF07920669DA700AF99BE /* WaterfallCommands.swift in Sources */,
+				913EF06C20669DA700AF99BE /* AppExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,6 +573,7 @@
 		913EF00F20669D6400AF99BE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -263,9 +585,10 @@
 				INFOPLIST_FILE = "xLib6000-master/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "net.k3tzr.xLib6000-master";
+				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xLib6000;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
@@ -273,6 +596,7 @@
 		913EF01020669D6400AF99BE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -284,7 +608,7 @@
 				INFOPLIST_FILE = "xLib6000-master/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "net.k3tzr.xLib6000-master";
+				PRODUCT_BUNDLE_IDENTIFIER = net.k3tzr.xLib6000;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 4.0;
@@ -303,7 +627,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		913EF00E20669D6400AF99BE /* Build configuration list for PBXNativeTarget "xLib6000-master" */ = {
+		913EF00E20669D6400AF99BE /* Build configuration list for PBXNativeTarget "xLib6000" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				913EF00F20669D6400AF99BE /* Debug */,
