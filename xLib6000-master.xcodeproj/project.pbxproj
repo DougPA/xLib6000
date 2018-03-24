@@ -23,7 +23,6 @@
 		913EF06720669DA700AF99BE /* Equalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01F20669DA700AF99BE /* Equalizer.swift */; };
 		913EF06820669DA700AF99BE /* AudioStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02020669DA700AF99BE /* AudioStream.swift */; };
 		913EF06A20669DA700AF99BE /* xLib6000.h in Headers */ = {isa = PBXBuildFile; fileRef = 913EF02220669DA700AF99BE /* xLib6000.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		913EF06B20669DA700AF99BE /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 913EF02320669DA700AF99BE /* README.md */; };
 		913EF06C20669DA700AF99BE /* AppExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02420669DA700AF99BE /* AppExtensions.swift */; };
 		913EF06D20669DA700AF99BE /* Radio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02620669DA700AF99BE /* Radio.swift */; };
 		913EF06E20669DA700AF99BE /* Waveform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02820669DA700AF99BE /* Waveform.swift */; };
@@ -91,7 +90,6 @@
 		913EF02020669DA700AF99BE /* AudioStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioStream.swift; sourceTree = "<group>"; };
 		913EF02120669DA700AF99BE /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		913EF02220669DA700AF99BE /* xLib6000.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xLib6000.h; sourceTree = "<group>"; };
-		913EF02320669DA700AF99BE /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		913EF02420669DA700AF99BE /* AppExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppExtensions.swift; sourceTree = "<group>"; };
 		913EF02620669DA700AF99BE /* Radio.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Radio.swift; sourceTree = "<group>"; };
 		913EF02820669DA700AF99BE /* Waveform.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Waveform.swift; sourceTree = "<group>"; };
@@ -172,7 +170,6 @@
 			children = (
 				913EF02420669DA700AF99BE /* AppExtensions.swift */,
 				913EF02120669DA700AF99BE /* Info.plist */,
-				913EF02320669DA700AF99BE /* README.md */,
 				913EF02220669DA700AF99BE /* xLib6000.h */,
 				913EF02520669DA700AF99BE /* Radio */,
 				913EF01120669DA700AF99BE /* Dynamic Models */,
@@ -382,7 +379,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				913EF06B20669DA700AF99BE /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
