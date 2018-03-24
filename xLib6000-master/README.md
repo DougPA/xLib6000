@@ -4,12 +4,10 @@
 Builds on macOS 10.13.3 using XCode 9.2 (9c40b) using Swift 4 with a Deployment
 Target of macOS 10.10
 
+NOTE: The Swift 4 Branch has been eliminated, the Master Branch is now the sole repository.
 
-
-** NOTE **: Version 0.9.1328 is a major reorganization of this framework. Most of the
-functionality is unchanged but a new class has been added (Api.swift) and the initialization of the
-framework has been changed to start with an Api object (not a Radio object).
-
+Version 1.0.1 is a reorganization of the file structure to reflect the use of Common Code between this
+framework and xAPITesterSL and xSDR6000
 
 ==========================================================================
 
