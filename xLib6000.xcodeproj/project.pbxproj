@@ -155,7 +155,7 @@
 			isa = PBXGroup;
 			children = (
 				913F7F8B2066F05B00F35E9B /* README.md */,
-				913EF00820669D6400AF99BE /* xLib6000-master */,
+				913EF00820669D6400AF99BE /* xLib6000 */,
 				913EF00720669D6400AF99BE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -168,7 +168,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		913EF00820669D6400AF99BE /* xLib6000-master */ = {
+		913EF00820669D6400AF99BE /* xLib6000 */ = {
 			isa = PBXGroup;
 			children = (
 				913EF02420669DA700AF99BE /* AppExtensions.swift */,
@@ -180,7 +180,7 @@
 				913EF03020669DA700AF99BE /* Commands */,
 				913EF04620669DA700AF99BE /* CommonCode */,
 			);
-			path = "xLib6000-master";
+			path = xLib6000;
 			sourceTree = "<group>";
 		};
 		913EF01120669DA700AF99BE /* Dynamic Models */ = {
@@ -340,7 +340,7 @@
 			dependencies = (
 			);
 			name = xLib6000;
-			productName = "xLib6000-master";
+			productName = "xLib6000";
 			productReference = 913EF00620669D6400AF99BE /* xLib6000.framework */;
 			productType = "com.apple.product-type.framework";
 		};
@@ -360,7 +360,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 913EF00020669D6400AF99BE /* Build configuration list for PBXProject "xLib6000-master" */;
+			buildConfigurationList = 913EF00020669D6400AF99BE /* Build configuration list for PBXProject "xLib6000" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -582,7 +582,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = "xLib6000-master/Info.plist";
+				INFOPLIST_FILE = xLib6000/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
@@ -606,7 +606,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = "xLib6000-master/Info.plist";
+				INFOPLIST_FILE = xLib6000/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
@@ -620,7 +620,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		913EF00020669D6400AF99BE /* Build configuration list for PBXProject "xLib6000-master" */ = {
+		913EF00020669D6400AF99BE /* Build configuration list for PBXProject "xLib6000" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				913EF00C20669D6400AF99BE /* Debug */,
