@@ -1,0 +1,8 @@
+xLib6000 Change Log
+
+v1.0.2
+
+added this file - ChangeLog.txt
+Changed project name & project folder from xLib6000-master to xLib6000
+Radio.swift - removed _localIP & _localUDPPort properties
+RadioCommands.swift - changed radio.localIP & radio.localUDPPort to _api.localIP & _api.localUDPPort
