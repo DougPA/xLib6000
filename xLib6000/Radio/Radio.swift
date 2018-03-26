@@ -100,8 +100,8 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   // MARK: - Private properties
   
   private var _radioInitialized = false
-  private var _localIP                      = "0.0.0.0"                     // client IP for radio
-  private var _localUDPPort                 : UInt16 = 0                    // bound UDP port
+//  private var _localIP                      = "0.0.0.0"                     // client IP for radio
+//  private var _localUDPPort                 : UInt16 = 0                    // bound UDP port
   private var _hardwareVersion              : String?                       // ???
 
   // GCD Queue
@@ -1942,13 +1942,13 @@ extension Radio {
     get { return _objectQ.sync { _iqStreams } }
     set { _objectQ.sync(flags: .barrier) { _iqStreams = newValue } } }
   
-  public var localIP: String {
-    get { return _objectQ.sync { _localIP } }
-    set { _objectQ.sync(flags: .barrier) { _localIP = newValue } } }
-  
-  public var localUDPPort: UInt16 {
-    get { return _objectQ.sync { _localUDPPort } }
-    set { _objectQ.sync(flags: .barrier) { _localUDPPort = newValue } } }
+//  public var localIP: String {
+//    get { return _objectQ.sync { _localIP } }
+//    set { _objectQ.sync(flags: .barrier) { _localIP = newValue } } }
+//  
+//  public var localUDPPort: UInt16 {
+//    get { return _objectQ.sync { _localUDPPort } }
+//    set { _objectQ.sync(flags: .barrier) { _localUDPPort = newValue } } }
 
   public var memories: [MemoryId: Memory] {
     get { return _objectQ.sync { _memories } }

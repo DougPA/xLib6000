@@ -334,13 +334,14 @@
 				913EF00220669D6400AF99BE /* Frameworks */,
 				913EF00320669D6400AF99BE /* Headers */,
 				913EF00420669D6400AF99BE /* Resources */,
+				91A2D8D52069352800676728 /* ShellScript */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = xLib6000;
-			productName = "xLib6000";
+			productName = xLib6000;
 			productReference = 913EF00620669D6400AF99BE /* xLib6000.framework */;
 			productType = "com.apple.product-type.framework";
 		};
@@ -387,6 +388,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		91A2D8D52069352800676728 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "buildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"${PROJECT_DIR}/${INFOPLIST_FILE}\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		913EF00120669D6400AF99BE /* Sources */ = {

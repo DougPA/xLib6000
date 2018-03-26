@@ -179,11 +179,11 @@ extension Radio {
     // if remote check only ip
     // TODO: this is a temporary fix and a flaw in Flex way to think.. :-)
     if isWan {
-      if localIP == statusIpStr {
+      if _api.localIP == statusIpStr {
         return true
       }
     } else {
-      if localIP == statusIpStr && localUDPPort == statusPort {
+      if _api.localIP == statusIpStr && _api.localUDPPort == statusPort {
         return true
       }
     }
