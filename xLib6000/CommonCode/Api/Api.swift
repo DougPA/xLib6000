@@ -190,7 +190,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
       case .initialized:                      // not connected but initialized
         
         // Create a Radio class
-        radio = Radio(api: self, objectQ: _objectQ)
+        radio = Radio(api: self, objectQ: _objectQ, isWan: isWan)
         
         activeRadio = selectedRadio
         
@@ -378,7 +378,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
         // set the streaming UDP port
         if isWan {
           // Wan, establish a UDP port for the Data Streams
-          _udp.bind(radioParameters: activeRadio!, isWan: true, clientHandle: wanConnectionHandle)
+          _udp.bind(radioParameters: activeRadio!, isWan: true, clientHandle: radio?.connectionHandle ?? "")
           
         } else {
           // Local
