@@ -88,7 +88,7 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
   ///   - isWan:                  enable WAN connection
   /// - Returns:                  success / failure
   ///
-  func connect(radioParameters: RadioParameters, isWan: Bool = false) -> Bool {
+  func connect(radioParameters: RadioParameters, isWan: Bool) -> Bool {
     
     _isWan = isWan
     var port = 0

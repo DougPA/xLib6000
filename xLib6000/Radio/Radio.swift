@@ -71,9 +71,6 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   public private(set) var uptime            = 0
   @objc dynamic public var radioVersion     : String { return _api.activeRadio?.firmwareVersion ?? "" }
   
-  public private(set) var isWan             : Bool
-  public private(set) var connectionHandle  : String?
-
   // Static models
   @objc dynamic public private(set) var atu       : Atu!                    // Atu model
   @objc dynamic public private(set) var cwx       : Cwx!                    // Cwx model
@@ -218,11 +215,10 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   /// - Parameters:
   ///   - api:        an Api instance
   ///
-  public init(api: Api, objectQ: DispatchQueue, isWan: Bool) {
+  public init(api: Api, objectQ: DispatchQueue) {
     
     _api = api
     _objectQ = objectQ
-    self.isWan = isWan
 
     super.init()
 
@@ -669,36 +665,28 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   ///   - inUse:          false = "to be deleted"
   ///
   func parseClient(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    var isMyHandle = false
     
     guard keyValues.count >= 2 else {
       
       Log.sharedInstance.msg("Invalid client status", level: .warning, function: #function, file: #file, line: #line)
       return
     }
-    // is there an API Handle?
-    if var apiHandle = connectionHandle {
+    // guard that the message has my API Handle
+    guard ("0x" + _api.connectionHandle == keyValues[0].key) else { return }
+    
+    // what is the message?
+    if keyValues[1].key == "connected" {
+      // Connected
+      _api.setConnectionState(.clientConnected)
       
-      // add "0x" to apiHandle
-      apiHandle = "0x" + apiHandle
-      isMyHandle = (apiHandle == keyValues[0].key)
-    }
-    if isMyHandle {
+    } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
+      // FIXME: Handle the disconnect?
+      // Disconnected
+      Log.sharedInstance.msg("Disconnect, forced=\(keyValues[2].value)", level: .verbose, function: #function, file: #file, line: #line)
       
-      if keyValues[1].key == "connected" {
-        
-        _api.setConnectionState(.clientConnected)
-        
-      } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
-        
-        // FIXME: Handle the disconnect
-        
-        Log.sharedInstance.msg("Disconnect, forced=\(keyValues[2].value)", level: .verbose, function: #function, file: #file, line: #line)
-        
-      } else {
-        
-        Log.sharedInstance.msg("Unprocessed message, \(remainder)", level: .warning, function: #function, file: #file, line: #line)
-      }
+    } else {
+      // Unrecognized
+      Log.sharedInstance.msg("Unprocessed message, \(remainder)", level: .warning, function: #function, file: #file, line: #line)
     }
   }
   
@@ -1370,7 +1358,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
     switch msg[msg.startIndex] {
       
     case "H", "h":   // Handle type
-      connectionHandle = suffix
+      _api.connectionHandle = suffix
       
     case "M", "m":   // Message Type
       parseMessage(suffix)

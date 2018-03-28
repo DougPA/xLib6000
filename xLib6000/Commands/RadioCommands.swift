@@ -178,7 +178,7 @@ extension Radio {
     // if local check ip and port
     // if remote check only ip
     // TODO: this is a temporary fix and a flaw in Flex way to think.. :-)
-    if isWan {
+    if _api.isWan {
       if _api.localIP == statusIpStr {
         return true
       }

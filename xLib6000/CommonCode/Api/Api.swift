@@ -77,6 +77,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   public var pingerEnabled                  = true                          // Pinger enable
   public var isWan                          = false                         // Remote connection
   public var wanConnectionHandle            = ""                            // Wan connection handle
+  public var connectionHandle               = ""                            // Status messages handle
 
   public private(set) var apiVersionMajor   = 0                             // numeric versions of Radio firmware version
   public private(set) var apiVersionMinor   = 0
@@ -190,7 +191,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
       case .initialized:                      // not connected but initialized
         
         // Create a Radio class
-        radio = Radio(api: self, objectQ: _objectQ, isWan: isWan)
+        radio = Radio(api: self, objectQ: _objectQ)
         
         activeRadio = selectedRadio
         
@@ -341,7 +342,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
       
       if !isWan {
         // establish a UDP port for the Data Streams
-        _udp.bind(radioParameters: activeRadio!, isWan: self.isWan)
+        _udp.bind(radioParameters: activeRadio!, isWan: isWan)
       } else {
         
         let cmd = "wan validate handle=" + wanConnectionHandle // TODO: + "\n"
@@ -378,7 +379,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
         // set the streaming UDP port
         if isWan {
           // Wan, establish a UDP port for the Data Streams
-          _udp.bind(radioParameters: activeRadio!, isWan: true, clientHandle: radio?.connectionHandle ?? "")
+          _udp.bind(radioParameters: activeRadio!, isWan: true, clientHandle: connectionHandle)
           
         } else {
           // Local
