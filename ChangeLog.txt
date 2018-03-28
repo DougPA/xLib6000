@@ -1,5 +1,10 @@
 xLib6000 Change Log
 
+v1.0.12
+
+APi.swift - changed setConnectionState(...) to public from internal
+Api.swift - added testerDelegate property & usage
+
 v1.0.7
 
 Api.swift - added connectionHandle property

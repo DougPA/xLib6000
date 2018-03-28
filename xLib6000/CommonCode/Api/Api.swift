@@ -72,6 +72,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
     return _radioFactory.availableRadios }
   public let log                            = Log.sharedInstance
   public var delegate                       : ApiDelegate?                  // API delegate
+  public var testerDelegate                 : ApiDelegate?                  // API delegate for xAPITester
   public var radio                          : Radio?                        // current Radio class
   public var activeRadio                    : RadioParameters?              // Radio params
   public var pingerEnabled                  = true                          // Pinger enable
@@ -314,16 +315,12 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
     // send the secondary commands
     sendCommandList(_secondaryCommands)
   }
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Internal methods
-  
   /// Called by the Tcp & Udp Manager delegates when a connection state change occurs
   ///
   /// - Parameters:
   ///   - state:  the new State
   ///
-  internal func setConnectionState(_ state: ConnectionState) {
+  public func setConnectionState(_ state: ConnectionState) {
     
     connectionState = state
     
@@ -622,23 +619,29 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
       _parseQ.async { [ unowned self ] in
         self.delegate?.receivedMessage( String(msg.dropLast()) )
       }
+      // pass it to xAPITester (if present)
+      testerDelegate?.receivedMessage( String(msg.dropLast()) )
     }
+    
   }
   /// Process a sent message
   ///
-  /// - Parameter text:         text of the message
+  /// - Parameter msg:         text of the message
   ///
-  func sentMessage(_ text: String) {
+  func sentMessage(_ msg: String) {
     
-    delegate?.sentMessage( String(text.dropLast()) )
+    delegate?.sentMessage( String(msg.dropLast()) )
+    
+    // pass it to xAPITester (if present)
+    testerDelegate?.sentMessage( String(msg.dropLast()) )
   }
   /// Receive an Error message from TCP Manager
   ///
-  /// - Parameter message:      the error message
+  /// - Parameter msg:          the error message
   ///
-  func tcpError(_ message: String) {
+  func tcpError(_ msg: String) {
     
-    log.msg("TCP error:  \(message)", level: .error, function: #function, file: #file, line: #line)
+    log.msg("TCP error:  \(msg)", level: .error, function: #function, file: #file, line: #line)
   }
   /// Respond to a TCP Connection/Disconnection event
   ///
@@ -726,6 +729,9 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   func udpStreamHandler(_ vitaPacket: Vita) {
     
     delegate?.streamHandler(vitaPacket)
+
+    // pass it to xAPITester (if present)
+    testerDelegate?.streamHandler(vitaPacket)
   }
 }
 
