@@ -218,7 +218,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   /// - Parameters:
   ///   - api:        an Api instance
   ///
-  public init(api: Api, objectQ: DispatchQueue, isWan: Bool = false) {
+  public init(api: Api, objectQ: DispatchQueue, isWan: Bool) {
     
     _api = api
     _objectQ = objectQ

@@ -1,5 +1,9 @@
 xLib6000 Change Log
 
+v1.0.5
+
+Radio.swift - removed default value for isWan from initializer
+
 v1.0.4
 
 Api.swift, connected(...) - added missing param "isWan: isWan" to Radio init method
