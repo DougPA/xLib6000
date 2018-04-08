@@ -54,18 +54,7 @@ extension xLib6000.Slice {
   ///   - value:      the new value
   ///
   private func sliceTuneCmd(_ value: Any) {
-    
-    
-    var cmd = xLib6000.Slice.kTuneCmd + "0x\(id) \(value)"
-    if !_autoPan {
-      cmd += "autopan=0"
-    }
-    Api.sharedInstance.send(cmd)
-    //Api.sharedInstance.send(xLib6000.Slice.kTuneCmd + "0x\(id) \(value) autopan=0")
-
-    
-    
-    
+        
     Api.sharedInstance.send(xLib6000.Slice.kTuneCmd + "0x\(id) \(value) autopan=\(_autoPan.asNumber())")
   }
   /// Set a Slice status property on the Radio
