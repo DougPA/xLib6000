@@ -2,6 +2,7 @@ xLib6000 Change Log
 
 v1.0.12
 
+Merged branch v1.0.5x (changes to Slice.swift and SliceCommands.swift) for autoPan property
 APi.swift - changed setConnectionState(...) to public from internal
 Api.swift - added testerDelegate property & usage
 
