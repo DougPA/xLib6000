@@ -53,6 +53,7 @@ public final class Slice                    : NSObject, StatusParser, Properties
   private var __audioGain                   = 0                             // Slice audio gain (0 - 100)
   private var __audioMute                   = false                         // State of slice audio MUTE
   private var __audioPan                    = 50                            // Slice audio pan (0 - 100)
+  private var __autoPan                     = false                         // panadapter frequency follows slice
   private var __daxChannel                  = 0                             // DAX channel for this slice (1-8)
   private var __daxTxEnabled                = false                         // DAX for transmit
   private var __dfmPreDeEmphasisEnabled     = false                         //
@@ -768,6 +769,10 @@ extension xLib6000.Slice {
     get { return _q.sync { __audioPan } }
     set { _q.sync(flags: .barrier) { __audioPan = newValue } } }
   
+  internal var _autoPan: Bool {
+    get { return _q.sync { __autoPan } }
+    set { _q.sync(flags: .barrier) { __autoPan = newValue } } }
+  
   internal var _daxChannel: Int {
     get { return _q.sync { __daxChannel } }
     set { _q.sync(flags: .barrier) { __daxChannel = newValue } } }
@@ -1011,6 +1016,10 @@ extension xLib6000.Slice {
   //          If yes, implement it, if not should they be "get" only?
   
   // listed in alphabetical order
+  @objc dynamic public var autoPan: Bool {
+    get { return _autoPan }
+    set { if _autoPan != newValue { _autoPan = newValue } } }
+  
   @objc dynamic public var daxClients: Int {
     get { return _daxClients }
     set { if _daxClients != newValue {  _daxClients = newValue } } }
