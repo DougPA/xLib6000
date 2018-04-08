@@ -7,9 +7,9 @@ Api.swift - added testerDelegate property & usage
 
 v1.0.7
 
-Api.swift - added connectionHandle property
-Radio.swift - removed connectionHandle property
-Radio.swift - changed usage of connectionHandle to use property on Api.swift
+Api.swift - added connectionHandle & isWan properties
+Radio.swift - removed connectionHandle  & isWan properties
+Radio.swift - changed usage of connectionHandle & isWan to use properties on Api.swift
 Radio.swift - removed isWan property from initializer
 TcpManager.swift - removed default value for isWan from connect(...) method
 UdpManager.swift - removed default value for isWan from bind(...) method
