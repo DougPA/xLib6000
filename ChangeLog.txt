@@ -3,6 +3,8 @@ xLib6000 Change Log
 v1.0.5
 
 Radio.swift - removed default value for isWan from initializer
+Slice.swift - added autoPan (Bool) property
+SliceCommands.swift - added autoPan to sliceTune(...) method
 
 v1.0.4
 
