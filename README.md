@@ -15,6 +15,10 @@
 This framework provides most of the capability of FlexLib but does not provide an identical  interface due to the  
 differences between the Windows and macOS environments and system services.
 
+If you want to learn more about the 6000 series API, please take a look at the xAPITester project. It uses this framework.
+
+* https://github.com/DougPA/xAPITester
+
 
 ## Builds
 
@@ -32,4 +36,4 @@ douglas.adams@me.com
 
 Version 7.6.3 of CocoaAsyncSocket is embedded in this project as source code. It can be found on GitHub at:  
 
-* https://github.com/robbiehanson/CocoaAsyncSocket)
+* https://github.com/robbiehanson/CocoaAsyncSocket
