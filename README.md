@@ -19,6 +19,10 @@ If you want to learn more about the 6000 series API, please take a look at the x
 
 * https://github.com/DougPA/xAPITester
 
+For an example of a SmartSDR-like client for the Mac, please take a look at the xSDR6000 project. It uses this framework.
+
+* https://github.com/DougPA/xSDR6000
+
 
 ## Builds
 
