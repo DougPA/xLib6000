@@ -12,14 +12,13 @@
 
 ## Usage
 
-This framework provides most of the capability of FlexLib but does not provide an identical   
-interface due to the differences between the Windows and macOS environments and system services.
+This framework provides most of the capability of FlexLib but does not provide an identical  interface due to the  
+differences between the Windows and macOS environments and system services.
 
 
 ## Builds
 
-A compiled RELEASE build executable is contained in the GitHub Release if you would  
-rather not build from sources.  
+A compiled RELEASE build executable is contained in the GitHub Release if you would rather not build from sources.  
 
 If you require a DEBUG build you will have to build from sources.   
 
@@ -31,7 +30,6 @@ douglas.adams@me.com
 
 ## Credits
 
-Version 7.6.3 of CocoaAsyncSocket is embedded in this project as source code.  
-It can be found on GitHub at:  
+Version 7.6.3 of CocoaAsyncSocket is embedded in this project as source code. It can be found on GitHub at:  
 
 * https://github.com/robbiehanson/CocoaAsyncSocket)
