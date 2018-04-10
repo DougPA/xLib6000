@@ -18,9 +18,9 @@ differences between the Windows and macOS environments and system services.
 
 ## Builds
 
-A compiled RELEASE build executable is contained in the GitHub Release if you would rather not build from sources.  
+A compiled DEBUG build executable is contained in the GitHub Release if you would rather not build from sources.  
 
-If you require a DEBUG build you will have to build from sources.   
+If you require a RELEASE build you will have to build from sources.   
 
 
 ## Comments / Questions
