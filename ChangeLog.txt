@@ -1,5 +1,9 @@
 xLib6000 Change Log
 
+v1.0.13
+
+Restructured folders to eliminate the "CommonCode" folder
+
 v1.0.12
 
 Merged branch v1.0.5x (changes to Slice.swift and SliceCommands.swift) for autoPan property

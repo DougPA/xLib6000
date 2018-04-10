@@ -177,11 +177,14 @@
 				913EF02420669DA700AF99BE /* AppExtensions.swift */,
 				913EF02120669DA700AF99BE /* Info.plist */,
 				913EF02220669DA700AF99BE /* xLib6000.h */,
+				913EF05220669DA700AF99BE /* Api */,
 				913EF02520669DA700AF99BE /* Radio */,
 				913EF01120669DA700AF99BE /* Dynamic Models */,
 				913EF02720669DA700AF99BE /* Static Models */,
 				913EF03020669DA700AF99BE /* Commands */,
-				913EF04620669DA700AF99BE /* CommonCode */,
+				913EF04C20669DA700AF99BE /* Networking */,
+				913EF04720669DA700AF99BE /* Misc */,
+				913EF05520669DA700AF99BE /* CocoaAsyncSocket */,
 			);
 			path = xLib6000;
 			sourceTree = "<group>";
@@ -257,17 +260,6 @@
 				913EF04220669DA700AF99BE /* XvtrCommands.swift */,
 			);
 			path = Commands;
-			sourceTree = "<group>";
-		};
-		913EF04620669DA700AF99BE /* CommonCode */ = {
-			isa = PBXGroup;
-			children = (
-				913EF05220669DA700AF99BE /* Api */,
-				913EF05520669DA700AF99BE /* CocoaAsyncSocket */,
-				913EF04720669DA700AF99BE /* Misc */,
-				913EF04C20669DA700AF99BE /* Networking */,
-			);
-			path = CommonCode;
 			sourceTree = "<group>";
 		};
 		913EF04720669DA700AF99BE /* Misc */ = {

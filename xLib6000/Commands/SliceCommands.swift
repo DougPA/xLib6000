@@ -21,7 +21,7 @@ extension xLib6000.Slice {
   //              slice create <value>...
   //              slice create pan=<value>...
   //              slice remove <SliceId>
-  //              slice tune <SliceId> <value> autopan=0
+  //              slice tune <SliceId> <value> autopan=<autoPan>
   //              slice <SliceId> <valueName>=<value>
   //              slice lock/unlock <SliceId>"
   //              slice set <SliceId> <valueName>=<value>
