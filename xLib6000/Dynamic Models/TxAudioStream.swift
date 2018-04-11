@@ -11,8 +11,10 @@ import Cocoa
 // ------------------------------------------------------------------------------
 // MARK: - TxAudioStream Class implementation
 //
-//      creates a UDP stream of audio, from the Client to the Radio (hardware),
-//      to be used by the Radio as transmit audio
+//      creates a TxAudioStream instance to be used by a Client to support the
+//      processing of a stream of Audio from the client to the Radio. TxAudioStream
+//      objects are added / removed by the incoming TCP messages. TxAudioStream
+//      objects periodically send Tx Audio in a UDP stream.
 //
 // ------------------------------------------------------------------------------
 
@@ -41,6 +43,50 @@ public final class TxAudioStream            : NSObject, StatusParser, Properties
   private var __txGainScalar                : Float = 1.0                   // scalar gain value for multiplying
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - StatusParser Protocol method
+  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  
+  /// Parse a TxAudioStream status message
+  ///
+  /// - Parameters:
+  ///   - keyValues:      a KeyValuesArray
+  ///   - radio:          the current Radio class
+  ///   - queue:          a parse Queue for the object
+  ///   - inUse:          false = "to be deleted"
+  ///
+  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
+    // Format:  <streamId, > <"dax_tx", channel> <"in_use", 1|0> <"ip", ip> <"port", port>
+    
+    //get the AudioStreamId (remove the "0x" prefix)
+    if let streamId =  UInt32(String(keyValues[0].key.dropFirst(2)), radix: 16) {
+      
+      // is the TX Audio Stream in use?
+      if inUse {
+        
+        // YES, does the AudioStream exist?
+        if radio.txAudioStreams[streamId] == nil {
+          
+          // NO, is this stream for this client?
+          if !radio.isAudioStreamStatusForThisClient(keyValues) { return }
+          
+          // create a new AudioStream & add it to the AudioStreams collection
+          radio.txAudioStreams[streamId] = TxAudioStream(id: streamId, queue: queue)
+        }
+        // pass the remaining key values to the AudioStream for parsing (dropping the Id)
+        radio.txAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        
+      } else {
+        
+        // NO, notify all observers
+        NC.post(.txAudioStreamWillBeRemoved, object: radio.txAudioStreams[streamId] as Any?)
+        
+        // remove it
+        radio.txAudioStreams[streamId] = nil
+      }
+    }
+  }
   
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -125,50 +171,6 @@ public final class TxAudioStream            : NSObject, StatusParser, Properties
       samplesSent += numSamplesToSend
     }
     return true
-  }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
-
-  /// Parse a TxAudioStream status message
-  ///
-  /// - Parameters:
-  ///   - keyValues:      a KeyValuesArray
-  ///   - radio:          the current Radio class
-  ///   - queue:          a parse Queue for the object
-  ///   - inUse:          false = "to be deleted"
-  ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format:  <streamId, > <"dax_tx", channel> <"in_use", 1|0> <"ip", ip> <"port", port>
-    
-    //get the AudioStreamId (remove the "0x" prefix)
-    if let streamId =  UInt32(String(keyValues[0].key.dropFirst(2)), radix: 16) {
-      
-      // is the TX Audio Stream in use?
-      if inUse {
-        
-        // YES, does the AudioStream exist?
-        if radio.txAudioStreams[streamId] == nil {
-          
-          // NO, is this stream for this client?
-          if !radio.isAudioStreamStatusForThisClient(keyValues) { return }
-          
-          // create a new AudioStream & add it to the AudioStreams collection
-          radio.txAudioStreams[streamId] = TxAudioStream(id: streamId, queue: queue)
-        }
-        // pass the remaining key values to the AudioStream for parsing (dropping the Id)
-        radio.txAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-        
-      } else {
-        
-        // NO, notify all observers
-        NC.post(.txAudioStreamWillBeRemoved, object: radio.txAudioStreams[streamId] as Any?)
-        
-        // remove it
-        radio.txAudioStreams[streamId] = nil
-      }
-    }
   }
   
   // ------------------------------------------------------------------------------

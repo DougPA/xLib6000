@@ -12,7 +12,8 @@ import Foundation
 // MARK: - Transmit Class implementation
 //
 //      creates a Transmit instance to be used by a Client to support the
-//      processing of the Transmit-related activities
+//      processing of the Transmit-related activities. Transmit objects are added,
+//      removed and updated by the incoming TCP messages.
 //
 // --------------------------------------------------------------------------------
 

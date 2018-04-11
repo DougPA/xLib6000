@@ -12,7 +12,8 @@ import Foundation
 // MARK: - Interlock Class implementation
 //
 //      creates an Interlock instance to be used by a Client to support the
-//      processing of interlocks
+//      processing of interlocks. Interlock objects are added, removed and 
+//      updated by the incoming TCP messages.
 //
 // --------------------------------------------------------------------------------
 

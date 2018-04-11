@@ -11,26 +11,30 @@ import simd
 
 public typealias PanadapterId = UInt32
 
-// --------------------------------------------------------------------------------
-// MARK: - PanadapterStreamHandler protocol
-//
-// --------------------------------------------------------------------------------
+//// --------------------------------------------------------------------------------
+//// MARK: - PanadapterStreamHandler protocol
+////
+//// --------------------------------------------------------------------------------
 
 public protocol PanadapterStreamHandler     : class {
-  
+
   // method to process Panadapter data stream
-  func panadapterStreamHandler(_ frame: PanadapterFrame) -> Void
+  func streamHandler(_ frame: PanadapterFrame) -> Void
 }
 
 // --------------------------------------------------------------------------------
 // MARK: - Panadapter implementation
 //
 //      creates a Panadapter instance to be used by a Client to support the
-//      rendering of a Panadapter
+//      processing of a Panadapter. Panadapter objects are added / removed by the
+//      incoming TCP messages. Panadapter objects periodically receive Panadapter
+//      data in a UDP stream.
 //
 // --------------------------------------------------------------------------------
 
-public final class Panadapter               : NSObject, StatusParser, PropertiesParser, VitaHandler {
+public final class Panadapter               : NSObject, StatusParser, PropertiesParser, VitaProcessor {
+  
+  static let kMaxBins                       = 5120
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -90,56 +94,10 @@ public final class Panadapter               : NSObject, StatusParser, Properties
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
-  // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize a Panadapter
-  ///
-  /// - Parameters:
-  ///   - streamId:           a Panadapter Stream Id
-  ///   - radio:              parent Radio class
-  ///   - queue:              Concurrent queue
-  ///
-  init(id: PanadapterId, queue: DispatchQueue) {
-    
-    self.id = id
-    _q = queue
-
-    // allocate two dataframes
-    _dataframes.append(PanadapterFrame(frameSize: 4096))
-    _dataframes.append(PanadapterFrame(frameSize: 4096))
-
-    super.init()
-  }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Panadapter Reply Handler
-  
-  /// Process the Reply to an Rf Gain Info command, reply format: <value>,<value>,...<value>
-  ///
-  /// - Parameters:
-  ///   - seqNum:         the Sequence Number of the original command
-  ///   - responseValue:  the response value
-  ///   - reply:          the reply
-  ///
-  func replyHandler(_ command: String, seqNum: String, responseValue: String, reply: String) {
-    
-    guard responseValue == Radio.kNoError else {
-      // Anything other than 0 is an error, log it and ignore the Reply
-      Log.sharedInstance.msg(command + ", non-zero reply - \(responseValue)", level: .error, function: #function, file: #file, line: #line)
-      return
-    }
-    // parse out the values
-    let rfGainInfo = reply.valuesArray( delimiter: "," )
-    _rfGainLow = rfGainInfo[0].iValue()
-    _rfGainHigh = rfGainInfo[1].iValue()
-    _rfGainStep = rfGainInfo[2].iValue()
-  }
-  
   // ----------------------------------------------------------------------------
   // MARK: - StatusParser Protocol method
   //     called by Radio.parseStatusMessage(_:), executes on the parseQ
-
+  
   /// Parse a Panadapter status message
   ///
   /// - Parameters:
@@ -186,6 +144,52 @@ public final class Panadapter               : NSObject, StatusParser, Properties
         NC.post(.panadapterWillBeRemoved, object: radio.panadapters[streamId] as Any?)
       }
     }
+  }
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize a Panadapter
+  ///
+  /// - Parameters:
+  ///   - streamId:           a Panadapter Stream Id
+  ///   - radio:              parent Radio class
+  ///   - queue:              Concurrent queue
+  ///
+  init(id: PanadapterId, queue: DispatchQueue) {
+    
+    self.id = id
+    _q = queue
+
+    // allocate two dataframes
+    _dataframes.append(PanadapterFrame(frameSize: Panadapter.kMaxBins))
+    _dataframes.append(PanadapterFrame(frameSize: Panadapter.kMaxBins))
+
+    super.init()
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Panadapter Reply Handler
+  
+  /// Process the Reply to an Rf Gain Info command, reply format: <value>,<value>,...<value>
+  ///
+  /// - Parameters:
+  ///   - seqNum:         the Sequence Number of the original command
+  ///   - responseValue:  the response value
+  ///   - reply:          the reply
+  ///
+  func replyHandler(_ command: String, seqNum: String, responseValue: String, reply: String) {
+    
+    guard responseValue == Radio.kNoError else {
+      // Anything other than 0 is an error, log it and ignore the Reply
+      Log.sharedInstance.msg(command + ", non-zero reply - \(responseValue)", level: .error, function: #function, file: #file, line: #line)
+      return
+    }
+    // parse out the values
+    let rfGainInfo = reply.valuesArray( delimiter: "," )
+    _rfGainLow = rfGainInfo[0].iValue()
+    _rfGainHigh = rfGainInfo[1].iValue()
+    _rfGainStep = rfGainInfo[2].iValue()
   }
   
   // ------------------------------------------------------------------------------
@@ -356,9 +360,9 @@ public final class Panadapter               : NSObject, StatusParser, Properties
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - VitaHandler Protocol method
+  // MARK: - VitaProcessor Protocol method
   
-  //      called by Radio on the udpReceiveQ
+  //      called by Radio on the streamQ
   //
   //      The payload of the incoming Vita struct is converted to a PanadapterFrame and
   //      passed to the Panadapter Stream Handler
@@ -368,7 +372,7 @@ public final class Panadapter               : NSObject, StatusParser, Properties
   /// - Parameters:
   ///   - vita:        a Vita struct
   ///
-  func vitaHandler(_ vita: Vita) {
+  func vitaProcessor(_ vita: Vita) {
     
     // use the next dataframe
     _dataframeIndex = (_dataframeIndex + 1) % 2
@@ -385,7 +389,8 @@ public final class Panadapter               : NSObject, StatusParser, Properties
     lastFrameIndex = _dataframes[_dataframeIndex].frameIndex
     
     // Pass the data frame to this Panadapter's delegate
-    delegate?.panadapterStreamHandler(_dataframes[_dataframeIndex])
+//    delegate?.panadapterStreamHandler(_dataframes[_dataframeIndex])
+    delegate?.streamHandler(_dataframes[_dataframeIndex])
   }
 }
 
@@ -437,9 +442,10 @@ public class PanadapterFrame {
     binSize = Int(CFSwapInt32BigToHost(p.pointee.binSize))
     frameIndex = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
     
-    if numberOfBins >= 4096 {
+    if numberOfBins >= Panadapter.kMaxBins {
       
-      Swift.print("\(p.pointee)")
+      Swift.print("Panadapter # bins > \(Panadapter.kMaxBins), \(p.pointee)")
+      
     } else {
       
       // get a pointer to the data in the payload
@@ -646,6 +652,7 @@ extension Panadapter {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
   
+//  public var delegate: PanadapterStreamHandler? {
   public var delegate: PanadapterStreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }

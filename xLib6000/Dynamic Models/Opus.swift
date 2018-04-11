@@ -21,19 +21,20 @@ public protocol OpusStreamHandler           : class {
   ///
   /// - Parameter frame:          an OpusFrame struct
   ///
-  func opusStreamHandler(_ frame: OpusFrame) -> Void
+  func streamHandler(_ frame: OpusFrame) -> Void
 }
 
 // --------------------------------------------------------------------------------
 // MARK: - Opus Class implementation
 //
 //      creates an Opus instance to be used by a Client to support the
-//      processing of Opus encoded Rx (from the Radio) and Tx (to the Radio)
-//      streams
+//      processing of a stream of Audio to/from the Radio from/to the client. Opus
+//      objects are added / removed by the incoming TCP messages. Opus
+//      objects periodically receive/send Opus Audio in a UDP stream.
 //
 // --------------------------------------------------------------------------------
 
-public final class Opus                     : NSObject, StatusParser, PropertiesParser, VitaHandler {
+public final class Opus                     : NSObject, StatusParser, PropertiesParser, VitaProcessor {
     
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
@@ -72,6 +73,36 @@ public final class Opus                     : NSObject, StatusParser, Properties
   //                                                                                                  
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
+  // ----------------------------------------------------------------------------
+  // MARK: - StatusParser Protocol method
+  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  
+  /// Parse an Opus status message
+  ///
+  /// - Parameters:
+  ///   - keyValues:      a KeyValuesArray
+  ///   - radio:          the current Radio class
+  ///   - queue:          a parse Queue for the object
+  ///   - inUse:          false = "to be deleted"
+  ///
+  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
+    // Format:  <streamId, > <"ip", ip> <"port", port> <"opus_rx_stream_stopped", 1|0>  <"rx_on", 1|0> <"tx_on", 1|0>
+    
+    // get the Opus Id (without the "0x" prefix)
+    //        let opusId = String(keyValues[0].key.characters.dropFirst(2))
+    if let streamId =  UInt32(String(keyValues[1].key.dropFirst(2)), radix: 16) {
+      
+      // does the Opus exist?
+      if  radio.opusStreams[streamId] == nil {
+        
+        // NO, create a new Opus & add it to the OpusStreams collection
+        radio.opusStreams[streamId] = Opus(id: streamId, queue: queue)
+      }
+      // pass the key values to Opus for parsing  (dropping the Id)
+      radio.opusStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+    }
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -128,36 +159,6 @@ public final class Opus                     : NSObject, StatusParser, Properties
     }
     // increment the sequence number (mod 16)
     txSeq = (txSeq + 1) % 16
-  }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
-
-  /// Parse an Opus status message
-  ///
-  /// - Parameters:
-  ///   - keyValues:      a KeyValuesArray
-  ///   - radio:          the current Radio class
-  ///   - queue:          a parse Queue for the object
-  ///   - inUse:          false = "to be deleted"
-  ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format:  <streamId, > <"ip", ip> <"port", port> <"opus_rx_stream_stopped", 1|0>  <"rx_on", 1|0> <"tx_on", 1|0>
-    
-    // get the Opus Id (without the "0x" prefix)
-    //        let opusId = String(keyValues[0].key.characters.dropFirst(2))
-    if let streamId =  UInt32(String(keyValues[1].key.dropFirst(2)), radix: 16) {
-      
-      // does the Opus exist?
-      if  radio.opusStreams[streamId] == nil {
-        
-        // NO, create a new Opus & add it to the OpusStreams collection
-        radio.opusStreams[streamId] = Opus(id: streamId, queue: queue)
-      }
-      // pass the key values to Opus for parsing  (dropping the Id)
-      radio.opusStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-    }
   }
   
   // ------------------------------------------------------------------------------
@@ -222,9 +223,9 @@ public final class Opus                     : NSObject, StatusParser, Properties
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - VitaHandler protocol methods
+  // MARK: - VitaProcessor protocol methods
   
-  //      called by Radio on the udpReceiveQ
+  //      called by Radio on the streamQ
   //
   //      The payload of the incoming Vita struct is converted to an OpusFrame and
   //      passed to the Opus Stream Handler where it is decoded
@@ -234,7 +235,7 @@ public final class Opus                     : NSObject, StatusParser, Properties
   /// - Parameters:
   ///   - vita:       an Opus Vita struct
   ///
-  func vitaHandler(_ vita: Vita) {
+  func vitaProcessor(_ vita: Vita) {
     
     // is this the first packet?
     if rxSeq == nil { rxSeq = vita.sequence }
@@ -263,7 +264,7 @@ public final class Opus                     : NSObject, StatusParser, Properties
     rxSeq = (rxSeq! + 1) % 16
     
     // Pass the data frame to the Opus delegate
-    delegate?.opusStreamHandler( OpusFrame(payload: vita.payload!, numberOfSamples: vita.payloadSize) )
+    delegate?.streamHandler( OpusFrame(payload: vita.payload!, numberOfSamples: vita.payloadSize) )
   }
 }
 

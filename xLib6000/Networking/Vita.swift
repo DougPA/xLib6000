@@ -9,13 +9,13 @@
 import Foundation
 
 // --------------------------------------------------------------------------------
-// MARK: - VitaHandler protocol
+// MARK: - VitaProcessor protocol
 //
 // --------------------------------------------------------------------------------
 
-protocol VitaHandler {
+protocol VitaProcessor {
   
-  func vitaHandler(_ vitaPacket: Vita) -> Void
+  func vitaProcessor(_ vitaPacket: Vita) -> Void
 }
 
 // ------------------------------------------------------------------------------
@@ -81,36 +81,6 @@ public class Vita {
   var payloadSize                     : Int = 0                             // Size of payload (bytes)
   var trailer                         : UInt32 = 0                          // Trailer, 4 bytes (if used)
   var headerSize                      : Int = MemoryLayout<VitaHeader>.size // Header size (bytes)
-  
-  /// Initialize this Vita struct with the defaults above
-  ///
-  init() {
-    // nothing needed, all values are defaulted
-  }
-  
-  /// Initialize a Vita struct as a dataWithStream (Ext or If)
-  ///
-  /// - Parameters:
-  ///   - packetType:     a Vita Packet Type (.extDataWithStream || .ifDataWithStream)
-  ///   - classCode:      a Vita Class Code
-  ///   - streamId:       a Stream ID (as a String, no "0x")
-  /// - Returns:          a partially populated Vita struct
-  ///
-  init(packetType: PacketType, classCode: PacketClassCode, streamId: UInt32, tsi: TsiType = .utc, tsf: TsfType = .sampleCount) {
-    
-    assert(packetType == .extDataWithStream || packetType == .ifDataWithStream)
-    
-    self.packetType = packetType
-    self.classCode = classCode
-    self.streamId = streamId
-    self.tsiType = tsi
-    self.tsfType = tsf
-    
-    // default values for:  HeaderSize, Oui, InformationClassCode, TimeStamp(s), Sequence,
-    //                      PacketSize, Payload, PayloadSize, Trailer
-    
-    // to be changed later: TimeStamps, Sequence, PacketSize, Payload, PayloadSize, Trailer
-  }
   
   // ----------------------------------------------------------------------------
   // MARK: - Class methods
@@ -427,6 +397,39 @@ public class Vita {
     return nil
   }
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize this Vita struct with the defaults above
+  ///
+  init() {
+    // nothing needed, all values are defaulted
+  }
+  
+  /// Initialize a Vita struct as a dataWithStream (Ext or If)
+  ///
+  /// - Parameters:
+  ///   - packetType:     a Vita Packet Type (.extDataWithStream || .ifDataWithStream)
+  ///   - classCode:      a Vita Class Code
+  ///   - streamId:       a Stream ID (as a String, no "0x")
+  /// - Returns:          a partially populated Vita struct
+  ///
+  init(packetType: PacketType, classCode: PacketClassCode, streamId: UInt32, tsi: TsiType = .utc, tsf: TsfType = .sampleCount) {
+    
+    assert(packetType == .extDataWithStream || packetType == .ifDataWithStream)
+    
+    self.packetType = packetType
+    self.classCode = classCode
+    self.streamId = streamId
+    self.tsiType = tsi
+    self.tsfType = tsf
+    
+    // default values for:  HeaderSize, Oui, InformationClassCode, TimeStamp(s), Sequence,
+    //                      PacketSize, Payload, PayloadSize, Trailer
+    
+    // to be changed later: TimeStamps, Sequence, PacketSize, Payload, PayloadSize, Trailer
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Instance methods
   

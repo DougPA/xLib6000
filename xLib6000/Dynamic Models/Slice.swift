@@ -14,7 +14,8 @@ public typealias SliceId = String
 // MARK: - Slice Class implementation
 //
 //      creates a Slice instance to be used by a Client to support the
-//      rendering of a Slice
+//      rendering of a Slice. Slice objects are added, removed and
+//      updated by the incoming TCP messages.
 //
 // ------------------------------------------------------------------------------
 
@@ -114,6 +115,57 @@ public final class Slice                    : NSObject, StatusParser, Properties
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ---------
   
+  // ----------------------------------------------------------------------------
+  // MARK: - StatusParser Protocol method
+  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  
+  /// Parse a Slice status message
+  ///
+  /// - Parameters:
+  ///   - keyValues:      a KeyValuesArray
+  ///   - radio:          the current Radio class
+  ///   - queue:          a parse Queue for the object
+  ///   - inUse:          false = "to be deleted"
+  ///
+  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
+    
+    // get the Slice Id
+    let sliceId = keyValues[0].key
+    
+    // is the Slice in use?
+    if inUse {
+      
+      // YES, does the Slice exist?
+      if radio.slices[sliceId] == nil {
+        
+        // NO, create a new Slice & add it to the Slices collection
+        radio.slices[sliceId] = xLib6000.Slice(id: sliceId, queue: queue)
+        
+        // scan the meters
+        for (_, meter) in radio.meters {
+          
+          // is this meter associated with this slice?
+          if meter.source == Meter.Source.slice.rawValue && meter.number == sliceId {
+            
+            // YES, add it to this Slice
+            radio.slices[sliceId]!.addMeter(meter)
+          }
+        }
+      }
+      // pass the remaining key values to the Slice for parsing (dropping the Id)
+      radio.slices[sliceId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      
+    } else {
+      
+      // NO, notify all observers
+      NC.post(.sliceWillBeRemoved, object: radio.slices[sliceId] as Any?)
+      
+      // remove it
+      radio.slices[sliceId] = nil
+      
+    }
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -279,57 +331,6 @@ public final class Slice                    : NSObject, StatusParser, Properties
       }
     }
     return newValue
-  }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
-
-  /// Parse a Slice status message
-  ///
-  /// - Parameters:
-  ///   - keyValues:      a KeyValuesArray
-  ///   - radio:          the current Radio class
-  ///   - queue:          a parse Queue for the object
-  ///   - inUse:          false = "to be deleted"
-  ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    
-    // get the Slice Id
-    let sliceId = keyValues[0].key
-    
-    // is the Slice in use?
-    if inUse {
-      
-      // YES, does the Slice exist?
-      if radio.slices[sliceId] == nil {
-        
-        // NO, create a new Slice & add it to the Slices collection
-        radio.slices[sliceId] = xLib6000.Slice(id: sliceId, queue: queue)
-        
-        // scan the meters
-        for (_, meter) in radio.meters {
-          
-          // is this meter associated with this slice?
-          if meter.source == Meter.Source.slice.rawValue && meter.number == sliceId {
-            
-            // YES, add it to this Slice
-            radio.slices[sliceId]!.addMeter(meter)
-          }
-        }
-      }
-      // pass the remaining key values to the Slice for parsing (dropping the Id)
-      radio.slices[sliceId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-      
-    } else {
-      
-      // NO, notify all observers
-      NC.post(.sliceWillBeRemoved, object: radio.slices[sliceId] as Any?)
-      
-      // remove it
-      radio.slices[sliceId] = nil
-      
-    }
   }
   
   // ----------------------------------------------------------------------------

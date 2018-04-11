@@ -535,8 +535,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
     case .client:
       //      kv                0         1            2
       //      format: client <handle> connected
-      //      format: client <handle> disconnected <forced=1/0>
-      
+      //      format: client <handle> disconnected <forced=1/0>      
       parseClient(remainder.keyValuesArray(), radio: self, queue: _objectQ)
       
     case .cwx:
@@ -1503,83 +1502,68 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   }
   /// Process received UDP Vita packets
   ///
-  /// - Parameter vitaPacket: a Vita packet
+  /// - Parameter vitaPacket:       a Vita packet
   ///
-  public func streamHandler(_ vitaPacket: Vita) {
+  public func vitaParser(_ vitaPacket: Vita) {
     
     _streamQ.async { [unowned self ] in
       
       // Pass the stream to the appropriate object
       switch (vitaPacket.classCode) {
         
-      case .daxAudio:
-        // what type of Dax packet?
-        if let audioStream = self.audioStreams[vitaPacket.streamId] {
-          // Audio
-          audioStream.vitaHandler(vitaPacket)
-          
-        } else if let micStream = self.micAudioStreams[vitaPacket.streamId] {
-          // Microphone
-          micStream.vitaHandler(vitaPacket)
-          
-        } else {
-          Log.sharedInstance.msg("UDP Stream error - \(vitaPacket.desc)", level: .error, function: #function, file: #file, line: #line)
-        }
+      case .daxAudio where self.audioStreams[vitaPacket.streamId] != nil:
+        // Dax Slice Audio
+        self.audioStreams[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         
-      case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
+      case .daxAudio where self.micAudioStreams[vitaPacket.streamId] != nil:
+        // Dax Microphone Audio
+        self.micAudioStreams[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         
-        if let iqStream = self.iqStreams[vitaPacket.streamId] {
-          iqStream.vitaHandler(vitaPacket)
-        } else {
-          Log.sharedInstance.msg("UDP Stream error - \(vitaPacket.desc)", level: .error, function: #function, file: #file, line: #line)
-        }
+      case .daxIq24 where self.iqStreams[vitaPacket.streamId] != nil,
+           .daxIq48 where self.iqStreams[vitaPacket.streamId] != nil,
+           .daxIq96 where self.iqStreams[vitaPacket.streamId] != nil,
+           .daxIq192 where self.iqStreams[vitaPacket.streamId] != nil:
+        // Dax IQ
+        self.iqStreams[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         
       case .meter:
-        // four bytes per Meter
-        let numberOfMeters = Int(vitaPacket.payloadSize / 4)
+        // Meter - unlike other streams, the Meter stream contains multiple Meters
+        //         and must be processed by a class method on the Meter object
+        Meter.vitaProcessor(vitaPacket)
         
-        // pointer to the first Meter number / Meter value pair
-        if let ptr16 = (vitaPacket.payload)?.bindMemory(to: UInt16.self, capacity: 2) {
-          
-          // for each meter in the Meters packet
-          for i in 0..<numberOfMeters {
-            
-            // get the Meter number and the Meter value
-            let meterNumber: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: 2 * i).pointee)
-            let meterValue: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: (2 * i) + 1).pointee)
-            
-            // Find the meter (if present) & update it
-            if let thisMeter = self.meters[String(format: "%i", meterNumber)] {
-              
-              // interpret it as a signed value
-              thisMeter.update( Int16(bitPattern: meterValue) )
-            }
-          }
-        }
+//        // four bytes per Meter
+//        let numberOfMeters = Int(vitaPacket.payloadSize / 4)
+//        
+//        // pointer to the first Meter number / Meter value pair
+//        if let ptr16 = (vitaPacket.payload)?.bindMemory(to: UInt16.self, capacity: 2) {
+//          
+//          // for each meter in the Meters packet
+//          for i in 0..<numberOfMeters {
+//            
+//            // get the Meter number and the Meter value
+//            let meterNumber: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: 2 * i).pointee)
+//            let meterValue: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: (2 * i) + 1).pointee)
+//            
+//            // Find the meter (if present) & update it
+//            if let thisMeter = self.meters[String(format: "%i", meterNumber)] {
+//              
+//              // interpret it as a signed value
+//              thisMeter.update( Int16(bitPattern: meterValue) )
+//            }
+//          }
+//        }
         
-      case .opus:
+      case .opus where self.opusStreams[vitaPacket.streamId] != nil:
+        // Opus
+        self.opusStreams[vitaPacket.streamId]!.vitaProcessor( vitaPacket )
         
-        if let opus = self.opusStreams[vitaPacket.streamId] {
-          opus.vitaHandler( vitaPacket )
-        } else {
-          Log.sharedInstance.msg("UDP Stream error - \(vitaPacket.desc)", level: .error, function: #function, file: #file, line: #line)
-        }
+      case .panadapter where self.panadapters[vitaPacket.streamId] != nil:
+        // Panadapter
+        self.panadapters[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         
-      case .panadapter:
-        
-        if let panadapter = self.panadapters[vitaPacket.streamId] {
-          panadapter.vitaHandler(vitaPacket)
-        } else {
-          Log.sharedInstance.msg("UDP Stream error - \(vitaPacket.desc)", level: .error, function: #function, file: #file, line: #line)
-        }
-        
-      case .waterfall:
-        
-        if let waterfall = self.waterfalls[vitaPacket.streamId] {
-          waterfall.vitaHandler(vitaPacket)
-        } else {
-          Log.sharedInstance.msg("UDP Stream error - \(vitaPacket.desc)", level: .error, function: #function, file: #file, line: #line)
-        }
+      case .waterfall where self.waterfalls[vitaPacket.streamId] != nil:
+        // Waterfall
+        self.waterfalls[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         
       default:
         // log the error

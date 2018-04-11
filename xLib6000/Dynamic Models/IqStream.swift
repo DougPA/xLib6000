@@ -20,19 +20,20 @@ public protocol IqStreamHandler             : class {
   ///
   /// - Parameter frame:          an IqStreamFrame struct
   ///
-  func iqStreamHandler(_ frame: IqStreamFrame)
+  func streamHandler(_ frame: IqStreamFrame)
 }
 
 // ------------------------------------------------------------------------------
 // MARK: - IqStream Class implementation
 //
-//      creates a UDP stream of I / Q data, from a Panadapter in the Radio (hardware) to
-//      to the Client, to be used by the client for various purposes (e.g. CW Skimmer,
-//      digital modes, etc.)
+//      creates an IqStream instance to be used by a Client to support the
+//      processing of a stream of IQ data from the Radio to the client. IqStream
+//      objects are added / removed by the incoming TCP messages. IqStream
+//      objects periodically receive IQ data in a UDP stream.
 //
 // ------------------------------------------------------------------------------
 
-public final class IqStream                 : NSObject, StatusParser, PropertiesParser {
+public final class IqStream                 : NSObject, StatusParser, PropertiesParser, VitaProcessor {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
@@ -67,24 +68,6 @@ public final class IqStream                 : NSObject, StatusParser, Properties
   private weak var _delegate                : IqStreamHandler?              // Delegate for IQ stream
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -------
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize an IQ Stream
-  ///
-  /// - Parameters:
-  ///   - id:                 the Stream Id
-  ///   - radio:              the Radio instance
-  ///   - queue:              Concurrent queue
-  ///
-  init(id: DaxStreamId, queue: DispatchQueue) {
-    
-    self.id = id
-    _q = queue
-    
-    super.init()
-  }
   
   // ----------------------------------------------------------------------------
   // MARK: - StatusParser Protocol method
@@ -130,6 +113,24 @@ public final class IqStream                 : NSObject, StatusParser, Properties
     }
   }
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize an IQ Stream
+  ///
+  /// - Parameters:
+  ///   - id:                 the Stream Id
+  ///   - radio:              the Radio instance
+  ///   - queue:              Concurrent queue
+  ///
+  init(id: DaxStreamId, queue: DispatchQueue) {
+    
+    self.id = id
+    _q = queue
+    
+    super.init()
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - PropertiesParser Protocol method
   //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
@@ -209,9 +210,9 @@ public final class IqStream                 : NSObject, StatusParser, Properties
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - VitaHandler Protocol method
+  // MARK: - VitaProcessor Protocol method
   
-  //      called by Radio on the udpReceiveQ
+  //      called by Radio on the streamQ
   //
   //      The payload of the incoming Vita struct is converted to an IqStreamFrame and
   //      passed to the IQ Stream Handler
@@ -221,7 +222,7 @@ public final class IqStream                 : NSObject, StatusParser, Properties
   /// - Parameters:
   ///   - vita:       a Vita struct
   ///
-  func vitaHandler(_ vita: Vita) {
+  func vitaProcessor(_ vita: Vita) {
     
     if vita.classCode != .daxIq24 && vita.classCode != .daxIq48 && vita.classCode != .daxIq96 && vita.classCode != .daxIq192 {
       // not for us
@@ -258,7 +259,7 @@ public final class IqStream                 : NSObject, StatusParser, Properties
       vDSP_vsmul(&dataRight, 1, &_kOneOverZeroDBfs, &(dataFrame.imagSamples), 1, vDSP_Length(dataFrame.samples))
       
       // Pass the data frame to this AudioSream's delegate
-      delegate.iqStreamHandler(dataFrame)
+      delegate.streamHandler(dataFrame)
     }
     
     // calculate the next Sequence Number

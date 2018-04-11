@@ -12,7 +12,8 @@ import Foundation
 // MARK: - Waveform Class implementation
 //
 //      creates a Waveform instance to be used by a Client to support the
-//      processing of installed Waveform functions
+//      processing of installed Waveform functions. Waveform objects are added,
+//      removed and updated by the incoming TCP messages.
 //
 // --------------------------------------------------------------------------------
 

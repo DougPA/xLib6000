@@ -19,18 +19,20 @@ public protocol MicAudioStreamHandler       : class {
   ///
   /// - Parameter frame:          a MicAudioStreamFrame struct
   ///
-  func micAudioStreamHandler(_ frame: MicAudioStreamFrame)
+  func streamHandler(_ frame: MicAudioStreamFrame)
 }
 
 // ------------------------------------------------------------------------------
 // MARK: - MicAudioStream Class implementation
 //
-//      creates a UDP stream of audio, from the Radio (hardware) to the Client,
-//      containing the Radio's transmit audio
+//      creates a MicAudioStream instance to be used by a Client to support the
+//      processing of a stream of Mic Audio from the Radio to the client. MicAudioStream
+//      objects are added / removed by the incoming TCP messages. MicAudioStream
+//      objects periodically receive Mic Audio in a UDP stream.
 //
 // ------------------------------------------------------------------------------
 
-public final class MicAudioStream           : NSObject, StatusParser, PropertiesParser, VitaHandler {
+public final class MicAudioStream           : NSObject, StatusParser, PropertiesParser, VitaProcessor {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
@@ -60,27 +62,9 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
   // ----------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize an Mic Audio Stream
-  ///
-  /// - Parameters:
-  ///   - id:                 a Dax Stream Id
-  ///   - radio:              the Radio instance
-  ///   - queue:              Concurrent queue
-  ///
-  init(id: DaxStreamId, queue: DispatchQueue) {
-    
-    self.id = id
-    _q = queue
-    
-    super.init()
-  }
-  
-  // ----------------------------------------------------------------------------
   // MARK: - StatusParser Protocol method
   //     called by Radio.parseStatusMessage(_:), executes on the parseQ
-
+  
   /// Parse a Mic AudioStream status message
   ///
   /// - Parameters:
@@ -119,6 +103,24 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
         radio.micAudioStreams[streamId] = nil
       }
     }
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize an Mic Audio Stream
+  ///
+  /// - Parameters:
+  ///   - id:                 a Dax Stream Id
+  ///   - radio:              the Radio instance
+  ///   - queue:              Concurrent queue
+  ///
+  init(id: DaxStreamId, queue: DispatchQueue) {
+    
+    self.id = id
+    _q = queue
+    
+    super.init()
   }
   
   // ------------------------------------------------------------------------------
@@ -172,9 +174,9 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - VitaHandler protocol methods
+  // MARK: - VitaProcessor protocol methods
   
-  //      called by Radio on the udpReceiveQ
+  //      called by Radio on the streamQ
   //
   //      The payload of the incoming Vita struct is converted to a MicAudioStreamFrame and
   //      passed to the Mic Audio Stream Handler
@@ -184,7 +186,7 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
   /// - Parameters:
   ///   - vitaPacket:         a Vita struct
   ///
-  func vitaHandler(_ vita: Vita) {
+  func vitaProcessor(_ vita: Vita) {
     
     if vita.classCode != .daxAudio {
       // not for us
@@ -229,7 +231,7 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
       }
       
       // Pass the data frame to this AudioSream's delegate
-      delegate.micAudioStreamHandler(dataFrame)
+      delegate.streamHandler(dataFrame)
     }
     
     // calculate the next Sequence Number

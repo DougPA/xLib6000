@@ -12,7 +12,8 @@ import Foundation
 // MARK: - Profile Class implementation
 //
 //      creates a Profiles instance to be used by a Client to support the
-//      processing of the profiles
+//      processing of the profiles. Profile objects are added, removed and
+//      updated by the incoming TCP messages.
 //
 // --------------------------------------------------------------------------------
 

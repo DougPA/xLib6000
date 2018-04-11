@@ -18,18 +18,20 @@ public typealias WaterfallId = UInt32
 public protocol WaterfallStreamHandler      : class {
   
   // method to process Waterfall data stream
-  func waterfallStreamHandler(_ dataFrame: WaterfallFrame ) -> Void
+  func streamHandler(_ dataFrame: WaterfallFrame ) -> Void
 }
 
 // --------------------------------------------------------------------------------
 // MARK: - Waterfall Class implementation
 //
 //      creates a Waterfall instance to be used by a Client to support the
-//      rendering of a Waterfall
+//      processing of a Waterfall. Waterfall objects are added / removed by the
+//      incoming TCP messages. Waterfall objects periodically receive Waterfall
+//      data in a UDP stream.
 //
 // --------------------------------------------------------------------------------
 
-public final class Waterfall                : NSObject, StatusParser, PropertiesParser, VitaHandler {
+public final class Waterfall                : NSObject, StatusParser, PropertiesParser, VitaProcessor {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -62,32 +64,10 @@ public final class Waterfall                : NSObject, StatusParser, Properties
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
-  // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize a Waterfall
-  ///
-  /// - Parameters:
-  ///   - streamId:           a Waterfall Id
-  ///   - radio:              parent Radio class
-  ///   - queue:              Concurrent queue
-  ///
-  public init(id: WaterfallId, queue: DispatchQueue) {
-    
-    self.id = id
-    _q = queue
-    
-    // allocate two dataframes
-    _dataframes.append(WaterfallFrame(frameSize: 4096))
-    _dataframes.append(WaterfallFrame(frameSize: 4096))
-
-    super.init()
-  }
-  
   // ----------------------------------------------------------------------------
   // MARK: - StatusParser Protocol method
   //     called by Radio.parseStatusMessage(_:), executes on the parseQ
-
+  
   /// Parse a Waterfall status message
   ///
   /// - Parameters:
@@ -135,6 +115,28 @@ public final class Waterfall                : NSObject, StatusParser, Properties
         radio.waterfalls[streamId] = nil
       }
     }
+  }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize a Waterfall
+  ///
+  /// - Parameters:
+  ///   - streamId:           a Waterfall Id
+  ///   - radio:              parent Radio class
+  ///   - queue:              Concurrent queue
+  ///
+  public init(id: WaterfallId, queue: DispatchQueue) {
+    
+    self.id = id
+    _q = queue
+    
+    // allocate two dataframes
+    _dataframes.append(WaterfallFrame(frameSize: 4096))
+    _dataframes.append(WaterfallFrame(frameSize: 4096))
+
+    super.init()
   }
   
   // ------------------------------------------------------------------------------
@@ -208,9 +210,9 @@ public final class Waterfall                : NSObject, StatusParser, Properties
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - VitaHandler protocol methods
+  // MARK: - VitaProcessor protocol methods
   
-  //      called by Radio on the udpReceiveQ
+  //      called by Radio on the streamQ
   //
   //      The payload of the incoming Vita struct is converted to a WaterfallFrame and
   //      passed to the Waterfall Stream Handler
@@ -220,7 +222,7 @@ public final class Waterfall                : NSObject, StatusParser, Properties
   /// - Parameters:
   ///   - vita:       a Vita struct
   ///
-  func vitaHandler(_ vita: Vita) {
+  func vitaProcessor(_ vita: Vita) {
     
     // use the next dataframe
     _dataframeIndex = (_dataframeIndex + 1) % 2
@@ -241,7 +243,7 @@ public final class Waterfall                : NSObject, StatusParser, Properties
     _autoBlackLevel = _dataframes[_dataframeIndex].autoBlackLevel
     
     // Pass the data frame to this Waterfall's delegate
-    delegate?.waterfallStreamHandler(_dataframes[_dataframeIndex])
+    delegate?.streamHandler(_dataframes[_dataframeIndex])
   }
 }
 

@@ -14,7 +14,8 @@ public typealias MemoryId = String
 // MARK: - Memory Class implementation
 //
 //      creates a Memory instance to be used by a Client to support the
-//      processing of a Memory
+//      processing of a Memory. Memory objects are added, removed and
+//      updated by the incoming TCP messages.
 //
 // --------------------------------------------------------------------------------
 
@@ -55,6 +56,48 @@ public final class Memory                   : NSObject, StatusParser, Properties
   //                                                                                                  
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
+  // ----------------------------------------------------------------------------
+  // MARK: - StatusParser Protocol method
+  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  
+  /// Parse a Memory status message
+  ///
+  /// - Parameters:
+  ///   - keyValues:      a KeyValuesArray
+  ///   - radio:          the current Radio class
+  ///   - queue:          a parse Queue for the object
+  ///   - inUse:          false = "to be deleted"
+  ///
+  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
+    var memory: Memory?
+    
+    // get the Memory Id
+    let memoryId = keyValues[0].key
+    
+    // is the Memory in use?
+    if inUse {
+      
+      // YES, does it exist?
+      memory = radio.memories[memoryId]
+      if memory == nil {
+        
+        // NO, create a new Memory & add it to the Memories collection
+        memory = Memory(id: memoryId, queue: queue)
+        radio.memories[memoryId] = memory
+      }
+      // pass the key values to the Memory for parsing (dropping the Id)
+      memory!.parseProperties( Array(keyValues.dropFirst(1)) )
+      
+    } else {
+      
+      // NO, notify all observers
+      NC.post(.memoryWillBeRemoved, object: radio.memories[memoryId] as Any?)
+      
+      // remove it
+      radio.memories[memoryId] = nil
+    }
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -154,48 +197,6 @@ public final class Memory                   : NSObject, StatusParser, Properties
   func toneValueValid( _ value: Int) -> Bool {
     
     return toneMode == ToneMode.ctcssTx.rawValue && toneValue.within(0, 301)
-  }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
-
-  /// Parse a Memory status message
-  ///
-  /// - Parameters:
-  ///   - keyValues:      a KeyValuesArray
-  ///   - radio:          the current Radio class
-  ///   - queue:          a parse Queue for the object
-  ///   - inUse:          false = "to be deleted"
-  ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    var memory: Memory?
-    
-    // get the Memory Id
-    let memoryId = keyValues[0].key
-    
-    // is the Memory in use?
-    if inUse {
-      
-      // YES, does it exist?
-      memory = radio.memories[memoryId]
-      if memory == nil {
-        
-        // NO, create a new Memory & add it to the Memories collection
-        memory = Memory(id: memoryId, queue: queue)
-        radio.memories[memoryId] = memory
-      }
-      // pass the key values to the Memory for parsing (dropping the Id)
-      memory!.parseProperties( Array(keyValues.dropFirst(1)) )
-      
-    } else {
-      
-      // NO, notify all observers
-      NC.post(.memoryWillBeRemoved, object: radio.memories[memoryId] as Any?)
-      
-      // remove it
-      radio.memories[memoryId] = nil
-    }
   }
   
   // ------------------------------------------------------------------------------

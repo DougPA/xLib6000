@@ -14,7 +14,8 @@ public typealias AmplifierId = String
 // MARK: - Amplifier Class implementation
 //
 //      creates an Amplifier instance to be used by a Client to support the
-//      control of an external Amplifier
+//      control of an external Amplifier. Amplifier objects are added, removed and
+//      updated by the incoming TCP messages.
 //
 // ------------------------------------------------------------------------------
 
@@ -41,24 +42,6 @@ public final class Amplifier                : NSObject, StatusParser, Properties
   private var __serialNumber                = ""                            // Serial number
   //                                                                                              
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize an Amplifier
-  ///
-  /// - Parameters:
-  ///   - id:                 an Xvtr Id
-  ///   - radio:              parent Radio class
-  ///   - queue:              Concurrent queue
-  ///
-  public init(id: AmplifierId, queue: DispatchQueue) {
-    
-    self.id = id
-    _q = queue
-    
-    super.init()
-  }
   
   // ----------------------------------------------------------------------------
   // MARK: - StatusParser Protocol method
@@ -103,6 +86,25 @@ public final class Amplifier                : NSObject, StatusParser, Properties
       radio.amplifiers[streamId] = nil
     }
   }
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize an Amplifier
+  ///
+  /// - Parameters:
+  ///   - id:                 an Xvtr Id
+  ///   - radio:              parent Radio class
+  ///   - queue:              Concurrent queue
+  ///
+  public init(id: AmplifierId, queue: DispatchQueue) {
+    
+    self.id = id
+    _q = queue
+    
+    super.init()
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - PropertiesParser Protocol method
   //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ

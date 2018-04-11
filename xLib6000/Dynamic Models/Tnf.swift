@@ -14,7 +14,8 @@ public typealias TnfId = String
 // MARK: - TNF Class implementation
 //
 //      creates a Tnf instance to be used by a Client to support the
-//      rendering of a Tnf
+//      rendering of a Tnf. Tnf objects are added, removed and
+//      updated by the incoming TCP messages.
 //
 // ------------------------------------------------------------------------------
 
@@ -43,6 +44,33 @@ public final class Tnf                      : NSObject, StatusParser, Properties
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
+  // ----------------------------------------------------------------------------
+  // MARK: - StatusParser Protocol method
+  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  
+  /// Parse a Tnf status message
+  ///
+  /// - Parameters:
+  ///   - keyValues:      a KeyValuesArray
+  ///   - radio:          the current Radio class
+  ///   - queue:          a parse Queue for the object
+  ///   - inUse:          false = "to be deleted"
+  ///
+  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
+    
+    // get the Tnf Id
+    let tnfId = keyValues[0].key
+    
+    // does the TNF exist?
+    if radio.tnfs[tnfId] == nil {
+      
+      // NO, create a new Tnf & add it to the Tnfs collection
+      radio.tnfs[tnfId] = Tnf(id: tnfId, queue: queue)
+    }
+    // pass the remaining key values to the Tnf for parsing (dropping the Id)
+    radio.tnfs[tnfId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -89,33 +117,6 @@ public final class Tnf                      : NSObject, StatusParser, Properties
     self.depth = depth
     self.width = width
     self.permanent = permanent
-  }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
-
-  /// Parse a Tnf status message
-  ///
-  /// - Parameters:
-  ///   - keyValues:      a KeyValuesArray
-  ///   - radio:          the current Radio class
-  ///   - queue:          a parse Queue for the object
-  ///   - inUse:          false = "to be deleted"
-  ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    
-    // get the Tnf Id
-    let tnfId = keyValues[0].key
-    
-    // does the TNF exist?
-    if radio.tnfs[tnfId] == nil {
-      
-      // NO, create a new Tnf & add it to the Tnfs collection
-      radio.tnfs[tnfId] = Tnf(id: tnfId, queue: queue)
-    }
-    // pass the remaining key values to the Tnf for parsing (dropping the Id)
-    radio.tnfs[tnfId]!.parseProperties( Array(keyValues.dropFirst(1)) )
   }
   
   // ------------------------------------------------------------------------------

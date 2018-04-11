@@ -273,7 +273,7 @@ public extension String {
     let parts = self.components(separatedBy: ".")
     
     // convert each value to an Int
-    let nums = parts.flatMap { Int($0) }
+    let nums = parts.compactMap { Int($0) }
     
     // must have 4 values containing 4 numbers & 0 <= number < 256
     return parts.count == 4 && nums.count == 4 && nums.filter { $0 >= 0 && $0 < 256}.count == 4

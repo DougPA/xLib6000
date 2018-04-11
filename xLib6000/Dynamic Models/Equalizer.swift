@@ -14,7 +14,8 @@ public typealias EqualizerId = String
 // MARK: - Equalizer Class implementation
 //
 //      creates an Equalizer instance to be used by a Client to support the
-//      rendering of an Equalizer
+//      rendering of an Equalizer. Equalizer objects are added, removed and
+//      updated by the incoming TCP messages.
 //
 //      Note: ignores the non-"sc" version of Equalizer messages
 //            The "sc" version is the standard for API Version 1.4 and greater
@@ -46,24 +47,6 @@ public final class Equalizer                : NSObject, StatusParser, Properties
   private var __level8000Hz                 = 0
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize an Equalizer
-  ///
-  /// - Parameters:
-  ///   - eqType:             the Equalizer type (rxsc or txsc)
-  ///   - radio:              the parent Radio class
-  ///   - queue:              Concurrent queue
-  ///
-  init(id: EqualizerId, queue: DispatchQueue) {
-    
-    self.id = id
-    _q = queue
-    
-    super.init()
-  }
   
   // ----------------------------------------------------------------------------
   // MARK: - StatusParser Protocol method
@@ -113,6 +96,24 @@ public final class Equalizer                : NSObject, StatusParser, Properties
     }
   }
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize an Equalizer
+  ///
+  /// - Parameters:
+  ///   - eqType:             the Equalizer type (rxsc or txsc)
+  ///   - radio:              the parent Radio class
+  ///   - queue:              Concurrent queue
+  ///
+  init(id: EqualizerId, queue: DispatchQueue) {
+    
+    self.id = id
+    _q = queue
+    
+    super.init()
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - PropertiesParser Protocol method
   //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ

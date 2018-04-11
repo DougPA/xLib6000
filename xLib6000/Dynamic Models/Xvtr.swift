@@ -14,7 +14,8 @@ import Foundation
 // MARK: - Xvtr Class implementation
 //
 //      creates an Xvtr instance to be used by a Client to support the
-//      processing of an Xvtr
+//      processing of an Xvtr. Xvtr objects are added, removed and updated by
+//      the incoming TCP messages.
 //
 // --------------------------------------------------------------------------------
 
@@ -48,28 +49,10 @@ public final class Xvtr                     : NSObject, StatusParser, Properties
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
-  // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize an Xvtr
-  ///
-  /// - Parameters:
-  ///   - id:                 an Xvtr Id
-  ///   - radio:              parent Radio class
-  ///   - queue:              Concurrent queue
-  ///
-  public init(id: XvtrId, queue: DispatchQueue) {
-    
-    self.id = id
-    _q = queue
-    
-    super.init()
-  }
-  
   // ----------------------------------------------------------------------------
   // MARK: - StatusParser Protocol method
   //     called by Radio.parseStatusMessage(_:), executes on the parseQ
-
+  
   /// Parse an Xvtr status message
   ///
   /// - Parameters:
@@ -108,6 +91,24 @@ public final class Xvtr                     : NSObject, StatusParser, Properties
       // remove it
       radio.xvtrs[name] = nil
     }
+  }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize an Xvtr
+  ///
+  /// - Parameters:
+  ///   - id:                 an Xvtr Id
+  ///   - radio:              parent Radio class
+  ///   - queue:              Concurrent queue
+  ///
+  public init(id: XvtrId, queue: DispatchQueue) {
+    
+    self.id = id
+    _q = queue
+    
+    super.init()
   }
   
   // ------------------------------------------------------------------------------

@@ -44,9 +44,9 @@ public protocol ApiDelegate {
   
   /// Process received UDP Vita packets
   ///
-  /// - Parameter vitaPacket: a Vita packet
+  /// - Parameter vitaPacket:     a Vita packet
   ///
-  func streamHandler(_ vitaPacket: Vita)
+  func vitaParser(_ vitaPacket: Vita)
 }
 
 // --------------------------------------------------------------------------------
@@ -604,7 +604,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   
   // ----------------------------------------------------------------------------
   // MARK: - TcpManagerDelegate methods
-  //    executes on the tcpReceiveQ
+  //    arrives on the tcpReceiveQ
 
   /// Process a received message
   ///
@@ -615,14 +615,14 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
     // is it a non-empty message?
     if msg.count > 1 {
       
-      // YES, pass it to the parser
+      // YES, pass it to the parser (async on the parseQ)
       _parseQ.async { [ unowned self ] in
         self.delegate?.receivedMessage( String(msg.dropLast()) )
+
+        // pass it to xAPITester (if present)
+        self.testerDelegate?.receivedMessage( String(msg.dropLast()) )
       }
-      // pass it to xAPITester (if present)
-      testerDelegate?.receivedMessage( String(msg.dropLast()) )
     }
-    
   }
   /// Process a sent message
   ///
@@ -681,7 +681,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
 
   // ----------------------------------------------------------------------------
   // MARK: - UdpManager delegate methods
-  //    executes on the udpReceiveQ
+  //    arrives on the udpReceiveQ
   
   /// Receive an Error message from UDP Manager
   ///
@@ -728,10 +728,10 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   ///
   func udpStreamHandler(_ vitaPacket: Vita) {
     
-    delegate?.streamHandler(vitaPacket)
+    delegate?.vitaParser(vitaPacket)
 
     // pass it to xAPITester (if present)
-    testerDelegate?.streamHandler(vitaPacket)
+    testerDelegate?.vitaParser(vitaPacket)
   }
 }
 

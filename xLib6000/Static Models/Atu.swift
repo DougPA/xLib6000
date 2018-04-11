@@ -12,7 +12,8 @@ import Foundation
 // MARK: - Atu Class implementation
 //
 //      creates an Atu instance to be used by a Client to support the
-//      processing of the Antenna Tuning Unit (if installed)
+//      processing of the Antenna Tuning Unit (if installed). Atu objects are
+//      added, removed and updated by the incoming TCP messages.
 //
 // --------------------------------------------------------------------------------
 

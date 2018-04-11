@@ -14,7 +14,8 @@ public typealias UsbCableId = String
 // MARK: - USB Cable Class implementation
 //
 //      creates a USB Cable instance to be used by a Client to support the
-//      processing of USB connections to the Radio (hardware)
+//      processing of USB connections to the Radio (hardware). USB Cable objects
+//      are added, removed and updated by the incoming TCP messages.
 //
 // --------------------------------------------------------------------------------
 
@@ -56,30 +57,10 @@ public final class UsbCable                 : NSObject, StatusParser, Properties
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
-  // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize a UsbCable
-  ///
-  /// - Parameters:
-  ///   - id:                 a UsbCable serial number
-  ///   - radio:              parent Radio class
-  ///   - queue:              Concurrent queue
-  ///   - cableType:          the type of UsbCable
-  ///
-  public init(id: UsbCableId, queue: DispatchQueue, cableType: UsbCableType) {
-    
-    self.id = id
-    self._q = queue
-    self.cableType = cableType
-    
-    super.init()
-  }
-  
   // ----------------------------------------------------------------------------
   // MARK: - StatusParser Protocol method
   //     called by Radio.parseStatusMessage(_:), executes on the parseQ
-
+  
   /// Parse a USB Cable status message
   ///
   /// - Parameters:
@@ -117,6 +98,26 @@ public final class UsbCable                 : NSObject, StatusParser, Properties
     }
     // pass the remaining key values to the Usb Cable for parsing (dropping the Id)
     radio.usbCables[usbCableId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+  }
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize a UsbCable
+  ///
+  /// - Parameters:
+  ///   - id:                 a UsbCable serial number
+  ///   - radio:              parent Radio class
+  ///   - queue:              Concurrent queue
+  ///   - cableType:          the type of UsbCable
+  ///
+  public init(id: UsbCableId, queue: DispatchQueue, cableType: UsbCableType) {
+    
+    self.id = id
+    self._q = queue
+    self.cableType = cableType
+    
+    super.init()
   }
   
   // ------------------------------------------------------------------------------

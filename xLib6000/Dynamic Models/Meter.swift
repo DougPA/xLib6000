@@ -15,7 +15,9 @@ public typealias MeterName = String
 // MARK: - Meter Class implementation
 //
 //      creates a Meter instance to be used by a Client to support the
-//      rendering of a Meter
+//      rendering of a Meter. Meter objects are added / removed by the
+//      incoming TCP messages. Meters are periodically updated by a UDP
+//      stream containing multiple Meters.
 //
 // ----------------------------------------------------------------------------------
 
@@ -51,6 +53,39 @@ public final class Meter                    : StatusParser, PropertiesParser {
   private var _value                        : Float = 0.0                   // value
   //                                                                                              
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Class methods
+  
+  /// Process the Panadapter Vita struct
+  ///
+  /// - Parameters:
+  ///   - vita:        a Vita struct
+  ///
+  class func vitaProcessor(_ vita: Vita) {
+    
+    // four bytes per Meter
+    let numberOfMeters = Int(vita.payloadSize / 4)
+    
+    // pointer to the first Meter number / Meter value pair
+    if let ptr16 = (vita.payload)?.bindMemory(to: UInt16.self, capacity: 2) {
+      
+      // for each meter in the Meters packet
+      for i in 0..<numberOfMeters {
+        
+        // get the Meter number and the Meter value
+        let meterNumber: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: 2 * i).pointee)
+        let meterValue: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: (2 * i) + 1).pointee)
+        
+        // Find the meter (if present) & update it
+        if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", meterNumber)] {
+          
+          // interpret it as a signed value
+          meter.update( Int16(bitPattern: meterValue) )
+        }
+      }
+    }
+  }
   
   // ----------------------------------------------------------------------------
   // MARK: - Initialization

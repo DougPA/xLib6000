@@ -23,19 +23,20 @@ public protocol AudioStreamHandler          : class {
   ///
   /// - Parameter frame:          an AudioStreamFrame struct
   ///
-  func audioStreamHandler(_ frame: AudioStreamFrame)
+  func streamHandler(_ frame: AudioStreamFrame)
 }
 
 // ------------------------------------------------------------------------------
 // MARK: - AudioStream Class implementation
 //
-//      creates a UDP stream of audio, from a Slice in the Radio (hardware) to
-//      the Client, to be used by the client for various purposes (e.g. CW Skimmer,
-//      digital modes, etc.)
+//      creates an AudioStream instance to be used by a Client to support the
+//      processing of a stream of Audio from the Radio to the client. AudioStream
+//      objects are added / removed by the incoming TCP messages. AudioStream
+//      objects periodically receive Audio in a UDP stream.
 //
 // ------------------------------------------------------------------------------
 
-public final class AudioStream              : NSObject, StatusParser, PropertiesParser {
+public final class AudioStream              : NSObject, StatusParser, PropertiesParser, VitaProcessor {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
@@ -65,24 +66,6 @@ public final class AudioStream              : NSObject, StatusParser, Properties
   private weak var _delegate                : AudioStreamHandler? // Delegate for Audio stream
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize an Audio Stream
-  ///
-  /// - Parameters:
-  ///   - id:                 the Stream Id
-  ///   - radio:              the Radio instance
-  ///   - queue:              Concurrent queue
-  ///
-  init(id: DaxStreamId, queue: DispatchQueue) {
-    
-    self.id = id
-    _q = queue
-    
-    super.init()
-  }
   
   // ----------------------------------------------------------------------------
   // MARK: - StatusParser Protocol method
@@ -128,6 +111,24 @@ public final class AudioStream              : NSObject, StatusParser, Properties
     }
   }
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize an Audio Stream
+  ///
+  /// - Parameters:
+  ///   - id:                 the Stream Id
+  ///   - radio:              the Radio instance
+  ///   - queue:              Concurrent queue
+  ///
+  init(id: DaxStreamId, queue: DispatchQueue) {
+    
+    self.id = id
+    _q = queue
+    
+    super.init()
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - PropertiesParser Protocol method
   //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
@@ -196,9 +197,9 @@ public final class AudioStream              : NSObject, StatusParser, Properties
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - VitaHandler Protocol method
+  // MARK: - VitaProcessor Protocol method
   
-  //      called by Radio on the udpReceiveQ
+  //      called by Radio on the streamQ
   //
   //      The payload of the incoming Vita struct is converted to an AudioStreamFrame and
   //      passed to the Audio Stream Handler
@@ -208,7 +209,7 @@ public final class AudioStream              : NSObject, StatusParser, Properties
   /// - Parameters:
   ///   - vita:       a Vita struct
   ///
-  func vitaHandler(_ vita: Vita) {
+  func vitaProcessor(_ vita: Vita) {
     
     if vita.classCode != .daxAudio {
       // not for us
@@ -246,7 +247,7 @@ public final class AudioStream              : NSObject, StatusParser, Properties
       memcpy(&(dataFrame.rightAudio), &dataRight, dataFrame.samples * 4)
       
       // Pass the data frame to this AudioSream's delegate
-      delegate.audioStreamHandler(dataFrame)
+      delegate.streamHandler(dataFrame)
     }
     
     // calculate the next Sequence Number

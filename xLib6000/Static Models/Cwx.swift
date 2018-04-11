@@ -12,7 +12,8 @@ import Foundation
 // MARK: - Cwx Class implementation
 //
 //      creates a Cwx instance to be used by a Client to support the
-//      rendering of a Cwx
+//      rendering of a Cwx. Cwx objects are added, removed and updated 
+//      by the incoming TCP messages.
 //
 // --------------------------------------------------------------------------------
 

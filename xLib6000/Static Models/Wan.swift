@@ -12,7 +12,8 @@ import Foundation
 // MARK: - Wan Class implementation
 //
 //      creates a Wan instance to be used by a Client to support the
-//      processing of the Wan-related activities
+//      processing of the Wan-related activities. Wan objects are added,
+//      removed and updated by the incoming TCP messages.
 //
 // --------------------------------------------------------------------------------
 

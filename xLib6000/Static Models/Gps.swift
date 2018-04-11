@@ -12,7 +12,8 @@ import Foundation
 // MARK: - Gps Class implementation
 //
 //      creates a Gps instance to be used by a Client to support the
-//      processing of the internal Gps (if installed)
+//      processing of the internal Gps (if installed). Gps objects are added,
+//      removed and updated by the incoming TCP messages.
 //
 // --------------------------------------------------------------------------------
 
