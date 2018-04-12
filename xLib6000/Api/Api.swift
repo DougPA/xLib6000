@@ -233,7 +233,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
       log.msg("Pinger stopped", level: .error, function: #function, file: #file, line: #line)
     }
     // the radio class will be removed, inform observers
-    NC.post(.radioWillBeRemoved, object: activeRadio as Any?)
+    NC.post(.radioWillBeRemoved, object: radio as Any?)
     
     // disconnect TCP
     _tcp.disconnect()
@@ -264,6 +264,9 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
 
     // register to be notified when reply received
     delegate?.addReplyHandler( String(seqNumber), replyTuple: (replyTo: callback, command: command) )
+    
+    // pass it to xAPITester (if present)
+    testerDelegate?.addReplyHandler( String(seqNumber), replyTuple: (replyTo: callback, command: command) )
   }
   /// Send a command to the Radio (hardware), first check that a Radio is connected
   ///

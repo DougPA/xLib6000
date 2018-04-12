@@ -39,7 +39,7 @@ public final class Opus                     : NSObject, StatusParser, Properties
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var _id               : OpusId                        // The Opus stream id
+  public private(set) var id                : OpusId                        // The Opus stream id
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -115,7 +115,7 @@ public final class Opus                     : NSObject, StatusParser, Properties
   ///
   init(id: OpusId, queue: DispatchQueue) {
     
-    self._id = id
+    self.id = id
     _q = queue
     
     super.init()
@@ -136,7 +136,7 @@ public final class Opus                     : NSObject, StatusParser, Properties
     
     if _vita == nil {
       // get a new Vita struct (w/defaults & IfDataWithStream, daxAudio, StreamId, tsi.other)
-      _vita = Vita(packetType: .ifDataWithStream, classCode: .daxAudio, streamId: _id, tsi: .other)
+      _vita = Vita(packetType: .ifDataWithStream, classCode: .daxAudio, streamId: id, tsi: .other)
     }
     // create new array for payload (interleaved L/R samples)
     let payload = [UInt8](repeating: 0, count: _txPacketSize)
