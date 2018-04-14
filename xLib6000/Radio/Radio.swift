@@ -1508,7 +1508,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
     
     _streamQ.async { [unowned self ] in
       
-      // Pass the stream to the appropriate object
+      // Pass the stream to the appropriate object (checking for existence of the object first)
       switch (vitaPacket.classCode) {
         
       case .daxAudio where self.audioStreams[vitaPacket.streamId] != nil:
@@ -1531,28 +1531,6 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
         //         and must be processed by a class method on the Meter object
         Meter.vitaProcessor(vitaPacket)
         
-//        // four bytes per Meter
-//        let numberOfMeters = Int(vitaPacket.payloadSize / 4)
-//        
-//        // pointer to the first Meter number / Meter value pair
-//        if let ptr16 = (vitaPacket.payload)?.bindMemory(to: UInt16.self, capacity: 2) {
-//          
-//          // for each meter in the Meters packet
-//          for i in 0..<numberOfMeters {
-//            
-//            // get the Meter number and the Meter value
-//            let meterNumber: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: 2 * i).pointee)
-//            let meterValue: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: (2 * i) + 1).pointee)
-//            
-//            // Find the meter (if present) & update it
-//            if let thisMeter = self.meters[String(format: "%i", meterNumber)] {
-//              
-//              // interpret it as a signed value
-//              thisMeter.update( Int16(bitPattern: meterValue) )
-//            }
-//          }
-//        }
-        
       case .opus where self.opusStreams[vitaPacket.streamId] != nil:
         // Opus
         self.opusStreams[vitaPacket.streamId]!.vitaProcessor( vitaPacket )
@@ -1567,7 +1545,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
         
       default:
         // log the error
-        Log.sharedInstance.msg("UDP Stream error - \(vitaPacket.desc())", level: .error, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("UDP Stream error, no object for - \(vitaPacket.desc())", level: .error, function: #function, file: #file, line: #line)
       }
     }
   }
