@@ -273,7 +273,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
     } else {
       
       // pass the error to the delegate
-      _delegate?.udpError("Invalid packet received")
+      _delegate?.udpError("Unable to decode received packet")
     }
   }
 }
