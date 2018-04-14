@@ -196,14 +196,13 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
     // if there is a delegate, process the Mic Audio stream
     if let delegate = delegate {
       
+      let payloadPtr = UnsafeRawPointer(vita.payloadData)
+      
       // initialize a data frame
-      var dataFrame = MicAudioStreamFrame(payload: vita.payload!, numberOfBytes: vita.payloadSize)
+      var dataFrame = MicAudioStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
       
       // get a pointer to the data in the payload
-      guard let wordsPtr = vita.payload?.bindMemory(to: UInt32.self, capacity: dataFrame.samples * 2) else {
-        
-        return
-      }
+      let wordsPtr = payloadPtr.bindMemory(to: UInt32.self, capacity: dataFrame.samples * 2)
       
       // allocate temporary data arrays
       var dataLeft = [UInt32](repeating: 0, count: dataFrame.samples)

@@ -77,7 +77,8 @@ public class Vita {
   var fracTimeStampLsb                : UInt32 = 0                          // fractional portion -LSB 32 bits
   var oui                             : UInt32 = kFlexOui                   // Flex Radio oui
   var informationClassCode            : UInt32 = kFlexInformationClassCode  // Flex Radio classCode
-  var payload                         : UnsafeRawPointer? = nil             // Void Pointer to the payload
+//  var payload                         : UnsafeRawPointer? = nil             // Void Pointer to the payload
+  var payloadData                     = [UInt8]()
   var payloadSize                     : Int = 0                             // Size of payload (bytes)
   var trailer                         : UInt32 = 0                          // Trailer, 4 bytes (if used)
   var headerSize                      : Int = MemoryLayout<VitaHeader>.size // Header size (bytes)
@@ -118,7 +119,7 @@ public class Vita {
       payloadArray[i] = UInt8(cString[i])
     }
     // give the Vita struct a pointer to the payload
-    vita.payload = UnsafeRawPointer(payloadArray)
+    vita.payloadData = payloadArray
     
     // return the encoded Vita class as Data
     return Vita.encodeAsData(vita)
@@ -229,9 +230,15 @@ public class Vita {
     // calculate the payload size (bytes)
     // NOTE: The data payload size is NOT necessarily a multiple of 4 bytes (it can be any number of bytes)
     vita.payloadSize = data.count - vita.headerSize - (vita.trailerPresent ? kTrailerSize : 0)
+
+    // initialize the payload array & copy the data
+    vita.payloadData = [UInt8](repeating: 0x00, count: vita.payloadSize)
+    let bytesRange = NSMakeRange(vita.headerSize, vita.payloadSize)
+    (data as NSData).getBytes(&vita.payloadData, range: bytesRange)
     
-    // get a <Void> pointer to the Payload
-    vita.payload = UnsafeRawPointer((data as NSData).bytes.advanced(by: vita.headerSize))
+//    vita.payload = UnsafeRawPointer(vita.payloadData)
+//    // get a <Void> pointer to the Payload
+//    vita.payload = UnsafeRawPointer((data as NSData).bytes.advanced(by: vita.headerSize))
     
     // capture the Trailer (if any)
     if vita.trailerPresent {
@@ -289,14 +296,15 @@ public class Vita {
     // create the Data type and populate it with the VitaHeader
     var data = Data(bytes: &header, count: MemoryLayout<VitaHeader>.size)
     
-    // obtain a pointer to the bytes in the payload
-    guard let uint8Ptr = vita.payload?.bindMemory(to: UInt8.self, capacity: vita.payloadSize) else {
-      // Invalid payload pointer
-      return nil
-    }
+//    // obtain a pointer to the bytes in the payload
+//    guard let uint8Ptr = vita.payload?.bindMemory(to: UInt8.self, capacity: vita.payloadSize) else {
+//      // Invalid payload pointer
+//      return nil
+//    }
     // append the payload bytes to the Data type
     //      assumes the payload data is already in big-endian form
-    data.append(uint8Ptr, count: vita.payloadSize)
+//    data.append(uint8Ptr, count: vita.payloadSize)
+    data.append(&vita.payloadData, count: vita.payloadSize)
     
     // TODO: Handle Trailer data
     
@@ -316,8 +324,8 @@ public class Vita {
       let radio = RadioParameters()
       
       // Payload is a series of strings of the form <key=value> separated by ' ' (space)
-      let payloadData = NSString(bytes: vita.payload!, length: vita.payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
-      
+      let payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
+
       // parse into a KeyValuesArray
       let keyValues = payloadData.keyValuesArray()
       
@@ -439,7 +447,7 @@ public class Vita {
   ///
   public func desc() -> String {
     
-    let payloadString = NSString(bytes: payload!, length: payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
+//    let payloadString = NSString(bytes: payload!, length: payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
     
     return packetType.description() + "\n" +
       "classIdPresent = \(classIdPresent)\n" +
@@ -450,15 +458,14 @@ public class Vita {
       "integerTimeStamp = \(integerTimestamp)\n" +
       "fracTimeStampMsb = \(fracTimeStampMsb)\n" +
       "fracTimeStampLsb = \(fracTimeStampLsb)\n" +
-      "oui = \(String(format: "0x%x", oui))\n" +
-      "informationClassCode = \(String(format: "0x%x", informationClassCode))\n" +
-      "classCode = \(String(format: "0x%x", classCode.rawValue))\n" +
-      "trailer = \(trailer)\n" +
-      "streamId = 0x\(streamId)\n" +
+      "oui = \(oui == Vita.kFlexOui ? "Flex Radio" : "Unknown")\n" +
+      "informationClassCode = \(informationClassCode == Vita.kFlexInformationClassCode ? "Flex Radio" : "Unknown")\n" +
+      "classCode = \(classCode.description())\n" +
+      "trailer = \(trailerPresent ? trailer.hex : "None")\n" +
+      "streamId = \(streamId.hex)\n" +
       "headerSize = \(headerSize) bytes\n" +
       "payloadSize = \(payloadSize) bytes\n" +
-      "packetSize = \(packetSize) bytes\n" +
-    payloadString
+      "packetSize = \(packetSize) bytes\n"
   }
 }
 

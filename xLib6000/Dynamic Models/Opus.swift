@@ -139,10 +139,7 @@ public final class Opus                     : NSObject, StatusParser, Properties
       _vita = Vita(packetType: .ifDataWithStream, classCode: .daxAudio, streamId: id, tsi: .other)
     }
     // create new array for payload (interleaved L/R samples)
-    let payload = [UInt8](repeating: 0, count: _txPacketSize)
-    
-    // get a raw pointer to the start of the payload
-    _vita!.payload = UnsafeRawPointer(payload)
+    _vita!.payloadData = [UInt8](repeating: 0, count: _txPacketSize)
     
     // set the length of the packet
     _vita!.payloadSize = _txPacketSize                                      // 8-Bit encoded samples
@@ -264,7 +261,7 @@ public final class Opus                     : NSObject, StatusParser, Properties
     rxSeq = (rxSeq! + 1) % 16
     
     // Pass the data frame to the Opus delegate
-    delegate?.streamHandler( OpusFrame(payload: vita.payload!, numberOfSamples: vita.payloadSize) )
+    delegate?.streamHandler( OpusFrame(payload: vita.payloadData, numberOfSamples: vita.payloadSize) )
   }
 }
 

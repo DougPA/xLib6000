@@ -301,8 +301,10 @@ public class WaterfallFrame {
   ///
   public func populate(vita: Vita) {
     
+    let payloadPtr = UnsafeRawPointer(vita.payloadData)
+
     // map the payload to the WaterfallPayload struct
-    let p = vita.payload!.bindMemory(to: WaterfallPayload.self, capacity: 1)
+    let p = payloadPtr.bindMemory(to: WaterfallPayload.self, capacity: 1)
     
     // byte swap and convert each payload component
     firstBinFreq = CGFloat(CFSwapInt64BigToHost(p.pointee.firstBinFreq)) / 1.048576E6
@@ -314,12 +316,11 @@ public class WaterfallFrame {
     numberOfBins = Int( CFSwapInt16BigToHost(p.pointee.numberOfBins) )
     
     // get a pointer to the data in the payload
-    if let binsPtr = vita.payload?.advanced(by: kByteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins) {
-      
-      // Swap the byte ordering of the data & place it in the bins
-      for i in 0..<numberOfBins * lineHeight {
-        bins[i] = CFSwapInt16BigToHost(binsPtr.advanced(by: i).pointee)
-      }
+    let binsPtr = payloadPtr.advanced(by: kByteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
+    
+    // Swap the byte ordering of the data & place it in the bins
+    for i in 0..<numberOfBins * lineHeight {
+      bins[i] = CFSwapInt16BigToHost(binsPtr.advanced(by: i).pointee)
     }
   }
 }

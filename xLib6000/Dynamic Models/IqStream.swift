@@ -232,15 +232,15 @@ public final class IqStream                 : NSObject, StatusParser, Properties
     // if there is a delegate, process the Panadapter stream
     if let delegate = delegate {
       
+      let payloadPtr = UnsafeRawPointer(vita.payloadData)
+      
       // initialize a data frame
-      var dataFrame = IqStreamFrame(payload: vita.payload!, numberOfBytes: vita.payloadSize)
+      var dataFrame = IqStreamFrame(payload: payloadPtr, numberOfBytes: vita.payloadSize)
       
       dataFrame.daxIqChannel = self.daxIqChannel
       
       // get a pointer to the data in the payload
-      guard let wordsPtr = vita.payload?.bindMemory(to: Float32.self, capacity: dataFrame.samples * 2) else {
-        return
-      }
+      let wordsPtr = payloadPtr.bindMemory(to: Float32.self, capacity: dataFrame.samples * 2)
       
       // allocate temporary data arrays
       var dataLeft = [Float32](repeating: 0, count: dataFrame.samples)

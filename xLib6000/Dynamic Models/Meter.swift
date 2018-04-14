@@ -64,11 +64,13 @@ public final class Meter                    : StatusParser, PropertiesParser {
   ///
   class func vitaProcessor(_ vita: Vita) {
     
+    let payloadPtr = UnsafeRawPointer(vita.payloadData)
+    
     // four bytes per Meter
     let numberOfMeters = Int(vita.payloadSize / 4)
     
     // pointer to the first Meter number / Meter value pair
-    if let ptr16 = (vita.payload)?.bindMemory(to: UInt16.self, capacity: 2) {
+    let ptr16 = payloadPtr.bindMemory(to: UInt16.self, capacity: 2)
       
       // for each meter in the Meters packet
       for i in 0..<numberOfMeters {
@@ -84,7 +86,7 @@ public final class Meter                    : StatusParser, PropertiesParser {
           meter.update( Int16(bitPattern: meterValue) )
         }
       }
-    }
+    
   }
   
   // ----------------------------------------------------------------------------

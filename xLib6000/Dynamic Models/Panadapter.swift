@@ -398,7 +398,7 @@ public final class Panadapter               : NSObject, StatusParser, Properties
 // MARK: - PanadapterFrame class implementation
 // --------------------------------------------------------------------------------
 //
-//  Populated by the Panadapter vitaHandler
+//  Populated by the Panadapter vitaProcessor
 //
 
 public class PanadapterFrame {
@@ -433,8 +433,10 @@ public class PanadapterFrame {
   ///
   public func populate(vita: Vita) {
   
+    let payloadPtr = UnsafeRawPointer(vita.payloadData)
+    
     // map the payload to the PanadapterPayload struct
-    let p = vita.payload!.bindMemory(to: PanadapterPayload.self, capacity: 1)
+    let p = payloadPtr.bindMemory(to: PanadapterPayload.self, capacity: 1)
     
     // byte swap and convert each payload component
     startingBinIndex = Int(CFSwapInt32BigToHost(p.pointee.startingBinIndex))
@@ -444,17 +446,17 @@ public class PanadapterFrame {
     
     if numberOfBins >= Panadapter.kMaxBins {
       
-      Swift.print("Panadapter # bins > \(Panadapter.kMaxBins), \(p.pointee)")
+      Swift.print("Vita = \(vita.desc())")
+      Swift.print("startingBinIndex = \(startingBinIndex), numberOfBins = \(numberOfBins), binSize = \(binSize), frameIndex = \(frameIndex)")
       
     } else {
       
       // get a pointer to the data in the payload
-      if let binsPtr = vita.payload?.advanced(by: kByteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins) {
+      let binsPtr = payloadPtr.advanced(by: kByteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
         
-        // Swap the byte ordering of the data & place it in the bins
-        for i in 0..<numberOfBins {
-          bins[i] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
-        }
+      // Swap the byte ordering of the data & place it in the bins
+      for i in 0..<numberOfBins {
+        bins[i] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
       }
     }
   }

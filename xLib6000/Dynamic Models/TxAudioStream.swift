@@ -124,14 +124,16 @@ public final class TxAudioStream            : NSObject, StatusParser, Properties
     let kNumberOfChannels = 2       // 2 channels
     
     // create new array for payload (interleaved L/R samples)
-    var payload = [Float](repeating: 0.0, count: kMaxSamplesToSend * kNumberOfChannels)
+    let payloadData = [UInt8](repeating: 0, count: kMaxSamplesToSend * kNumberOfChannels * MemoryLayout<Float>.size)
     
     // get a raw pointer to the start of the payload
-    let payloadPtr = UnsafeMutableRawPointer(mutating: payload)
-    _vita!.payload = UnsafeRawPointer(payload)
+    let payloadPtr = UnsafeMutableRawPointer(mutating: payloadData)
     
     // get a pointer to 32-bit chunks in the payload
     let wordsPtr = payloadPtr.bindMemory(to: UInt32.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
+    
+    // get a pointer to Float chunks in the payload
+    let floatPtr = payloadPtr.bindMemory(to: Float.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
     
     var samplesSent = 0
     while samplesSent < samples {
@@ -142,8 +144,11 @@ public final class TxAudioStream            : NSObject, StatusParser, Properties
       
       // interleave the payload & scale with tx gain
       for i in 0..<numSamplesToSend {                                         // TODO: use Accelerate
-        payload[(2 * i)] = left[i + samplesSent] * _txGainScalar
-        payload[(2 * i) + 1] = right[i + samplesSent] * _txGainScalar
+        floatPtr.advanced(by: 2 * i).pointee = left[i + samplesSent] * _txGainScalar
+        floatPtr.advanced(by: (2 * i) + 1).pointee = left[i + samplesSent] * _txGainScalar
+
+//        payload[(2 * i)] = left[i + samplesSent] * _txGainScalar
+//        payload[(2 * i) + 1] = right[i + samplesSent] * _txGainScalar
       }
       
       // swap endianess of the samples
@@ -151,6 +156,8 @@ public final class TxAudioStream            : NSObject, StatusParser, Properties
         wordsPtr.advanced(by: i).pointee = CFSwapInt32HostToBig(wordsPtr.advanced(by: i).pointee)
       }
       
+      _vita!.payloadData = payloadData
+
       // set the length of the packet
       _vita!.payloadSize = numFloatsToSend * MemoryLayout<UInt32>.size        // 32-Bit L/R samples
       _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size     // payload size + header size
