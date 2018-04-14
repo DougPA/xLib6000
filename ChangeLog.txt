@@ -4,6 +4,9 @@ v1.0.15
 
 Vita.swift - corrected payload usage, replaced UnsafeRawPointer to payload with payload data array
 Corresponding changes to all Dynamic Models with Udp Streams
+Vita.swift - made string produced by desc() method more readable
+Vita.swift - in class encodeAsData(_:) added code to handle trailer
+Radio.swift - corrected "UDP Stream error" log message
 
 v1.0.14
 
