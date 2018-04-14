@@ -77,8 +77,7 @@ public class Vita {
   var fracTimeStampLsb                : UInt32 = 0                          // fractional portion -LSB 32 bits
   var oui                             : UInt32 = kFlexOui                   // Flex Radio oui
   var informationClassCode            : UInt32 = kFlexInformationClassCode  // Flex Radio classCode
-//  var payload                         : UnsafeRawPointer? = nil             // Void Pointer to the payload
-  var payloadData                     = [UInt8]()
+  var payloadData                     = [UInt8]()                           // Array of bytes in payload
   var payloadSize                     : Int = 0                             // Size of payload (bytes)
   var trailer                         : UInt32 = 0                          // Trailer, 4 bytes (if used)
   var headerSize                      : Int = MemoryLayout<VitaHeader>.size // Header size (bytes)
@@ -231,14 +230,9 @@ public class Vita {
     // NOTE: The data payload size is NOT necessarily a multiple of 4 bytes (it can be any number of bytes)
     vita.payloadSize = data.count - vita.headerSize - (vita.trailerPresent ? kTrailerSize : 0)
 
-    // initialize the payload array & copy the data
+    // initialize the payload array & copy the payload data into it
     vita.payloadData = [UInt8](repeating: 0x00, count: vita.payloadSize)
-    let bytesRange = NSMakeRange(vita.headerSize, vita.payloadSize)
-    (data as NSData).getBytes(&vita.payloadData, range: bytesRange)
-    
-//    vita.payload = UnsafeRawPointer(vita.payloadData)
-//    // get a <Void> pointer to the Payload
-//    vita.payload = UnsafeRawPointer((data as NSData).bytes.advanced(by: vita.headerSize))
+    (data as NSData).getBytes(&vita.payloadData, range: NSMakeRange(vita.headerSize, vita.payloadSize))
     
     // capture the Trailer (if any)
     if vita.trailerPresent {
@@ -296,17 +290,15 @@ public class Vita {
     // create the Data type and populate it with the VitaHeader
     var data = Data(bytes: &header, count: MemoryLayout<VitaHeader>.size)
     
-//    // obtain a pointer to the bytes in the payload
-//    guard let uint8Ptr = vita.payload?.bindMemory(to: UInt8.self, capacity: vita.payloadSize) else {
-//      // Invalid payload pointer
-//      return nil
-//    }
-    // append the payload bytes to the Data type
-    //      assumes the payload data is already in big-endian form
-//    data.append(uint8Ptr, count: vita.payloadSize)
+    // append the payload bytes
     data.append(&vita.payloadData, count: vita.payloadSize)
     
-    // TODO: Handle Trailer data
+    // is there a Trailer?
+    if vita.trailerPresent {
+      
+      // YES, append the trailer bytes
+      data.append( Data(bytes: &vita.trailer, count: MemoryLayout<UInt32>.size) )
+    }
     
     // return the Data type
     return data
