@@ -446,16 +446,20 @@ public class Vita {
   /// - Returns:          a String describing the Vita class
   ///
   public func desc() -> String {
-    
-//    let payloadString = NSString(bytes: payload!, length: payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
-    
+
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateStyle = .none
+    dateFormatter.timeStyle = .medium
+
+    let date = Date(timeIntervalSinceReferenceDate: Double(integerTimestamp) )
+
     return packetType.description() + "\n" +
       "classIdPresent = \(classIdPresent)\n" +
       "trailerPresent = \(trailerPresent)\n" +
       "tsi = \(tsiType.description())\n" +
       "tsf = \(tsfType.description())\n" +
       "sequence = \(sequence)\n" +
-      "integerTimeStamp = \(integerTimestamp)\n" +
+      "integerTimeStamp = \(dateFormatter.string(from: date))\n" +
       "fracTimeStampMsb = \(fracTimeStampMsb)\n" +
       "fracTimeStampLsb = \(fracTimeStampLsb)\n" +
       "oui = \(oui == Vita.kFlexOui ? "Flex Radio" : "Unknown")\n" +
