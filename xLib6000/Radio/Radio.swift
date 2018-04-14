@@ -1567,7 +1567,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
         
       default:
         // log the error
-        Log.sharedInstance.msg("UDP Stream error - \(vitaPacket.desc)", level: .error, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("UDP Stream error - \(vitaPacket.desc())", level: .error, function: #function, file: #file, line: #line)
       }
     }
   }
