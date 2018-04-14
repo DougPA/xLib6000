@@ -1,5 +1,10 @@
 xLib6000 Change Log
 
+v1.0.15
+
+Vita.swift - corrected payload usage, replaced UnsafeRawPointer to payload with payload data array
+Corresponding changes to all Dynamic Models with Udp Streams
+
 v1.0.14
 
 Added Documentation folder and "xLib6000 Overview.pdf" file
