@@ -3,6 +3,7 @@ xLib6000 Change Log
 v1.0.16
 
 AppExtensions.swift - added conditional use of compactMap vs flatMap
+Radio.swift - in vitaParser(..) simplified UDP Stream Error message
 
 v1.0.15
 
