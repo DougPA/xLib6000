@@ -1,5 +1,9 @@
 xLib6000 Change Log
 
+v1.0.17
+
+SliceCommands.swift - corrected sliceLock(_:), changed "0x\(id)" to " 0x\(id)"
+
 v1.0.16
 
 AppExtensions.swift - added conditional use of compactMap vs flatMap

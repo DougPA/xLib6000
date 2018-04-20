@@ -74,7 +74,7 @@ extension xLib6000.Slice {
   ///
   private func sliceLock(_ value: String) {
     
-    Api.sharedInstance.send(xLib6000.Slice.kCmd + value + "0x\(id)")
+    Api.sharedInstance.send(xLib6000.Slice.kCmd + value + " 0x\(id)")
   }
   /// Set a Slice property on the Radio
   ///
