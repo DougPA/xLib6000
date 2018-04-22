@@ -42,10 +42,13 @@ public final class Amplifier                : NSObject, StatusParser, Properties
   private var __serialNumber                = ""                            // Serial number
   //                                                                                              
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
+    
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
   
   // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  //      StatusParser Protocol method
+  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
   
   /// Parse an Amplifier status message
   ///
@@ -129,30 +132,20 @@ public final class Amplifier                : NSObject, StatusParser, Properties
       switch token {
         
       case .ant:
-        willChangeValue(forKey: "ant")
-        _ant = property.value
-        didChangeValue(forKey: "ant")
+        update(&_ant, value: property.value, key: "ant")
         
       case .ip:
-        willChangeValue(forKey: "ip")
-        _ip = property.value
-        didChangeValue(forKey: "ip")
-        
+        update(&_ip, value: property.value, key: "ip")
+
       case .model:
-        willChangeValue(forKey: "model")
-        _model = property.value
-        didChangeValue(forKey: "model")
-        
+        update(&_model, value: property.value, key: "model")
+
       case .port:
-        willChangeValue(forKey: "port")
-        _port = property.value.iValue()
-        didChangeValue(forKey: "port")
-        
+        update(&_port, value: property.value.iValue(), key: "port")
+
       case .serialNumber:
-        willChangeValue(forKey: "serialNumber")
-        _serialNumber = property.value
-        didChangeValue(forKey: "serialNumber")
-        
+        update(&_serialNumber, value: property.value, key: "serialNumber")
+
       case .mode:      // never received from Radio
         break
       }
@@ -165,6 +158,22 @@ public final class Amplifier                : NSObject, StatusParser, Properties
       
       // notify all observers
       NC.post(.amplifierHasBeenAdded, object: self as Any?)
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 }

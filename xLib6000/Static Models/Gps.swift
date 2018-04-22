@@ -63,7 +63,7 @@ public final class Gps                      : NSObject, PropertiesParser {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  internal func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ properties: KeyValuesArray) {
     // Format: <"lat", value> <"lon", value> <"grid", value> <"altitude", value> <"tracked", value> <"visible", value> <"speed", value>
     //          <"freq_error", value> <"status", "Not Present" | "Present"> <"time", value> <"track", value>
     
@@ -81,60 +81,54 @@ public final class Gps                      : NSObject, PropertiesParser {
       switch token {
         
       case .altitude:
-        willChangeValue(forKey: "altitude")
-        _altitude = property.value
-        didChangeValue(forKey: "altitude")
-        
+        update(&_altitude, value: property.value, key: "altitude")
+
       case .frequencyError:
-        willChangeValue(forKey: "frequencyError")
-        _frequencyError = property.value.dValue()
-        didChangeValue(forKey: "frequencyError")
-        
+        update(&_frequencyError, value: property.value.dValue(), key: "frequencyError")
+
       case .grid:
-        willChangeValue(forKey: "grid")
-        _grid = property.value
-        didChangeValue(forKey: "grid")
-        
+        update(&_grid, value: property.value, key: "grid")
+
       case .latitude:
-        willChangeValue(forKey: "latitude")
-        _latitude = property.value
-        didChangeValue(forKey: "latitude")
-        
+        update(&_latitude, value: property.value, key: "latitude")
+
       case .longitude:
-        willChangeValue(forKey: "longitude")
-        _longitude = property.value
-        didChangeValue(forKey: "longitude")
-        
+        update(&_longitude, value: property.value, key: "longitude")
+
       case .speed:
-        willChangeValue(forKey: "speed")
-        _speed = property.value
-        didChangeValue(forKey: "speed")
-        
+        update(&_speed, value: property.value, key: "speed")
+
       case .status:
-        willChangeValue(forKey: "status")
-        _status = ( property.value == "present" ? true : false )
-        didChangeValue(forKey: "status")
-        
+        update(&_status, value: ( property.value == "present" ? true : false ), key: "status")
+
       case .time:
-        willChangeValue(forKey: "time")
-        _time = property.value
-        didChangeValue(forKey: "time")
-        
+        update(&_time, value: property.value, key: "time")
+
       case .track:
-        willChangeValue(forKey: "track")
-        _track = property.value.dValue()
-        didChangeValue(forKey: "track")
-        
+        update(&_track, value: property.value.dValue(), key: "track")
+
       case .tracked:
-        willChangeValue(forKey: "tracked")
-        _tracked = property.value.bValue()
-        didChangeValue(forKey: "tracked")
-        
+        update(&_tracked, value: property.value.bValue(), key: "tracked")
+
       case .visible:
-        willChangeValue(forKey: "visible")
-        _visible = property.value.bValue()
-        didChangeValue(forKey: "visible")
+        update(&_visible, value: property.value.bValue(), key: "visible")
       }
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 }

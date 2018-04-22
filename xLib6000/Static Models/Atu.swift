@@ -56,7 +56,7 @@ public final class Atu                      : NSObject, PropertiesParser {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  internal func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ properties: KeyValuesArray) {
     // Format: <"status", value> <"memories_enabled", 1|0> <"using_mem", 1|0>
     
     // process each key/value pair, <key=value>
@@ -73,25 +73,33 @@ public final class Atu                      : NSObject, PropertiesParser {
       switch token {
         
       case .enabled:
-        willChangeValue(forKey: "enabled")
-        _enabled = property.value.bValue()
-        didChangeValue(forKey: "enabled")
-        
+        update(&_enabled, value: property.value.bValue(), key: "enabled")
+
       case .memoriesEnabled:
-        willChangeValue(forKey: "memoriesEnabled")
-        _memoriesEnabled = property.value.bValue()
-        didChangeValue(forKey: "memoriesEnabled")
-        
+        update(&_memoriesEnabled, value: property.value.bValue(), key: "memoriesEnabled")
+
       case .status:
-        willChangeValue(forKey: "status")
-        _status = ( property.value == "present" ? true : false )
-        didChangeValue(forKey: "status")
-        
+        update(&_status, value: ( property.value == "present" ? true : false ), key: "status")
+
       case .usingMemories:
-        willChangeValue(forKey: "usingMemories")
-        _usingMemories = property.value.bValue()
-        didChangeValue(forKey: "usingMemories")
+        update(&_usingMemories, value: property.value.bValue(), key: "usingMemories")
       }
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 }

@@ -48,9 +48,12 @@ public final class Equalizer                : NSObject, StatusParser, Properties
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  //      StatusParser Protocol method
+  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
 
   /// Parse a Stream status message
   ///
@@ -138,50 +141,48 @@ public final class Equalizer                : NSObject, StatusParser, Properties
       switch token {
         
       case .level63Hz:
-        willChangeValue(forKey: "level63Hz")
-        _level63Hz = property.value.iValue()
-        didChangeValue(forKey: "level63Hz")
-        
+        update(&_level63Hz, value: property.value.iValue(), key: "level63Hz")
+
       case .level125Hz:
-        willChangeValue(forKey: "level125Hz")
-        _level125Hz = property.value.iValue()
-        didChangeValue(forKey: "level125Hz")
-        
+        update(&_level125Hz, value: property.value.iValue(), key: "level125Hz")
+
       case .level250Hz:
-        willChangeValue(forKey: "level250Hz")
-        _level250Hz = property.value.iValue()
-        didChangeValue(forKey: "level250Hz")
-        
+        update(&_level250Hz, value: property.value.iValue(), key: "level250Hz")
+
       case .level500Hz:
-        willChangeValue(forKey:  "level500Hz")
-        _level500Hz = property.value.iValue()
-        didChangeValue(forKey:  "level500Hz")
-        
+        update(&_level500Hz, value: property.value.iValue(), key: "level500Hz")
+
       case .level1000Hz:
-        willChangeValue(forKey: "level1000Hz")
-        _level1000Hz = property.value.iValue()
-        didChangeValue(forKey: "level1000Hz")
-        
+        update(&_level1000Hz, value: property.value.iValue(), key: "level1000Hz")
+
       case .level2000Hz:
-        willChangeValue(forKey: "level2000Hz")
-        _level2000Hz = property.value.iValue()
-        didChangeValue(forKey: "level2000Hz")
-        
+        update(&_level2000Hz, value: property.value.iValue(), key: "level2000Hz")
+
       case .level4000Hz:
-        willChangeValue(forKey: "level4000Hz")
-        _level4000Hz = property.value.iValue()
-        didChangeValue(forKey: "level4000Hz")
-        
+        update(&_level4000Hz, value: property.value.iValue(), key: "level4000Hz")
+
       case .level8000Hz:
-        willChangeValue(forKey: "level8000Hz")
-        _level8000Hz = property.value.iValue()
-        didChangeValue(forKey: "level8000Hz")
-        
+        update(&_level8000Hz, value: property.value.iValue(), key: "level8000Hz")
+
       case .enabled:
-        willChangeValue(forKey: "eqEnabled")
-        _eqEnabled = property.value.bValue()
-        didChangeValue(forKey: "eqEnabled")
+        update(&_eqEnabled, value: property.value.bValue(), key: "eqEnabled")
       }
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 }

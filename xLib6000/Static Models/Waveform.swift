@@ -53,7 +53,7 @@ public final class Waveform                 : NSObject, PropertiesParser {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  internal func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -69,12 +69,27 @@ public final class Waveform                 : NSObject, PropertiesParser {
       switch token {
         
       case .waveformList:
-        _waveformList = property.value
-        
+        update(&_waveformList, value: property.value, key: "waveformList")
+
       }
     }
   }
-}
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
+    }
+  }}
 
 // --------------------------------------------------------------------------------
 // MARK: - Waveform Class extensions

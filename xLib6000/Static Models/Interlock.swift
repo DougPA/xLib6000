@@ -70,7 +70,7 @@ public final class Interlock                : NSObject, PropertiesParser {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  internal func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ properties: KeyValuesArray) {
     // Format: <"timeout", value> <"acc_txreq_enable", 1|0> <"rca_txreq_enable", 1|0> <"acc_txreq_polarity", 1|0> <"rca_txreq_polarity", 1|0>
     //              <"tx1_enabled", 1|0> <"tx1_delay", value> <"tx2_enabled", 1|0> <"tx2_delay", value> <"tx3_enabled", 1|0> <"tx3_delay", value>
     //              <"acc_tx_enabled", 1|0> <"acc_tx_delay", value> <"tx_delay", value>
@@ -91,95 +91,75 @@ public final class Interlock                : NSObject, PropertiesParser {
       switch token {
         
       case .accTxEnabled:
-        willChangeValue(forKey: "accTxEnabled")
-        _accTxEnabled = property.value.bValue()
-        didChangeValue(forKey: "accTxEnabled")
-        
+        update(&_accTxEnabled, value: property.value.bValue(), key: "accTxEnabled")
+
       case .accTxDelay:
-        willChangeValue(forKey: "accTxDelay")
-        _accTxDelay = property.value.iValue()
-        didChangeValue(forKey: "accTxDelay")
-        
+        update(&_accTxDelay, value: property.value.iValue(), key: "accTxDelay")
+
       case .accTxReqEnabled:
-        willChangeValue(forKey: "accTxReqEnabled")
-        _accTxReqEnabled = property.value.bValue()
-        didChangeValue(forKey: "accTxReqEnabled")
-        
+         update(&_accTxReqEnabled, value: property.value.bValue(), key: "accTxReqEnabled")
+
       case .accTxReqPolarity:
-        willChangeValue(forKey: "accTxReqPolarity")
-        _accTxReqPolarity = property.value.bValue()
-        didChangeValue(forKey: "accTxReqPolarity")
-        
+       update(&_accTxReqPolarity, value: property.value.bValue(), key: "accTxReqPolarity")
+
       case .rcaTxReqEnabled:
-        willChangeValue(forKey: "rcaTxReqEnabled")
-        _rcaTxReqEnabled = property.value.bValue()
-        didChangeValue(forKey: "rcaTxReqEnabled")
-        
+        update(&_rcaTxReqEnabled, value: property.value.bValue(), key: "rcaTxReqEnabled")
+
       case .rcaTxReqPolarity:
-        willChangeValue(forKey: "rcaTxReqPolarity")
-        _rcaTxReqPolarity = property.value.bValue()
-        didChangeValue(forKey: "rcaTxReqPolarity")
-        
+         update(&_rcaTxReqPolarity, value: property.value.bValue(), key: "rcaTxReqPolarity")
+
       case .reason:
-        willChangeValue(forKey: "reason")
-        _reason = property.value
-        didChangeValue(forKey: "reason")
-        
+        update(&_reason, value: property.value, key: "reason")
+
       case .source:
-        willChangeValue(forKey: "source")
-        _source = property.value
-        didChangeValue(forKey: "source")
-        
+        update(&_source, value: property.value, key: "source")
+
       case .state:
-        willChangeValue(forKey: "state")
-        _state = property.value
-        didChangeValue(forKey: "state")
-        
+        update(&_state, value: property.value, key: "state")
+
       case .timeout:
-        willChangeValue(forKey: "timeout")
-        _timeout = property.value.iValue()
-        didChangeValue(forKey: "timeout")
-        
+        update(&_timeout, value: property.value.iValue(), key: "timeout")
+
       case .txAllowed:
-        willChangeValue(forKey: "txAllowed")
-        _txAllowed = property.value.bValue()
-        didChangeValue(forKey: "txAllowed")
-        
+        update(&_txAllowed, value: property.value.bValue(), key: "txAllowed")
+
       case .txDelay:
-        willChangeValue(forKey: "txDelay")
-        _txDelay = property.value.iValue()
-        didChangeValue(forKey: "txDelay")
-        
+        update(&_txDelay, value: property.value.iValue(), key: "txDelay")
+
       case .tx1Delay:
-        willChangeValue(forKey: "tx1Enabled")
-        _tx1Delay = property.value.iValue()
-        didChangeValue(forKey: "tx1Enabled")
-        
+        update(&_tx1Delay, value: property.value.iValue(), key: "tx1Delay")
+
       case .tx1Enabled:
-        willChangeValue(forKey: "key")
-        _tx1Enabled = property.value.bValue()
-        didChangeValue(forKey: "key")
-        
+        update(&_tx1Enabled, value: property.value.bValue(), key: "tx1Enabled")
+
       case .tx2Delay:
-        willChangeValue(forKey: "tx2Delay")
-        _tx2Delay = property.value.iValue()
-        didChangeValue(forKey: "tx2Delay")
-        
+        update(&_tx2Delay, value: property.value.iValue(), key: "tx2Delay")
+
       case .tx2Enabled:
-        willChangeValue(forKey: "tx2Enabled")
-        _tx2Enabled = property.value.bValue()
-        didChangeValue(forKey: "tx2Enabled")
-        
+        update(&_tx2Enabled, value: property.value.bValue(), key: "tx2Enabled")
+
       case .tx3Delay:
-        willChangeValue(forKey: "tx3Delay")
-        _tx3Delay = property.value.iValue()
-        didChangeValue(forKey: "tx3Delay")
-        
+        update(&_tx3Delay, value: property.value.iValue(), key: "tx3Delay")
+
       case .tx3Enabled:
-        willChangeValue(forKey: "tx3Enabled")
-        _tx3Enabled = property.value.bValue()
-        didChangeValue(forKey: "tx3Enabled")
+        update(&_tx3Enabled, value: property.value.bValue(), key: "tx3Enabled")
       }
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 }

@@ -99,7 +99,7 @@ public final class Transmit                 : NSObject, PropertiesParser {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  internal func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -115,225 +115,153 @@ public final class Transmit                 : NSObject, PropertiesParser {
       switch token {
         
       case .amCarrierLevel:
-        willChangeValue(forKey: "carrierLevel")
-        _carrierLevel = property.value.iValue()
-        didChangeValue(forKey: "carrierLevel")
-        
+        update(&_carrierLevel, value: property.value.iValue(), key: "carrierLevel")
+
       case .companderEnabled:
-        willChangeValue(forKey: "companderEnabled")
-        _companderEnabled = property.value.bValue()
-        didChangeValue(forKey: "companderEnabled")
-        
+        update(&_companderEnabled, value: property.value.bValue(), key: "companderEnabled")
+
       case .companderLevel:
-        willChangeValue(forKey: "companderLevel")
-        _companderLevel = property.value.iValue()
-        didChangeValue(forKey: "companderLevel")
-        
+        update(&_companderLevel, value: property.value.iValue(), key: "companderLevel")
+
       case .cwBreakInEnabled:
-        willChangeValue(forKey: "cwBreakInEnabled")
-        _cwBreakInEnabled = property.value.bValue()
-        didChangeValue(forKey: "cwBreakInEnabled")
-        
+        update(&_cwBreakInEnabled, value: property.value.bValue(), key: "cwBreakInEnabled")
+
       case .cwBreakInDelay:
-        willChangeValue(forKey: "cwBreakInDelay")
-        _cwBreakInDelay = property.value.iValue()
-        didChangeValue(forKey: "cwBreakInDelay")
-        
+        update(&_cwBreakInDelay, value: property.value.iValue(), key: "cwBreakInDelay")
+
       case .cwIambicEnabled:
-        willChangeValue(forKey: "cwIambicEnabled")
-        _cwIambicEnabled = property.value.bValue()
-        didChangeValue(forKey: "cwIambicEnabled")
-        
+        update(&_cwIambicEnabled, value: property.value.bValue(), key: "cwIambicEnabled")
+
       case .cwIambicMode:
-        willChangeValue(forKey: "cwIambicMode")
-        _cwIambicMode = property.value.iValue()
-        didChangeValue(forKey: "cwIambicMode")
-        
+        update(&_cwIambicMode, value: property.value.iValue(), key: "cwIambicMode")
+
       case .cwlEnabled:
-        willChangeValue(forKey: "cwlEnabled")
-        _cwlEnabled = property.value.bValue()
-        didChangeValue(forKey: "cwlEnabled")
-        
+        update(&_cwlEnabled, value: property.value.bValue(), key: "cwlEnabled")
+
       case .cwPitch:
-        willChangeValue(forKey: "cwPtch")
-        _cwPitch = property.value.iValue()
-        didChangeValue(forKey: "cwPtch")
-        
+        update(&_cwPitch, value: property.value.iValue(), key: "cwPtch")
+
       case .cwSidetoneEnabled:
-        willChangeValue(forKey: "cwSidetoneEnabled")
-        _cwSidetoneEnabled = property.value.bValue()
-        didChangeValue(forKey: "cwSidetoneEnabled")
-        
+        update(&_cwSidetoneEnabled, value: property.value.bValue(), key: "cwSidetoneEnabled")
+
       case .cwSpeed:
-        willChangeValue(forKey: "cwSpeed")
-        _cwSpeed = property.value.iValue()
-        didChangeValue(forKey: "cwSpeed")
-        
+        update(&_cwSpeed, value: property.value.iValue(), key: "cwSpeed")
+
       case .cwSwapPaddles:
-        willChangeValue(forKey: "cwSwapPaddles")
-        _cwSwapPaddles = property.value.bValue()
-        didChangeValue(forKey: "cwSwapPaddles")
-        
+        update(&_cwSwapPaddles, value: property.value.bValue(), key: "cwSwapPaddles")
+
       case .cwSyncCwxEnabled:
-        willChangeValue(forKey: "cwSyncCwxEnabled")
-        _cwSyncCwxEnabled = property.value.bValue()
-        didChangeValue(forKey: "cwSyncCwxEnabled")
-        
+        update(&_cwSyncCwxEnabled, value: property.value.bValue(), key: "cwSyncCwxEnabled")
+
       case .daxEnabled:
-        willChangeValue(forKey: "daxEnabled")
-        _daxEnabled = property.value.bValue()
-        didChangeValue(forKey: "daxEnabled")
-        
+        update(&_daxEnabled, value: property.value.bValue(), key: "daxEnabled")
+
       case .frequency:
-        willChangeValue(forKey: "frequency")
-        _frequency = property.value.mhzToHz()
-        didChangeValue(forKey: "frequency")
-        
+        update(&_frequency, value: property.value.mhzToHz(), key: "frequency")
+
       case .hwAlcEnabled:
-        willChangeValue(forKey: "hwAlcEnabled")
-        _hwAlcEnabled = property.value.bValue()
-        didChangeValue(forKey: "hwAlcEnabled")
-        
+        update(&_hwAlcEnabled, value: property.value.bValue(), key: "hwAlcEnabled")
+
       case .inhibit:
-        willChangeValue(forKey: "inhibit")
-        _inhibit = property.value.bValue()
-        didChangeValue(forKey: "inhibit")
-        
+        update(&_inhibit, value: property.value.bValue(), key: "inhibit")
+
       case .maxPowerLevel:
-        willChangeValue(forKey: "maxPowerLevel")
-        _maxPowerLevel = property.value.iValue()
-        didChangeValue(forKey: "maxPowerLevel")
-        
+        update(&_maxPowerLevel, value: property.value.iValue(), key: "maxPowerLevel")
+
       case .metInRxEnabled:
-        willChangeValue(forKey: "metInRxEnabled")
-        _metInRxEnabled = property.value.bValue()
-        didChangeValue(forKey: "metInRxEnabled")
-        
+        update(&_metInRxEnabled, value: property.value.bValue(), key: "metInRxEnabled")
+
       case .micAccEnabled:
-        willChangeValue(forKey: "micAccEnabled")
-        _micAccEnabled = property.value.bValue()
-        didChangeValue(forKey: "micAccEnabled")
-        
+        update(&_micAccEnabled, value: property.value.bValue(), key: "micAccEnabled")
+
       case .micBoostEnabled:
-        willChangeValue(forKey: "micBoostEnabled")
-        _micBoostEnabled = property.value.bValue()
-        didChangeValue(forKey: "micBoostEnabled")
-        
+        update(&_micBoostEnabled, value: property.value.bValue(), key: "micBoostEnabled")
+
       case .micBiasEnabled:
-        willChangeValue(forKey: "micBiasEnabled")
-        _micBiasEnabled = property.value.bValue()
-        didChangeValue(forKey: "micBiasEnabled")
-        
+        update(&_micBiasEnabled, value: property.value.bValue(), key: "micBiasEnabled")
+
       case .micLevel:
-        willChangeValue(forKey: "micLevel")
-        _micLevel = property.value.iValue()
-        didChangeValue(forKey: "micLevel")
-        
+        update(&_micLevel, value: property.value.iValue(), key: "micLevel")
+
       case .micSelection:
-        willChangeValue(forKey: "micSelection")
-        _micSelection = property.value
-        didChangeValue(forKey: "micSelection")
-        
+        update(&_micSelection, value: property.value, key: "micSelection")
+
       case .rawIqEnabled:
-        willChangeValue(forKey: "rawIqEnabled")
-        _rawIqEnabled = property.value.bValue()
-        didChangeValue(forKey: "rawIqEnabled")
-        
+        update(&_rawIqEnabled, value: property.value.bValue(), key: "rawIqEnabled")
+
       case .rfPower:
-        willChangeValue(forKey: "rfPower")
-        _rfPower = property.value.iValue()
-        didChangeValue(forKey: "rfPower")
-        
+        update(&_rfPower, value: property.value.iValue(), key: "rfPower")
+
       case .speechProcessorEnabled:
-        willChangeValue(forKey: "speechProcessorEnabled")
-        _speechProcessorEnabled = property.value.bValue()
-        didChangeValue(forKey: "speechProcessorEnabled")
-        
+        update(&_speechProcessorEnabled, value: property.value.bValue(), key: "speechProcessorEnabled")
+
       case .speechProcessorLevel:
-        willChangeValue(forKey: "speechProcessorLevel")
-        _speechProcessorLevel = property.value.iValue()
-        didChangeValue(forKey: "speechProcessorLevel")
-        
+        update(&_speechProcessorLevel, value: property.value.iValue(), key: "speechProcessorLevel")
+
       case .txFilterChanges:
-        willChangeValue(forKey: "txFilterChanges")
-        _txFilterChanges = property.value.bValue()
-        didChangeValue(forKey: "txFilterChanges")
-        
+        update(&_txFilterChanges, value: property.value.bValue(), key: "txFilterChanges")
+
       case .txFilterHigh:
-        willChangeValue(forKey: "txFilterHigh")
-        _txFilterHigh = property.value.iValue()
-        didChangeValue(forKey: "txFilterHigh")
-        
+        update(&_txFilterHigh, value: property.value.iValue(), key: "txFilterHigh")
+
       case .txFilterLow:
-        willChangeValue(forKey: "txFilterLow")
-        _txFilterLow = property.value.iValue()
-        didChangeValue(forKey: "txFilterLow")
-        
+        update(&_txFilterLow, value: property.value.iValue(), key: "txFilterLow")
+
       case .txInWaterfallEnabled:
-        willChangeValue(forKey: "txInWaterfallEnabled")
-        _txInWaterfallEnabled = property.value.bValue()
-        didChangeValue(forKey: "txInWaterfallEnabled")
-        
+        update(&_txInWaterfallEnabled, value: property.value.bValue(), key: "txInWaterfallEnabled")
+
       case .txMonitorAvailable:
-        willChangeValue(forKey: "txMonitorAvailable")
-        _txMonitorAvailable = property.value.bValue()
-        didChangeValue(forKey: "txMonitorAvailable")
-        
+        update(&_txMonitorAvailable, value: property.value.bValue(), key: "txMonitorAvailable")
+
       case .txMonitorEnabled:
-        willChangeValue(forKey: "txMonitorEnabled")
-        _txMonitorEnabled = property.value.bValue()
-        didChangeValue(forKey: "txMonitorEnabled")
-        
+        update(&_txMonitorEnabled, value: property.value.bValue(), key: "txMonitorEnabled")
+
       case .txMonitorGainCw:
-        willChangeValue(forKey: "txMonitorGainCw")
-        _txMonitorGainCw = property.value.iValue()
-        didChangeValue(forKey: "txMonitorGainCw")
-        
+        update(&_txMonitorGainCw, value: property.value.iValue(), key: "txMonitorGainCw")
+
       case .txMonitorGainSb:
-        willChangeValue(forKey: "txMonitorGainSb")
-        _txMonitorGainSb = property.value.iValue()
-        didChangeValue(forKey: "txMonitorGainSb")
-        
+        update(&_txMonitorGainSb, value: property.value.iValue(), key: "txMonitorGainSb")
+
       case .txMonitorPanCw:
-        willChangeValue(forKey: "txMonitorPanCw")
-        _txMonitorPanCw = property.value.iValue()
-        didChangeValue(forKey: "txMonitorPanCw")
-        
+        update(&_txMonitorPanCw, value: property.value.iValue(), key: "txMonitorPanCw")
+
       case .txMonitorPanSb:
-        willChangeValue(forKey: "txMonitorPanSb")
-        _txMonitorPanSb = property.value.iValue()
-        didChangeValue(forKey: "txMonitorPanSb")
-        
+        update(&_txMonitorPanSb, value: property.value.iValue(), key: "txMonitorPanSb")
+
       case .txRfPowerChanges:
-        willChangeValue(forKey: "txRfPowerChanges")
-        _txRfPowerChanges = property.value.bValue()
-        didChangeValue(forKey: "txRfPowerChanges")
-        
+        update(&_txRfPowerChanges, value: property.value.bValue(), key: "txRfPowerChanges")
+
       case .tune:
-        willChangeValue(forKey: "tune")
-        _tune = property.value.bValue()
-        didChangeValue(forKey: "tune")
-        
+        update(&_tune, value: property.value.bValue(), key: "tune")
+
       case .tunePower:
-        willChangeValue(forKey: "tunePower")
-        _tunePower = property.value.iValue()
-        didChangeValue(forKey: "tunePower")
-        
+        update(&_tunePower, value: property.value.iValue(), key: "tunePower")
+
       case .voxEnabled:
-        willChangeValue(forKey: "voxEnabled")
-        _voxEnabled = property.value.bValue()
-        didChangeValue(forKey: "voxEnabled")
-        
+        update(&_voxEnabled, value: property.value.bValue(), key: "voxEnabled")
+
       case .voxDelay:
-        willChangeValue(forKey: "voxDelay")
-        _voxDelay = property.value.iValue()
-        didChangeValue(forKey: "voxDelay")
-        
+        update(&_voxDelay, value: property.value.iValue(), key: "voxDelay")
+
       case .voxLevel:
-        willChangeValue(forKey: "voxLevel")
-        _voxLevel = property.value.iValue()
-        didChangeValue(forKey: "voxLevel")
+        update(&_voxLevel, value: property.value.iValue(), key: "voxLevel")
       }
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 }

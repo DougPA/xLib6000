@@ -59,7 +59,7 @@ public final class Profile                  : NSObject, PropertiesParser {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  internal func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ properties: KeyValuesArray) {
     // Format:  <profileType, > <"list",value^value...^value>
     //      OR
     // Format:  <profileType, > <"current", value>
@@ -75,50 +75,54 @@ public final class Profile                  : NSObject, PropertiesParser {
         switch subToken {
         case .list:
           // Global List
-          willChangeValue(forKey: "profiles")
-          _profiles[.global] = values
-          didChangeValue(forKey: "profiles")
-        
+          update(&_profiles[.global], value: values, key: "profiles")
+
         case .current:
           // Global Current
-          willChangeValue(forKey: "currentGlobalProfile")
-          _currentGlobalProfile = values[0]
-          didChangeValue(forKey: "currentGlobalProfile")
+          update(&_currentGlobalProfile, value: values[0], key: "currentGlobalProfile")
         }
         
       case .mic:
         switch subToken {
         case .list:
           // Mic List
-          willChangeValue(forKey: "profiles")
-          _profiles[.mic] = values
-          didChangeValue(forKey: "profiles")
-        
+          update(&_profiles[.mic], value: values, key: "profiles")
+
         case .current:
           // Mic Current
-          willChangeValue(forKey: "currentMicProfile")
-          _currentMicProfile = values[0]
-          didChangeValue(forKey: "currentMicProfile")
+          update(&_currentMicProfile, value: values[0], key: "currentMicProfile")
         }
         
       case .tx:
         switch subToken {
         case .list:
           // Tx List
-          willChangeValue(forKey: "profiles")
-          _profiles[.tx] = values
-          didChangeValue(forKey: "profiles")
-        
+          update(&_profiles[.tx] , value: values, key: "profiles")
+
         case .current:
           // Tx Current
-          willChangeValue(forKey: "currentTxProfile")
-          _currentTxProfile = values[0]
-          didChangeValue(forKey: "currentTxProfile")
+          update(&_currentTxProfile, value: values[0], key: "currentTxProfile")
         }
       }
     } else {
       // unknown type
       Log.sharedInstance.msg("Unknown profile - \(properties[0].key), \(properties[1].key)", level: .debug, function: #function, file: #file, line: #line)
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 }

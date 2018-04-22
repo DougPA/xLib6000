@@ -49,9 +49,12 @@ public final class Xvtr                     : NSObject, StatusParser, Properties
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  //      StatusParser Protocol method
+  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
   
   /// Parse an Xvtr status message
   ///
@@ -135,64 +138,40 @@ public final class Xvtr                     : NSObject, StatusParser, Properties
       switch token {
         
       case .name:
-        willChangeValue(forKey: "name")
-        _name = property.value
-        didChangeValue(forKey: "name")
-        
+        update(&_name, value: property.value, key: "name")
+
       case .ifFrequency:
-        willChangeValue(forKey: "ifFrequency")
-        _ifFrequency = property.value.iValue()
-        didChangeValue(forKey: "ifFrequency")
-        
+        update(&_ifFrequency, value: property.value.iValue(), key: "ifFrequency")
+
       case .inUse:
-        willChangeValue(forKey: "inUse")
-        _inUse = property.value.bValue()
-        didChangeValue(forKey: "inUse")
-        
+        update(&_inUse, value: property.value.bValue(), key: "inUse")
+
       case .isValid:
-        willChangeValue(forKey: "isValid")
-        _isValid = property.value.bValue()
-        didChangeValue(forKey: "isValid")
-        
+        update(&_isValid, value: property.value.bValue(), key: "isValid")
+
       case .loError:
-        willChangeValue(forKey: "loError")
-        _loError = property.value.iValue()
-        didChangeValue(forKey: "loError")
-        
+        update(&_loError, value: property.value.iValue(), key: "loError")
+
       case .maxPower:
-        willChangeValue(forKey: "maxPower")
-        _maxPower = property.value.iValue()
-        didChangeValue(forKey: "maxPower")
-        
+        update(&_maxPower, value: property.value.iValue(), key: "maxPower")
+
       case .order:
-        willChangeValue(forKey: "order")
-        _order = property.value.iValue()
-        didChangeValue(forKey: "order")
-        
+        update(&_order, value: property.value.iValue(), key: "order")
+
       case .preferred:
-        willChangeValue(forKey: "preferred")
-        _preferred = property.value.bValue()
-        didChangeValue(forKey: "preferred")
-        
+        update(&_preferred, value: property.value.bValue(), key: "preferred")
+
       case .rfFrequency:
-        willChangeValue(forKey: "rfFrequency")
-        _rfFrequency = property.value.iValue()
-        didChangeValue(forKey: "rfFrequency")
-        
+        update(&_rfFrequency, value: property.value.iValue(), key: "rfFrequency")
+
       case .rxGain:
-        willChangeValue(forKey: "rxGain")
-        _rxGain = property.value.iValue()
-        didChangeValue(forKey: "rxGain")
-        
+        update(&_rxGain, value: property.value.iValue(), key: "rxGain")
+
       case .rxOnly:
-        willChangeValue(forKey: "rxOnly")
-        _rxOnly = property.value.bValue()
-        didChangeValue(forKey: "rxOnly")
-        
+        update(&_rxOnly, value: property.value.bValue(), key: "rxOnly")
+
       case .twoMeterInt:
-        willChangeValue(forKey: "twoMeterInt")
-        _twoMeterInt = property.value.iValue()
-        didChangeValue(forKey: "twoMeterInt")
+        update(&_twoMeterInt, value: property.value.iValue(), key: "twoMeterInt")
       }
     }
     // is the waterfall initialized?
@@ -205,7 +184,22 @@ public final class Xvtr                     : NSObject, StatusParser, Properties
       NC.post(.xvtrHasBeenAdded, object: self as Any?)
     }
   }
-}
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
+    }
+  }}
 
 // --------------------------------------------------------------------------------
 // MARK: - Xvtr Class extensions

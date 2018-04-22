@@ -57,9 +57,12 @@ public final class UsbCable                 : NSObject, StatusParser, Properties
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  //      StatusParser Protocol method
+  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
   
   /// Parse a USB Cable status message
   ///
@@ -157,94 +160,60 @@ public final class UsbCable                 : NSObject, StatusParser, Properties
         switch token {
           
         case .autoReport:
-          willChangeValue(forKey: "autoReport")
-          _autoReport = property.value.bValue()
-          didChangeValue(forKey: "autoReport")
-          
+          update(&_autoReport, value: property.value.bValue(), key: "autoReport")
+
         case .band:
-          willChangeValue(forKey: "band")
-          _band = property.value
-          didChangeValue(forKey: "band")
-          
+          update(&_band, value: property.value, key: "band")
+
         case .cableType:
           // ignore this token's value (set by init)
           break
           
         case .dataBits:
-          willChangeValue(forKey: "dataBits")
-          _dataBits = property.value.iValue()
-          didChangeValue(forKey: "dataBits")
-          
+          update(&_dataBits, value: property.value.iValue(), key: "dataBits")
+
         case .enable:
-          willChangeValue(forKey: "enable")
-          _enable = property.value.bValue()
-          didChangeValue(forKey: "enable")
-          
+          update(&_enable, value: property.value.bValue(), key: "enable")
+
         case .flowControl:
-          willChangeValue(forKey: "flowControl")
-          _flowControl = property.value
-          didChangeValue(forKey: "flowControl")
-          
+          update(&_flowControl, value: property.value, key: "flowControl")
+
         case .name:
-          willChangeValue(forKey: "name")
-          _name = property.value
-          didChangeValue(forKey: "name")
-          
+          update(&_name, value: property.value, key: "name")
+
         case .parity:
-          willChangeValue(forKey: "parity")
-          _parity = property.value
-          didChangeValue(forKey: "parity")
-          
+          update(&_parity, value: property.value, key: "parity")
+
         case .pluggedIn:
-          willChangeValue(forKey: "pluggedIn")
-          _pluggedIn = property.value.bValue()
-          didChangeValue(forKey: "pluggedIn")
-          
+          update(&_pluggedIn, value: property.value.bValue(), key: "pluggedIn")
+
         case .polarity:
-          willChangeValue(forKey: "polarity")
-          _polarity = property.value
-          didChangeValue(forKey: "polarity")
-          
+          update(&_polarity, value: property.value, key: "polarity")
+
         case .preamp:
-          willChangeValue(forKey: "preamp")
-          _preamp = property.value
-          didChangeValue(forKey: "preamp")
-          
+          update(&_preamp, value: property.value, key: "preamp")
+
         case .source:
-          willChangeValue(forKey: "source")
-          _source = property.value
-          didChangeValue(forKey: "source")
-          
+          update(&_source, value: property.value, key: "source")
+
         case .sourceRxAnt:
-          willChangeValue(forKey: "sourceRxAnt")
-          _sourceRxAnt = property.value
-          didChangeValue(forKey: "sourceRxAnt")
-          
+          update(&_sourceRxAnt, value: property.value, key: "sourceRxAnt")
+
         case .sourceSlice:
-          willChangeValue(forKey: "sourceSlice")
-          _sourceSlice = property.value.iValue()
-          didChangeValue(forKey: "sourceSlice")
-          
+          update(&_sourceSlice, value: property.value.iValue(), key: "sourceSlice")
+
         case .sourceTxAnt:
-          willChangeValue(forKey: "sourceTxAnt")
-          _sourceTxAnt = property.value
-          didChangeValue(forKey: "sourceTxAnt")
-          
+          update(&_sourceTxAnt, value: property.value, key: "sourceTxAnt")
+
         case .speed:
-          willChangeValue(forKey: "speed")
-          _speed = property.value.iValue()
-          didChangeValue(forKey: "speed")
-          
+          update(&_speed, value: property.value.iValue(), key: "speed")
+
         case .stopBits:
-          willChangeValue(forKey: "stopBits")
-          _stopBits = property.value.iValue()
-          didChangeValue(forKey: "stopBits")
-          
+          update(&_stopBits, value: property.value.iValue(), key: "stopBits")
+
         case .usbLog:
-          willChangeValue(forKey: "usbLog")
-          _usbLog = property.value.bValue()
-          didChangeValue(forKey: "usbLog")
-          
+          update(&_usbLog, value: property.value.bValue(), key: "usbLog")
+
           //                case .usbLogLine:
           //                    willChangeValue(forKey: "usbLogLine")
           //                    _usbLogLine = property.value
@@ -267,6 +236,22 @@ public final class UsbCable                 : NSObject, StatusParser, Properties
       
       // notify all observers
       NC.post(.usbCableHasBeenAdded, object: self as Any?)
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 }

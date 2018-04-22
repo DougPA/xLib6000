@@ -54,7 +54,7 @@ public final class Wan                      : NSObject, PropertiesParser {
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
-  internal func parseProperties(_ properties: KeyValuesArray) {
+  func parseProperties(_ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
     for property in properties {
@@ -70,15 +70,27 @@ public final class Wan                      : NSObject, PropertiesParser {
       switch token {
         
       case .serverConnected:
-        willChangeValue(forKey: "serverConnected")
-        _serverConnected = property.value.bValue()
-        didChangeValue(forKey: "serverConnected")
-        
+        update(&_serverConnected, value: property.value.bValue(), key: "serverConnected")
+
       case .radioAuthenticated:
-        willChangeValue(forKey: "radioAuthenticated")
-        _radioAuthenticated = property.value.bValue()
-        didChangeValue(forKey: "radioAuthenticated")
+        update(&_radioAuthenticated, value: property.value.bValue(), key: "radioAuthenticated")
       }
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 }

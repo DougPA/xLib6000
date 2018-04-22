@@ -56,9 +56,12 @@ public final class Memory                   : NSObject, StatusParser, Properties
   //                                                                                                  
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  //      StatusParser Protocol method
+  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
   
   /// Parse a Memory status message
   ///
@@ -222,25 +225,17 @@ public final class Memory                   : NSObject, StatusParser, Properties
       switch (token) {
         
       case .digitalLowerOffset:
-        willChangeValue(forKey: "digitalLowerOffset")
-        _digitalLowerOffset = property.value.iValue()
-        didChangeValue(forKey: "digitalLowerOffset")
-        
+        update(&_digitalLowerOffset, value: property.value.iValue(), key: "digitalLowerOffset")
+
       case .digitalUpperOffset:
-        willChangeValue(forKey: "digitalUpperOffset")
-        _digitalUpperOffset = property.value.iValue()
-        didChangeValue(forKey: "digitalUpperOffset")
-        
+        update(&_digitalUpperOffset, value: property.value.iValue(), key: "digitalUpperOffset")
+
       case .frequency:
-        willChangeValue(forKey: "frequency")
-        _frequency = property.value.mhzToHz()
-        didChangeValue(forKey: "frequency")
-        
+        update(&_frequency, value: property.value.mhzToHz(), key: "frequency")
+
       case .group:
-        willChangeValue(forKey: "group")
-        _group = property.value.replacingSpaces()
-        didChangeValue(forKey: "group")
-        
+        update(&_group, value: property.value.replacingSpaces(), key: "group")
+
       case .highlight:            // not implemented
         break
         
@@ -248,79 +243,49 @@ public final class Memory                   : NSObject, StatusParser, Properties
         break
         
       case .mode:
-        willChangeValue(forKey: "mode")
-        _mode = property.value.replacingSpaces()
-        didChangeValue(forKey: "mode")
-        
+        update(&_mode, value: property.value.replacingSpaces(), key: "mode")
+
       case .name:
-        willChangeValue(forKey: "name")
-        _name = property.value.replacingSpaces()
-        didChangeValue(forKey: "name")
-        
+        update(&_name, value: property.value.replacingSpaces(), key: "name")
+
       case .owner:
-        willChangeValue(forKey: "owner")
-        _owner = property.value.replacingSpaces()
-        didChangeValue(forKey: "owner")
-        
+        update(&_owner, value: property.value.replacingSpaces(), key: "owner")
+
       case .repeaterOffsetDirection:
-        willChangeValue(forKey: "offsetDirection")
-        _offsetDirection = property.value.replacingSpaces()
-        didChangeValue(forKey: "offsetDirection")
-        
+        update(&_offsetDirection, value: property.value.replacingSpaces(), key: "offsetDirection")
+
       case .repeaterOffset:
-        willChangeValue(forKey: "offset")
-        _offset = property.value.iValue()
-        didChangeValue(forKey: "offset")
-        
+        update(&_offset, value: property.value.iValue(), key: "offset")
+
       case .rfPower:
-        willChangeValue(forKey: "rfPower")
-        _rfPower = property.value.iValue()
-        didChangeValue(forKey: "rfPower")
-        
+        update(&_rfPower, value: property.value.iValue(), key: "rfPower")
+
       case .rttyMark:
-        willChangeValue(forKey: "rttyMark")
-        _rttyMark = property.value.iValue()
-        didChangeValue(forKey: "rttyMark")
-        
+        update(&__rttyMark, value: property.value.iValue(), key: "rttyMark")
+
       case .rttyShift:
-        willChangeValue(forKey: "rttyShift")
-        _rttyShift = property.value.iValue()
-        didChangeValue(forKey: "rttyShift")
-        
+        update(&_rttyShift, value: property.value.iValue(), key: "rttyShift")
+
       case .rxFilterHigh:
-        willChangeValue(forKey: "filterHigh")
-        _filterHigh = filterHighLimits(property.value.iValue())
-        didChangeValue(forKey: "filterHigh")
-        
+        update(&_filterHigh, value: filterHighLimits(property.value.iValue()), key: "filterHigh")
+
       case .rxFilterLow:
-        willChangeValue(forKey: "filterLow")
-        _filterLow = filterLowLimits(property.value.iValue())
-        didChangeValue(forKey: "filterLow")
-        
+        update(&_filterLow, value: filterLowLimits(property.value.iValue()), key: "filterLow")
+
       case .squelchEnabled:
-        willChangeValue(forKey: "squelchEnabled")
-        _squelchEnabled = property.value.bValue()
-        didChangeValue(forKey: "squelchEnabled")
-        
+        update(&_squelchEnabled, value: property.value.bValue(), key: "squelchEnabled")
+
       case .squelchLevel:
-        willChangeValue(forKey: "squelchLevel")
-        _squelchLevel = property.value.iValue()
-        didChangeValue(forKey: "squelchLevel")
-        
+        update(&_squelchLevel, value: property.value.iValue(), key: "squelchLevel")
+
       case .step:
-        willChangeValue(forKey: "step")
-        _step = property.value.iValue()
-        didChangeValue(forKey: "step")
-        
+        update(&_step, value: property.value.iValue(), key: "step")
+
       case .toneMode:
-        willChangeValue(forKey: "toneMode")
-        _toneMode = property.value.replacingSpaces()
-        didChangeValue(forKey: "toneMode")
-        
+        update(&_toneMode, value: property.value.replacingSpaces(), key: "toneMode")
+
       case .toneValue:
-        willChangeValue(forKey: "toneValue")
-        _toneValue = property.value.iValue()
-        didChangeValue(forKey: "toneValue")
+        update(&_toneValue, value: property.value.iValue(), key: "toneValue")
       }
     }
     // is the Memory initialized?
@@ -331,6 +296,22 @@ public final class Memory                   : NSObject, StatusParser, Properties
       
       // notify all observers
       NC.post(.memoryHasBeenAdded, object: self as Any?)
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 }

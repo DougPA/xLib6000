@@ -11,6 +11,17 @@ import Foundation
 public typealias MeterId = String
 public typealias MeterName = String
 
+// --------------------------------------------------------------------------------
+// MARK: - MeterStreamHandler protocol
+//
+// --------------------------------------------------------------------------------
+
+protocol MeterStreamHandler                 : class {
+  
+  // method to process Meter data
+  func streamHandler(_ value: Int16 ) -> Void
+}
+
 // ----------------------------------------------------------------------------------
 // MARK: - Meter Class implementation
 //
@@ -21,7 +32,7 @@ public typealias MeterName = String
 //
 // ----------------------------------------------------------------------------------
 
-public final class Meter                    : StatusParser, PropertiesParser {
+public final class Meter                    : NSObject, StatusParser, PropertiesParser, MeterStreamHandler {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -41,7 +52,7 @@ public final class Meter                    : StatusParser, PropertiesParser {
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
-  private var _description                  = ""                            // long description
+  private var _desc                         = ""                            // long description
   private var _fps                          = 0                             // frames per second
   private var _high: Float                  = 0.0                           // high limit
   private var _low: Float                   = 0.0                           // low limit
@@ -54,10 +65,18 @@ public final class Meter                    : StatusParser, PropertiesParser {
   //                                                                                              
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
-  // ----------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
-  /// Process the Panadapter Vita struct
+  // ----------------------------------------------------------------------------
+  //      VitaProcessor protocol methods
+  
+  //      called by Radio on the streamQ
+  //
+  //      The payload of the incoming Vita struct is converted to Meter values
+  //      which are passed to their respective Meter Stream Handlers
+
+  /// Process the Meter Vita struct
   ///
   /// - Parameters:
   ///   - vita:        a Vita struct
@@ -83,76 +102,16 @@ public final class Meter                    : StatusParser, PropertiesParser {
         if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", meterNumber)] {
           
           // interpret it as a signed value
-          meter.update( Int16(bitPattern: meterValue) )
+          meter.streamHandler( Int16(bitPattern: meterValue) )
         }
       }
     
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Initialization
+  //      StatusParser Protocol method
+  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
   
-  /// Initialize a Meter
-  ///
-  /// - Parameters:
-  ///   - id:                 a Meter Id
-  ///   - radio:              the parent Radio class
-  ///   - queue:              Concurrent queue
-  ///
-  public init(id: MeterId, queue: DispatchQueue) {
-    
-    self.id = id
-    _q = queue
-    
-    // FIXME:
-    
-    // set voltage/amperage denominator for older API versions (before 1.11)
-    if Api.sharedInstance.apiVersionMajor == 1 && Api.sharedInstance.apiVersionMinor <= 10 {
-      _voltsAmpsDenom = 1024.0
-    }
-  }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Internal methods
-  
-  /// Update meter readings, called by UdpManager, executes on the udpReceiveQ
-  ///
-  /// - Parameters:
-  ///   - newValue:   the new value for the Meter
-  ///
-  func update(_ newValue: Int16) {
-    let oldValue = value
-    
-    // check for unknown Units
-    guard let token = Units(rawValue: units) else {
-      
-      // unknown Units, log it and ignore it
-      Log.sharedInstance.msg("Meter \(id).\(description), Unknown units - \(units)", level: .debug, function: #function, file: #file, line: #line)
-      return
-    }
-    
-    switch token {
-      
-    case .volts, .amps:
-      value = Float(newValue) / _voltsAmpsDenom
-      
-    case .swr, .dbm, .dbfs:
-      value = Float(newValue) / kSwrDbmDbfsDenom
-      
-    case .degc:
-      value = Float(newValue) / kDegcDenom
-    }
-    // did it change?
-    if oldValue != value {
-      // notify all observers
-      NC.post(.meterUpdated, object: self as Any?)
-    }
-  }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
-
   /// Parse a Meter status message
   ///
   /// - Parameters:
@@ -222,6 +181,29 @@ public final class Meter                    : StatusParser, PropertiesParser {
       }
     }
   }
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize a Meter
+  ///
+  /// - Parameters:
+  ///   - id:                 a Meter Id
+  ///   - radio:              the parent Radio class
+  ///   - queue:              Concurrent queue
+  ///
+  public init(id: MeterId, queue: DispatchQueue) {
+    
+    self.id = id
+    _q = queue
+    
+    // FIXME:
+    
+    // set voltage/amperage denominator for older API versions (before 1.11)
+    if Api.sharedInstance.apiVersionMajor == 1 && Api.sharedInstance.apiVersionMinor <= 10 {
+      _voltsAmpsDenom = 1024.0
+    }
+  }
   
   // ------------------------------------------------------------------------------
   // MARK: - PropertiesParser Protocol method
@@ -257,7 +239,7 @@ public final class Meter                    : StatusParser, PropertiesParser {
       switch token {
         
       case .desc:
-        description = property.value
+        desc = property.value
         
       case .fps:
         fps = property.value.iValue()
@@ -291,6 +273,44 @@ public final class Meter                    : StatusParser, PropertiesParser {
     }
   }
   
+  // ----------------------------------------------------------------------------
+  // MARK: - MeterStreamHandler protocol methods
+  
+  /// Process the UDP Stream Data for the Meter (arrives on the streamQ)
+  ///
+  /// - Parameters:
+  ///   - newValue:   the new value for the Meter
+  ///
+  func streamHandler(_ newValue: Int16) {
+    let previousValue = value
+    
+    // check for unknown Units
+    guard let token = Units(rawValue: units) else {
+      
+      // unknown Units, log it and ignore it
+      Log.sharedInstance.msg("Meter \(id).\(description), Unknown units - \(units)", level: .debug, function: #function, file: #file, line: #line)
+      return
+    }
+    
+    var adjNewValue: Float = 0.0
+    switch token {
+      
+    case .volts, .amps:
+      adjNewValue = Float(newValue) / _voltsAmpsDenom
+      
+    case .swr, .dbm, .dbfs:
+      adjNewValue = Float(newValue) / kSwrDbmDbfsDenom
+      
+    case .degc:
+      adjNewValue = Float(newValue) / kDegcDenom
+    }
+    // did it change?
+    if adjNewValue != previousValue {
+      //      // notify all observers
+      //      NC.post(.meterUpdated, object: self as Any?)
+      value = adjNewValue
+    }
+  }
 }
 
 // --------------------------------------------------------------------------------
@@ -309,9 +329,9 @@ extension Meter {
   //          If yes, implement it, if not should they be "get" only?
   
   // listed in alphabetical order
-  @objc dynamic public var description: String {
-    get { return _q.sync { _description } }
-    set { _q.sync(flags: .barrier) { _description = newValue } } }
+  @objc dynamic public var desc: String {
+    get { return _q.sync { _desc } }
+    set { _q.sync(flags: .barrier) { _desc = newValue } } }
   
   @objc dynamic public var fps: Int {
     get { return _q.sync { _fps } }

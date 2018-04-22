@@ -44,9 +44,12 @@ public final class Tnf                      : NSObject, StatusParser, Properties
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  //      StatusParser Protocol method
+  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
   
   /// Parse a Tnf status message
   ///
@@ -142,24 +145,16 @@ public final class Tnf                      : NSObject, StatusParser, Properties
       switch token {
         
       case .depth:
-        willChangeValue(forKey: "depth")
-        _depth = Int(property.value) ?? 1
-        didChangeValue(forKey: "depth")
-        
+        update(&_depth, value: Int(property.value) ?? 1, key: "depth")
+
       case .frequency:
-        willChangeValue(forKey: "frequency")
-        _frequency = property.value.mhzToHz()
-        didChangeValue(forKey: "frequency")
-        
+        update(&_frequency, value: property.value.mhzToHz(), key: "frequency")
+
       case .permanent:
-        willChangeValue(forKey: "permanent")
-        _permanent = property.value.bValue()
-        didChangeValue(forKey: "permanent")
-        
+        update(&_permanent, value: property.value.bValue(), key: "permanent")
+
       case .width:
-        willChangeValue(forKey: "width")
-        _width = property.value.mhzToHz()
-        didChangeValue(forKey: "width")
+         update(&_width, value: property.value.mhzToHz(), key: "width")
       }
     }
     // is the Tnf initialized?
@@ -170,6 +165,22 @@ public final class Tnf                      : NSObject, StatusParser, Properties
       
       // notify all observers
       NC.post(.tnfHasBeenAdded, object: self as Any?)
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 }

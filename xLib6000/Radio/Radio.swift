@@ -402,8 +402,11 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
     return tnfFreq
   }
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Private methods
+  
   // --------------------------------------------------------------------------------
-  // MARK: - Second level parsers
+  //      Second level parsers
   //      Note: All are executed on the parseQ
   // --------------------------------------------------------------------------------
   
@@ -663,7 +666,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  func parseClient(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
+  private func parseClient(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     
     guard keyValues.count >= 2 else {
       
@@ -690,249 +693,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   }
   
   // --------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     executes on the radioQ
-  
-  /// Parse a Radio status message
-  ///
-  /// - Parameters:
-  ///   - properties:      a KeyValuesArray
-  ///
-  internal func parseProperties(_ properties: KeyValuesArray) {
-    var filterSharpness = false
-    var cw = false
-    var digital = false
-    var voice = false
-    var staticNetParams = false
-    var oscillator = false
-    
-    // FIXME: What about a 6700 with two scu's?
-    
-    // process each key/value pair, <key=value>
-    for property in properties {
-      
-      // Check for Unknown token
-      guard let token = RadioToken(rawValue: property.key)  else {
-        
-        // unknown Display Type, log it and ignore this token
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
-        continue
-      }
-      // Known tokens, in alphabetical order
-      switch token {
-        
-      case .autoLevel:
-        if filterSharpness && cw {
-          willChangeValue(forKey: "filterCwAutoLevel")
-          _filterCwAutoLevel = property.value.iValue() ; cw = false
-          didChangeValue(forKey: "filterCwAutoLevel")
-        }
-        if filterSharpness && digital {
-          willChangeValue(forKey: "filterDigitalAutoLevel")
-          _filterDigitalAutoLevel = property.value.iValue() ; digital = false
-          didChangeValue(forKey: "filterDigitalAutoLevel")
-        }
-        if filterSharpness && voice {
-          willChangeValue(forKey: "filterVoiceAutoLevel")
-          _filterVoiceAutoLevel = property.value.iValue() ; voice = false
-          didChangeValue(forKey: "filterVoiceAutoLevel")
-        }
-        filterSharpness = false
-        
-      case .backlight:
-        willChangeValue(forKey: "backlight")
-        _backlight = property.value.iValue()
-        didChangeValue(forKey: "backlight")
-
-      case .bandPersistenceEnabled:
-        willChangeValue(forKey: "bandPersistenceEnabled")
-        _bandPersistenceEnabled = property.value.bValue()
-        didChangeValue(forKey: "bandPersistenceEnabled")
-        
-      case .binauralRxEnabled:
-        willChangeValue(forKey: "binauralRxEnabled")
-        _binauralRxEnabled = property.value.bValue()
-        didChangeValue(forKey: "binauralRxEnabled")
-        
-      case .calFreq:
-        willChangeValue(forKey: "calFreq")
-        _calFreq = property.value.iValue()
-        didChangeValue(forKey: "calFreq")
-        
-      case .callsign:
-        willChangeValue(forKey: "callsign")
-        _callsign = property.value
-        didChangeValue(forKey: "callsign")
-        
-      case .cw, .CW:
-        cw = true
-        
-      case .digital, .DIGITAL:
-        digital = true
-        
-      case .enforcePrivateIpEnabled:
-        willChangeValue(forKey: "enforcePrivateIpEnabled")
-        _enforcePrivateIpEnabled = property.value.bValue()
-        didChangeValue(forKey: "enforcePrivateIpEnabled")
-        
-      case .filterSharpness:
-        filterSharpness = true
-        
-      case .freqErrorPpb:
-        willChangeValue(forKey: "freqErrorPpb")
-        _freqErrorPpb = property.value.iValue()
-        didChangeValue(forKey: "freqErrorPpb")
-        
-      case .fullDuplexEnabled:
-        willChangeValue(forKey: "fullDuplexEnabled")
-        _fullDuplexEnabled = property.value.bValue()
-        didChangeValue(forKey: "fullDuplexEnabled")
-        
-      case .gateway:
-        if staticNetParams {
-          willChangeValue(forKey: "staticGateway")
-          _staticGateway = property.value
-          didChangeValue(forKey: "staticGateway")
-        }
-        
-      case .headphoneGain:
-        willChangeValue(forKey: "headphoneGain")
-        _headphoneGain = property.value.iValue()
-        didChangeValue(forKey: "headphoneGain")
-        
-      case .headphoneMute:
-        willChangeValue(forKey: "headphoneMute")
-        _headphoneMute = property.value.bValue()
-        didChangeValue(forKey: "headphoneMute")
-        
-      case .ip:
-        if staticNetParams {
-          willChangeValue(forKey: "staticIp")
-          _staticIp = property.value
-          didChangeValue(forKey: "staticIp")
-        }
-        
-      case .level:
-        if filterSharpness && cw {
-          willChangeValue(forKey: "filterCwLevel")
-          _filterCwLevel = property.value.iValue() ; cw = false
-          didChangeValue(forKey: "filterCwLevel")
-        }
-        if filterSharpness && digital {
-          willChangeValue(forKey: "filterDigitalLevel")
-          _filterDigitalLevel = property.value.iValue() ; digital = false
-          didChangeValue(forKey: "filterDigitalLevel")
-        }
-        if filterSharpness && voice {
-          willChangeValue(forKey: "filterVoiceLevel")
-          _filterVoiceLevel = property.value.iValue() ; voice = false
-          didChangeValue(forKey: "filterVoiceLevel")
-        }
-        filterSharpness = false
-        
-      case .lineoutGain:
-        willChangeValue(forKey: "lineoutGain")
-        _lineoutGain = property.value.iValue()
-        didChangeValue(forKey: "lineoutGain")
-        
-      case .lineoutMute:
-        willChangeValue(forKey: "lineoutMute")
-        _lineoutMute = property.value.bValue()
-        didChangeValue(forKey: "lineoutMute")
-        
-      case .locked:
-        if oscillator {
-          willChangeValue(forKey: "locked")
-          _locked = property.value.bValue()
-          didChangeValue(forKey: "locked")
-        }
-        
-      case .netmask:
-        if staticNetParams {
-          willChangeValue(forKey: "staticNetmask")
-          _staticNetmask = property.value ; staticNetParams = false
-          didChangeValue(forKey: "staticNetmask")
-        }
-        
-      case .nickname:
-        willChangeValue(forKey: "nickname")
-        _nickname = property.value
-        didChangeValue(forKey: "nickname")
-        
-      case .oscillator:
-        oscillator = true
-        
-      case .panadapters:
-        willChangeValue(forKey: "availablePanadapters")
-        _availablePanadapters = property.value.iValue()
-        didChangeValue(forKey: "availablePanadapters")
-        
-      case .pllDone:
-        willChangeValue(forKey: "startOffset")
-        _startOffset = property.value.bValue()
-        didChangeValue(forKey: "startOffset")
-        
-      case .remoteOnEnabled:
-        willChangeValue(forKey: "remoteOnEnabled")
-        _remoteOnEnabled = property.value.bValue()
-        didChangeValue(forKey: "remoteOnEnabled")
-        
-      case .rttyMark:
-        willChangeValue(forKey: "rttyMark")
-        _rttyMark = property.value.iValue()
-        didChangeValue(forKey: "rttyMark")
-        
-      case .setting:
-        if oscillator {
-          willChangeValue(forKey: "setting")
-          _setting = property.value
-          didChangeValue(forKey: "setting")
-        }
-        
-      case .slices:
-        willChangeValue(forKey: "availableSlices")
-        _availableSlices = property.value.iValue()
-        didChangeValue(forKey: "availableSlices")
-        
-      case .snapTuneEnabled:
-        willChangeValue(forKey: "snapTuneEnabled")
-        _snapTuneEnabled = property.value.bValue()
-        didChangeValue(forKey: "snapTuneEnabled")
-        
-      case .state:
-        if oscillator {
-          willChangeValue(forKey: "state")
-          _state = property.value
-          didChangeValue(forKey: "state")
-        }
-        
-      case .staticNetParams:
-        staticNetParams = true
-        
-      case .tnfEnabled:
-        willChangeValue(forKey: "tnfEnabled")
-        _tnfEnabled = property.value.bValue()
-        didChangeValue(forKey: "tnfEnabled")
-        
-      case .voice, .VOICE:
-        voice = true
-        
-      }
-    }
-    // is the Radio initialized?
-    if !_radioInitialized {
-      
-      // YES, the Radio (hardware) has acknowledged this Radio
-      _radioInitialized = true
-      
-      // notify all observers
-      NC.post(.radioHasBeenAdded, object: self as Any?)
-    }
-  }
-  
-  // --------------------------------------------------------------------------------
-  // MARK: - Internal Supporting methods
-  // --------------------------------------------------------------------------------
+  // MARK: - Public methods
   
   // MARK: ----- Panadapter -----
   
@@ -1340,6 +1101,247 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
     }
   }
   
+  // --------------------------------------------------------------------------------
+  // MARK: - PropertiesParser Protocol method
+  //     executes on the radioQ
+  
+  /// Parse a Radio status message
+  ///
+  /// - Parameters:
+  ///   - properties:      a KeyValuesArray
+  ///
+  func parseProperties(_ properties: KeyValuesArray) {
+    var filterSharpness = false
+    var cw = false
+    var digital = false
+    var voice = false
+    var staticNetParams = false
+    var oscillator = false
+    
+    // FIXME: What about a 6700 with two scu's?
+    
+    // process each key/value pair, <key=value>
+    for property in properties {
+      
+      // Check for Unknown token
+      guard let token = RadioToken(rawValue: property.key)  else {
+        
+        // unknown Display Type, log it and ignore this token
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        continue
+      }
+      // Known tokens, in alphabetical order
+      switch token {
+        
+      case .autoLevel:
+        if filterSharpness && cw {
+          willChangeValue(forKey: "filterCwAutoLevel")
+          _filterCwAutoLevel = property.value.iValue() ; cw = false
+          didChangeValue(forKey: "filterCwAutoLevel")
+        }
+        if filterSharpness && digital {
+          willChangeValue(forKey: "filterDigitalAutoLevel")
+          _filterDigitalAutoLevel = property.value.iValue() ; digital = false
+          didChangeValue(forKey: "filterDigitalAutoLevel")
+        }
+        if filterSharpness && voice {
+          willChangeValue(forKey: "filterVoiceAutoLevel")
+          _filterVoiceAutoLevel = property.value.iValue() ; voice = false
+          didChangeValue(forKey: "filterVoiceAutoLevel")
+        }
+        filterSharpness = false
+        
+      case .backlight:
+        willChangeValue(forKey: "backlight")
+        _backlight = property.value.iValue()
+        didChangeValue(forKey: "backlight")
+        
+      case .bandPersistenceEnabled:
+        willChangeValue(forKey: "bandPersistenceEnabled")
+        _bandPersistenceEnabled = property.value.bValue()
+        didChangeValue(forKey: "bandPersistenceEnabled")
+        
+      case .binauralRxEnabled:
+        willChangeValue(forKey: "binauralRxEnabled")
+        _binauralRxEnabled = property.value.bValue()
+        didChangeValue(forKey: "binauralRxEnabled")
+        
+      case .calFreq:
+        willChangeValue(forKey: "calFreq")
+        _calFreq = property.value.iValue()
+        didChangeValue(forKey: "calFreq")
+        
+      case .callsign:
+        willChangeValue(forKey: "callsign")
+        _callsign = property.value
+        didChangeValue(forKey: "callsign")
+        
+      case .cw, .CW:
+        cw = true
+        
+      case .digital, .DIGITAL:
+        digital = true
+        
+      case .enforcePrivateIpEnabled:
+        willChangeValue(forKey: "enforcePrivateIpEnabled")
+        _enforcePrivateIpEnabled = property.value.bValue()
+        didChangeValue(forKey: "enforcePrivateIpEnabled")
+        
+      case .filterSharpness:
+        filterSharpness = true
+        
+      case .freqErrorPpb:
+        willChangeValue(forKey: "freqErrorPpb")
+        _freqErrorPpb = property.value.iValue()
+        didChangeValue(forKey: "freqErrorPpb")
+        
+      case .fullDuplexEnabled:
+        willChangeValue(forKey: "fullDuplexEnabled")
+        _fullDuplexEnabled = property.value.bValue()
+        didChangeValue(forKey: "fullDuplexEnabled")
+        
+      case .gateway:
+        if staticNetParams {
+          willChangeValue(forKey: "staticGateway")
+          _staticGateway = property.value
+          didChangeValue(forKey: "staticGateway")
+        }
+        
+      case .headphoneGain:
+        willChangeValue(forKey: "headphoneGain")
+        _headphoneGain = property.value.iValue()
+        didChangeValue(forKey: "headphoneGain")
+        
+      case .headphoneMute:
+        willChangeValue(forKey: "headphoneMute")
+        _headphoneMute = property.value.bValue()
+        didChangeValue(forKey: "headphoneMute")
+        
+      case .ip:
+        if staticNetParams {
+          willChangeValue(forKey: "staticIp")
+          _staticIp = property.value
+          didChangeValue(forKey: "staticIp")
+        }
+        
+      case .level:
+        if filterSharpness && cw {
+          willChangeValue(forKey: "filterCwLevel")
+          _filterCwLevel = property.value.iValue() ; cw = false
+          didChangeValue(forKey: "filterCwLevel")
+        }
+        if filterSharpness && digital {
+          willChangeValue(forKey: "filterDigitalLevel")
+          _filterDigitalLevel = property.value.iValue() ; digital = false
+          didChangeValue(forKey: "filterDigitalLevel")
+        }
+        if filterSharpness && voice {
+          willChangeValue(forKey: "filterVoiceLevel")
+          _filterVoiceLevel = property.value.iValue() ; voice = false
+          didChangeValue(forKey: "filterVoiceLevel")
+        }
+        filterSharpness = false
+        
+      case .lineoutGain:
+        willChangeValue(forKey: "lineoutGain")
+        _lineoutGain = property.value.iValue()
+        didChangeValue(forKey: "lineoutGain")
+        
+      case .lineoutMute:
+        willChangeValue(forKey: "lineoutMute")
+        _lineoutMute = property.value.bValue()
+        didChangeValue(forKey: "lineoutMute")
+        
+      case .locked:
+        if oscillator {
+          willChangeValue(forKey: "locked")
+          _locked = property.value.bValue()
+          didChangeValue(forKey: "locked")
+        }
+        
+      case .netmask:
+        if staticNetParams {
+          willChangeValue(forKey: "staticNetmask")
+          _staticNetmask = property.value ; staticNetParams = false
+          didChangeValue(forKey: "staticNetmask")
+        }
+        
+      case .nickname:
+        willChangeValue(forKey: "nickname")
+        _nickname = property.value
+        didChangeValue(forKey: "nickname")
+        
+      case .oscillator:
+        oscillator = true
+        
+      case .panadapters:
+        willChangeValue(forKey: "availablePanadapters")
+        _availablePanadapters = property.value.iValue()
+        didChangeValue(forKey: "availablePanadapters")
+        
+      case .pllDone:
+        willChangeValue(forKey: "startOffset")
+        _startOffset = property.value.bValue()
+        didChangeValue(forKey: "startOffset")
+        
+      case .remoteOnEnabled:
+        willChangeValue(forKey: "remoteOnEnabled")
+        _remoteOnEnabled = property.value.bValue()
+        didChangeValue(forKey: "remoteOnEnabled")
+        
+      case .rttyMark:
+        willChangeValue(forKey: "rttyMark")
+        _rttyMark = property.value.iValue()
+        didChangeValue(forKey: "rttyMark")
+        
+      case .setting:
+        if oscillator {
+          willChangeValue(forKey: "setting")
+          _setting = property.value
+          didChangeValue(forKey: "setting")
+        }
+        
+      case .slices:
+        willChangeValue(forKey: "availableSlices")
+        _availableSlices = property.value.iValue()
+        didChangeValue(forKey: "availableSlices")
+        
+      case .snapTuneEnabled:
+        willChangeValue(forKey: "snapTuneEnabled")
+        _snapTuneEnabled = property.value.bValue()
+        didChangeValue(forKey: "snapTuneEnabled")
+        
+      case .state:
+        if oscillator {
+          willChangeValue(forKey: "state")
+          _state = property.value
+          didChangeValue(forKey: "state")
+        }
+        
+      case .staticNetParams:
+        staticNetParams = true
+        
+      case .tnfEnabled:
+        willChangeValue(forKey: "tnfEnabled")
+        _tnfEnabled = property.value.bValue()
+        didChangeValue(forKey: "tnfEnabled")
+        
+      case .voice, .VOICE:
+        voice = true
+        
+      }
+    }
+    // is the Radio initialized?
+    if !_radioInitialized {
+      
+      // YES, the Radio (hardware) has acknowledged this Radio
+      _radioInitialized = true
+      
+      // notify all observers
+      NC.post(.radioHasBeenAdded, object: self as Any?)
+    }
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Api delegate methods
   

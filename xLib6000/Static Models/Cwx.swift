@@ -187,10 +187,8 @@ public final class Cwx                      : NSObject, PropertiesParser {
         switch token {
           
         case .breakInDelay:
-          willChangeValue(forKey: "breakInDelay")
-          _breakInDelay = property.value.iValue()
-          didChangeValue(forKey: "breakInDelay")
-          
+          update(&_breakInDelay, value: property.value.iValue(), key: "breakInDelay")
+
         case .erase:
           let values = property.value.components(separatedBy: ",")
           if values.count != 2 { break }
@@ -202,20 +200,32 @@ public final class Cwx                      : NSObject, PropertiesParser {
           }
           
         case .qskEnabled:
-          willChangeValue(forKey: "qskEnabled")
-          _qskEnabled = property.value.bValue()
-          didChangeValue(forKey: "qskEnabled")
-          
+          update(&_qskEnabled, value: property.value.bValue(), key: "qskEnabled")
+
         case .sent:
           // inform the Event Handler (if any)
           charSentEventHandler?(property.value.iValue())
           
         case .wpm:
-          willChangeValue(forKey: "wpm")
-          _wpm = property.value.iValue()
-          didChangeValue(forKey: "wpm")
+          update(&_wpm, value: property.value.iValue(), key: "wpm")
         }
       }
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 }

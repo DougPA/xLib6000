@@ -93,10 +93,13 @@ public final class Panadapter               : NSObject, StatusParser, Properties
   private weak var _delegate                : PanadapterStreamHandler?      // Delegate for Panadapter stream
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
   
   // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  //      StatusParser Protocol method
+  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
   
   /// Parse a Panadapter status message
   ///
@@ -215,130 +218,80 @@ public final class Panadapter               : NSObject, StatusParser, Properties
       switch token {
         
       case .antList:
-        willChangeValue(forKey: "antList")
-        _antList = property.value.components(separatedBy: ",")
-        didChangeValue(forKey: "antList")
-        
+        update(&_antList, value: property.value.components(separatedBy: ","), key: "antList")
+
       case .average:
-        willChangeValue(forKey: "average")
-        _average = property.value.iValue()
-        didChangeValue(forKey: "average")
-        
+        update(&_average, value: property.value.iValue(), key: "average")
+
       case .band:
-        willChangeValue(forKey: "band")
-        _band = property.value
-        didChangeValue(forKey: "band")
-        
+        update(&_band, value: property.value, key: "band")
+
       case .bandwidth:
-        willChangeValue(forKey: "bandwidth")
-        _bandwidth = property.value.mhzToHz()
-        didChangeValue(forKey: "bandwidth")
-        
+        update(&_bandwidth, value: property.value.mhzToHz(), key: "bandwidth")
+
       case .center:
-        willChangeValue(forKey: "center")
-        _center = property.value.mhzToHz()
-        didChangeValue(forKey: "center")
-        
+        update(&_center, value: property.value.mhzToHz(), key: "center")
+
       case .daxIqChannel:
-        willChangeValue(forKey: "daxIqChannel")
-        _daxIqChannel = property.value.iValue()
-        didChangeValue(forKey: "daxIqChannel")
-        
+        update(&_daxIqChannel, value: property.value.iValue(), key: "daxIqChannel")
+
       case .fps:
-        willChangeValue(forKey: "fps")
-        _fps = property.value.iValue()
-        didChangeValue(forKey: "fps")
-        
+        update(&_fps, value: property.value.iValue(), key: "fps")
+
       case .loopAEnabled:
-        willChangeValue(forKey: "loopAEnabled")
-        _loopAEnabled = property.value.bValue()
-        didChangeValue(forKey: "loopAEnabled")
-        
+        update(&_loopAEnabled, value: property.value.bValue(), key: "loopAEnabled")
+
       case .loopBEnabled:
-        willChangeValue(forKey: "loopAEnabled")
-        _loopAEnabled = property.value.bValue()
-        didChangeValue(forKey: "loopAEnabled")
-        
+        update(&_loopBEnabled, value: property.value.bValue(), key: "loopBEnabled")
+
       case .maxBw:
-        willChangeValue(forKey: "maxBw")
-        _maxBw = property.value.mhzToHz()
-        didChangeValue(forKey: "maxBw")
-        
+        update(&_maxBw, value: property.value.mhzToHz(), key: "maxBw")
+
       case .maxDbm:
-        willChangeValue(forKey: "maxDbm")
-        _maxDbm = CGFloat(property.value.fValue())
-        didChangeValue(forKey: "maxDbm")
-        
+        update(&_maxDbm, value: CGFloat(property.value.fValue()), key: "maxDbm")
+
       case .minBw:
-        willChangeValue(forKey: "minBw")
-        _minBw = property.value.mhzToHz()
-        didChangeValue(forKey: "minBw")
-        
+        update(&_minBw, value: property.value.mhzToHz(), key: "minBw")
+
       case .minDbm:
-        willChangeValue(forKey: "minDbm")
-        _minDbm = CGFloat(property.value.fValue())
-        didChangeValue(forKey: "minDbm")
-        
+        update(&_minDbm, value: CGFloat(property.value.fValue()), key: "minDbm")
+
       case .preamp:
-        willChangeValue(forKey: "preamp")
-        _preamp = property.value
-        didChangeValue(forKey: "preamp")
-        
+        update(&_preamp, value: property.value, key: "preamp")
+
       case .rfGain:
-        willChangeValue(forKey: "rfGain")
-        _rfGain = property.value.iValue()
-        didChangeValue(forKey: "rfGain")
-        
+        update(&_rfGain, value: property.value.iValue(), key: "rfGain")
+
       case .rxAnt:
-        willChangeValue(forKey: "rxAnt")
-        _rxAnt = property.value
-        didChangeValue(forKey: "rxAnt")
-        
+        update(&_rxAnt, value: property.value, key: "rxAnt")
+
       case .waterfallId:
-        willChangeValue(forKey: "waterfallId")
-        _waterfallId = UInt32(property.value, radix: 16) ?? 0
-        didChangeValue(forKey: "waterfallId")
-        
+        update(&_waterfallId, value: UInt32(property.value, radix: 16) ?? 0, key: "waterfallId")
+
       case .wide:
-        willChangeValue(forKey: "wide")
-        _wide = property.value.bValue()
-        didChangeValue(forKey: "wide")
-        
+        update(&_wide, value: property.value.bValue(), key: "wide")
+
       case .weightedAverageEnabled:
-        willChangeValue(forKey: "weightedAverageEnabled")
-        _weightedAverageEnabled = property.value.bValue()
-        didChangeValue(forKey: "weightedAverageEnabled")
-        
+        update(&_weightedAverageEnabled, value: property.value.bValue(), key: "weightedAverageEnabled")
+
       case .wnbEnabled:
-        willChangeValue(forKey: "wnbEnabled")
-        _wnbEnabled = property.value.bValue()
-        didChangeValue(forKey: "wnbEnabled")
-        
+        update(&_wnbEnabled, value: property.value.bValue(), key: "wnbEnabled")
+
       case .wnbLevel:
-        willChangeValue(forKey: "wnbLevel")
-        _wnbLevel = property.value.iValue()
-        didChangeValue(forKey: "wnbLevel")
-        
+        update(&_wnbLevel, value: property.value.iValue(), key: "wnbLevel")
+
       case .wnbUpdating:
-        willChangeValue(forKey: "wnbUpdating")
-        _wnbUpdating = property.value.bValue()
-        didChangeValue(forKey: "wnbUpdating")
-        
+        update(&_wnbUpdating, value: property.value.bValue(), key: "wnbUpdating")
+
       case .xPixels:
-        willChangeValue(forKey: "xPixels")
-        _xPixels = CGFloat(property.value.fValue())
-        didChangeValue(forKey: "xPixels")
-        
+        update(&_xPixels, value: CGFloat(property.value.fValue()), key: "xPixels")
+
       case .xvtrLabel:
-        willChangeValue(forKey: "xvtrLabel")
-        _xvtrLabel = property.value
-        didChangeValue(forKey: "xvtrLabel")
-        
+        update(&_xvtrLabel, value: property.value, key: "xvtrLabel")
+
       case .yPixels:
-        willChangeValue(forKey: "yPixels")
-        _yPixels = CGFloat(property.value.fValue())
-        didChangeValue(forKey: "yPixels")
-        
+        update(&_yPixels, value: CGFloat(property.value.fValue()), key: "yPixels")
+
       case .available, .capacity, .daxIqRate:
         // ignored by Panadapter
         break
@@ -358,7 +311,23 @@ public final class Panadapter               : NSObject, StatusParser, Properties
       NC.post(.panadapterHasBeenAdded, object: self as Any?)
     }
   }
-  
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
+    }
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - VitaProcessor Protocol method
   

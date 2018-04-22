@@ -69,9 +69,12 @@ public final class IqStream                 : NSObject, StatusParser, Properties
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -------
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  //      StatusParser Protocol method
+  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
 
   /// Parse a Stream status message
   ///
@@ -153,49 +156,31 @@ public final class IqStream                 : NSObject, StatusParser, Properties
       switch token {
         
       case .available:
-        willChangeValue(forKey: "available")
-        _available = property.value.iValue()
-        didChangeValue(forKey: "available")
-        
+        update(&_available, value: property.value.iValue(), key: "available")
+
       case .capacity:
-        willChangeValue(forKey: "capacity")
-        _capacity = property.value.iValue()
-        didChangeValue(forKey: "capacity")
-        
+        update(&_capacity, value: property.value.iValue(), key: "capacity")
+
       case .daxIqChannel:
-        willChangeValue(forKey: "daxIqChannel")
-        _daxIqChannel = property.value.iValue()
-        didChangeValue(forKey: "daxIqChannel")
-        
+        update(&_daxIqChannel, value: property.value.iValue(), key: "daxIqChannel")
+
       case .inUse:
-        willChangeValue(forKey: "inUse")
-        _inUse = property.value.bValue()
-        didChangeValue(forKey: "inUse")
-        
+        update(&_inUse, value: property.value.bValue(), key: "inUse")
+
       case .ip:
-        willChangeValue(forKey: "ip")
-        _ip = property.value
-        didChangeValue(forKey: "ip")
-        
+        update(&_ip, value: property.value, key: "ip")
+
       case .pan:
-        willChangeValue(forKey: "pan")
-        _pan = UInt32(property.value.dropFirst(2), radix: 16) ?? 0
-        didChangeValue(forKey: "pan")
-        
+        update(&_pan, value:  UInt32(property.value.dropFirst(2), radix: 16) ?? 0, key: "pan")
+
       case .port:
-        willChangeValue(forKey: "port")
-        _port = property.value.iValue()
-        didChangeValue(forKey: "port")
-        
+        update(&_port, value: property.value.iValue(), key: "port")
+
       case .rate:
-        willChangeValue(forKey: "rate")
-        _rate = property.value.iValue()
-        didChangeValue(forKey: "rate")
-        
+        update(&_rate, value: property.value.iValue(), key: "rate")
+
       case .streaming:
-        willChangeValue(forKey: "streaming")
-        _streaming = property.value.bValue()
-        didChangeValue(forKey: "streaming")
+        update(&_streaming, value: property.value.bValue(), key: "streaming")
       }
     }
     // is the Stream initialized?
@@ -208,7 +193,23 @@ public final class IqStream                 : NSObject, StatusParser, Properties
       NC.post(.iqStreamHasBeenAdded, object: self as Any?)
     }
   }
-  
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
+    }
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - VitaProcessor Protocol method
   

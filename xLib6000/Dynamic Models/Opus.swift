@@ -73,9 +73,12 @@ public final class Opus                     : NSObject, StatusParser, Properties
   //                                                                                                  
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  //      StatusParser Protocol method
+  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
   
   /// Parse an Opus status message
   ///
@@ -183,29 +186,19 @@ public final class Opus                     : NSObject, StatusParser, Properties
       switch token {
         
       case .ipAddress:
-        willChangeValue(forKey: "ip")
-        _ip = property.value.trimmingCharacters(in: CharacterSet.whitespaces)
-        didChangeValue(forKey: "ip")
-        
+        update(&_ip, value: property.value.trimmingCharacters(in: CharacterSet.whitespaces), key: "ip")
+
       case .port:
-        willChangeValue(forKey: "port")
-        _port = property.value.iValue()
-        didChangeValue(forKey: "port")
-        
+        update(&_port, value: property.value.iValue(), key: "port")
+
       case .remoteRxOn:
-        willChangeValue(forKey: "remoteRxOn")
-        _remoteRxOn = property.value.bValue()
-        didChangeValue(forKey: "remoteRxOn")
-        
+        update(&_remoteRxOn, value: property.value.bValue(), key: "remoteRxOn")
+
       case .remoteTxOn:
-        willChangeValue(forKey: "remoteTxOn")
-        _remoteTxOn = property.value.bValue()
-        didChangeValue(forKey: "remoteTxOn")
-        
+        update(&_remoteTxOn, value: property.value.bValue(), key: "remoteTxOn")
+
       case .rxStreamStopped:
-        willChangeValue(forKey: "rxStreamStopped")
-        _rxStreamStopped = property.value.bValue()
-        didChangeValue(forKey: "rxStreamStopped")
+        update(&_rxStreamStopped, value: property.value.bValue(), key: "rxStreamStopped")
       }
     }
     // the Radio (hardware) has acknowledged this Opus
@@ -218,7 +211,23 @@ public final class Opus                     : NSObject, StatusParser, Properties
       NC.post(.opusHasBeenAdded, object: self as Any?)
     }
   }
-  
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
+    }
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - VitaProcessor protocol methods
   

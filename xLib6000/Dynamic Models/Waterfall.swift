@@ -64,9 +64,12 @@ public final class Waterfall                : NSObject, StatusParser, Properties
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   // ----------------------------------------------------------------------------
-  // MARK: - StatusParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  //      StatusParser Protocol method
+  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
   
   /// Parse a Waterfall status message
   ///
@@ -163,35 +166,23 @@ public final class Waterfall                : NSObject, StatusParser, Properties
       switch token {
         
       case .autoBlackEnabled:
-        willChangeValue(forKey: "autoBlackEnabled")
-        _autoBlackEnabled = property.value.bValue()
-        didChangeValue(forKey: "autoBlackEnabled")
-        
+        update(&_autoBlackEnabled, value: property.value.bValue(), key: "autoBlackEnabled")
+
       case .blackLevel:
-        willChangeValue(forKey: "blackLevel")
-        _blackLevel = property.value.iValue()
-        didChangeValue(forKey: "blackLevel")
-        
+        update(&_blackLevel, value: property.value.iValue(), key: "blackLevel")
+
       case .colorGain:
-        willChangeValue(forKey: "colorGain")
-        _colorGain = property.value.iValue()
-        didChangeValue(forKey: "colorGain")
-        
+        update(&_colorGain, value: property.value.iValue(), key: "colorGain")
+
       case .gradientIndex:
-        willChangeValue(forKey: "gradientIndex")
-        _gradientIndex = property.value.iValue()
-        didChangeValue(forKey: "gradientIndex")
-        
+        update(&_gradientIndex, value: property.value.iValue(), key: "gradientIndex")
+
       case .lineDuration:
-        willChangeValue(forKey: "lineDuration")
-        _lineDuration = property.value.iValue()
-        didChangeValue(forKey: "lineDuration")
-        
+        update(&_lineDuration, value: property.value.iValue(), key: "lineDuration")
+
       case .panadapterId:     // does not have leading "0x"
-        willChangeValue(forKey: "panadapterId")
-        _panadapterId = UInt32(property.value, radix: 16) ?? 0
-        didChangeValue(forKey: "panadapterId")
-        
+        update(&_panadapterId, value: UInt32(property.value, radix: 16) ?? 0, key: "panadapterId")
+
       case .available, .band, .bandwidth, .capacity, .center, .daxIq, .daxIqRate,
            .loopA, .loopB, .rfGain, .rxAnt, .wide, .xPixels, .xvtr:
         // ignored here
@@ -208,7 +199,23 @@ public final class Waterfall                : NSObject, StatusParser, Properties
       NC.post(.waterfallHasBeenAdded, object: self as Any?)
     }
   }
-  
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
+    }
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - VitaProcessor protocol methods
   

@@ -1,5 +1,16 @@
 xLib6000 Change Log
 
+v1.0.18
+
+Meter.swift - added NSObject to class declaration
+Meter.swift - changed "description" property to "desc"
+Added update(_:value:key:) to each model (dynamic & static)
+Replaced cases in parseProperties() with update version
+Edited comments and repositioned source code in all Models
+Panadapter.swift - corrected error in parseProperties() for .loopBEnabled
+Interlock.swift - corrected error in parseProperties() for .tx1Delay
+Interlock.swift - corrected error in parseProperties() for .tx1Enabled
+
 v1.0.17
 
 SliceCommands.swift - corrected sliceLock(_:), changed "0x\(id)" to " 0x\(id)"
