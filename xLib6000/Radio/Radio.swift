@@ -97,9 +97,8 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   // MARK: - Private properties
   
   private var _radioInitialized = false
-//  private var _localIP                      = "0.0.0.0"                     // client IP for radio
-//  private var _localUDPPort                 : UInt16 = 0                    // bound UDP port
   private var _hardwareVersion              : String?                       // ???
+  private var _metersToSubscribe            = [Api.MeterShortName]()
 
   // GCD Queue
   private let _objectQ                      : DispatchQueue
@@ -215,10 +214,11 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   /// - Parameters:
   ///   - api:        an Api instance
   ///
-  public init(api: Api, objectQ: DispatchQueue) {
+  public init(api: Api, objectQ: DispatchQueue, metersToSubscribe: [Api.MeterShortName]) {
     
     _api = api
     _objectQ = objectQ
+    _metersToSubscribe = metersToSubscribe
 
     super.init()
 
@@ -1014,18 +1014,20 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   ///   - reply:          the reply
   ///
   private func parseMeterListReply(_ reply: String) {
-    
-    // nested function to add & parse meters
+
+    // nested function to add meter subscriptions
     func addMeter(id: String, keyValues: KeyValuesArray) {
-      
-      // create a meter
-      let meter = Meter(id: id, queue: _objectQ)
-      
-      // add it to the collection
-      self.meters[id] = meter
-      
-      // pass the key values to the Meter for parsing
-      meter.parseProperties( keyValues )
+
+      // is the meter Short Name valid?
+      if let shortName = Api.MeterShortName(rawValue: keyValues[2].value.uppercased()) {
+        
+        // YES, is it in the list needing subscription?
+        if _metersToSubscribe.contains(shortName) {
+          
+          // YES, send a subscription command
+          _api.send("sub meter \(id)")
+        }
+      }
     }
     
     // drop the "meter " string

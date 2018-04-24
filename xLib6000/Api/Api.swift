@@ -94,6 +94,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   private var _primaryCmdTypes              = [Api.Command]()               // Primary command types to be sent
   private var _secondaryCmdTypes            = [Api.Command]()               // Secondary command types to be sent
   private var _subscriptionCmdTypes         = [Api.Command]()               // Subscription command types to be sent
+  
   private var _primaryCommands              = [CommandTuple]()              // Primary commands to be sent
   private var _secondaryCommands            = [CommandTuple]()              // Secondary commands to be sent
   private var _subscriptionCommands         = [CommandTuple]()              // Subscription commands to be sent
@@ -162,8 +163,9 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   public func connect(_ selectedRadio: RadioParameters, clientName: String, isGui: Bool = true,
                       primaryCmdTypes: [Api.Command] = [.allPrimary],
                       secondaryCmdTypes: [Api.Command] = [.allSecondary],
-                      subscriptionCmdTypes: [Api.Command] = [.allSubscription]) -> Bool {
-    
+                      subscriptionCmdTypes: [Api.Command] = [.allSubscription],
+                      metersToSubscribe: [MeterShortName] = MeterShortName.allMeters() ) -> Bool {
+
     _clientName = clientName
     _isGui = isGui
 
@@ -192,7 +194,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
       case .initialized:                      // not connected but initialized
         
         // Create a Radio class
-        radio = Radio(api: self, objectQ: _objectQ)
+        radio = Radio(api: self, objectQ: _objectQ, metersToSubscribe: metersToSubscribe)
         
         activeRadio = selectedRadio
         
@@ -817,13 +819,48 @@ extension Api {
       return [.clientProgram, .clientLowBW, .clientGui]
     }
     static func allSecondaryCommands() -> [Command] {
-      return [.info, .version, .antList, .micList, .profileGlobal,
+      return [.info, .version, .antList, .meterList, .micList, .profileGlobal,
               .profileTx, .profileMic, .eqRx, .eqTx]
     }
     static func allSubscriptionCommands() -> [Command] {
-      return [.subRadio, .subTx, .subAtu, .subMeter, .subPan, .subSlice, .subTnf, .subGps,
+      return [.subRadio, .subTx, .subAtu, .subPan, .subSlice, .subTnf, .subGps,
               .subAudioStream, .subCwx, .subXvtr, .subMemories, .subDaxIq, .subDax,
               .subUsbCable, .subAmplifier, .subFoundation, .subScu]
+    }
+  }
+    
+  public enum MeterShortName : String {
+    case codecOutput            = "CODEC"
+    case microphoneAverage      = "MIC"
+    case microphoneOutput       = "SC_MIC"
+    case microphonePeak         = "MICPEAK"
+    case postClipper            = "COMPPEAK"
+    case postFilter1            = "SC_FILT_1"
+    case postFilter2            = "SC_FILT_2"
+    case postGain               = "GAIN"
+    case postRamp               = "AFRAMP"
+    case postSoftwareAlc        = "ALC"
+    case powerForward           = "FWDPWR"
+    case powerReflected         = "REFPWR"
+    case preRamp                = "B4RAMP"
+    case preWaveAgc             = "PRE_WAVE_AGC"
+    case preWaveShim            = "PRE_WAVE"
+    case signal24Khz            = "24kHz"
+    case signalPassband         = "LEVEL"
+    case signalPostNrAnf        = "NR/ANF"
+    case signalPostAgc          = "AGC+"
+    case swr                    = "SWR"
+    case temperaturePa          = "PATEMP"
+    case voltageAfterFuse       = "+13.8B"
+    case voltageBeforeFuse      = "+13.8A"
+    case voltageHwAlc           = "HWALC"
+
+    public static func allMeters() -> [MeterShortName] {
+      return [.codecOutput, .microphoneAverage, .microphoneOutput, .microphonePeak,
+              .postClipper, .postFilter1, .postFilter2, .postGain, .postRamp, .postSoftwareAlc,
+              .powerForward, .powerReflected, .preWaveAgc, .preWaveShim, .signal24Khz,
+              .signalPassband, .signalPostNrAnf, .signalPostAgc, .swr, .temperaturePa,
+              .voltageAfterFuse, .voltageBeforeFuse, .voltageHwAlc]
     }
   }
   

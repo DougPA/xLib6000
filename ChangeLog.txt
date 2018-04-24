@@ -1,5 +1,13 @@
 xLib6000 Change Log
 
+v1.0.19
+
+Api.swift - added MeterShortName enum
+Api.swift - added metersToSubscribe: parameter to connect(_:clientName:isGui:primaryCmdTypes:secondaryCmdTypes:subscriptionCmdTypes:)
+Radio.swift - added property _metersToSubscribe
+Radio.swift - added metersToSubscribe: parameter to init(api:objectQ:)
+Radio.swift - rewrote parseMeterListReply(_:) to generate sub messages for all meters in _metersToSubscribe
+
 v1.0.18
 
 Meter.swift - added NSObject to class declaration
