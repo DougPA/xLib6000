@@ -1,7 +1,21 @@
 xLib6000 Change Log
 
+v1.0.20
+
+SliceCommands.swift - corrected audioCmd, changed "token=value" to "token value"
+Slice.swift - added static names() to AgcMode enum
+Slice.swift - added @objc dynamic agcNames property
+
 v1.0.19
 
+Notifications.swift - added sliceMeterHasBeenAdded
+Meter.swift - moved code that handles "Slice Meters" from parseStatus(...) to parseProperties(...)
+Slice.swift - added missing "_q.sync" & "@objc dynamic" to meters property
+Panadapter.swift - added daxChannels & daxChoices properties
+Radio.swift - added findMeteryBy(id:)
+Radio.swift - Added update(_:value:key:)
+Radio.swift - Replaced cases in parseProperties() with update version
+Radio.swift - changed parseMeterListReply(_:) to "lowercase" meter names instead of "uppercase" them
 Api.swift - added MeterShortName enum
 Api.swift - added metersToSubscribe: parameter to connect(_:clientName:isGui:primaryCmdTypes:secondaryCmdTypes:subscriptionCmdTypes:)
 Radio.swift - added property _metersToSubscribe

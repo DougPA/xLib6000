@@ -870,7 +870,23 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   
   // MARK: ----- Meter -----
   
-  /// Synchronously find a Meter by its ShortName
+  /// Find a Meter by its Slice
+  ///
+  /// - Parameters:
+  ///   - slice:      a Slice id
+  /// - Returns:      a Meter reference
+  ///
+  public func findMeteryBy(id: SliceId) -> Meter? {
+    var meter: Meter?
+    
+    for (_, aMeter) in meters where aMeter.source == "slc" && aMeter.number ==  id {
+      
+      // get a reference to the Meter
+      meter = aMeter
+    }
+    return meter
+  }
+  /// Find a Meter by its ShortName
   ///
   /// - Parameters:
   ///   - name:       Short Name of a Meter
@@ -1019,7 +1035,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
     func addMeter(id: String, keyValues: KeyValuesArray) {
 
       // is the meter Short Name valid?
-      if let shortName = Api.MeterShortName(rawValue: keyValues[2].value.uppercased()) {
+      if let shortName = Api.MeterShortName(rawValue: keyValues[2].value.lowercased()) {
         
         // YES, is it in the list needing subscription?
         if _metersToSubscribe.contains(shortName) {
@@ -1029,7 +1045,6 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
         }
       }
     }
-    
     // drop the "meter " string
     let meters = String(reply.dropFirst(6))
     let keyValues = meters.keyValuesArray(delimiter: "#")
@@ -1137,47 +1152,34 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
         
       case .autoLevel:
         if filterSharpness && cw {
-          willChangeValue(forKey: "filterCwAutoLevel")
-          _filterCwAutoLevel = property.value.iValue() ; cw = false
-          didChangeValue(forKey: "filterCwAutoLevel")
+          update(&_filterCwAutoLevel, value: property.value.iValue(), key: "filterCwAutoLevel")
+          cw = false
         }
         if filterSharpness && digital {
-          willChangeValue(forKey: "filterDigitalAutoLevel")
-          _filterDigitalAutoLevel = property.value.iValue() ; digital = false
-          didChangeValue(forKey: "filterDigitalAutoLevel")
+          update(&_filterDigitalAutoLevel, value: property.value.iValue(), key: "filterDigitalAutoLevel")
+          digital = false
         }
         if filterSharpness && voice {
-          willChangeValue(forKey: "filterVoiceAutoLevel")
-          _filterVoiceAutoLevel = property.value.iValue() ; voice = false
-          didChangeValue(forKey: "filterVoiceAutoLevel")
+          update(&_filterVoiceAutoLevel, value: property.value.iValue(), key: "filterVoiceAutoLevel")
+          voice = false
         }
         filterSharpness = false
         
       case .backlight:
-        willChangeValue(forKey: "backlight")
-        _backlight = property.value.iValue()
-        didChangeValue(forKey: "backlight")
-        
+        update(&_backlight, value: property.value.iValue(), key: "backlight")
+
       case .bandPersistenceEnabled:
-        willChangeValue(forKey: "bandPersistenceEnabled")
-        _bandPersistenceEnabled = property.value.bValue()
-        didChangeValue(forKey: "bandPersistenceEnabled")
-        
+        update(&_bandPersistenceEnabled, value: property.value.bValue(), key: "bandPersistenceEnabled")
+
       case .binauralRxEnabled:
-        willChangeValue(forKey: "binauralRxEnabled")
-        _binauralRxEnabled = property.value.bValue()
-        didChangeValue(forKey: "binauralRxEnabled")
-        
+        update(&_binauralRxEnabled, value: property.value.bValue(), key: "binauralRxEnabled")
+
       case .calFreq:
-        willChangeValue(forKey: "calFreq")
-        _calFreq = property.value.iValue()
-        didChangeValue(forKey: "calFreq")
-        
+        update(&_calFreq, value: property.value.iValue(), key: "calFreq")
+
       case .callsign:
-        willChangeValue(forKey: "callsign")
-        _callsign = property.value
-        didChangeValue(forKey: "callsign")
-        
+        update(&_callsign, value: property.value, key: "callsign")
+
       case .cw, .CW:
         cw = true
         
@@ -1185,149 +1187,105 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
         digital = true
         
       case .enforcePrivateIpEnabled:
-        willChangeValue(forKey: "enforcePrivateIpEnabled")
-        _enforcePrivateIpEnabled = property.value.bValue()
-        didChangeValue(forKey: "enforcePrivateIpEnabled")
-        
+        update(&_enforcePrivateIpEnabled, value: property.value.bValue(), key: "enforcePrivateIpEnabled")
+
       case .filterSharpness:
         filterSharpness = true
         
       case .freqErrorPpb:
-        willChangeValue(forKey: "freqErrorPpb")
-        _freqErrorPpb = property.value.iValue()
-        didChangeValue(forKey: "freqErrorPpb")
-        
+         update(&_freqErrorPpb, value: property.value.iValue(), key: "freqErrorPpb")
+
       case .fullDuplexEnabled:
-        willChangeValue(forKey: "fullDuplexEnabled")
-        _fullDuplexEnabled = property.value.bValue()
-        didChangeValue(forKey: "fullDuplexEnabled")
-        
+        update(&_fullDuplexEnabled, value: property.value.bValue(), key: "fullDuplexEnabled")
+
       case .gateway:
         if staticNetParams {
-          willChangeValue(forKey: "staticGateway")
-          _staticGateway = property.value
-          didChangeValue(forKey: "staticGateway")
+          update(&_staticGateway, value: property.value, key: "staticGateway")
         }
         
       case .headphoneGain:
-        willChangeValue(forKey: "headphoneGain")
-        _headphoneGain = property.value.iValue()
-        didChangeValue(forKey: "headphoneGain")
-        
+        update(&_headphoneGain, value: property.value.iValue(), key: "headphoneGain")
+
       case .headphoneMute:
-        willChangeValue(forKey: "headphoneMute")
-        _headphoneMute = property.value.bValue()
-        didChangeValue(forKey: "headphoneMute")
-        
+        update(&_headphoneMute, value: property.value.bValue(), key: "headphoneMute")
+
       case .ip:
         if staticNetParams {
-          willChangeValue(forKey: "staticIp")
-          _staticIp = property.value
-          didChangeValue(forKey: "staticIp")
+          update(&_staticIp, value: property.value, key: "staticIp")
         }
         
       case .level:
         if filterSharpness && cw {
-          willChangeValue(forKey: "filterCwLevel")
-          _filterCwLevel = property.value.iValue() ; cw = false
-          didChangeValue(forKey: "filterCwLevel")
+          update(&_filterCwLevel, value: property.value.iValue(), key: "filterCwLevel")
+          cw = false
         }
         if filterSharpness && digital {
-          willChangeValue(forKey: "filterDigitalLevel")
-          _filterDigitalLevel = property.value.iValue() ; digital = false
-          didChangeValue(forKey: "filterDigitalLevel")
+          update(&_filterDigitalLevel, value: property.value.iValue(), key: "filterDigitalLevel")
+          digital = false
         }
         if filterSharpness && voice {
-          willChangeValue(forKey: "filterVoiceLevel")
-          _filterVoiceLevel = property.value.iValue() ; voice = false
-          didChangeValue(forKey: "filterVoiceLevel")
+          update(&_filterVoiceLevel, value: property.value.iValue(), key: "filterVoiceLevel")
+          voice = false
         }
         filterSharpness = false
         
       case .lineoutGain:
-        willChangeValue(forKey: "lineoutGain")
-        _lineoutGain = property.value.iValue()
-        didChangeValue(forKey: "lineoutGain")
-        
+         update(&_lineoutGain, value: property.value.iValue(), key: "lineoutGain")
+
       case .lineoutMute:
-        willChangeValue(forKey: "lineoutMute")
-        _lineoutMute = property.value.bValue()
-        didChangeValue(forKey: "lineoutMute")
-        
+        update(&_lineoutMute, value: property.value.bValue(), key: "lineoutMute")
+
       case .locked:
         if oscillator {
-          willChangeValue(forKey: "locked")
-          _locked = property.value.bValue()
-          didChangeValue(forKey: "locked")
+          update(&_locked, value: property.value.bValue(), key: "locked")
         }
         
       case .netmask:
         if staticNetParams {
-          willChangeValue(forKey: "staticNetmask")
-          _staticNetmask = property.value ; staticNetParams = false
-          didChangeValue(forKey: "staticNetmask")
+          update(&_staticNetmask, value: property.value, key: "staticNetmask")
+          staticNetParams = false
         }
         
       case .nickname:
-        willChangeValue(forKey: "nickname")
-        _nickname = property.value
-        didChangeValue(forKey: "nickname")
-        
+        update(&_nickname, value: property.value, key: "nickname")
+
       case .oscillator:
         oscillator = true
         
       case .panadapters:
-        willChangeValue(forKey: "availablePanadapters")
-        _availablePanadapters = property.value.iValue()
-        didChangeValue(forKey: "availablePanadapters")
-        
+        update(&_availablePanadapters, value: property.value.iValue(), key: "availablePanadapters")
+
       case .pllDone:
-        willChangeValue(forKey: "startOffset")
-        _startOffset = property.value.bValue()
-        didChangeValue(forKey: "startOffset")
-        
+        update(&_startOffset, value: property.value.bValue(), key: "startOffset")
+
       case .remoteOnEnabled:
-        willChangeValue(forKey: "remoteOnEnabled")
-        _remoteOnEnabled = property.value.bValue()
-        didChangeValue(forKey: "remoteOnEnabled")
-        
+        update(&_remoteOnEnabled, value: property.value.bValue(), key: "remoteOnEnabled")
+
       case .rttyMark:
-        willChangeValue(forKey: "rttyMark")
-        _rttyMark = property.value.iValue()
-        didChangeValue(forKey: "rttyMark")
-        
+        update(&_rttyMark, value: property.value.iValue(), key: "rttyMark")
+
       case .setting:
         if oscillator {
-          willChangeValue(forKey: "setting")
-          _setting = property.value
-          didChangeValue(forKey: "setting")
+          update(&_setting, value: property.value, key: "setting")
         }
         
       case .slices:
-        willChangeValue(forKey: "availableSlices")
-        _availableSlices = property.value.iValue()
-        didChangeValue(forKey: "availableSlices")
-        
+        update(&_availableSlices, value: property.value.iValue(), key: "availableSlices")
+
       case .snapTuneEnabled:
-        willChangeValue(forKey: "snapTuneEnabled")
-        _snapTuneEnabled = property.value.bValue()
-        didChangeValue(forKey: "snapTuneEnabled")
-        
+        update(&_snapTuneEnabled, value: property.value.bValue(), key: "snapTuneEnabled")
+
       case .state:
         if oscillator {
-          willChangeValue(forKey: "state")
-          _state = property.value
-          didChangeValue(forKey: "state")
+          update(&_state, value: property.value, key: "state")
         }
         
       case .staticNetParams:
         staticNetParams = true
         
       case .tnfEnabled:
-        willChangeValue(forKey: "tnfEnabled")
-        _tnfEnabled = property.value.bValue()
-        didChangeValue(forKey: "tnfEnabled")
-        
+        update(&_tnfEnabled, value: property.value.bValue(), key: "tnfEnabled")
+
       case .voice, .VOICE:
         voice = true
         
@@ -1341,6 +1299,22 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
       
       // notify all observers
       NC.post(.radioHasBeenAdded, object: self as Any?)
+    }
+  }
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    if property != value {
+      willChangeValue(forKey: key)
+      property = value
+      didChangeValue(forKey: key)
     }
   }
 

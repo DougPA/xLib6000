@@ -92,14 +92,9 @@ extension xLib6000.Slice {
   ///   - token:      the parse token
   ///   - value:      the new value
   ///
-  private func audioCmd(_ token: Token, _ value: Any) {
+  private func audioCmd(_ token: String, value: Any) {
     
-    Api.sharedInstance.send(xLib6000.Slice.kAudioCmd + "0x\(id) " + token.rawValue + "=\(value)")
-  }
-  // alternate form for commands that do not use the Token raw value in outgoing messages
-  private func audioCmd(_ token: String, _ value: Any) {
-    
-    Api.sharedInstance.send(xLib6000.Slice.kAudioCmd + "0x\(id) " + token + "=\(value)")
+    Api.sharedInstance.send(xLib6000.Slice.kAudioCmd + "0x\(id) " + token + " \(value)")
   }
   /// Set a Filter property on the Radio
   ///
@@ -118,15 +113,15 @@ extension xLib6000.Slice {
   
   @objc dynamic public var audioGain: Int {
     get { return _audioGain }
-    set { if _audioGain != newValue { if newValue.within(Radio.kMin, Radio.kMax) { _audioGain = newValue ; audioCmd( "gain", newValue) } } } }
+    set { if _audioGain != newValue { if newValue.within(Radio.kMin, Radio.kMax) { _audioGain = newValue ; audioCmd("gain", value: newValue) } } } }
   
   @objc dynamic public var audioMute: Bool {
     get { return _audioMute }
-    set { if _audioMute != newValue { _audioMute = newValue ; audioCmd( "mute", newValue.asNumber()) } } }
+    set { if _audioMute != newValue { _audioMute = newValue ; audioCmd("mute", value: newValue) } } }
   
   @objc dynamic public var audioPan: Int {
     get { return _audioPan }
-    set { if _audioPan != newValue { _audioPan = newValue ; audioCmd( "pan", newValue) } } }
+    set { if _audioPan != newValue { if newValue.within(Radio.kMin, Radio.kMax) { _audioGain = newValue ; audioCmd("pan", value: newValue) } } } }
   
   // ***** FILTER COMMANDS *****
   

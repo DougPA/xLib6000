@@ -66,6 +66,8 @@ public enum NotificationType : String {
   case sliceHasBeenAdded
   case sliceWillBeRemoved
   
+  case sliceMeterHasBeenAdded
+  
   case tcpDidConnect
   case tcpDidDisconnect
   case tcpPingStarted

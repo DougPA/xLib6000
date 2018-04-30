@@ -140,17 +140,6 @@ public final class Meter                    : NSObject, StatusParser, Properties
         
         // NO, create a new Meter & add it to the Meters collection
         radio.meters[meterId] = Meter(id: meterId, queue: queue)
-        
-        // is it a Slice meter?
-        if radio.meters[meterId]!.source == Meter.Source.slice.rawValue {
-          
-          // YES, get the Slice
-          if let slice = radio.slices[radio.meters[meterId]!.number] {
-            
-            // add it to the Slice
-            slice.addMeter(radio.meters[meterId]!)
-          }
-        }
       }
       // pass the key values to the Meter for parsing
       radio.meters[meterId]!.parseProperties( keyValues )
@@ -268,8 +257,23 @@ public final class Meter                    : NSObject, StatusParser, Properties
       // the Radio (hardware) has acknowledged this Meter
       _initialized = true
       
-      // notify all observers
-      NC.post(.meterHasBeenAdded, object: self as Any?)
+      // is it a Slice meter?
+      if source == Meter.Source.slice.rawValue {
+        
+        // YES, get the Slice
+        if let slice = Api.sharedInstance.radio!.slices[number] {
+          
+          // add it to the Slice
+          slice.addMeter(self)
+          
+          // notify all observers
+          NC.post(.sliceMeterHasBeenAdded, object: self as Any?)
+        }
+        
+      } else {
+        // notify all observers
+        NC.post(.meterHasBeenAdded, object: self as Any?)
+      }
     }
   }
   

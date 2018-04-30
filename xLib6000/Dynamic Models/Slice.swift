@@ -25,7 +25,8 @@ public final class Slice                    : NSObject, StatusParser, Properties
   // MARK: - Public properties
   
   public private(set) var id                : SliceId = ""                  // Id that uniquely identifies this Slice
-  
+  @objc dynamic public var agcNames         = AgcMode.names()
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -972,11 +973,11 @@ extension xLib6000.Slice {
     set { _wide = newValue } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
+  // MARK: - Public properties - KVO compliant Setters / Getters with synchronization
   
-  public var meters: [String: Meter] {                                               // meters
-    get { return _meters }
-    set { _meters = newValue } }
+  @objc dynamic public var meters: [String: Meter] { 
+    get { return _q.sync { _meters } }
+    set { _q.sync(flags: .barrier) { _meters = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Slice tokens
@@ -1068,6 +1069,10 @@ extension xLib6000.Slice {
     case slow
     case medium
     case fast
+  
+    static func names() -> [String] {
+      return [AgcMode.off.rawValue, AgcMode.slow.rawValue, AgcMode.medium.rawValue, AgcMode.fast.rawValue]
+    }
   }
   
   public enum Mode : String {

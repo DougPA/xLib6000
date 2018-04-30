@@ -35,6 +35,7 @@ public protocol PanadapterStreamHandler     : class {
 public final class Panadapter               : NSObject, StatusParser, PropertiesParser, VitaProcessor {
   
   static let kMaxBins                       = 5120
+  static let daxChannels                    = ["None", "1", "2", "3", "4"]
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -43,7 +44,9 @@ public final class Panadapter               : NSObject, StatusParser, Properties
   
   public private(set) var lastFrameIndex    = 0                             // Frame index of previous Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
-
+  
+  @objc dynamic public let daxChoices       = Panadapter.daxChannels
+  
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
