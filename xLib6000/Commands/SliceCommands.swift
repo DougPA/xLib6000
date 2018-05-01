@@ -57,16 +57,6 @@ extension xLib6000.Slice {
     
     Api.sharedInstance.send(xLib6000.Slice.kTuneCmd + "0x\(id) \(value) autopan=\(_autoPan.asNumber())")
   }
-  /// Set a Slice status property on the Radio
-  ///
-  /// - Parameters:
-  ///   - token:      the parse token
-  ///   - value:      the new value
-  ///
-  private func sliceStatusCmd(_ token: Token, _ value: Any) {
-    
-    Api.sharedInstance.send(xLib6000.Slice.kCmd + "0x\(id) " + token.rawValue + "=\(value)")
-  }
   /// Set a Slice Lock property on the Radio
   ///
   /// - Parameters:
@@ -101,10 +91,17 @@ extension xLib6000.Slice {
   /// - Parameters:
   ///   - value:      the new value
   ///
-  private func filterCmd( _ value: Any) {
+  private func filterCmd( _ token: String, value: Any) {
     
-    Api.sharedInstance.send(xLib6000.Slice.kFilterCmd + "0x\(id) \(value)")
+    Api.sharedInstance.send(xLib6000.Slice.kFilterCmd + "0x\(id) " + token + " \(value)")
   }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  public func setRecord(_ value: Bool) { Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) record=\(value.asNumber())") }
+  
+  public func setPlay(_ value: Bool) { Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) play=\(value.asNumber())") }
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
@@ -117,21 +114,21 @@ extension xLib6000.Slice {
   
   @objc dynamic public var audioMute: Bool {
     get { return _audioMute }
-    set { if _audioMute != newValue { _audioMute = newValue ; audioCmd("mute", value: newValue) } } }
+    set { if _audioMute != newValue { _audioMute = newValue ; audioCmd("mute", value: newValue.asNumber()) } } }
   
   @objc dynamic public var audioPan: Int {
     get { return _audioPan }
     set { if _audioPan != newValue { if newValue.within(Radio.kMin, Radio.kMax) { _audioGain = newValue ; audioCmd("pan", value: newValue) } } } }
   
   // ***** FILTER COMMANDS *****
-  
+
   @objc dynamic public var filterHigh: Int {
     get { return _filterHigh }
-    set { if _filterHigh != newValue { let value = filterHighLimits(newValue) ; _filterHigh = value ; filterCmd( "\(filterLow) \(value)") } } }
+    set { if _filterHigh != newValue { let value = filterHighLimits(newValue) ; _filterHigh = value ; filterCmd( "filter_lo ", value: value) } } }
   
   @objc dynamic public var filterLow: Int {
     get { return _filterLow }
-    set { if _filterLow != newValue { let value = filterLowLimits(newValue) ; _filterLow = value ; filterCmd( "\(value) \(filterHigh)") } } }
+    set { if _filterLow != newValue { let value = filterLowLimits(newValue) ; _filterLow = value ; filterCmd( "filter_hi ", value: value) } } }
   
   // ***** SLICE LOCK COMMANDS *****
   
@@ -327,5 +324,4 @@ extension xLib6000.Slice {
   @objc dynamic public var frequency: Int {
     get { return _frequency }
     set { if !_locked { if _frequency != newValue { _frequency = newValue ; sliceTuneCmd( newValue.hzToMhz()) } } } }
-  
 }

@@ -16,6 +16,11 @@ import Foundation
 extension Meter {
   
   // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  public class func subscribeToId(_ id: MeterId) { Api.sharedInstance.send("sub meter \(id)") }
+
+  // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
   
   // ----- NONE -----

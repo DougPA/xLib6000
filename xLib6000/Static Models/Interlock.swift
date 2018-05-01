@@ -271,23 +271,23 @@ extension Interlock {
   // MARK: - Interlock tokens
   
   internal enum Token: String {
-    case accTxEnabled = "acc_tx_enabled"
-    case accTxDelay = "acc_tx_delay"
-    case accTxReqEnabled = "acc_txreq_enable"
-    case accTxReqPolarity = "acc_txreq_polarity"
-    case rcaTxReqEnabled = "rca_txreq_enable"
-    case rcaTxReqPolarity = "rca_txreq_polarity"
+    case accTxEnabled       = "acc_tx_enabled"
+    case accTxDelay         = "acc_tx_delay"
+    case accTxReqEnabled    = "acc_txreq_enable"
+    case accTxReqPolarity   = "acc_txreq_polarity"
+    case rcaTxReqEnabled    = "rca_txreq_enable"
+    case rcaTxReqPolarity   = "rca_txreq_polarity"
     case reason
     case source
     case state
     case timeout
-    case txAllowed = "tx_allowed"
-    case txDelay = "tx_delay"
-    case tx1Enabled = "tx1_enabled"
-    case tx1Delay = "tx1_delay"
-    case tx2Enabled = "tx2_enabled"
-    case tx2Delay = "tx2_delay"
-    case tx3Enabled = "tx3_enabled"
-    case tx3Delay = "tx3_delay"
+    case txAllowed          = "tx_allowed"
+    case txDelay            = "tx_delay"
+    case tx1Enabled         = "tx1_enabled"
+    case tx1Delay           = "tx1_delay"
+    case tx2Enabled         = "tx2_enabled"
+    case tx2Delay           = "tx2_delay"
+    case tx3Enabled         = "tx3_enabled"
+    case tx3Delay           = "tx3_delay"
   }
 }

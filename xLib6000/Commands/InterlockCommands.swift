@@ -47,7 +47,7 @@ extension Interlock {
   
   @objc dynamic public var accTxDelay: Int {
     get { return _accTxDelay }
-    set { if _accTxDelay != newValue { _accTxDelay = newValue ; interlockCmd( .accTxEnabled, newValue) } } }
+    set { if _accTxDelay != newValue { _accTxDelay = newValue ; interlockCmd( .accTxDelay, newValue) } } }
   
   @objc dynamic public var accTxReqEnabled: Bool {
     get {  return _accTxReqEnabled }

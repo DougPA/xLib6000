@@ -95,7 +95,7 @@ extension UsbCable {
   
   @objc dynamic public var sourceSlice: Int {
     get { return _sourceSlice }
-    set { if _sourceSlice != newValue { _sourceSlice = newValue ; usbCableCmd( .source, newValue) } } }
+    set { if _sourceSlice != newValue { _sourceSlice = newValue ; usbCableCmd( .sourceSlice, newValue) } } }
   
   @objc dynamic public var sourceTxAnt: String {
     get { return _sourceTxAnt }

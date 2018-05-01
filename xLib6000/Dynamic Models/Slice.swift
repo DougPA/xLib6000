@@ -197,12 +197,6 @@ public final class Slice                    : NSObject, StatusParser, Properties
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send commands to the Radio (hardware)
-  
-  public func setRecord(_ value: Bool) { Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) record=\(value.asNumber())") }
-  public func setPlay(_ value: Bool) { Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) play=\(value.asNumber())") }
-  
-  // ----------------------------------------------------------------------------
   // MARK: - Internal methods
   
   /// Add a Meter to this Slice's Meters collection

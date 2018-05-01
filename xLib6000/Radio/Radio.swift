@@ -1041,7 +1041,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
         if _metersToSubscribe.contains(shortName) {
           
           // YES, send a subscription command
-          _api.send("sub meter \(id)")
+          Meter.subscribeToId(id)
         }
       }
     }

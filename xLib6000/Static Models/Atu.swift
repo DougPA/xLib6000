@@ -147,8 +147,8 @@ extension Atu {
   
   internal enum Token: String {
     case status
-    case enabled = "atu_enabled"
-    case memoriesEnabled = "memories_enabled"
-    case usingMemories = "using_mem"
+    case enabled          = "atu_enabled"
+    case memoriesEnabled  = "memories_enabled"
+    case usingMemories    = "using_mem"
   }
 }

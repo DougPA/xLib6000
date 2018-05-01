@@ -120,11 +120,6 @@ public final class Memory                   : NSObject, StatusParser, Properties
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Public methods that send commands to the Radio (hardware)
-  
-  public func select() { Api.sharedInstance.send("memory apply \(id)") }
-  
-  // ------------------------------------------------------------------------------
   // MARK: - Private methods
   
   /// Restrict the Filter High value

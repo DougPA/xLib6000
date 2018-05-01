@@ -265,11 +265,11 @@ extension Cwx {
   // Mark: - Cwx tokens
   
   internal enum Token : String {
-    case breakInDelay = "break_in_delay"
-    case qskEnabled = "qsk_enabled"
+    case breakInDelay   = "break_in_delay"
+    case qskEnabled     = "qsk_enabled"
     case erase
     case sent
-    case wpm = "wpm"
+    case wpm            = "wpm"
   }
   
 }

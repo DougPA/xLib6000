@@ -43,6 +43,11 @@ extension Memory {
     Api.sharedInstance.send(Memory.kSetCmd + "\(id) " + token.rawValue + "=\(value)")
   }
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Public methods that send commands to the Radio (hardware)
+  
+  public func select() { Api.sharedInstance.send("memory apply \(id)") }
+
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
   
