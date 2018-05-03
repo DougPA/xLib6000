@@ -24,6 +24,22 @@ extension Equalizer {
   static let kCmd                           = "eq "                         // Command prefixes
   
   // ----------------------------------------------------------------------------
+  // MARK: - Class methods that send Commands to the Radio (hardware)
+  
+  /// Return a list of Equalizer values
+  ///
+  /// - Parameters:
+  ///   - eqType:             Equalizer type raw value of the enum)
+  ///   - callback:           ReplyHandler (optional)
+  /// - Returns:              Success / Failure
+  ///
+  public class func equalizerInfo(_ eqType: String, callback:  ReplyHandler? = nil) -> Bool {
+    
+    // ask the Radio for the selected Equalizer settings
+    return Api.sharedInstance.sendWithCheck(Equalizer.kCmd + eqType + " info", replyTo: callback)
+  }
+
+  // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   
   /// Set an Equalizer property on the Radio

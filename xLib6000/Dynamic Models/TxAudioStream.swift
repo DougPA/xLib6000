@@ -72,7 +72,7 @@ public final class TxAudioStream            : NSObject, StatusParser, Properties
         if radio.txAudioStreams[streamId] == nil {
           
           // NO, is this stream for this client?
-          if !radio.isAudioStreamStatusForThisClient(keyValues) { return }
+          if !AudioStream.isStatusForThisClient(keyValues) { return }
           
           // create a new AudioStream & add it to the AudioStreams collection
           radio.txAudioStreams[streamId] = TxAudioStream(id: streamId, queue: queue)
@@ -82,11 +82,15 @@ public final class TxAudioStream            : NSObject, StatusParser, Properties
         
       } else {
         
-        // NO, notify all observers
-        NC.post(.txAudioStreamWillBeRemoved, object: radio.txAudioStreams[streamId] as Any?)
-        
-        // remove it
-        radio.txAudioStreams[streamId] = nil
+        // does the stream exist?
+        if let stream = radio.txAudioStreams[streamId] {
+          
+          // notify all observers
+          NC.post(.txAudioStreamWillBeRemoved, object: stream as Any?)
+          
+          // remove the stream object
+          radio.txAudioStreams[streamId] = nil
+        }
       }
     }
   }

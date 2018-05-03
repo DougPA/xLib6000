@@ -28,6 +28,42 @@ extension Tnf {
   static let kSetCmd                        = "tnf set "
   
   // ----------------------------------------------------------------------------
+  // MARK: - Class methods that send Commands to the Radio (hardware)
+  
+  /// Create a Tnf
+  ///
+  /// - Parameters:
+  ///   - frequency:          frequency (Hz)
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public class func create(frequency: String, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Tnf
+    Api.sharedInstance.send(Tnf.kCreateCmd + "freq" + "=\(frequency)", replyTo: callback)
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  /// Remove a Tnf
+  ///
+  /// - Parameters:
+  ///   - tnf:                Tnf Id
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove the Tnf
+    Api.sharedInstance.send(Tnf.kRemoveCmd + " \(id)", replyTo: callback)
+    
+    // notify all observers
+    NC.post(.tnfWillBeRemoved, object: self as Any?)
+    
+    // remove the Tnf
+    Api.sharedInstance.radio!.tnfs[self.id] = nil
+  }
+
+  // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   
   /// Set a Tnf property on the Radio

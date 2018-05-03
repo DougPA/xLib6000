@@ -15,20 +15,6 @@ import Foundation
 
 extension xLib6000.Slice {
   
-  //
-  //  NOTE:   Slice Commands are in one of the following formats:
-  //
-  //              slice create <value>...
-  //              slice create pan=<value>...
-  //              slice remove <SliceId>
-  //              slice tune <SliceId> <value> autopan=<autoPan>
-  //              slice <SliceId> <valueName>=<value>
-  //              slice lock/unlock <SliceId>"
-  //              slice set <SliceId> <valueName>=<value>
-  //              audio client 0 slice <SliceId> <valueName>=<value>
-  //              filt <SliceId> <value>
-  //
-  
   // NOTE:    most outgoing commands use the same Token value as is found
   //          in the incoming Status messages, SOME DO NOT. The alternate
   //          form of the ...Cmd methods were created to deal with this issue.
@@ -44,6 +30,69 @@ extension xLib6000.Slice {
 
   static let kMinOffset                     = -99_999                       // frequency offset range
   static let kMaxOffset                     = 99_999
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Class methods that send Commands to the Radio (hardware)
+  
+  /// Create a new Slice
+  ///
+  /// - Parameters:
+  ///   - frequency:          frequenct (Hz)
+  ///   - antenna:            selected antenna
+  ///   - mode:               selected mode
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public class func create(frequency: Int, antenna: String, mode: String, callback: ReplyHandler? = nil) { if Api.sharedInstance.radio!.availableSlices > 0 {
+    
+    // tell the Radio to create a Slice
+    Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "\(frequency.hzToMhz()) \(antenna) \(mode)", replyTo: callback) }
+  }
+  /// Create a new Slice
+  ///
+  /// - Parameters:
+  ///   - panadapter:         selected panadapter
+  ///   - frequency:          frequency (Hz)
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public class func create(panadapter: Panadapter, frequency: Int = 0, callback: ReplyHandler? = nil) { if Api.sharedInstance.radio!.availableSlices > 0 {
+    
+    // tell the Radio to create a Slice
+    Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "pan" + "=\(panadapter.id.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz())")", replyTo: callback) }
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  /// Remove this Slice
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove a Slice
+    Api.sharedInstance.send(xLib6000.Slice.kRemoveCmd + " \(id)", replyTo: callback)
+  }
+  /// Requent the Slice frequency error values
+  ///
+  /// - Parameters:
+  ///   - id:                 Slice Id
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func errorRequest(_ id: SliceId, callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for the current frequency error
+    Api.sharedInstance.send(xLib6000.Slice.kCmd + "get_error" + " \(id)", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+  }
+  /// Request a list of slice Stream Id's
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func listRequest(callback: ReplyHandler? = nil) {
+    
+    // ask the Radio for a list of Slices
+    Api.sharedInstance.send(xLib6000.Slice.kCmd + "list", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
@@ -91,9 +140,9 @@ extension xLib6000.Slice {
   /// - Parameters:
   ///   - value:      the new value
   ///
-  private func filterCmd( _ token: String, value: Any) {
+  private func filterCmd(low: Any, high: Any) {
     
-    Api.sharedInstance.send(xLib6000.Slice.kFilterCmd + "0x\(id) " + token + " \(value)")
+    Api.sharedInstance.send(xLib6000.Slice.kFilterCmd + "0x\(id)" + " \(low)" + " \(high)")
   }
   
   // ----------------------------------------------------------------------------
@@ -124,11 +173,11 @@ extension xLib6000.Slice {
 
   @objc dynamic public var filterHigh: Int {
     get { return _filterHigh }
-    set { if _filterHigh != newValue { let value = filterHighLimits(newValue) ; _filterHigh = value ; filterCmd( "filter_lo ", value: value) } } }
+    set { if _filterHigh != newValue { let value = filterHighLimits(newValue) ; _filterHigh = value ; filterCmd( low: _filterLow, high: value) } } }
   
   @objc dynamic public var filterLow: Int {
     get { return _filterLow }
-    set { if _filterLow != newValue { let value = filterLowLimits(newValue) ; _filterLow = value ; filterCmd( "filter_hi ", value: value) } } }
+    set { if _filterLow != newValue { let value = filterLowLimits(newValue) ; _filterLow = value ; filterCmd( low: value, high: _filterHigh) } } }
   
   // ***** SLICE LOCK COMMANDS *****
   

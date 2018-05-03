@@ -19,6 +19,8 @@ import Foundation
 
 public final class Gps                      : NSObject, PropertiesParser {
 
+  static let kGpsCmd                        = "radio gps "
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -40,6 +42,30 @@ public final class Gps                      : NSObject, PropertiesParser {
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Class methods that send Commands to the Radio (hardware)
+  
+  /// Gps Install
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public class func gpsInstall(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to install the GPS device
+    Api.sharedInstance.send(kGpsCmd + "install", replyTo: callback)
+  }
+  /// Gps Un-Install
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public class func gpsUnInstall(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove the GPS device
+    Api.sharedInstance.send(kGpsCmd + "uninstall", replyTo: callback)
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
   

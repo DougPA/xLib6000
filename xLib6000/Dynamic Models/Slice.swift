@@ -169,6 +169,93 @@ public final class Slice                    : NSObject, StatusParser, Properties
       
     }
   }
+  /// Disable all TxEnabled
+  ///
+  public class func disableAllTx() {
+    
+    // for all Slices, turn off txEnabled
+    for (_, slice) in Api.sharedInstance.radio!.slices {
+      
+      slice.txEnabled = false
+    }
+  }
+  /// Return references to all Slices on the specified Panadapter
+  ///
+  /// - Parameters:
+  ///   - pan:        a Panadapter Id
+  /// - Returns:      an array of Slices (may be empty)
+  ///
+  public class func findAll(with id: PanadapterId) -> [Slice] {
+    var sliceValues = [Slice]()
+    
+    // for all Slices on the specified Panadapter
+    for (_, slice) in Api.sharedInstance.radio!.slices where slice.panadapterId == id {
+      
+      // append to the result
+      sliceValues.append(slice)
+    }
+    return sliceValues
+  }
+  /// Given a Frequency, return the Slice on the specified Panadapter containing it (if any)
+  ///
+  /// - Parameters:
+  ///   - pan:        a reference to A Panadapter
+  ///   - freq:       a Frequency (in hz)
+  /// - Returns:      a reference to a Slice (or nil)
+  ///
+  public class func find(with id: PanadapterId, byFrequency freq: Int, minWidth: Int) -> Slice? {
+    var slice: Slice?
+    
+//    let minWidth = Int( CGFloat(panafallBandwidth) * kSliceFindWidth )
+    
+    // find the Panadapter containing the Slice (if any)
+    for (_, s) in Api.sharedInstance.radio!.slices where s.panadapterId == id {
+      
+      let widthDown = min(-minWidth/2, s.filterLow)
+      let widthUp = max(minWidth/2, s.filterHigh)
+      
+      if freq >= s.frequency + widthDown && freq <= s.frequency + widthUp {
+        
+        // YES, return the Slice
+        slice = s
+        break
+      }
+    }
+    return slice
+  }
+  /// Return the Active Slice on the specified Panadapter (if any)
+  ///
+  /// - Parameters:
+  ///   - pan:        a Panadapter reference
+  /// - Returns:      a Slice reference (or nil)
+  ///
+  public class func findActive(with id: PanadapterId) -> Slice? {
+    var slice: Slice?
+    
+    // is the Slice on the Panadapter and Active?
+    for (_, s) in Api.sharedInstance.radio!.slices where s.panadapterId == id && s.active {
+      
+      // YES, return the Slice
+      slice = s
+    }
+    return slice
+  }
+  /// Find a Slice by DAX Channel
+  ///
+  /// - Parameter channel:    Dax channel number
+  /// - Returns:              a Slice (if any)
+  ///
+  public class func find(with channel: DaxChannel) -> Slice? {
+    var slice: Slice?
+    
+    // find the Slice for the Dax Channel (if any)
+    for (_, s) in Api.sharedInstance.radio!.slices where s.daxChannel == channel {
+      
+      // YES, return the Slice
+      slice = s
+    }
+    return slice
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization

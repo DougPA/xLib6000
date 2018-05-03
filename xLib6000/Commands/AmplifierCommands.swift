@@ -21,6 +21,46 @@ extension Amplifier {
   static let kStandby                       = "STANDBY"
   
   // ----------------------------------------------------------------------------
+  // MARK: - Class methods that send Commands to the Radio (hardware)
+  
+  /// Create an Amplifier record
+  ///
+  /// - Parameters:
+  ///   - ip:             Ip Address (dotted-decimal STring)
+  ///   - port:           Port number
+  ///   - model:          Model
+  ///   - serialNumber:   Serial number
+  ///   - antennaPairs:   antenna pairs
+  ///   - callback:       ReplyHandler (optional)
+  ///
+  public class func create(ip: String, port: Int, model: String, serialNumber: String, antennaPairs: String, callback: ReplyHandler? = nil) {
+    
+    // TODO: add code
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  /// Remove this Amplifier record
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // TODO: add code
+  }
+  /// Change the Amplifier Mode
+  ///
+  /// - Parameters:
+  ///   - mode:           mode (String)
+  ///   - callback:       ReplyHandler (optional)
+  ///
+  public func setMode(_ mode: Bool, callback: ReplyHandler? = nil) {
+    
+    // TODO: add code
+  }
+  
+  // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   
   /// Set an Amplifier property on the Radio

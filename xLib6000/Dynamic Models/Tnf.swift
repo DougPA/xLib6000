@@ -73,7 +73,88 @@ public final class Tnf                      : NSObject, StatusParser, Properties
     // pass the remaining key values to the Tnf for parsing (dropping the Id)
     radio.tnfs[tnfId]!.parseProperties( Array(keyValues.dropFirst(1)) )
   }
-
+  /// Given a Frequency, return a reference to the Tnf containing it (if any)
+  ///
+  /// - Parameters:
+  ///   - freq:       a Frequency (in hz)
+  ///   - bandwidth:  panadapter bandwidth (hz)
+  /// - Returns:      a Tnf reference (or nil)
+  ///
+  class public func findBy(frequency freq: Int, minWidth: Int) -> Tnf? {
+    var tnfFound: Tnf?
+    
+//    let minWidth = Int( CGFloat(panafallBandwidth) * kTnfFindWidth )
+    
+    for (_, tnf) in Api.sharedInstance.radio!.tnfs {
+      
+      let halfwidth = max(minWidth, tnf.width/2)
+      if freq >= (tnf.frequency - halfwidth) && freq <= (tnf.frequency + halfwidth) {
+        tnfFound = tnf
+        break
+      }
+    }
+    return tnfFound
+  }
+  /// Determine a frequency for a Tnf
+  ///
+  /// - Parameters:
+  ///   - frequency:      tnf frequency (may be 0)
+  ///   - panadapter:     a Panadapter reference
+  /// - Returns:          the calculated Tnf frequency
+  ///
+  class func calcFreq(_ frequency: Int, _ panadapter: Panadapter) -> Int {
+    var freqDiff = 1_000_000_000
+    var targetSlice: xLib6000.Slice?
+    var tnfFreq = frequency
+    
+    // if frequency is 0, calculate a frequency
+    if tnfFreq == 0 {
+      
+      // for each Slice on this Panadapter find the one within freqDiff and closesst to the center
+      for slice in Slice.findAll(with: panadapter.id) {
+        
+        // how far is it from the center?
+        let diff = abs(slice.frequency - panadapter.center)
+        
+        // if within freqDiff of center
+        if diff < freqDiff {
+          
+          // update the freqDiff
+          freqDiff = diff
+          // save the slice
+          targetSlice = slice
+        }
+      }
+      // do we have a Slice?
+      if let slice = targetSlice {
+        
+        // YES, what mode?
+        switch slice.mode {
+          
+        case "LSB", "DIGL":
+          tnfFreq = slice.frequency + (( slice.filterLow - slice.filterHigh) / 2)
+          
+        case "RTTY":
+          tnfFreq = slice.frequency - (slice.rttyShift / 2)
+          
+        case "CW", "AM", "SAM":
+          tnfFreq = slice.frequency + ( slice.filterHigh / 2)
+          
+        case "USB", "DIGU", "FDV":
+          tnfFreq = slice.frequency + (( slice.filterLow - slice.filterHigh) / 2)
+          
+        default:
+          tnfFreq = slice.frequency + (( slice.filterHigh - slice.filterLow) / 2)
+        }
+        
+      } else {
+        
+        // NO, put it in the panadapter center
+        tnfFreq = panadapter.center
+      }
+    }
+    return tnfFreq
+  }
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
   

@@ -82,6 +82,7 @@ public final class Meter                    : NSObject, StatusParser, Properties
   ///   - vita:        a Vita struct
   ///
   class func vitaProcessor(_ vita: Vita) {
+//    var meterCount: [UInt16:Int] = [:]
     
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
@@ -97,7 +98,13 @@ public final class Meter                    : NSObject, StatusParser, Properties
         // get the Meter number and the Meter value
         let meterNumber: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: 2 * i).pointee)
         let meterValue: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: (2 * i) + 1).pointee)
-        
+
+//        if let count = meterCount[meterNumber] {
+//          meterCount[meterNumber] = count + 1
+//        } else {
+//          meterCount[meterNumber] = 1
+//        }
+
         // Find the meter (if present) & update it
         if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", meterNumber)] {
           
@@ -105,9 +112,43 @@ public final class Meter                    : NSObject, StatusParser, Properties
           meter.streamHandler( Int16(bitPattern: meterValue) )
         }
       }
-    
+//    for (meterNumber, count) in meterCount where count > 1 {
+//      Swift.print("meter = \(meterNumber), count = \(count)")
+//    }
   }
-  
+  /// Find a Meter by its Slice
+  ///
+  /// - Parameters:
+  ///   - slice:      a Slice id
+  /// - Returns:      a Meter reference
+  ///
+  public class func findBy(id: SliceId) -> Meter? {
+    var meter: Meter?
+    
+    for (_, aMeter) in Api.sharedInstance.radio!.meters where aMeter.source == "slc" && aMeter.number ==  id {
+      
+      // get a reference to the Meter
+      meter = aMeter
+    }
+    return meter
+  }
+  /// Find a Meter by its ShortName
+  ///
+  /// - Parameters:
+  ///   - name:       Short Name of a Meter
+  /// - Returns:      a Meter reference
+  ///
+  public class func findBy(shortName name: MeterName) -> Meter? {
+    var meter: Meter?
+    
+    for (_, aMeter) in Api.sharedInstance.radio!.meters where aMeter.name == name {
+      
+      // get a reference to the Meter
+      meter = aMeter
+    }
+    return meter
+  }
+
   // ----------------------------------------------------------------------------
   //      StatusParser Protocol method
   //      called by Radio.parseStatusMessage(_:), executes on the parseQ

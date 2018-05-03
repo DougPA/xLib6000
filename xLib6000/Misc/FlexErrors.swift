@@ -14,18 +14,33 @@ import Foundation
 //      Flex 6000 error codes
 //      see http://wiki.flexradio.com/index.php?title=Known_API_Responses
 //
-//      Usage:
-//          let errorString = (FlexErrors(rawValue: errorCode) ?? .SL_ERROR).description()
-//
-//              where:  errorCode is the UInt32 error value
-//   OR
-//          let errorString = FlexErrors(rawString: errorCode).description()
-//
-//              where:  errorCode is the String (hex) error value
-//
 // ----------------------------------------------------------------------------
 
-public enum FlexErrors: UInt32 {
+public func flexErrorString(errorCode: String) -> String {
+  var errorString = ""
+  
+  let number = UInt32(errorCode, radix: 16) ?? 0
+  
+  switch number {
+  case 0x10000001...0x10000003:
+    errorString = FlexErrors(rawValue: number )!.toString()
+  case 0x31000001...0x31000009:
+    errorString = FlexErrors(rawValue: number )!.toString()
+  case 0x50000001...0x500000A3:
+    errorString = FlexErrors(rawValue: number )!.toString()
+  case 0x50001000...0x50001017:
+    errorString = FlexErrors(rawValue: number )!.toString()
+  case 0xE2000000:
+    errorString = FlexErrors(rawValue: number )!.toString()
+  case 0xF3000001...0xF3000004:
+    errorString = FlexErrors(rawValue: number )!.toString()
+  default:
+    errorString = "Unknown error"
+  }
+  return errorString
+}
+
+enum FlexErrors: UInt32 {
   
   // Fatal
   case SLM_F_MAX_CLIENTS                              = 0xF3000001
@@ -248,10 +263,7 @@ public enum FlexErrors: UInt32 {
   case SLM_I_UNKNOWN_CLIENT                           = 0x10000002
   case SL_I_CWX_NOTHING_TO_ERASE                      = 0x10000003
   
-  // ----------------------------------------------------------------------------
-  // MARK: - Public methods
-  
-  public func description() -> String {
+  func toString() -> String {
     
     switch self {
       
@@ -479,12 +491,5 @@ public enum FlexErrors: UInt32 {
     case .SL_I_CWX_NOTHING_TO_ERASE: return "Nothing to erase"                          // 0x10000003
     }
   }
-}
-extension FlexErrors {
-  
-  public init(rawString: String) {
-    self = FlexErrors(rawValue: UInt32(rawString, radix: 16) ?? 0xE2000000 )!
-  }
-  
 }
 

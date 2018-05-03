@@ -33,6 +33,67 @@ extension Panadapter {
   static let kSetCmd                        = "display panafall set "
   
   // ----------------------------------------------------------------------------
+  // MARK: - Class methods that send Commands to the Radio (hardware)
+  
+  /// Create a Panafall
+  ///
+  /// - Parameters:
+  ///   - dimensions:         Panafall dimensions
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public class func create(_ dimensions: CGSize, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Panafall (if any available)
+    if Api.sharedInstance.radio!.availablePanadapters > 0 {
+      Api.sharedInstance.send(Panadapter.kCmd + "create x=\(dimensions.width) y=\(dimensions.height)", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+    }
+  }
+  /// Create a Panafall
+  ///
+  /// - Parameters:
+  ///   - frequency:          selected frequency (Hz)
+  ///   - antenna:            selected antenna
+  ///   - dimensions:         Panafall dimensions
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public class func create(frequency: Int, antenna: String? = nil, dimensions: CGSize? = nil, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Panafall (if any available)
+    if Api.sharedInstance.radio!.availablePanadapters > 0 {
+      
+      var cmd = Panadapter.kCreateCmd + "freq" + "=\(frequency.hzToMhz())"
+      if antenna != nil { cmd += " ant=" + "\(antenna!)" }
+      if dimensions != nil { cmd += " x" + "=\(dimensions!.width)" + " y" + "=\(dimensions!.height)" }
+      Api.sharedInstance.send(cmd, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+    }
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  /// Remove this Panafall
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove a Panafall
+    Api.sharedInstance.send(Panadapter.kRemoveCmd + "\(id.hex)", replyTo: callback)
+  }
+  /// Request Click Tune
+  ///
+  /// - Parameters:
+  ///   - frequency:          Frequency (Hz)
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func clickTune(_ frequency: Int, callback: ReplyHandler? = nil) {
+    
+    // FIXME: ???
+    Api.sharedInstance.send(xLib6000.Slice.kCmd + "m " + "\(frequency.hzToMhz())" + " pan=\(id.hex)", replyTo: callback)
+  }
+
+  // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   
   /// Set a Panadapter property on the Radio
@@ -55,8 +116,7 @@ extension Panadapter {
   // MARK: - Public methods that Request Information from the Radio (hardware)
   
   public func requestRfGainInfo() { Api.sharedInstance.send(Panadapter.kCmd + "rf_gain_info " + "\(id.hex)", replyTo: replyHandler) }
-  
-  
+    
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
   

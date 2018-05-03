@@ -128,12 +128,6 @@ extension Cwx {
   
   // ----------------------------------------------------------------------------
   
-  //
-  //  NOTE:   Cwx Commands are in the following format:
-  //
-  //              cwx <valueName> <value>
-  //
-  
   // NOTE:    most outgoing commands use the same Token value as is found
   //          in the incoming Status messages, SOME DO NOT. The alternate
   //          form of the ...Cmd methods were created to deal with this issue.

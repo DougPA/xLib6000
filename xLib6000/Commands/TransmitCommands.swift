@@ -53,7 +53,6 @@ extension Transmit {
     
     Api.sharedInstance.send(Transmit.kTuneCmd + token.rawValue + " \(value)")
   }
-  
   /// Set a Transmit property on the Radio
   ///
   /// - Parameters:
@@ -69,7 +68,6 @@ extension Transmit {
     
     Api.sharedInstance.send(Transmit.kSetCmd + token + "=\(value)")
   }
-  
   /// Set a CW property on the Radio
   ///
   /// - Parameters:
@@ -210,6 +208,10 @@ extension Transmit {
   @objc dynamic public var micLevel: Int {
     get {  return _micLevel }
     set { if _micLevel != newValue { _micLevel = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( "miclevel", newValue) } } }
+  
+  @objc dynamic public var moxEnabled: Bool {
+    get { return _moxEnabled }
+    set { if _moxEnabled != newValue { _moxEnabled = newValue ; transmitCmd( "mox", newValue.asNumber()) } } }
   
   @objc dynamic public var rfPower: Int {
     get {  return _rfPower }

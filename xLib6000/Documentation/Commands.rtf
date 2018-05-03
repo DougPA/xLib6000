@@ -5,8 +5,8 @@
 \margl1440\margr1440\vieww51000\viewh28800\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\f0\fs32 \cf0 Commands as of v1.0.21\
-\
+\f0\fs32 \cf0 Commands as of v1.0.22\
+as\
 
 \f1\b AmplifierCommands:
 \f0\b0 \
@@ -42,8 +42,11 @@
   \}\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
-   "atu set " + .memoriesEnabled.rawValue + "=\\(newValue.asNumber())"\
-   "atu set " + .enabled.rawValue + "=\\(newValue.asNumber())"\
+   "atu clear"\
+   "atu bypass"\
+   "atu start"\
+   "atu set " + .memoriesEnabled.rawValue + "=\\(value.asNumber())"\
+   "atu set " + .enabled.rawValue + "=\\(value.asNumber())"\
 \
 
 \f1\b AudioStreamCommands:
@@ -78,12 +81,10 @@
 \cf0 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \cf0 	"cwx " + "\cf2 delay\cf0 " + " \\(value)"\
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
-\cf0 	\
+	\
 	"cwx " + .qskEnabled.rawValue + " \\(value.asNumber())"\
 	"cwx " + .wpm.rawValue + " \\(value)"\
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
-\cf0 	"cwx " + "clear")\
+	"cwx " + "clear")\
 	"cwx " + "erase \\(numberOfChars)")\
 	"cwx " + "erase \\(numberOfChars)" + " \\(radioIndex)")\
 \
@@ -221,6 +222,8 @@
 \cf0 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 \cf0 	"memory apply \\(id)"\
+	"memory create"\
+	"memory remove \\(id)"\
   \
 	"memory set " + "\\(id) " + .digitalLowerOffset.rawValue + "=\\(value)"\
   	"memory set " + "\\(id) " + .digitalUpperOffset.rawValue + "=\\(value)"\
@@ -341,52 +344,24 @@
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
-\cf0    "profile " + .global.rawValue + " load \\"\\(value)\\""\
-   "profile " + .mic.rawValue + " load \\"\\(value)\\""\
-   "profile " + .tx.rawValue + " load \\"\\(value)\\""\
+\cf0    "profile " + \\(token).rawValue + " load \\"\\(value)\\""\
+	"profile " + \\(token).rawValue + " delete \\"" + \\(name) + \\""\
+	"profile " + \\(token).rawValue + " save \\"" + \\(name) + \\""\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
 \
-RadioCommands\
+
+\f1\b RadioCommands:
+\f0\b0 \
 \
   Api.Command.antList.rawValue, replyTo: callback == nil ? defaultReplyHandler : callback)\
-  Atu.kClearCmd, replyTo: callback)\
-  Atu.kStartCmd, replyTo: callback)\
-  Atu.kBypassCmd, replyTo: callback)\
   Api.Command.clientProgram.rawValue + "low_bw_connect", replyTo: callback)\
   Api.Command.clientProgram.rawValue + "start_persistence off", replyTo: callback)\
   Transmit.kCwCmd + "key immediate" + " \\(state.asNumber())", replyTo: callback)\
-  Radio.kGpsCmd + "install", replyTo: callback)\
-  Radio.kGpsCmd + "uninstall", replyTo: callback)\
-  Radio.kStreamRemoveCmd + "\\(id.hex)", replyTo: callback)\
   return Radio.kLicenseCmd + "refresh", replyTo: callback)\
-  Memory.kApplyCmd + "\\(index)", replyTo: callback)\
-  Memory.kCreateCmd, replyTo: callback)\
-  Memory.kRemoveCmd + "\\(id)", replyTo: callback)\
-  Api.Command.meterList.rawValue, replyTo: callback == nil ? defaultReplyHandler : callback)\
-  Radio.kStreamRemoveCmd + "\\(id.hex)", replyTo: callback)\
-  Api.Command.micList.rawValue, replyTo: callback == nil ? defaultReplyHandler : callback)\
-  Radio.kStreamRemoveCmd + "0x\\(id)", replyTo: callback)\
-  Panadapter.kCmd + "create x=\\(dimensions.width) y=\\(dimensions.height)", replyTo: callback == nil ? defaultReplyHandler : callback)\
-  cmd, replyTo: callback == nil ? defaultReplyHandler : callback)\
-  Panadapter.kRemoveCmd + "\\(id.hex)", replyTo: callback)\
-  xLib6000.Slice.kCmd + "m " + "\\(frequency.hzToMhz())" + " pan=\\(id.hex)", replyTo: callback)\
-  Profile.kCmd + Profile.Token.global.rawValue + " delete \\"" + name + "\\"", replyTo: callback)\
-  Profile.kCmd + Profile.Token.global.rawValue + " save \\"" + name + "\\"", replyTo: callback)\
-  Profile.kCmd + Profile.Token.mic.rawValue + " delete \\"" + name + "\\"", replyTo: callback)\
-  Profile.kCmd  + Profile.Token.mic.rawValue + " save \\"" + name + "\\"", replyTo: callback)\
-  Profile.kCmd  + "transmit" + " save \\"" + name + "\\"", replyTo: callback)\
-  Profile.kCmd  + "transmit" + " save \\"" + name + "\\"", replyTo: callback)\
   Radio.kCmd + RadioToken.staticNetParams.rawValue + " reset", replyTo: callback)\
   Opus.kCmd + Opus.Token.remoteRxOn.rawValue + " \\(value.asNumber())", replyTo: callback)\
   Radio.kCmd + RadioToken.staticNetParams.rawValue + " reset", replyTo: callback)\
-  xLib6000.Slice.kCreateCmd + "\\(frequency.hzToMhz()) \\(antenna) \\(mode)", replyTo: callback) \}\
-  xLib6000.Slice.kCreateCmd + "pan" + "=\\(panadapter.id.hex) \\(frequency == 0 ? "" : "freq" + "=\\(frequency.hzToMhz())")", replyTo: callback) \}\
-  xLib6000.Slice.kRemoveCmd + " \\(id)", replyTo: callback)\
-  xLib6000.Slice.kCmd + "get_error" + " \\(id)", replyTo: callback == nil ? defaultReplyHandler : callback)\
-  xLib6000.Slice.kCmd + "list", replyTo: callback == nil ? defaultReplyHandler : callback)\
-  Tnf.kCreateCmd + "freq" + "=\\(calcTnfFreq(frequency, panadapter).hzToMhz())", replyTo: callback)\
-  Tnf.kRemoveCmd + " \\(tnf.id)", replyTo: callback)\
   Radio.kXmitCmd + " \\(value.asNumber())", replyTo: callback)\
   Radio.kStreamRemoveCmd + "\\(id.hex)", replyTo: callback)\
   Radio.kUptimeCmd, replyTo: callback == nil ? defaultReplyHandler : callback)\
@@ -396,12 +371,12 @@ RadioCommands\
   Radio.kSetCmd + token.rawValue + "=\\(value)")\
   Radio.kCmd + token.rawValue + " \\(value)")\
   Radio.kCmd + token1.rawValue + " " + token2.rawValue + " " + token3.rawValue + "=\\(value)")\
-  set \{ if _nickname != newValue \{ _nickname = newValue ;Radio.kCmd + "name" + " \\(newValue)") \} \} \}\
-  set \{ if _radioScreenSaver != newValue \{ _radioScreenSaver = newValue ;Radio.kCmd + "screensaver" + " \\(newValue)") \} \} \}\
-  set \{ if _startOffset != newValue \{ _startOffset = newValue ; if !_startOffset \{Radio.kCmd + "pll_start") \} \} \} \}\
-  set \{ if _staticGateway != newValue \{ _staticGateway = newValue ;Radio.kCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\\(staticIp) " + RadioToken.gateway.rawValue + "=\\(newValue) " + RadioToken.netmask.rawValue + "=\\(staticNetmask)") \} \} \}\
-  set \{ if _staticIp != newValue \{ _staticIp = newValue ;Radio.kCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\\(staticIp) " + RadioToken.gateway.rawValue + "=\\(newValue) " + RadioToken.netmask.rawValue + "=\\(staticNetmask)") \} \} \}\
-  set \{ if _staticNetmask != newValue \{ _staticNetmask = newValue ;Radio.kCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\\(staticIp) " + RadioToken.gateway.rawValue + "=\\(newValue) " + RadioToken.netmask.rawValue + "=\\(staticNetmask)") \} \} \}\
+  Radio.kCmd + "name" + " \\(newValue)") \} \} \}\
+  Radio.kCmd + "screensaver" + " \\(newValue)") \} \} \}\
+  Radio.kCmd + "pll_start") \} \} \} \}\
+  Radio.kCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\\(staticIp) " + RadioToken.gateway.rawValue + "=\\(newValue) " + RadioToken.netmask.rawValue + "=\\(staticNetmask)") \} \} \}\
+  Radio.kCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\\(staticIp) " + RadioToken.gateway.rawValue + "=\\(newValue) " + RadioToken.netmask.rawValue + "=\\(staticNetmask)") \} \} \}\
+  Radio.kCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\\(staticIp) " + RadioToken.gateway.rawValue + "=\\(newValue) " + RadioToken.netmask.rawValue + "=\\(staticNetmask)") \} \} \}\
 \
 
 \f1\b SliceCommands:\
@@ -482,14 +457,12 @@ RadioCommands\
   \}\
   	\
 	"audio client 0 slice " + "0x\\(id)" + " gain" + " \\(value)"\
-\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
-\cf0   	"audio client 0 slice " + "0x\\(id)" + " mute" + " \\(value.asNumber())"\
+  	"audio client 0 slice " + "0x\\(id)" + " mute" + " \\(value.asNumber())"\
   	"audio client 0 slice " + "0x\\(id)" + " pan" + " \\(value)"\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
-\cf0   	"filt " + "0x\\(id)" + "filter_lo" + " \\(filterLow)"\
-  	"filt " + "0x\\(id)" + "filter_hi" + " \\(filterHigh)"\
+\cf0   	"filt " + "0x\\(id)" + " \\(filterLow)" + " \\(filterHigh)"\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
@@ -557,11 +530,14 @@ RadioCommands\
   \}\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
+	"tnf create " + "freq" + "=\\(value)"\
+	"tnf remove " + "\\(id)"\
+\
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
-\cf0   	"tnf set " + "\\(id) " + .depth.rawValue + "=\\(value)"\
-  	"tnf set " + "\\(id) " + .frequency.rawValue + "=\\(value.hzToMhz())"\
-  	"tnf set " + "\\(id) " + .permanent.rawValue + "=\\(value.asNumber())"\
-  	"tnf set " + "\\(id) " + .width.rawValue + "=\\(value.hzToMhz())"\
+\cf0 	 "tnf set " + "\\(id) " + .depth.rawValue + "=\\(value)"\
+  	 "tnf set " + "\\(id) " + .frequency.rawValue + "=\\(value.hzToMhz())"\
+  	 "tnf set " + "\\(id) " + .permanent.rawValue + "=\\(value.asNumber())"\
+  	 "tnf set " + "\\(id) " + .width.rawValue + "=\\(value.hzToMhz())"\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 \
 

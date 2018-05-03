@@ -103,10 +103,6 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   // GCD Queue
   private let _objectQ                      : DispatchQueue
   private let _streamQ                      = DispatchQueue(label: Api.kId + ".streamQ", qos: .userInteractive)
-
-  // constants
-  private let kTnfFindWidth: CGFloat        = 0.01                          // * bandwidth = Tnf tolerance multiplier
-  private let kSliceFindWidth: CGFloat      = 0.01                          // * bandwidth = Slice tolerance multiplier
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
@@ -253,11 +249,11 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
     }
     audioStreams.removeAll()
     
-    for (_, iqStream) in _iqStreams {
-      // notify all observers
-      NC.post(.iqStreamWillBeRemoved, object: iqStream as Any?)
-    }
-    iqStreams.removeAll()
+//    for (_, iqStream) in _iqStreams {
+//      // notify all observers
+//      NC.post(.iqStreamWillBeRemoved, object: iqStream as Any?)
+//    }
+//    iqStreams.removeAll()
     
     for (_, micAudioStream) in _micAudioStreams {
       // notify all observers
@@ -337,71 +333,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
     
 //    Swift.print("Radio - deinit")
   }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Internal methods
-  
-  /// Determine a frequency for a Tnf
-  ///
-  /// - Parameters:
-  ///   - frequency:      tnf frequency (may be 0)
-  ///   - panadapter:     a Panadapter reference
-  /// - Returns:          the calculated Tnf frequency
-  ///
-  func calcTnfFreq(_ frequency: Int, _ panadapter: Panadapter) -> Int {
-    var freqDiff = 1_000_000_000
-    var targetSlice: xLib6000.Slice?
-    var tnfFreq = frequency
-    
-    // if frequency is 0, calculate a frequency
-    if tnfFreq == 0 {
-      
-      // for each Slice on this Panadapter find the one within freqDiff and closesst to the center
-      for slice in findSlicesOn(panadapter.id) {
-        
-        // how far is it from the center?
-        let diff = abs(slice.frequency - panadapter.center)
-        
-        // if within freqDiff of center
-        if diff < freqDiff {
-          
-          // update the freqDiff
-          freqDiff = diff
-          // save the slice
-          targetSlice = slice
-        }
-      }
-      // do we have a Slice?
-      if let slice = targetSlice {
-        
-        // YES, what mode?
-        switch slice.mode {
-          
-        case "LSB", "DIGL":
-          tnfFreq = slice.frequency + (( slice.filterLow - slice.filterHigh) / 2)
-          
-        case "RTTY":
-          tnfFreq = slice.frequency - (slice.rttyShift / 2)
-          
-        case "CW", "AM", "SAM":
-          tnfFreq = slice.frequency + ( slice.filterHigh / 2)
-          
-        case "USB", "DIGU", "FDV":
-          tnfFreq = slice.frequency + (( slice.filterLow - slice.filterHigh) / 2)
-          
-        default:
-          tnfFreq = slice.frequency + (( slice.filterHigh - slice.filterLow) / 2)
-        }
-        
-      } else {
-        
-        // NO, put it in the panadapter center
-        tnfFreq = panadapter.center
-      }
-    }
-    return tnfFreq
-  }
-  
+
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
@@ -691,217 +623,6 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
       Log.sharedInstance.msg("Unprocessed message, \(remainder)", level: .warning, function: #function, file: #file, line: #line)
     }
   }
-  
-  // --------------------------------------------------------------------------------
-  // MARK: - Public methods
-  
-  // MARK: ----- Panadapter -----
-  
-  /// Find the active Panadapter
-  ///
-  /// - Returns:      a reference to a Panadapter (or nil)
-  ///
-  public func findActivePanadapter() -> Panadapter? {
-    var panadapter: Panadapter?
-    
-    // find the active Panadapter (if any)
-    for (_, pan) in panadapters where findActiveSliceOn(pan.id) != nil {
-      
-      // return it
-      panadapter = pan
-    }
-    
-    return panadapter
-  }
-  /// Find the Panadapter for a DaxIqChannel
-  ///
-  /// - Parameters:
-  ///   - daxIqChannel:   a Dax channel number
-  /// - Returns:          a Panadapter reference (or nil)
-  ///
-  public func findPanadapterBy(daxIqChannel: DaxIqChannel) -> Panadapter? {
-    var panadapter: Panadapter?
-    
-    // find the matching Panadapter (if any)
-    for (_, pan) in panadapters where pan.daxIqChannel == daxIqChannel {
-      
-      // return it
-      panadapter = pan
-      break
-    }
-    
-    return panadapter
-  }
-  
-  // MARK: ----- IqStream -----
-  
-  /// Find the IQ Stream for a DaxIqChannel
-  ///
-  /// - Parameters:
-  ///   - daxIqChannel:   a Dax IQ channel number
-  /// - Returns:          an IQ Stream reference (or nil)
-  ///
-  public func findIqStreamBy(daxIqChannel: DaxIqChannel) -> IqStream? {
-    var iqStream: IqStream?
-    
-    // find the matching IqStream (if any)
-    for (_, stream) in iqStreams where stream.daxIqChannel == daxIqChannel {
-      iqStream = stream
-    }
-    return iqStream
-  }
-  
-  // MARK: ----- Slice -----
-  
-  /// Disable all TxEnabled
-  ///
-  public func disableTx() {
-    
-    // for all Slices, turn off txEnabled
-    for (_, slice) in slices {
-      
-      slice.txEnabled = false
-    }
-  }
-  /// Return references to all Slices on the specified Panadapter
-  ///
-  /// - Parameters:
-  ///   - pan:        a Panadapter Id
-  /// - Returns:      an array of Slices (may be empty)
-  ///
-  public func findSlicesOn(_ id: PanadapterId) -> [Slice] {
-    var sliceValues = [Slice]()
-    
-    // for all Slices on the specified Panadapter
-    for (_, slice) in slices where slice.panadapterId == id {
-      
-      // append to the result
-      sliceValues.append(slice)
-    }
-    return sliceValues
-  }
-  /// Given a Frequency, return the Slice on the specified Panadapter containing it (if any)
-  ///
-  /// - Parameters:
-  ///   - pan:        a reference to A Panadapter
-  ///   - freq:       a Frequency (in hz)
-  /// - Returns:      a reference to a Slice (or nil)
-  ///
-  public func findSliceOn(_ id: PanadapterId, byFrequency freq: Int, panafallBandwidth: Int) -> Slice? {
-    var slice: Slice?
-    
-    let minWidth = Int( CGFloat(panafallBandwidth) * kSliceFindWidth )
-    
-    // find the Panadapter containing the Slice (if any)
-    for (_, s) in slices where s.panadapterId == id {
-      
-      //            let width = CGFloat(s.filterHigh) - CGFloat(s.filterLow)
-      
-      let widthDown = min(-minWidth/2, s.filterLow)
-      let widthUp = max(minWidth/2, s.filterHigh)
-      
-      if freq >= s.frequency + widthDown && freq <= s.frequency + widthUp {
-        
-        // YES, return the Slice
-        slice = s
-        break
-      }
-    }
-    return slice
-  }
-  /// Return the Active Slice on the specified Panadapter (if any)
-  ///
-  /// - Parameters:
-  ///   - pan:        a Panadapter reference
-  /// - Returns:      a Slice reference (or nil)
-  ///
-  public func findActiveSliceOn(_ id: PanadapterId) -> Slice? {
-    var slice: Slice?
-    
-    // is the Slice on the Panadapter and Active?
-    for (_, s) in self.slices where s.panadapterId == id && s.active {
-      
-      // YES, return the Slice
-      slice = s
-    }
-    return slice
-  }
-  /// Find a Slice by DAX Channel
-  ///
-  /// - Parameter channel:    Dax channel number
-  /// - Returns:              a Slice (if any)
-  ///
-  public func findSliceBy(daxChannel channel: DaxChannel) -> Slice? {
-    var slice: Slice?
-    
-    // find the Slice for the Dax Channel (if any)
-    for (_, s) in self.slices where s.daxChannel == channel {
-      
-      // YES, return the Slice
-      slice = s
-    }
-    return slice
-  }
-  
-  // MARK: ----- Tnf -----
-  
-  /// Given a Frequency, return a reference to the Tnf containing it (if any)
-  ///
-  /// - Parameters:
-  ///   - freq:       a Frequency (in hz)
-  ///   - bandwidth:  panadapter bandwidth (hz)
-  /// - Returns:      a Tnf reference (or nil)
-  ///
-  public func findTnfBy(frequency freq: Int, panafallBandwidth: Int) -> Tnf? {
-    var tnf: Tnf?
-    
-    let minWidth = Int( CGFloat(panafallBandwidth) * kTnfFindWidth )
-    
-    for (_, t) in tnfs {
-      
-      let halfwidth = max(minWidth, t.width/2)
-      if freq >= (t.frequency - halfwidth) && freq <= (t.frequency + halfwidth) {
-        tnf = t
-        break
-      }
-    }
-    return tnf
-  }
-  
-  // MARK: ----- Meter -----
-  
-  /// Find a Meter by its Slice
-  ///
-  /// - Parameters:
-  ///   - slice:      a Slice id
-  /// - Returns:      a Meter reference
-  ///
-  public func findMeteryBy(id: SliceId) -> Meter? {
-    var meter: Meter?
-    
-    for (_, aMeter) in meters where aMeter.source == "slc" && aMeter.number ==  id {
-      
-      // get a reference to the Meter
-      meter = aMeter
-    }
-    return meter
-  }
-  /// Find a Meter by its ShortName
-  ///
-  /// - Parameters:
-  ///   - name:       Short Name of a Meter
-  /// - Returns:      a Meter reference
-  ///
-  public func findMeteryBy(shortName name: MeterName) -> Meter? {
-    var meter: Meter?
-    
-    for (_, aMeter) in meters where aMeter.name == name {
-      
-      // get a reference to the Meter
-      meter = aMeter
-    }
-    return meter
-  }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
   ///
   /// - Parameters:
@@ -922,94 +643,58 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
       switch token {
         
       case .atuPresent:
-        willChangeValue(forKey: "atuPresent")
-        atu._status = property.value.bValue()
-        didChangeValue(forKey: "atuPresent")
-        
+        update(&atu._status, value: property.value.bValue(), key: "atuPresent")
+
       case .callsign:
-        willChangeValue(forKey: "callsign")
-        _callsign = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "callsign")
-        
+        update(&_callsign, value: property.value.replacingOccurrences(of: "\"", with:""), key: "callsign")
+
       case .chassisSerial:
-        willChangeValue(forKey: "chassisSerial")
-        _chassisSerial = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "chassisSerial")
-        
+        update(&_chassisSerial, value: property.value.replacingOccurrences(of: "\"", with:""), key: "chassisSerial")
+
       case .gateway:
-        willChangeValue(forKey: "gateway")
-        _gateway = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "gateway")
-        
+        update(&_gateway, value: property.value.replacingOccurrences(of: "\"", with:""), key: "gateway")
+
       case .gps:
-        willChangeValue(forKey: "gpsPresent")
-        gps._status = property.value.bValue()
-        didChangeValue(forKey: "gpsPresent")
-        
+        update(&gps._status, value: property.value.bValue(), key: "gpsPresent")
+
       case .ipAddress:
-        willChangeValue(forKey: "ipAddress")
-        _ipAddress = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "ipAddress")
-        
+        update(&_ipAddress, value: property.value.replacingOccurrences(of: "\"", with:""), key: "ipAddress")
+
       case .location:
-        willChangeValue(forKey: "location")
-        _location = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "location")
-        
+        update(&_location, value: property.value.replacingOccurrences(of: "\"", with:""), key: "location")
+
       case .macAddress:
-        willChangeValue(forKey: "macAddress")
-        _macAddress = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "macAddress")
-        
+        update(&_macAddress, value: property.value.replacingOccurrences(of: "\"", with:""), key: "macAddress")
+
       case .model:
-        willChangeValue(forKey: "radioModel")
-        _radioModel = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "radioModel")
-        
+         update(&_radioModel, value: property.value.replacingOccurrences(of: "\"", with:""), key: "radioModel")
+
       case .netmask:
-        willChangeValue(forKey: "netmask")
-        _netmask = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "netmask")
-        
+        update(&_netmask, value: property.value.replacingOccurrences(of: "\"", with:""), key: "netmask")
+
       case .name:
-        willChangeValue(forKey: "nickname")
-        _nickname = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "nickname")
-        
+        update(&_nickname, value: property.value.replacingOccurrences(of: "\"", with:""), key: "nickname")
+
       case .numberOfScus:
-        willChangeValue(forKey: "numberOfScus")
-        _numberOfScus = property.value.iValue()
-        didChangeValue(forKey: "numberOfScus")
-        
+        update(&_numberOfScus, value: property.value.iValue(), key: "numberOfScus")
+
       case .numberOfSlices:
-        willChangeValue(forKey: "numberOfSlices")
-        _numberOfSlices = property.value.iValue()
-        didChangeValue(forKey: "numberOfSlices")
-        
+        update(&_numberOfSlices, value: property.value.iValue(), key: "numberOfSlices")
+
       case .numberOfTx:
-        willChangeValue(forKey: "numberOfTx")
-        _numberOfTx = property.value.iValue()
-        didChangeValue(forKey: "numberOfTx")
-        
+        update(&_numberOfTx, value: property.value.iValue(), key: "numberOfTx")
+
       case .options:
-        willChangeValue(forKey: "radioOptions")
-        _radioOptions = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "radioOptions")
-        
+        update(&_radioOptions, value: property.value.replacingOccurrences(of: "\"", with:""), key: "radioOptions")
+
       case .region:
-        willChangeValue(forKey: "region")
-        _region = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "region")
-        
+        update(&_region, value: property.value.replacingOccurrences(of: "\"", with:""), key: "region")
+
       case .screensaver:
-        willChangeValue(forKey: "radioScreenSaver")
-        _radioScreenSaver = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "radioScreenSaver")
-        
+        update(&_radioScreenSaver, value: property.value.replacingOccurrences(of: "\"", with:""), key: "radioScreenSaver")
+
       case .softwareVersion:
-        willChangeValue(forKey: "softwareVersion")
-        _softwareVersion = property.value.replacingOccurrences(of: "\"", with:"")
-        didChangeValue(forKey: "softwareVersion")
+        update(&_softwareVersion, value: property.value.replacingOccurrences(of: "\"", with:""), key: "softwareVersion")
       }
     }
   }
@@ -1041,7 +726,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
         if _metersToSubscribe.contains(shortName) {
           
           // YES, send a subscription command
-          Meter.subscribeToId(id)
+          Meter.subscribe(id: id)
         }
       }
     }
@@ -1081,39 +766,31 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   /// - Parameters:
   ///   - keyValues:          a KeyValuesArray
   ///
-  private func parseVersionReply(_ keyValues: KeyValuesArray) {
+  private func parseVersionReply(_ properties: KeyValuesArray) {
     
     // process each key/value pair, <key=value>
-    for kv in keyValues {
+    for property in properties {
       
       // check for unknown Tokens
-      guard let token = VersionToken(rawValue: kv.key) else {
+      guard let token = VersionToken(rawValue: property.key) else {
         // Unknown Token, log it and ignore this Token
-        Log.sharedInstance.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
       switch token {
         
       case .smartSdrMB:
-        willChangeValue(forKey: "smartSdrMB")
-        _smartSdrMB = kv.value
-        didChangeValue(forKey: "smartSdrMB")
-        
+        update(&_smartSdrMB, value: property.value, key: "smartSdrMB")
+
       case .psocMbTrx:
-        willChangeValue(forKey: "psocMbtrxVersion")
-        _psocMbtrxVersion = kv.value
-        didChangeValue(forKey: "psocMbtrxVersion")
-        
+        update(&_psocMbtrxVersion, value: property.value, key: "psocMbtrxVersion")
+
       case .psocMbPa100:
-        willChangeValue(forKey: "psocMbPa100Version")
-        _psocMbPa100Version = kv.value
-        didChangeValue(forKey: "psocMbPa100Version")
-        
+        update(&_psocMbPa100Version, value: property.value, key: "psocMbPa100Version")
+
       case .fpgaMb:
-        willChangeValue(forKey: "fpgaMbVersion")
-        _fpgaMbVersion = kv.value
-        didChangeValue(forKey: "fpgaMbVersion")
+        update(&_fpgaMbVersion, value: property.value, key: "fpgaMbVersion")
       }
     }
   }
@@ -1448,22 +1125,22 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
         // ignore, Panadapter & Waterfall will be created when Status reply is seen
         break
         
-      } else if command.hasPrefix(Radio.kStreamCreateCmd + "dax=") {
+      } else if command.hasPrefix(AudioStream.kStreamCreateCmd + "dax=") {
         
         // TODO: add code
         break
         
-      } else if command.hasPrefix(Radio.kStreamCreateCmd + "daxmic") {
+      } else if command.hasPrefix(AudioStream.kStreamCreateCmd + "daxmic") {
         
         // TODO: add code
         break
         
-      } else if command.hasPrefix(Radio.kStreamCreateCmd + "daxtx") {
+      } else if command.hasPrefix(AudioStream.kStreamCreateCmd + "daxtx") {
         
         // TODO: add code
         break
         
-      } else if command.hasPrefix(Radio.kStreamCreateCmd + "daxiq") {
+      } else if command.hasPrefix(IqStream.kStreamCreateCmd + "daxiq") {
         
         // TODO: add code
         break
@@ -1870,14 +1547,6 @@ extension Radio {
     get { return _objectQ.sync { _iqStreams } }
     set { _objectQ.sync(flags: .barrier) { _iqStreams = newValue } } }
   
-//  public var localIP: String {
-//    get { return _objectQ.sync { _localIP } }
-//    set { _objectQ.sync(flags: .barrier) { _localIP = newValue } } }
-//  
-//  public var localUDPPort: UInt16 {
-//    get { return _objectQ.sync { _localUDPPort } }
-//    set { _objectQ.sync(flags: .barrier) { _localUDPPort = newValue } } }
-
   public var memories: [MemoryId: Memory] {
     get { return _objectQ.sync { _memories } }
     set { _objectQ.sync(flags: .barrier) { _memories = newValue } } }

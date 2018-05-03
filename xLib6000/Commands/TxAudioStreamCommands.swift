@@ -15,14 +15,38 @@ import Foundation
 
 extension TxAudioStream {
   
-  //
-  //  NOTE:   TxAudioStream Commands are in the following format:
-  //
-  //              dax <valueName> <value>
-  //
-  
   static let kCmd                           = "dax "                        // Command prefixes
+  static let kStreamCreateCmd               = "stream create "
+  static let kStreamRemoveCmd               = "stream remove "
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Class methods that send Commands to the Radio (hardware)
   
+  /// Create a Tx Audio Stream
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              Success / Failure
+  ///
+  public class func create(callback: ReplyHandler? = nil) -> Bool {
+    
+    // tell the Radio to create a Stream
+    return Api.sharedInstance.sendWithCheck(kStreamCreateCmd + "daxtx", replyTo: callback)
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  /// Remove this Tx Audio Stream
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove a Stream
+    Api.sharedInstance.send(TxAudioStream.kStreamRemoveCmd + "\(id.hex)", replyTo: callback)
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   

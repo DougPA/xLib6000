@@ -1,5 +1,20 @@
 xLib6000 Change Log
 
+v1.1.1
+
+Radio.swift - moved atuClear(callback:), atuStart(callback:) & atuBypass(callback:) to AtuCommands.swift
+Radio.swift - moved memoryApply(id:callback:), memoryCreate(), memoryRemove(id:callback:) to MemoryCommands.swift
+Radio.swift - moved all helper methods to class methods on the object
+Radio.swift - refactored to use update(_:value:key:) in parseInfoReply(_:) & parseVersionReply(_:)
+on each object, in the <object>Commands.swift file, simplified names of instance methods (removed the name of the object as part of the method name)
+on each object, in the <object>Commands.swift file, made "create" a class method and "remove" an instance method
+SliceCommands.swift - corrected filterCmd(low:high:) and its usage
+AudioStream, MicAudioStream, IqStream & TxAudioStream.swift - corrected test in class parseStatus(_:radio:queue:inUse:) for class isStatusForThisClient(_:)
+FlexErrors.swift - refactored
+Api.swift - added testerModeEnabled property, used in class isStatusForThisClient(_:) to allow the xAPITester to see all streams
+
+============================================================
+
 v1.0.22
 
 interlockCommands.swift - corrected accTxDelay command

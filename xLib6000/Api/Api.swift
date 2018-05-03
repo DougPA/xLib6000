@@ -72,6 +72,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
     return _radioFactory.availableRadios }
   public let log                            = Log.sharedInstance
   public var delegate                       : ApiDelegate?                  // API delegate
+  public var testerModeEnabled              = false                         // Library being used by xAPITester
   public var testerDelegate                 : ApiDelegate?                  // API delegate for xAPITester
   public var radio                          : Radio?                        // current Radio class
   public var activeRadio                    : RadioParameters?              // Radio params

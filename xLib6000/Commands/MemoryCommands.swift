@@ -28,7 +28,44 @@ extension Memory {
   static let kRemoveCmd                     = "memory remove "
   static let kSetCmd                        = "memory set "
   static let kApplyCmd                      = "memory apply "
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Class methods that send Commands to the Radio (hardware)
   
+  /// Create a Memory
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public class func create(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to create a Memory
+    Api.sharedInstance.send(Memory.kCreateCmd, replyTo: callback)
+  }
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  /// Apply a Memory
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func apply(id: MemoryId, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to apply the Memory
+    Api.sharedInstance.send(Memory.kApplyCmd + "\(id)", replyTo: callback)
+  }
+  /// Remove a Memory
+  ///
+  /// - Parameters:
+  ///   - id:                 Memory Id
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(_ id: MemoryId, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove the Memory
+    Api.sharedInstance.send(Memory.kRemoveCmd + "\(id)", replyTo: callback)
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   

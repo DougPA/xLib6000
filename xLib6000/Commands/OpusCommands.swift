@@ -15,15 +15,35 @@ import Foundation
 
 extension Opus {
   
-  //
-  //  NOTE:   Opus Commands are in the following format:
-  //
-  //              remote audio <valueName>=<value>
-  //
-  
   static let kCmd                           = "remote_audio "               // Command prefixes
+  static let kStreamCreateCmd               = "stream create "
+  static let kStreamRemoveCmd               = "stream remove "
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
   
-  
+  /// Turn Opus Rx On/Off
+  ///
+  /// - Parameters:
+  ///   - value:              On/Off
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remoteRxAudioRequest(_ value: Bool, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to enable Opus Rx
+    Api.sharedInstance.send(Opus.kCmd + Opus.Token.remoteRxOn.rawValue + " \(value.asNumber())", replyTo: callback)
+  }
+  /// Remove this Opus Stream
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove the Stream
+    Api.sharedInstance.send(Opus.kStreamRemoveCmd + "0x\(id)", replyTo: callback)
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   

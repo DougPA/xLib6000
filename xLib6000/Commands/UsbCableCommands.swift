@@ -28,6 +28,21 @@ extension UsbCable {
   static let kSetBitCmd                     = "usb_cable set bit "
   
   // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  /// Remove this UsbCable
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  /// - Returns:              Success / Failure
+  ///
+  public func remove(callback: ReplyHandler? = nil) -> Bool {
+    
+    // tell the Radio to remove a USB Cable
+    return Api.sharedInstance.sendWithCheck(UsbCable.kCmd + "remove" + " \(id)")
+  }
+
+  // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   
   /// Set a USB Cable property on the Radio

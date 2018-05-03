@@ -15,14 +15,41 @@ import Foundation
 
 extension AudioStream {
   
-  //
-  //  NOTE:   AudioStream Commands are in the following format:
-  //
-  //              audio stream <StreamId> slice <SliceId> <valueName> <value>
-  //
-  
   static let kCmd                           = "audio stream "               // Command prefixes
+  static let kStreamCreateCmd               = "stream create "
+  static let kStreamRemoveCmd               = "stream remove "
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Class methods that send Commands to the Radio (hardware)
   
+  /// Create an Audio Stream
+  ///
+  /// - Parameters:
+  ///   - channel:            DAX channel number
+  ///   - callback:           ReplyHandler (optional)
+  /// - Returns:              Success / Failure
+  ///
+  public class func create(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
+    
+    // tell the Radio to create a Stream
+    return Api.sharedInstance.sendWithCheck(kStreamCreateCmd + "dax" + "=\(channel)", replyTo: callback)
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  /// Remove this Audio Stream
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  /// - Returns:              Success / Failure
+  ///
+  public func remove(callback: ReplyHandler? = nil) -> Bool {
+    
+    // tell the Radio to remove a Stream
+    return Api.sharedInstance.sendWithCheck(AudioStream.kStreamRemoveCmd + "\(id.hex)", replyTo: callback)
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   

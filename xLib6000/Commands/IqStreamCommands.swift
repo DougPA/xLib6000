@@ -15,14 +15,54 @@ import Foundation
 
 extension IqStream {
   
-  //
-  //  NOTE:   IqStream Commands are in the following format:
-  //
-  //              dax iq <Channel> <valueName>=<value>
-  //
-  
   static let kCmd                           = "dax iq "                     // Command prefixes
+  static let kStreamCreateCmd               = "stream create "
+  static let kStreamRemoveCmd               = "stream remove "
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Class methods that send Commands to the Radio (hardware)
   
+  /// Create an IQ Stream
+  ///
+  /// - Parameters:
+  ///   - channel:            DAX channel number
+  ///   - callback:           ReplyHandler (optional)
+  /// - Returns:              Success / Failure
+  ///
+  public class func create(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
+    
+    return Api.sharedInstance.sendWithCheck(kStreamCreateCmd + "daxiq" + "=\(channel)", replyTo: callback)
+  }
+  /// Create an IQ Stream
+  ///
+  /// - Parameters:
+  ///   - channel:            DAX channel number
+  ///   - ip:                 ip address
+  ///   - port:               port number
+  ///   - callback:           ReplyHandler (optional)
+  /// - Returns:              Success / Failure
+  ///
+  public class func create(_ channel: String, ip: String, port: Int, callback: ReplyHandler? = nil) -> Bool {
+    
+    // tell the Radio to create the Stream
+    return Api.sharedInstance.sendWithCheck(IqStream.kStreamCreateCmd + "daxiq" + "=\(channel) " + "ip" + "=\(ip) " + "port" + "=\(port)", replyTo: callback)
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  /// Remove this IQ Stream
+  ///
+  /// - Parameters:
+  ///   - id:                 IQ Stream Id
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+
+    // tell the Radio to remove the Stream
+    Api.sharedInstance.send(IqStream.kStreamRemoveCmd + "\(id.hex)", replyTo: callback)
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   

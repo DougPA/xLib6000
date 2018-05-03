@@ -15,19 +15,41 @@ import Foundation
 
 extension Atu {
   
-  //
-  //  NOTE:   Atu Commands are in one of the following formats:
-  //
-  //              atu clear
-  //              atu start
-  //              atu bypass
-  //              atu set <valueName>=<value>
-  //
-  
   static let kClearCmd                      = "atu clear"                   // Command prefixes
   static let kStartCmd                      = "atu start"
   static let kBypassCmd                     = "atu bypass"
   static let kSetCmd                        = "atu set "
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  /// Clear the ATU
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func atuClear(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to clear the ATU
+    Api.sharedInstance.send(Atu.kClearCmd, replyTo: callback)
+  }
+  /// Start the ATU
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func atuStart(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to start the ATU
+    Api.sharedInstance.send(Atu.kStartCmd, replyTo: callback)
+  }
+  /// Bypass the ATU
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func atuBypass(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to bypass the ATU
+    Api.sharedInstance.send(Atu.kBypassCmd, replyTo: callback)
+  }
   
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods

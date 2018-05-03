@@ -15,17 +15,37 @@ import Foundation
 
 extension Xvtr {
   
-  //
-  //  NOTE:   Xvtr Commands are in one of the following formats:
-  //
-  //              xvtr set <Id> <valueName>=<value>
-  //              xvtr create
-  //              xvtr remove <XvtrId>
-  //
-  
   static let kCreateCmd                     = "xvtr create"                 // Command prefixes
   static let kRemoveCmd                     = "xvtr remove "
   static let kSetCmd                        = "xvtr set "
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Class methods that send Commands to the Radio (hardware)
+  
+  /// Create an Xvtr
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              Success / Failure
+  ///
+  public class func create(callback: ReplyHandler? = nil) -> Bool {
+    
+    // tell the Radio to create a USB Cable
+    return Api.sharedInstance.sendWithCheck(Xvtr.kCreateCmd , replyTo: callback)
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  /// Remove this Xvtr
+  ///
+  /// - Parameters:
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func remove(callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to remove a XVTR
+    Api.sharedInstance.send(Xvtr.kRemoveCmd + "\(id)", replyTo: callback)
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods

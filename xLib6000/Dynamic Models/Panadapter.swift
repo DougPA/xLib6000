@@ -151,6 +151,41 @@ public final class Panadapter               : NSObject, StatusParser, Properties
       }
     }
   }
+  /// Find the active Panadapter
+  ///
+  /// - Returns:      a reference to a Panadapter (or nil)
+  ///
+  public class func findActive() -> Panadapter? {
+    var panadapter: Panadapter?
+    
+    // find the active Panadapter (if any)
+    for (_, pan) in Api.sharedInstance.radio!.panadapters where Slice.findActive(with: pan.id) != nil {
+      
+      // return it
+      panadapter = pan
+    }
+    
+    return panadapter
+  }
+  /// Find the Panadapter for a DaxIqChannel
+  ///
+  /// - Parameters:
+  ///   - daxIqChannel:   a Dax channel number
+  /// - Returns:          a Panadapter reference (or nil)
+  ///
+  public class func find(with channel: DaxIqChannel) -> Panadapter? {
+    var panadapter: Panadapter?
+    
+    // find the matching Panadapter (if any)
+    for (_, pan) in Api.sharedInstance.radio!.panadapters where pan.daxIqChannel == channel {
+      
+      // return it
+      panadapter = pan
+      break
+    }
+    
+    return panadapter
+  }
 
   // ------------------------------------------------------------------------------
   // MARK: - Initialization

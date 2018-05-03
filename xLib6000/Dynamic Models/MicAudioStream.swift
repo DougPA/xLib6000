@@ -89,7 +89,7 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
         if radio.micAudioStreams[streamId] == nil {
           
           // NO, is this stream for this client?
-          if !radio.isAudioStreamStatusForThisClient(keyValues) { return }
+          if !AudioStream.isStatusForThisClient(keyValues) { return }
           
           // create a new MicAudioStream & add it to the MicAudioStreams collection
           radio.micAudioStreams[streamId] = MicAudioStream(id: streamId, queue: queue)
@@ -99,11 +99,15 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
         
       } else {
         
-        // NO, notify all observers
-        NC.post(.micAudioStreamWillBeRemoved, object: radio.micAudioStreams[streamId] as Any?)
-        
-        // remove it
-        radio.micAudioStreams[streamId] = nil
+        // does the stream exist?
+        if let stream = radio.micAudioStreams[streamId] {
+          
+          // notify all observers
+          NC.post(.micAudioStreamWillBeRemoved, object: stream as Any?)
+          
+          // remove the stream object
+          radio.micAudioStreams[streamId] = nil
+        }
       }
     }
   }

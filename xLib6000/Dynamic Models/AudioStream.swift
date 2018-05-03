@@ -95,7 +95,7 @@ public final class AudioStream              : NSObject, StatusParser, Properties
         if radio.audioStreams[streamId] == nil {
           
           // NO, is this stream for this client?
-          if !radio.isAudioStreamStatusForThisClient(keyValues) { return }
+          if !AudioStream.isStatusForThisClient(keyValues) { return }
           
           // create a new AudioStream & add it to the AudioStreams collection
           radio.audioStreams[streamId] = AudioStream(id: streamId, queue: queue)
@@ -105,15 +105,71 @@ public final class AudioStream              : NSObject, StatusParser, Properties
         
       } else {
         
-        // NO, notify all observers
-        NC.post(.audioStreamWillBeRemoved, object: radio.audioStreams[streamId] as Any?)
-        
-        // remove it
-        radio.audioStreams[streamId] = nil
+        // does the stream exist?
+        if let stream = radio.audioStreams[streamId] {
+          
+          // notify all observers
+          NC.post(.audioStreamWillBeRemoved, object: stream as Any?)
+          
+          // remove the stream object
+          radio.audioStreams[streamId] = nil
+        }
       }
     }
   }
-  
+  /// Check if an audio stream belongs to us
+  ///
+  /// - Parameters:
+  ///   - keyValues:          a KeyValuesArray of the status message
+  ///
+  /// - Returns:              result of the check
+  ///
+  public class func isStatusForThisClient(_ properties: KeyValuesArray) -> Bool {
+    
+    guard Api.sharedInstance.testerModeEnabled == false else { return true }
+    
+    var statusIpStr = ""
+    var statusPortStr = ""
+    
+    // search thru each key/value pair, <key=value>
+    for property in properties {
+      
+      switch property.key.lowercased() {
+      case "ip":
+        statusIpStr = property.value
+      case "port":
+        statusPortStr = property.value
+      default:
+        break
+      }
+    }
+    
+    if statusIpStr == "" || statusPortStr == "" {
+      return false
+    }
+    if !statusIpStr.isValidIP4() {
+      return false
+    }
+    guard let statusPort = UInt16(statusPortStr) else {
+      return false
+    }
+    
+    // if local check ip and port
+    // if remote check only ip
+    // TODO: this is a temporary fix and a flaw in Flex way to think.. :-)
+    if Api.sharedInstance.isWan {
+      if Api.sharedInstance.localIP == statusIpStr {
+        return true
+      }
+    } else {
+      if Api.sharedInstance.localIP == statusIpStr && Api.sharedInstance.localUDPPort == statusPort {
+        return true
+      }
+    }
+    
+    return false
+  }
+
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -363,7 +419,7 @@ extension AudioStream {
       if _daxChannel != newValue {
         _daxChannel = newValue
         if Api.sharedInstance.radio != nil {
-          slice = Api.sharedInstance.radio!.findSliceBy(daxChannel: _daxChannel)
+          slice = xLib6000.Slice.find(with: _daxChannel)
         }
       }
     }

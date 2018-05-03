@@ -97,7 +97,7 @@ public final class IqStream                 : NSObject, StatusParser, Properties
         if radio.iqStreams[streamId] == nil {
           
           // NO, is this stream for this client?
-          if !radio.isAudioStreamStatusForThisClient(keyValues) { return }
+          if !AudioStream.isStatusForThisClient(keyValues) { return }
           
           // create a new Stream & add it to the Streams collection
           radio.iqStreams[streamId] = IqStream(id: streamId, queue: queue)
@@ -107,15 +107,34 @@ public final class IqStream                 : NSObject, StatusParser, Properties
         
       } else {
         
-        // NO, notify all observers
-        NC.post(.iqStreamWillBeRemoved, object: radio.iqStreams[streamId] as Any?)
-        
-        // remove it
-        radio.iqStreams[streamId] = nil
+        // does the stream exist?
+        if let stream = radio.iqStreams[streamId] {
+          
+          // notify all observers
+          NC.post(.iqStreamWillBeRemoved, object: stream as Any?)
+          
+          // remove the stream object
+          radio.iqStreams[streamId] = nil
+        }
       }
     }
   }
-  
+  /// Find the IQ Stream for a DaxIqChannel
+  ///
+  /// - Parameters:
+  ///   - daxIqChannel:   a Dax IQ channel number
+  /// - Returns:          an IQ Stream reference (or nil)
+  ///
+  public class func findBy(daxIqChannel: DaxIqChannel) -> IqStream? {
+    var iqStream: IqStream?
+    
+    // find the matching IqStream (if any)
+    for (_, stream) in Api.sharedInstance.radio!.iqStreams where stream.daxIqChannel == daxIqChannel {
+      iqStream = stream
+    }
+    return iqStream
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -184,7 +203,7 @@ public final class IqStream                 : NSObject, StatusParser, Properties
       }
     }
     // is the Stream initialized?
-    if !_initialized && /*_inUse &&*/ _ip != "" {   // in_use is not send at the beginning
+    if !_initialized && _ip != "" {
       
       // YES, the Radio (hardware) has acknowledged this Stream
       _initialized = true

@@ -24,6 +24,32 @@ extension Profile {
   static let kCmd                           = "profile "                    // Command prefixes
   
   // ----------------------------------------------------------------------------
+  // MARK: - Public methods that send Commands to the Radio (hardware)
+  
+  /// Delete a Global profile
+  ///
+  /// - Parameters:
+  ///   - name:               profile name
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func delete(_ token: Profile.Token, name: String, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to delete the named Global Profile
+    Api.sharedInstance.send(Profile.kCmd + token.rawValue + " delete \"" + name + "\"", replyTo: callback)
+  }
+  /// Save a Global profile
+  ///
+  /// - Parameters:
+  ///   - name:               profile name
+  ///   - callback:           ReplyHandler (optional)
+  ///
+  public func save(_ token: Profile.Token, name: String, callback: ReplyHandler? = nil) {
+    
+    // tell the Radio to save the named Global Profile
+    Api.sharedInstance.send(Profile.kCmd + token.rawValue + " save \"" + name + "\"", replyTo: callback)
+  }
+
+  // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   
   /// Set a Profile property on the Radio
