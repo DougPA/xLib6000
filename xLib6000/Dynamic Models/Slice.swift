@@ -20,12 +20,15 @@ public typealias SliceId = String
 // ------------------------------------------------------------------------------
 
 public final class Slice                    : NSObject, StatusParser, PropertiesParser {
-  
+
+  static let daxChannels                    = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
+
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   public private(set) var id                : SliceId = ""                  // Id that uniquely identifies this Slice
   @objc dynamic public var agcNames         = AgcMode.names()
+  @objc dynamic public let daxChoices       = Slice.daxChannels
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -673,11 +676,11 @@ public final class Slice                    : NSObject, StatusParser, Properties
   private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
     
     // update the property & signal KVO (if needed)
-    if property != value {
+//    if property != value {
       willChangeValue(forKey: key)
       property = value
       didChangeValue(forKey: key)
-    }
+//    }
   }
 }
 
@@ -1048,6 +1051,10 @@ extension xLib6000.Slice {
   @objc dynamic public var rxAntList: [Radio.AntennaPort] {
     get { return _rxAntList }
     set { _rxAntList = newValue } }
+  
+  @objc dynamic public var txAntList: [Radio.AntennaPort] {
+    get { return _txAntList }
+    set { _txAntList = newValue } }
   
   @objc dynamic public var wide: Bool {
     get { return _wide }

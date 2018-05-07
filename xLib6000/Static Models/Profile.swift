@@ -119,11 +119,11 @@ public final class Profile                  : NSObject, PropertiesParser {
   private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
     
     // update the property & signal KVO (if needed)
-    if property != value {
+//    if property != value {
       willChangeValue(forKey: key)
       property = value
       didChangeValue(forKey: key)
-    }
+//    }
   }
 }
 

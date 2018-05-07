@@ -1,5 +1,12 @@
 xLib6000 Change Log
 
+v1.1.2
+
+Panadapter.swift - renamed daxChoices & daxChannels -> daxIqChoices & daxIqChanneld
+Slice.swift - added daxChoices & daxChannels
+Slice.swift - added txAntList property
+all models - removed "if property != value" from update(_:value:key:)
+
 v1.1.1
 
 Radio.swift - moved atuClear(callback:), atuStart(callback:) & atuBypass(callback:) to AtuCommands.swift

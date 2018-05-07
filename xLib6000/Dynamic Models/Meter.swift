@@ -333,7 +333,7 @@ public final class Meter                    : NSObject, StatusParser, Properties
     guard let token = Units(rawValue: units) else {
       
       // unknown Units, log it and ignore it
-      Log.sharedInstance.msg("Meter \(id).\(description), Unknown units - \(units)", level: .debug, function: #function, file: #file, line: #line)
+      Log.sharedInstance.msg("Meter \(id).\(desc), Unknown units - \(units)", level: .debug, function: #function, file: #file, line: #line)
       return
     }
     
