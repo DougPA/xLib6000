@@ -64,10 +64,11 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   static let kDomainId                      = "net.k3tzr"                   // Domain name
   static let kBundleIdentifier              = Api.kDomainId + "." + Api.kId
   static let kTcpTimeout                    = 0.5                           // seconds
+  static let daxChannels                    = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
-  
+
   public var availableRadios                : [RadioParameters] {           // Radios discovered
     return _radioFactory.availableRadios }
   public let log                            = Log.sharedInstance
@@ -443,9 +444,26 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
       log.msg("Update in process", level: .info, function: #function, file: #file, line: #line)
     }
   }
-  
+  /// Update a property & signal KVO
+  ///
+  /// - Parameters:
+  ///   - property:           the property (mutable)
+  ///   - value:              the new value
+  ///   - key:                the KVO key
+  ///
+  func update<T: Equatable>(_ object: AnyObject, property: inout T, value: T, key: String) {
+    
+    // update the property & signal KVO (if needed)
+    //    if property != value {
+    object.willChangeValue(forKey: key)
+    property = value
+    object.didChangeValue(forKey: key)
+    //    }
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
+  
   
   /// Determine if the Radio (hardware) Firmware version is compatable with the API version
   ///

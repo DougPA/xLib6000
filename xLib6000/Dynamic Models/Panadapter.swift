@@ -50,6 +50,7 @@ public final class Panadapter               : NSObject, StatusParser, Properties
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
 
@@ -256,79 +257,79 @@ public final class Panadapter               : NSObject, StatusParser, Properties
       switch token {
         
       case .antList:
-        update(&_antList, value: property.value.components(separatedBy: ","), key: "antList")
+        _api.update(self, property: &_antList, value: property.value.components(separatedBy: ","), key: "antList")
 
       case .average:
-        update(&_average, value: property.value.iValue(), key: "average")
+        _api.update(self, property: &_average, value: property.value.iValue(), key: "average")
 
       case .band:
-        update(&_band, value: property.value, key: "band")
+        _api.update(self, property: &_band, value: property.value, key: "band")
 
       case .bandwidth:
-        update(&_bandwidth, value: property.value.mhzToHz(), key: "bandwidth")
+        _api.update(self, property: &_bandwidth, value: property.value.mhzToHz(), key: "bandwidth")
 
       case .center:
-        update(&_center, value: property.value.mhzToHz(), key: "center")
+        _api.update(self, property: &_center, value: property.value.mhzToHz(), key: "center")
 
       case .daxIqChannel:
-        update(&_daxIqChannel, value: property.value.iValue(), key: "daxIqChannel")
+        _api.update(self, property: &_daxIqChannel, value: property.value.iValue(), key: "daxIqChannel")
 
       case .fps:
-        update(&_fps, value: property.value.iValue(), key: "fps")
+        _api.update(self, property: &_fps, value: property.value.iValue(), key: "fps")
 
       case .loopAEnabled:
-        update(&_loopAEnabled, value: property.value.bValue(), key: "loopAEnabled")
+        _api.update(self, property: &_loopAEnabled, value: property.value.bValue(), key: "loopAEnabled")
 
       case .loopBEnabled:
-        update(&_loopBEnabled, value: property.value.bValue(), key: "loopBEnabled")
+        _api.update(self, property: &_loopBEnabled, value: property.value.bValue(), key: "loopBEnabled")
 
       case .maxBw:
-        update(&_maxBw, value: property.value.mhzToHz(), key: "maxBw")
+        _api.update(self, property: &_maxBw, value: property.value.mhzToHz(), key: "maxBw")
 
       case .maxDbm:
-        update(&_maxDbm, value: CGFloat(property.value.fValue()), key: "maxDbm")
+        _api.update(self, property: &_maxDbm, value: CGFloat(property.value.fValue()), key: "maxDbm")
 
       case .minBw:
-        update(&_minBw, value: property.value.mhzToHz(), key: "minBw")
+        _api.update(self, property: &_minBw, value: property.value.mhzToHz(), key: "minBw")
 
       case .minDbm:
-        update(&_minDbm, value: CGFloat(property.value.fValue()), key: "minDbm")
+        _api.update(self, property: &_minDbm, value: CGFloat(property.value.fValue()), key: "minDbm")
 
       case .preamp:
-        update(&_preamp, value: property.value, key: "preamp")
+        _api.update(self, property: &_preamp, value: property.value, key: "preamp")
 
       case .rfGain:
-        update(&_rfGain, value: property.value.iValue(), key: "rfGain")
+        _api.update(self, property: &_rfGain, value: property.value.iValue(), key: "rfGain")
 
       case .rxAnt:
-        update(&_rxAnt, value: property.value, key: "rxAnt")
+        _api.update(self, property: &_rxAnt, value: property.value, key: "rxAnt")
 
       case .waterfallId:
-        update(&_waterfallId, value: UInt32(property.value, radix: 16) ?? 0, key: "waterfallId")
+        _api.update(self, property: &_waterfallId, value: UInt32(property.value, radix: 16) ?? 0, key: "waterfallId")
 
       case .wide:
-        update(&_wide, value: property.value.bValue(), key: "wide")
+        _api.update(self, property: &_wide, value: property.value.bValue(), key: "wide")
 
       case .weightedAverageEnabled:
-        update(&_weightedAverageEnabled, value: property.value.bValue(), key: "weightedAverageEnabled")
+        _api.update(self, property: &_weightedAverageEnabled, value: property.value.bValue(), key: "weightedAverageEnabled")
 
       case .wnbEnabled:
-        update(&_wnbEnabled, value: property.value.bValue(), key: "wnbEnabled")
+        _api.update(self, property: &_wnbEnabled, value: property.value.bValue(), key: "wnbEnabled")
 
       case .wnbLevel:
-        update(&_wnbLevel, value: property.value.iValue(), key: "wnbLevel")
+        _api.update(self, property: &_wnbLevel, value: property.value.iValue(), key: "wnbLevel")
 
       case .wnbUpdating:
-        update(&_wnbUpdating, value: property.value.bValue(), key: "wnbUpdating")
+        _api.update(self, property: &_wnbUpdating, value: property.value.bValue(), key: "wnbUpdating")
 
       case .xPixels:
-        update(&_xPixels, value: CGFloat(property.value.fValue()), key: "xPixels")
+        _api.update(self, property: &_xPixels, value: CGFloat(property.value.fValue()), key: "xPixels")
 
       case .xvtrLabel:
-        update(&_xvtrLabel, value: property.value, key: "xvtrLabel")
+        _api.update(self, property: &_xvtrLabel, value: property.value, key: "xvtrLabel")
 
       case .yPixels:
-        update(&_yPixels, value: CGFloat(property.value.fValue()), key: "yPixels")
+        _api.update(self, property: &_yPixels, value: CGFloat(property.value.fValue()), key: "yPixels")
 
       case .available, .capacity, .daxIqRate:
         // ignored by Panadapter
@@ -348,22 +349,6 @@ public final class Panadapter               : NSObject, StatusParser, Properties
       // notify all observers
       NC.post(.panadapterHasBeenAdded, object: self as Any?)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 
   // ----------------------------------------------------------------------------

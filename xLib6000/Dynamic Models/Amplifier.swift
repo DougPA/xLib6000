@@ -29,6 +29,7 @@ public final class Amplifier                : NSObject, StatusParser, Properties
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
   
@@ -132,19 +133,19 @@ public final class Amplifier                : NSObject, StatusParser, Properties
       switch token {
         
       case .ant:
-        update(&_ant, value: property.value, key: "ant")
+        _api.update(self, property: &_ant, value: property.value, key: "ant")
         
       case .ip:
-        update(&_ip, value: property.value, key: "ip")
+        _api.update(self, property: &_ip, value: property.value, key: "ip")
 
       case .model:
-        update(&_model, value: property.value, key: "model")
+        _api.update(self, property: &_model, value: property.value, key: "model")
 
       case .port:
-        update(&_port, value: property.value.iValue(), key: "port")
+        _api.update(self, property: &_port, value: property.value.iValue(), key: "port")
 
       case .serialNumber:
-        update(&_serialNumber, value: property.value, key: "serialNumber")
+       _api.update(self, property: &_serialNumber, value: property.value, key: "serialNumber")
 
       case .mode:      // never received from Radio
         break
@@ -159,22 +160,6 @@ public final class Amplifier                : NSObject, StatusParser, Properties
       // notify all observers
       NC.post(.amplifierHasBeenAdded, object: self as Any?)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 

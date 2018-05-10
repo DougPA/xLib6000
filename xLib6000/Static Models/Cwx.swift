@@ -39,6 +39,7 @@ public final class Cwx                      : NSObject, PropertiesParser {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
@@ -187,7 +188,7 @@ public final class Cwx                      : NSObject, PropertiesParser {
         switch token {
           
         case .breakInDelay:
-          update(&_breakInDelay, value: property.value.iValue(), key: "breakInDelay")
+          _api.update(self, property: &_breakInDelay, value: property.value.iValue(), key: "breakInDelay")
 
         case .erase:
           let values = property.value.components(separatedBy: ",")
@@ -200,33 +201,17 @@ public final class Cwx                      : NSObject, PropertiesParser {
           }
           
         case .qskEnabled:
-          update(&_qskEnabled, value: property.value.bValue(), key: "qskEnabled")
+          _api.update(self, property: &_qskEnabled, value: property.value.bValue(), key: "qskEnabled")
 
         case .sent:
           // inform the Event Handler (if any)
           charSentEventHandler?(property.value.iValue())
           
         case .wpm:
-          update(&_wpm, value: property.value.iValue(), key: "wpm")
+          _api.update(self, property: &_wpm, value: property.value.iValue(), key: "wpm")
         }
       }
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 

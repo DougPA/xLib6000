@@ -50,7 +50,7 @@ extension Radio {
   public func clientLowBandwidthConnect(callback: ReplyHandler? = nil) {
     
     // tell the Radio to limit the connection bandwidth
-   _api.send(Api.Command.clientProgram.rawValue + "low_bw_connect", replyTo: callback)
+   Api.sharedInstance.send(Api.Command.clientProgram.rawValue + "low_bw_connect", replyTo: callback)
   }
   /// Turn off persistence
   ///
@@ -59,7 +59,7 @@ extension Radio {
   public func clientPersistenceOff(callback: ReplyHandler? = nil) {
     
     // tell the Radio to turn off persistence
-   _api.send(Api.Command.clientProgram.rawValue + "start_persistence off", replyTo: callback)
+   Api.sharedInstance.send(Api.Command.clientProgram.rawValue + "start_persistence off", replyTo: callback)
   }
   /// Key CW
   ///
@@ -70,7 +70,7 @@ extension Radio {
   public func cwKeyImmediate(state: Bool, callback: ReplyHandler? = nil) {
     
     // tell the Radio to change the keydown state
-   _api.send(Transmit.kCwCmd + "key immediate" + " \(state.asNumber())", replyTo: callback)
+   Api.sharedInstance.send(Transmit.kCwCmd + "key immediate" + " \(state.asNumber())", replyTo: callback)
   }
   
   /// Refresh the Radio License
@@ -81,7 +81,7 @@ extension Radio {
   public func refreshLicense(callback: ReplyHandler? = nil) {
     
     // ask the Radio for its license info
-    return _api.send(Radio.kLicenseCmd + "refresh", replyTo: callback)
+    return Api.sharedInstance.send(Radio.kLicenseCmd + "refresh", replyTo: callback)
   }
   /// Reset the Static Net Params
   ///
@@ -90,7 +90,7 @@ extension Radio {
   public func staticNetParamsReset(callback: ReplyHandler? = nil) {
     
     // tell the Radio to reset the Static Net Params
-   _api.send(Radio.kCmd + RadioToken.staticNetParams.rawValue + " reset", replyTo: callback)
+   Api.sharedInstance.send(Radio.kCmd + RadioToken.staticNetParams.rawValue + " reset", replyTo: callback)
   }
   /// Reboot the Radio
   ///
@@ -99,14 +99,14 @@ extension Radio {
   public func rebootRequest(callback: ReplyHandler? = nil) {
     
     // tell the Radio to reboot
-   _api.send(Radio.kCmd + RadioToken.staticNetParams.rawValue + " reset", replyTo: callback)
+   Api.sharedInstance.send(Radio.kCmd + RadioToken.staticNetParams.rawValue + " reset", replyTo: callback)
   }
   /// Request the elapsed uptime
   ///
   public func uptimeRequest(callback: ReplyHandler? = nil) {
     
     // ask the Radio for the elapsed uptime
-   _api.send(Radio.kUptimeCmd, replyTo: callback == nil ? defaultReplyHandler : callback)
+   Api.sharedInstance.send(Radio.kUptimeCmd, replyTo: callback == nil ? defaultReplyHandler : callback)
   }
   
   // ----------------------------------------------------------------------------
@@ -120,7 +120,7 @@ extension Radio {
   ///
   private func apfCmd( _ token: EqApfToken, _ value: Any) {
     
-   _api.send(Radio.kApfCmd + token.rawValue + "=\(value)")
+   Api.sharedInstance.send(Radio.kApfCmd + token.rawValue + "=\(value)")
   }
   /// Set a Mixer property on the Radio
   ///
@@ -130,7 +130,7 @@ extension Radio {
   ///
   private func mixerCmd( _ token: String, _ value: Any) {
     
-   _api.send(Radio.kMixerCmd + token + " \(value)")
+   Api.sharedInstance.send(Radio.kMixerCmd + token + " \(value)")
   }
   /// Set a Radio property on the Radio
   ///
@@ -140,7 +140,7 @@ extension Radio {
   ///
   private func radioSetCmd( _ token: RadioToken, _ value: Any) {
     
-   _api.send(Radio.kSetCmd + token.rawValue + "=\(value)")
+   Api.sharedInstance.send(Radio.kSetCmd + token.rawValue + "=\(value)")
   }
   /// Set a Radio property on the Radio
   ///
@@ -150,7 +150,17 @@ extension Radio {
   ///
   private func radioCmd( _ token: RadioToken, _ value: Any) {
     
-   _api.send(Radio.kCmd + token.rawValue + " \(value)")
+   Api.sharedInstance.send(Radio.kCmd + token.rawValue + " \(value)")
+  }
+  /// Set a Radio property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      a String
+  ///   - value:      the new value
+  ///
+  private func radioCmd( _ token: String, _ value: Any) {
+    
+    Api.sharedInstance.send(Radio.kCmd + token + " \(value)")
   }
   /// Set a Radio Filter property on the Radio
   ///
@@ -160,9 +170,19 @@ extension Radio {
   ///
   private func radioFilterCmd( _ token1: RadioToken,  _ token2: RadioToken, _ token3: RadioToken,_ value: Any) {
     
-   _api.send(Radio.kCmd + token1.rawValue + " " + token2.rawValue + " " + token3.rawValue + "=\(value)")
+   Api.sharedInstance.send(Radio.kCmd + token1.rawValue + " " + token2.rawValue + " " + token3.rawValue + "=\(value)")
   }
-  
+  /// Set Static Network properties on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func radioStaticCmd(_ value1: Any,_ value2: Any,_ value3: Any) {
+    
+    Api.sharedInstance.send(Radio.kCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\(value1) " + RadioToken.gateway.rawValue + "=\(value2) " + RadioToken.netmask.rawValue + "=\(value3)")
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant (with message sent to Radio)
   
@@ -251,11 +271,11 @@ extension Radio {
   
   @objc dynamic public var nickname: String {
     get {  return _nickname }
-    set { if _nickname != newValue { _nickname = newValue ;_api.send(Radio.kCmd + "name" + " \(newValue)") } } }
+    set { if _nickname != newValue { _nickname = newValue ; radioCmd("name", newValue) } } }
   
   @objc dynamic public var radioScreenSaver: String {
     get {  return _radioScreenSaver }
-    set { if _radioScreenSaver != newValue { _radioScreenSaver = newValue ;_api.send(Radio.kCmd + "screensaver" + " \(newValue)") } } }
+    set { if _radioScreenSaver != newValue { _radioScreenSaver = newValue ; radioCmd("screensaver", newValue) } } }
   
   @objc dynamic public var snapTuneEnabled: Bool {
     get {  return _snapTuneEnabled }
@@ -263,7 +283,7 @@ extension Radio {
   
   @objc dynamic public var startOffset: Bool {
     get { return _startOffset }
-    set { if _startOffset != newValue { _startOffset = newValue ; if !_startOffset {_api.send(Radio.kCmd + "pll_start") } } } }
+    set { if _startOffset != newValue { _startOffset = newValue ; if !_startOffset { radioCmd("pll_start", "") } } } }
   
   // ***** RADIO FILTER COMMANDS *****
   
@@ -295,13 +315,13 @@ extension Radio {
   
   @objc dynamic public var staticGateway: String {
     get {  return _staticGateway }
-    set { if _staticGateway != newValue { _staticGateway = newValue ;_api.send(Radio.kCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\(staticIp) " + RadioToken.gateway.rawValue + "=\(newValue) " + RadioToken.netmask.rawValue + "=\(staticNetmask)") } } }
+    set { if _staticGateway != newValue { _staticGateway = newValue ; radioStaticCmd(_staticIp,  newValue , _staticNetmask) } } }
   
   @objc dynamic public var staticIp: String {
     get {  return _staticIp }
-    set { if _staticIp != newValue { _staticIp = newValue ;_api.send(Radio.kCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\(staticIp) " + RadioToken.gateway.rawValue + "=\(newValue) " + RadioToken.netmask.rawValue + "=\(staticNetmask)") } } }
+    set { if _staticIp != newValue { _staticIp = newValue ; radioStaticCmd(newValue,  _staticGateway , _staticNetmask) } } }
   
   @objc dynamic public var staticNetmask: String {
     get {  return _staticNetmask }
-    set { if _staticNetmask != newValue { _staticNetmask = newValue ;_api.send(Radio.kCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\(staticIp) " + RadioToken.gateway.rawValue + "=\(newValue) " + RadioToken.netmask.rawValue + "=\(staticNetmask)") } } }
+    set { if _staticNetmask != newValue { _staticNetmask = newValue ; radioStaticCmd(_staticIp,  _staticGateway , newValue) } } }
 }

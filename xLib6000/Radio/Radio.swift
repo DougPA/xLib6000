@@ -87,15 +87,11 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   public private(set) var sliceList         = [SliceId]()                   // Array of available Slice id's
   
   public private(set) var sliceErrors       = [String]()                    // frequency error of a Slice (milliHz)
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Internal properties
-  
-  internal var _api                         = Api.sharedInstance            // the API
-  
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _radioInitialized = false
   private var _hardwareVersion              : String?                       // ???
   private var _metersToSubscribe            = [Api.MeterShortName]()
@@ -643,58 +639,58 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
       switch token {
         
       case .atuPresent:
-        update(&atu._status, value: property.value.bValue(), key: "atuPresent")
+        _api.update(self, property: &atu._status, value: property.value.bValue(), key: "atuPresent")
 
       case .callsign:
-        update(&_callsign, value: property.value.replacingOccurrences(of: "\"", with:""), key: "callsign")
+        _api.update(self, property: &_callsign, value: property.value.replacingOccurrences(of: "\"", with:""), key: "callsign")
 
       case .chassisSerial:
-        update(&_chassisSerial, value: property.value.replacingOccurrences(of: "\"", with:""), key: "chassisSerial")
+        _api.update(self, property: &_chassisSerial, value: property.value.replacingOccurrences(of: "\"", with:""), key: "chassisSerial")
 
       case .gateway:
-        update(&_gateway, value: property.value.replacingOccurrences(of: "\"", with:""), key: "gateway")
+        _api.update(self, property: &_gateway, value: property.value.replacingOccurrences(of: "\"", with:""), key: "gateway")
 
       case .gps:
-        update(&gps._status, value: property.value.bValue(), key: "gpsPresent")
+        _api.update(self, property: &gps._status, value: property.value.bValue(), key: "gpsPresent")
 
       case .ipAddress:
-        update(&_ipAddress, value: property.value.replacingOccurrences(of: "\"", with:""), key: "ipAddress")
+        _api.update(self, property: &_ipAddress, value: property.value.replacingOccurrences(of: "\"", with:""), key: "ipAddress")
 
       case .location:
-        update(&_location, value: property.value.replacingOccurrences(of: "\"", with:""), key: "location")
+        _api.update(self, property: &_location, value: property.value.replacingOccurrences(of: "\"", with:""), key: "location")
 
       case .macAddress:
-        update(&_macAddress, value: property.value.replacingOccurrences(of: "\"", with:""), key: "macAddress")
+        _api.update(self, property: &_macAddress, value: property.value.replacingOccurrences(of: "\"", with:""), key: "macAddress")
 
       case .model:
-         update(&_radioModel, value: property.value.replacingOccurrences(of: "\"", with:""), key: "radioModel")
+         _api.update(self, property: &_radioModel, value: property.value.replacingOccurrences(of: "\"", with:""), key: "radioModel")
 
       case .netmask:
-        update(&_netmask, value: property.value.replacingOccurrences(of: "\"", with:""), key: "netmask")
+        _api.update(self, property: &_netmask, value: property.value.replacingOccurrences(of: "\"", with:""), key: "netmask")
 
       case .name:
-        update(&_nickname, value: property.value.replacingOccurrences(of: "\"", with:""), key: "nickname")
+        _api.update(self, property: &_nickname, value: property.value.replacingOccurrences(of: "\"", with:""), key: "nickname")
 
       case .numberOfScus:
-        update(&_numberOfScus, value: property.value.iValue(), key: "numberOfScus")
+        _api.update(self, property: &_numberOfScus, value: property.value.iValue(), key: "numberOfScus")
 
       case .numberOfSlices:
-        update(&_numberOfSlices, value: property.value.iValue(), key: "numberOfSlices")
+        _api.update(self, property: &_numberOfSlices, value: property.value.iValue(), key: "numberOfSlices")
 
       case .numberOfTx:
-        update(&_numberOfTx, value: property.value.iValue(), key: "numberOfTx")
+        _api.update(self, property: &_numberOfTx, value: property.value.iValue(), key: "numberOfTx")
 
       case .options:
-        update(&_radioOptions, value: property.value.replacingOccurrences(of: "\"", with:""), key: "radioOptions")
+        _api.update(self, property: &_radioOptions, value: property.value.replacingOccurrences(of: "\"", with:""), key: "radioOptions")
 
       case .region:
-        update(&_region, value: property.value.replacingOccurrences(of: "\"", with:""), key: "region")
+        _api.update(self, property: &_region, value: property.value.replacingOccurrences(of: "\"", with:""), key: "region")
 
       case .screensaver:
-        update(&_radioScreenSaver, value: property.value.replacingOccurrences(of: "\"", with:""), key: "radioScreenSaver")
+        _api.update(self, property: &_radioScreenSaver, value: property.value.replacingOccurrences(of: "\"", with:""), key: "radioScreenSaver")
 
       case .softwareVersion:
-        update(&_softwareVersion, value: property.value.replacingOccurrences(of: "\"", with:""), key: "softwareVersion")
+        _api.update(self, property: &_softwareVersion, value: property.value.replacingOccurrences(of: "\"", with:""), key: "softwareVersion")
       }
     }
   }
@@ -781,16 +777,16 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
       switch token {
         
       case .smartSdrMB:
-        update(&_smartSdrMB, value: property.value, key: "smartSdrMB")
+        _api.update(self, property: &_smartSdrMB, value: property.value, key: "smartSdrMB")
 
       case .psocMbTrx:
-        update(&_psocMbtrxVersion, value: property.value, key: "psocMbtrxVersion")
+        _api.update(self, property: &_psocMbtrxVersion, value: property.value, key: "psocMbtrxVersion")
 
       case .psocMbPa100:
-        update(&_psocMbPa100Version, value: property.value, key: "psocMbPa100Version")
+        _api.update(self, property: &_psocMbPa100Version, value: property.value, key: "psocMbPa100Version")
 
       case .fpgaMb:
-        update(&_fpgaMbVersion, value: property.value, key: "fpgaMbVersion")
+        _api.update(self, property: &_fpgaMbVersion, value: property.value, key: "fpgaMbVersion")
       }
     }
   }
@@ -829,33 +825,33 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
         
       case .autoLevel:
         if filterSharpness && cw {
-          update(&_filterCwAutoLevel, value: property.value.iValue(), key: "filterCwAutoLevel")
+          _api.update(self, property: &_filterCwAutoLevel, value: property.value.iValue(), key: "filterCwAutoLevel")
           cw = false
         }
         if filterSharpness && digital {
-          update(&_filterDigitalAutoLevel, value: property.value.iValue(), key: "filterDigitalAutoLevel")
+          _api.update(self, property: &_filterDigitalAutoLevel, value: property.value.iValue(), key: "filterDigitalAutoLevel")
           digital = false
         }
         if filterSharpness && voice {
-          update(&_filterVoiceAutoLevel, value: property.value.iValue(), key: "filterVoiceAutoLevel")
+          _api.update(self, property: &_filterVoiceAutoLevel, value: property.value.iValue(), key: "filterVoiceAutoLevel")
           voice = false
         }
         filterSharpness = false
         
       case .backlight:
-        update(&_backlight, value: property.value.iValue(), key: "backlight")
+        _api.update(self, property: &_backlight, value: property.value.iValue(), key: "backlight")
 
       case .bandPersistenceEnabled:
-        update(&_bandPersistenceEnabled, value: property.value.bValue(), key: "bandPersistenceEnabled")
+        _api.update(self, property: &_bandPersistenceEnabled, value: property.value.bValue(), key: "bandPersistenceEnabled")
 
       case .binauralRxEnabled:
-        update(&_binauralRxEnabled, value: property.value.bValue(), key: "binauralRxEnabled")
+        _api.update(self, property: &_binauralRxEnabled, value: property.value.bValue(), key: "binauralRxEnabled")
 
       case .calFreq:
-        update(&_calFreq, value: property.value.iValue(), key: "calFreq")
+        _api.update(self, property: &_calFreq, value: property.value.iValue(), key: "calFreq")
 
       case .callsign:
-        update(&_callsign, value: property.value, key: "callsign")
+        _api.update(self, property: &_callsign, value: property.value, key: "callsign")
 
       case .cw, .CW:
         cw = true
@@ -864,104 +860,104 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
         digital = true
         
       case .enforcePrivateIpEnabled:
-        update(&_enforcePrivateIpEnabled, value: property.value.bValue(), key: "enforcePrivateIpEnabled")
+        _api.update(self, property: &_enforcePrivateIpEnabled, value: property.value.bValue(), key: "enforcePrivateIpEnabled")
 
       case .filterSharpness:
         filterSharpness = true
         
       case .freqErrorPpb:
-         update(&_freqErrorPpb, value: property.value.iValue(), key: "freqErrorPpb")
+         _api.update(self, property: &_freqErrorPpb, value: property.value.iValue(), key: "freqErrorPpb")
 
       case .fullDuplexEnabled:
-        update(&_fullDuplexEnabled, value: property.value.bValue(), key: "fullDuplexEnabled")
+        _api.update(self, property: &_fullDuplexEnabled, value: property.value.bValue(), key: "fullDuplexEnabled")
 
       case .gateway:
         if staticNetParams {
-          update(&_staticGateway, value: property.value, key: "staticGateway")
+          _api.update(self, property: &_staticGateway, value: property.value, key: "staticGateway")
         }
         
       case .headphoneGain:
-        update(&_headphoneGain, value: property.value.iValue(), key: "headphoneGain")
+        _api.update(self, property: &_headphoneGain, value: property.value.iValue(), key: "headphoneGain")
 
       case .headphoneMute:
-        update(&_headphoneMute, value: property.value.bValue(), key: "headphoneMute")
+        _api.update(self, property: &_headphoneMute, value: property.value.bValue(), key: "headphoneMute")
 
       case .ip:
         if staticNetParams {
-          update(&_staticIp, value: property.value, key: "staticIp")
+          _api.update(self, property: &_staticIp, value: property.value, key: "staticIp")
         }
         
       case .level:
         if filterSharpness && cw {
-          update(&_filterCwLevel, value: property.value.iValue(), key: "filterCwLevel")
+          _api.update(self, property: &_filterCwLevel, value: property.value.iValue(), key: "filterCwLevel")
           cw = false
         }
         if filterSharpness && digital {
-          update(&_filterDigitalLevel, value: property.value.iValue(), key: "filterDigitalLevel")
+          _api.update(self, property: &_filterDigitalLevel, value: property.value.iValue(), key: "filterDigitalLevel")
           digital = false
         }
         if filterSharpness && voice {
-          update(&_filterVoiceLevel, value: property.value.iValue(), key: "filterVoiceLevel")
+          _api.update(self, property: &_filterVoiceLevel, value: property.value.iValue(), key: "filterVoiceLevel")
           voice = false
         }
         filterSharpness = false
         
       case .lineoutGain:
-         update(&_lineoutGain, value: property.value.iValue(), key: "lineoutGain")
+         _api.update(self, property: &_lineoutGain, value: property.value.iValue(), key: "lineoutGain")
 
       case .lineoutMute:
-        update(&_lineoutMute, value: property.value.bValue(), key: "lineoutMute")
+        _api.update(self, property: &_lineoutMute, value: property.value.bValue(), key: "lineoutMute")
 
       case .locked:
         if oscillator {
-          update(&_locked, value: property.value.bValue(), key: "locked")
+          _api.update(self, property: &_locked, value: property.value.bValue(), key: "locked")
         }
         
       case .netmask:
         if staticNetParams {
-          update(&_staticNetmask, value: property.value, key: "staticNetmask")
+          _api.update(self, property: &_staticNetmask, value: property.value, key: "staticNetmask")
           staticNetParams = false
         }
         
       case .nickname:
-        update(&_nickname, value: property.value, key: "nickname")
+        _api.update(self, property: &_nickname, value: property.value, key: "nickname")
 
       case .oscillator:
         oscillator = true
         
       case .panadapters:
-        update(&_availablePanadapters, value: property.value.iValue(), key: "availablePanadapters")
+        _api.update(self, property: &_availablePanadapters, value: property.value.iValue(), key: "availablePanadapters")
 
       case .pllDone:
-        update(&_startOffset, value: property.value.bValue(), key: "startOffset")
+        _api.update(self, property: &_startOffset, value: property.value.bValue(), key: "startOffset")
 
       case .remoteOnEnabled:
-        update(&_remoteOnEnabled, value: property.value.bValue(), key: "remoteOnEnabled")
+        _api.update(self, property: &_remoteOnEnabled, value: property.value.bValue(), key: "remoteOnEnabled")
 
       case .rttyMark:
-        update(&_rttyMark, value: property.value.iValue(), key: "rttyMark")
+        _api.update(self, property: &_rttyMark, value: property.value.iValue(), key: "rttyMark")
 
       case .setting:
         if oscillator {
-          update(&_setting, value: property.value, key: "setting")
+          _api.update(self, property: &_setting, value: property.value, key: "setting")
         }
         
       case .slices:
-        update(&_availableSlices, value: property.value.iValue(), key: "availableSlices")
+        _api.update(self, property: &_availableSlices, value: property.value.iValue(), key: "availableSlices")
 
       case .snapTuneEnabled:
-        update(&_snapTuneEnabled, value: property.value.bValue(), key: "snapTuneEnabled")
+        _api.update(self, property: &_snapTuneEnabled, value: property.value.bValue(), key: "snapTuneEnabled")
 
       case .state:
         if oscillator {
-          update(&_state, value: property.value, key: "state")
+          _api.update(self, property: &_state, value: property.value, key: "state")
         }
         
       case .staticNetParams:
         staticNetParams = true
         
       case .tnfEnabled:
-        update(&_tnfEnabled, value: property.value.bValue(), key: "tnfEnabled")
+        _api.update(self, property: &_tnfEnabled, value: property.value.bValue(), key: "tnfEnabled")
 
       case .voice, .VOICE:
         voice = true
@@ -977,22 +973,6 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
       // notify all observers
       NC.post(.radioHasBeenAdded, object: self as Any?)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 
   // ----------------------------------------------------------------------------

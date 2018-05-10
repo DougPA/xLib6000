@@ -29,6 +29,7 @@ public final class Xvtr                     : NSObject, StatusParser, Properties
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
   
@@ -138,40 +139,40 @@ public final class Xvtr                     : NSObject, StatusParser, Properties
       switch token {
         
       case .name:
-        update(&_name, value: property.value, key: "name")
+        _api.update(self, property: &_name, value: property.value, key: "name")
 
       case .ifFrequency:
-        update(&_ifFrequency, value: property.value.iValue(), key: "ifFrequency")
+        _api.update(self, property: &_ifFrequency, value: property.value.iValue(), key: "ifFrequency")
 
       case .inUse:
-        update(&_inUse, value: property.value.bValue(), key: "inUse")
+        _api.update(self, property: &_inUse, value: property.value.bValue(), key: "inUse")
 
       case .isValid:
-        update(&_isValid, value: property.value.bValue(), key: "isValid")
+        _api.update(self, property: &_isValid, value: property.value.bValue(), key: "isValid")
 
       case .loError:
-        update(&_loError, value: property.value.iValue(), key: "loError")
+        _api.update(self, property: &_loError, value: property.value.iValue(), key: "loError")
 
       case .maxPower:
-        update(&_maxPower, value: property.value.iValue(), key: "maxPower")
+        _api.update(self, property: &_maxPower, value: property.value.iValue(), key: "maxPower")
 
       case .order:
-        update(&_order, value: property.value.iValue(), key: "order")
+        _api.update(self, property: &_order, value: property.value.iValue(), key: "order")
 
       case .preferred:
-        update(&_preferred, value: property.value.bValue(), key: "preferred")
+        _api.update(self, property: &_preferred, value: property.value.bValue(), key: "preferred")
 
       case .rfFrequency:
-        update(&_rfFrequency, value: property.value.iValue(), key: "rfFrequency")
+        _api.update(self, property: &_rfFrequency, value: property.value.iValue(), key: "rfFrequency")
 
       case .rxGain:
-        update(&_rxGain, value: property.value.iValue(), key: "rxGain")
+        _api.update(self, property: &_rxGain, value: property.value.iValue(), key: "rxGain")
 
       case .rxOnly:
-        update(&_rxOnly, value: property.value.bValue(), key: "rxOnly")
+        _api.update(self, property: &_rxOnly, value: property.value.bValue(), key: "rxOnly")
 
       case .twoMeterInt:
-        update(&_twoMeterInt, value: property.value.iValue(), key: "twoMeterInt")
+        _api.update(self, property: &_twoMeterInt, value: property.value.iValue(), key: "twoMeterInt")
       }
     }
     // is the waterfall initialized?
@@ -183,22 +184,6 @@ public final class Xvtr                     : NSObject, StatusParser, Properties
       // notify all observers
       NC.post(.xvtrHasBeenAdded, object: self as Any?)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 

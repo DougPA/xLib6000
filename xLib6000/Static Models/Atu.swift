@@ -22,6 +22,7 @@ public final class Atu                      : NSObject, PropertiesParser {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -73,34 +74,18 @@ public final class Atu                      : NSObject, PropertiesParser {
       switch token {
         
       case .enabled:
-        update(&_enabled, value: property.value.bValue(), key: "enabled")
+        _api.update(self, property: &_enabled, value: property.value.bValue(), key: "enabled")
 
       case .memoriesEnabled:
-        update(&_memoriesEnabled, value: property.value.bValue(), key: "memoriesEnabled")
+        _api.update(self, property: &_memoriesEnabled, value: property.value.bValue(), key: "memoriesEnabled")
 
       case .status:
-        update(&_status, value: ( property.value == "present" ? true : false ), key: "status")
+        _api.update(self, property: &_status, value: ( property.value == "present" ? true : false ), key: "status")
 
       case .usingMemories:
-        update(&_usingMemories, value: property.value.bValue(), key: "usingMemories")
+        _api.update(self, property: &_usingMemories, value: property.value.bValue(), key: "usingMemories")
       }
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 

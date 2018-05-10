@@ -44,6 +44,7 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
   
@@ -153,13 +154,13 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
       switch token {
         
       case .inUse:
-        update(&_inUse, value: property.value.bValue(), key: "inUse")
+        _api.update(self, property: &_inUse, value: property.value.bValue(), key: "inUse")
 
       case .ip:
-        update(&_ip, value: property.value, key: "ip")
+        _api.update(self, property: &_ip, value: property.value, key: "ip")
 
       case .port:
-        update(&_port, value: property.value.iValue(), key: "port")
+        _api.update(self, property: &_port, value: property.value.iValue(), key: "port")
 
       }
     }
@@ -172,22 +173,6 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
       // notify all observers
       NC.post(.micAudioStreamHasBeenAdded, object: self as Any?)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 
   // ----------------------------------------------------------------------------

@@ -31,6 +31,7 @@ public final class UsbCable                 : NSObject, StatusParser, Properties
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
   
@@ -160,59 +161,59 @@ public final class UsbCable                 : NSObject, StatusParser, Properties
         switch token {
           
         case .autoReport:
-          update(&_autoReport, value: property.value.bValue(), key: "autoReport")
+          _api.update(self, property: &_autoReport, value: property.value.bValue(), key: "autoReport")
 
         case .band:
-          update(&_band, value: property.value, key: "band")
+          _api.update(self, property: &_band, value: property.value, key: "band")
 
         case .cableType:
           // ignore this token's value (set by init)
           break
           
         case .dataBits:
-          update(&_dataBits, value: property.value.iValue(), key: "dataBits")
+          _api.update(self, property: &_dataBits, value: property.value.iValue(), key: "dataBits")
 
         case .enable:
-          update(&_enable, value: property.value.bValue(), key: "enable")
+          _api.update(self, property: &_enable, value: property.value.bValue(), key: "enable")
 
         case .flowControl:
-          update(&_flowControl, value: property.value, key: "flowControl")
+          _api.update(self, property: &_flowControl, value: property.value, key: "flowControl")
 
         case .name:
-          update(&_name, value: property.value, key: "name")
+          _api.update(self, property: &_name, value: property.value, key: "name")
 
         case .parity:
-          update(&_parity, value: property.value, key: "parity")
+          _api.update(self, property: &_parity, value: property.value, key: "parity")
 
         case .pluggedIn:
-          update(&_pluggedIn, value: property.value.bValue(), key: "pluggedIn")
+          _api.update(self, property: &_pluggedIn, value: property.value.bValue(), key: "pluggedIn")
 
         case .polarity:
-          update(&_polarity, value: property.value, key: "polarity")
+          _api.update(self, property: &_polarity, value: property.value, key: "polarity")
 
         case .preamp:
-          update(&_preamp, value: property.value, key: "preamp")
+          _api.update(self, property: &_preamp, value: property.value, key: "preamp")
 
         case .source:
-          update(&_source, value: property.value, key: "source")
+          _api.update(self, property: &_source, value: property.value, key: "source")
 
         case .sourceRxAnt:
-          update(&_sourceRxAnt, value: property.value, key: "sourceRxAnt")
+          _api.update(self, property: &_sourceRxAnt, value: property.value, key: "sourceRxAnt")
 
         case .sourceSlice:
-          update(&_sourceSlice, value: property.value.iValue(), key: "sourceSlice")
+          _api.update(self, property: &_sourceSlice, value: property.value.iValue(), key: "sourceSlice")
 
         case .sourceTxAnt:
-          update(&_sourceTxAnt, value: property.value, key: "sourceTxAnt")
+          _api.update(self, property: &_sourceTxAnt, value: property.value, key: "sourceTxAnt")
 
         case .speed:
-          update(&_speed, value: property.value.iValue(), key: "speed")
+          _api.update(self, property: &_speed, value: property.value.iValue(), key: "speed")
 
         case .stopBits:
-          update(&_stopBits, value: property.value.iValue(), key: "stopBits")
+          _api.update(self, property: &_stopBits, value: property.value.iValue(), key: "stopBits")
 
         case .usbLog:
-          update(&_usbLog, value: property.value.bValue(), key: "usbLog")
+          _api.update(self, property: &_usbLog, value: property.value.bValue(), key: "usbLog")
 
           //                case .usbLogLine:
           //                    willChangeValue(forKey: "usbLogLine")
@@ -237,22 +238,6 @@ public final class UsbCable                 : NSObject, StatusParser, Properties
       // notify all observers
       NC.post(.usbCableHasBeenAdded, object: self as Any?)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 

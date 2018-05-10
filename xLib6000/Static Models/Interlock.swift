@@ -22,6 +22,7 @@ public final class Interlock                : NSObject, PropertiesParser {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -91,76 +92,60 @@ public final class Interlock                : NSObject, PropertiesParser {
       switch token {
         
       case .accTxEnabled:
-        update(&_accTxEnabled, value: property.value.bValue(), key: "accTxEnabled")
+        _api.update(self, property: &_accTxEnabled, value: property.value.bValue(), key: "accTxEnabled")
 
       case .accTxDelay:
-        update(&_accTxDelay, value: property.value.iValue(), key: "accTxDelay")
+        _api.update(self, property: &_accTxDelay, value: property.value.iValue(), key: "accTxDelay")
 
       case .accTxReqEnabled:
-         update(&_accTxReqEnabled, value: property.value.bValue(), key: "accTxReqEnabled")
+         _api.update(self, property: &_accTxReqEnabled, value: property.value.bValue(), key: "accTxReqEnabled")
 
       case .accTxReqPolarity:
-       update(&_accTxReqPolarity, value: property.value.bValue(), key: "accTxReqPolarity")
+       _api.update(self, property: &_accTxReqPolarity, value: property.value.bValue(), key: "accTxReqPolarity")
 
       case .rcaTxReqEnabled:
-        update(&_rcaTxReqEnabled, value: property.value.bValue(), key: "rcaTxReqEnabled")
+        _api.update(self, property: &_rcaTxReqEnabled, value: property.value.bValue(), key: "rcaTxReqEnabled")
 
       case .rcaTxReqPolarity:
-         update(&_rcaTxReqPolarity, value: property.value.bValue(), key: "rcaTxReqPolarity")
+         _api.update(self, property: &_rcaTxReqPolarity, value: property.value.bValue(), key: "rcaTxReqPolarity")
 
       case .reason:
-        update(&_reason, value: property.value, key: "reason")
+        _api.update(self, property: &_reason, value: property.value, key: "reason")
 
       case .source:
-        update(&_source, value: property.value, key: "source")
+        _api.update(self, property: &_source, value: property.value, key: "source")
 
       case .state:
-        update(&_state, value: property.value, key: "state")
+        _api.update(self, property: &_state, value: property.value, key: "state")
 
       case .timeout:
-        update(&_timeout, value: property.value.iValue(), key: "timeout")
+        _api.update(self, property: &_timeout, value: property.value.iValue(), key: "timeout")
 
       case .txAllowed:
-        update(&_txAllowed, value: property.value.bValue(), key: "txAllowed")
+        _api.update(self, property: &_txAllowed, value: property.value.bValue(), key: "txAllowed")
 
       case .txDelay:
-        update(&_txDelay, value: property.value.iValue(), key: "txDelay")
+        _api.update(self, property: &_txDelay, value: property.value.iValue(), key: "txDelay")
 
       case .tx1Delay:
-        update(&_tx1Delay, value: property.value.iValue(), key: "tx1Delay")
+        _api.update(self, property: &_tx1Delay, value: property.value.iValue(), key: "tx1Delay")
 
       case .tx1Enabled:
-        update(&_tx1Enabled, value: property.value.bValue(), key: "tx1Enabled")
+        _api.update(self, property: &_tx1Enabled, value: property.value.bValue(), key: "tx1Enabled")
 
       case .tx2Delay:
-        update(&_tx2Delay, value: property.value.iValue(), key: "tx2Delay")
+        _api.update(self, property: &_tx2Delay, value: property.value.iValue(), key: "tx2Delay")
 
       case .tx2Enabled:
-        update(&_tx2Enabled, value: property.value.bValue(), key: "tx2Enabled")
+        _api.update(self, property: &_tx2Enabled, value: property.value.bValue(), key: "tx2Enabled")
 
       case .tx3Delay:
-        update(&_tx3Delay, value: property.value.iValue(), key: "tx3Delay")
+        _api.update(self, property: &_tx3Delay, value: property.value.iValue(), key: "tx3Delay")
 
       case .tx3Enabled:
-        update(&_tx3Enabled, value: property.value.bValue(), key: "tx3Enabled")
+        _api.update(self, property: &_tx3Enabled, value: property.value.bValue(), key: "tx3Enabled")
       }
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 

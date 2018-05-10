@@ -45,6 +45,7 @@ public final class IqStream                 : NSObject, StatusParser, Properties
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -175,31 +176,31 @@ public final class IqStream                 : NSObject, StatusParser, Properties
       switch token {
         
       case .available:
-        update(&_available, value: property.value.iValue(), key: "available")
+        _api.update(self, property: &_available, value: property.value.iValue(), key: "available")
 
       case .capacity:
-        update(&_capacity, value: property.value.iValue(), key: "capacity")
+        _api.update(self, property: &_capacity, value: property.value.iValue(), key: "capacity")
 
       case .daxIqChannel:
-        update(&_daxIqChannel, value: property.value.iValue(), key: "daxIqChannel")
+        _api.update(self, property: &_daxIqChannel, value: property.value.iValue(), key: "daxIqChannel")
 
       case .inUse:
-        update(&_inUse, value: property.value.bValue(), key: "inUse")
+        _api.update(self, property: &_inUse, value: property.value.bValue(), key: "inUse")
 
       case .ip:
-        update(&_ip, value: property.value, key: "ip")
+        _api.update(self, property: &_ip, value: property.value, key: "ip")
 
       case .pan:
-        update(&_pan, value:  UInt32(property.value.dropFirst(2), radix: 16) ?? 0, key: "pan")
+        _api.update(self, property: &_pan, value:  UInt32(property.value.dropFirst(2), radix: 16) ?? 0, key: "pan")
 
       case .port:
-        update(&_port, value: property.value.iValue(), key: "port")
+        _api.update(self, property: &_port, value: property.value.iValue(), key: "port")
 
       case .rate:
-        update(&_rate, value: property.value.iValue(), key: "rate")
+        _api.update(self, property: &_rate, value: property.value.iValue(), key: "rate")
 
       case .streaming:
-        update(&_streaming, value: property.value.bValue(), key: "streaming")
+        _api.update(self, property: &_streaming, value: property.value.bValue(), key: "streaming")
       }
     }
     // is the Stream initialized?
@@ -211,22 +212,6 @@ public final class IqStream                 : NSObject, StatusParser, Properties
       // notify all observers
       NC.post(.iqStreamHasBeenAdded, object: self as Any?)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 
   // ----------------------------------------------------------------------------

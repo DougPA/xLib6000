@@ -24,6 +24,7 @@ public final class Profile                  : NSObject, PropertiesParser {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -75,55 +76,39 @@ public final class Profile                  : NSObject, PropertiesParser {
         switch subToken {
         case .list:
           // Global List
-          update(&_profiles[.global], value: values, key: "profiles")
+          _api.update(self, property: &_profiles[.global], value: values, key: "profiles")
 
         case .current:
           // Global Current
-          update(&_currentGlobalProfile, value: values[0], key: "currentGlobalProfile")
+          _api.update(self, property: &_currentGlobalProfile, value: values[0], key: "currentGlobalProfile")
         }
         
       case .mic:
         switch subToken {
         case .list:
           // Mic List
-          update(&_profiles[.mic], value: values, key: "profiles")
+          _api.update(self, property: &_profiles[.mic], value: values, key: "profiles")
 
         case .current:
           // Mic Current
-          update(&_currentMicProfile, value: values[0], key: "currentMicProfile")
+          _api.update(self, property: &_currentMicProfile, value: values[0], key: "currentMicProfile")
         }
         
       case .tx:
         switch subToken {
         case .list:
           // Tx List
-          update(&_profiles[.tx] , value: values, key: "profiles")
+          _api.update(self, property: &_profiles[.tx] , value: values, key: "profiles")
 
         case .current:
           // Tx Current
-          update(&_currentTxProfile, value: values[0], key: "currentTxProfile")
+          _api.update(self, property: &_currentTxProfile, value: values[0], key: "currentTxProfile")
         }
       }
     } else {
       // unknown type
       Log.sharedInstance.msg("Unknown profile - \(properties[0].key), \(properties[1].key)", level: .debug, function: #function, file: #file, line: #line)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 

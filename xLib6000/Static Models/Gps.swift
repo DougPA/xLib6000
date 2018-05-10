@@ -24,6 +24,7 @@ public final class Gps                      : NSObject, PropertiesParser {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -107,55 +108,39 @@ public final class Gps                      : NSObject, PropertiesParser {
       switch token {
         
       case .altitude:
-        update(&_altitude, value: property.value, key: "altitude")
+        _api.update(self, property: &_altitude, value: property.value, key: "altitude")
 
       case .frequencyError:
-        update(&_frequencyError, value: property.value.dValue(), key: "frequencyError")
+        _api.update(self, property: &_frequencyError, value: property.value.dValue(), key: "frequencyError")
 
       case .grid:
-        update(&_grid, value: property.value, key: "grid")
+        _api.update(self, property: &_grid, value: property.value, key: "grid")
 
       case .latitude:
-        update(&_latitude, value: property.value, key: "latitude")
+        _api.update(self, property: &_latitude, value: property.value, key: "latitude")
 
       case .longitude:
-        update(&_longitude, value: property.value, key: "longitude")
+        _api.update(self, property: &_longitude, value: property.value, key: "longitude")
 
       case .speed:
-        update(&_speed, value: property.value, key: "speed")
+        _api.update(self, property: &_speed, value: property.value, key: "speed")
 
       case .status:
-        update(&_status, value: ( property.value == "present" ? true : false ), key: "status")
+        _api.update(self, property: &_status, value: ( property.value == "present" ? true : false ), key: "status")
 
       case .time:
-        update(&_time, value: property.value, key: "time")
+        _api.update(self, property: &_time, value: property.value, key: "time")
 
       case .track:
-        update(&_track, value: property.value.dValue(), key: "track")
+        _api.update(self, property: &_track, value: property.value.dValue(), key: "track")
 
       case .tracked:
-        update(&_tracked, value: property.value.bValue(), key: "tracked")
+        _api.update(self, property: &_tracked, value: property.value.bValue(), key: "tracked")
 
       case .visible:
-        update(&_visible, value: property.value.bValue(), key: "visible")
+        _api.update(self, property: &_visible, value: property.value.bValue(), key: "visible")
       }
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 

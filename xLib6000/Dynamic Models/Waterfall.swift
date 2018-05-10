@@ -44,6 +44,7 @@ public final class Waterfall                : NSObject, StatusParser, Properties
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -166,22 +167,22 @@ public final class Waterfall                : NSObject, StatusParser, Properties
       switch token {
         
       case .autoBlackEnabled:
-        update(&_autoBlackEnabled, value: property.value.bValue(), key: "autoBlackEnabled")
+        _api.update(self, property: &_autoBlackEnabled, value: property.value.bValue(), key: "autoBlackEnabled")
 
       case .blackLevel:
-        update(&_blackLevel, value: property.value.iValue(), key: "blackLevel")
+        _api.update(self, property: &_blackLevel, value: property.value.iValue(), key: "blackLevel")
 
       case .colorGain:
-        update(&_colorGain, value: property.value.iValue(), key: "colorGain")
+        _api.update(self, property: &_colorGain, value: property.value.iValue(), key: "colorGain")
 
       case .gradientIndex:
-        update(&_gradientIndex, value: property.value.iValue(), key: "gradientIndex")
+        _api.update(self, property: &_gradientIndex, value: property.value.iValue(), key: "gradientIndex")
 
       case .lineDuration:
-        update(&_lineDuration, value: property.value.iValue(), key: "lineDuration")
+        _api.update(self, property: &_lineDuration, value: property.value.iValue(), key: "lineDuration")
 
       case .panadapterId:     // does not have leading "0x"
-        update(&_panadapterId, value: UInt32(property.value, radix: 16) ?? 0, key: "panadapterId")
+        _api.update(self, property: &_panadapterId, value: UInt32(property.value, radix: 16) ?? 0, key: "panadapterId")
 
       case .available, .band, .bandwidth, .capacity, .center, .daxIq, .daxIqRate,
            .loopA, .loopB, .rfGain, .rxAnt, .wide, .xPixels, .xvtr:
@@ -198,22 +199,6 @@ public final class Waterfall                : NSObject, StatusParser, Properties
       // notify all observers
       NC.post(.waterfallHasBeenAdded, object: self as Any?)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 
   // ----------------------------------------------------------------------------

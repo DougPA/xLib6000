@@ -37,7 +37,7 @@ public protocol AudioStreamHandler          : class {
 // ------------------------------------------------------------------------------
 
 public final class AudioStream              : NSObject, StatusParser, PropertiesParser, VitaProcessor {
-  
+
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
@@ -48,6 +48,7 @@ public final class AudioStream              : NSObject, StatusParser, Properties
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue!                // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -211,22 +212,22 @@ public final class AudioStream              : NSObject, StatusParser, Properties
       switch token {
         
       case .daxChannel:
-        update(&_daxChannel, value: property.value.iValue(), key: "daxChannel")
+        _api.update(self, property: &_daxChannel, value: property.value.iValue(), key: "daxChannel")
 
       case .daxClients:
-        update(&_daxClients, value: property.value.iValue(), key: "daxClients")
+        _api.update(self, property: &_daxClients, value: property.value.iValue(), key: "daxClients")
 
       case .inUse:
-        update(&_inUse, value: property.value.bValue(), key: "inUse")
+        _api.update(self, property: &_inUse, value: property.value.bValue(), key: "inUse")
 
       case .ip:
-        update(&_ip, value: property.value, key: "ip")
+        _api.update(self, property: &_ip, value: property.value, key: "ip")
 
       case .port:
-        update(&_port, value: property.value.iValue(), key: "port")
+        _api.update(self, property: &_port, value: property.value.iValue(), key: "port")
 
       case .slice:
-        update(&_slice, value: Api.sharedInstance.radio!.slices[property.value], key: "slice")
+        _api.update(self, property: &_slice, value: _api.radio!.slices[property.value], key: "slice")
 
         let gain = _rxGain
         _rxGain = 0
@@ -242,22 +243,6 @@ public final class AudioStream              : NSObject, StatusParser, Properties
       // notify all observers
       NC.post(.audioStreamHasBeenAdded, object: self as Any?)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 
   // ----------------------------------------------------------------------------
@@ -418,7 +403,7 @@ extension AudioStream {
     set {
       if _daxChannel != newValue {
         _daxChannel = newValue
-        if Api.sharedInstance.radio != nil {
+        if _api.radio != nil {
           slice = xLib6000.Slice.find(with: _daxChannel)
         }
       }

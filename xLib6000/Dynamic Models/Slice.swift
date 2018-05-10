@@ -21,25 +21,24 @@ public typealias SliceId = String
 
 public final class Slice                    : NSObject, StatusParser, PropertiesParser {
 
-  static let daxChannels                    = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
-
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   public private(set) var id                : SliceId = ""                  // Id that uniquely identifies this Slice
-  @objc dynamic public var agcNames         = AgcMode.names()
-  @objc dynamic public let daxChoices       = Slice.daxChannels
+  @objc dynamic public var agcNames         = AgcMode.names()               // Names of AGC modes
+  @objc dynamic public let daxChoices       = Api.daxChannels               // Names of DAX channels
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
 
   private let kTuneStepList                 =                               // tuning steps
     [1, 10, 50, 100, 500, 1_000, 2_000, 3_000]
   private var _diversityIsAllowed          : Bool
-    { return Api.sharedInstance.activeRadio?.model == "FLEX-6700" || Api.sharedInstance.activeRadio?.model == "FLEX-6700R" }
+    { return _api.activeRadio?.model == "FLEX-6700" || _api.activeRadio?.model == "FLEX-6700R" }
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ---------
   //
@@ -364,7 +363,7 @@ public final class Slice                    : NSObject, StatusParser, Properties
         newValue = value
         
       case .cw:
-        newValue = (newValue > 12_000 - Api.sharedInstance.radio!.transmit.cwPitch ? 12_000 - Api.sharedInstance.radio!.transmit.cwPitch : newValue)
+        newValue = (newValue > 12_000 - _api.radio!.transmit.cwPitch ? 12_000 - _api.radio!.transmit.cwPitch : newValue)
         
       case .rtty:
         newValue = (newValue > rttyMark ? rttyMark : newValue)
@@ -401,7 +400,7 @@ public final class Slice                    : NSObject, StatusParser, Properties
         newValue = value
         
       case .cw:
-        newValue = (newValue < -12_000 - Api.sharedInstance.radio!.transmit.cwPitch ? -12_000 - Api.sharedInstance.radio!.transmit.cwPitch : newValue)
+        newValue = (newValue < -12_000 - _api.radio!.transmit.cwPitch ? -12_000 - _api.radio!.transmit.cwPitch : newValue)
         
       case .rtty:
         newValue = (newValue < -12_000 + rttyMark ? -12_000 + rttyMark : newValue)
@@ -444,212 +443,212 @@ public final class Slice                    : NSObject, StatusParser, Properties
       switch token {
         
       case .active:
-        update(&_active, value: property.value.bValue(), key: "active")
+        _api.update(self, property: &_active, value: property.value.bValue(), key: "active")
 
       case .agcMode:
-        update(&_agcMode, value: property.value, key: "agcMode")
+        _api.update(self, property: &_agcMode, value: property.value, key: "agcMode")
 
       case .agcOffLevel:
-        update(&_agcOffLevel, value: property.value.iValue(), key: "agcOffLevel")
+        _api.update(self, property: &_agcOffLevel, value: property.value.iValue(), key: "agcOffLevel")
 
       case .agcThreshold:
-        update(&_agcThreshold, value: property.value.iValue(), key: "agcThreshold")
+        _api.update(self, property: &_agcThreshold, value: property.value.iValue(), key: "agcThreshold")
 
       case .anfEnabled:
-        update(&_anfEnabled, value: property.value.bValue(), key: "anfEnabled")
+        _api.update(self, property: &_anfEnabled, value: property.value.bValue(), key: "anfEnabled")
 
       case .anfLevel:
-        update(&_anfLevel, value: property.value.iValue(), key: "anfLevel")
+        _api.update(self, property: &_anfLevel, value: property.value.iValue(), key: "anfLevel")
 
       case .apfEnabled:
-        update(&_apfEnabled, value: property.value.bValue(), key: "apfEnabled")
+        _api.update(self, property: &_apfEnabled, value: property.value.bValue(), key: "apfEnabled")
 
       case .apfLevel:
-        update(&_apfLevel, value: property.value.iValue(), key: "apfLevel")
+        _api.update(self, property: &_apfLevel, value: property.value.iValue(), key: "apfLevel")
 
       case .audioGain:
-        update(&_audioGain, value: property.value.iValue(), key: "audioGain")
+        _api.update(self, property: &_audioGain, value: property.value.iValue(), key: "audioGain")
 
       case .audioMute:
-        update(&_audioMute, value: property.value.bValue(), key: "audioMute")
+        _api.update(self, property: &_audioMute, value: property.value.bValue(), key: "audioMute")
 
       case .audioPan:
-        update(&_audioPan, value: property.value.iValue(), key: "audioPan")
+        _api.update(self, property: &_audioPan, value: property.value.iValue(), key: "audioPan")
 
       case .daxChannel:
-        update(&_daxChannel, value: property.value.iValue(), key: "daxChannel")
+        _api.update(self, property: &_daxChannel, value: property.value.iValue(), key: "daxChannel")
 
       case .daxTxEnabled:
-        update(&_daxTxEnabled, value: property.value.bValue(), key: "daxTxEnabled")
+        _api.update(self, property: &_daxTxEnabled, value: property.value.bValue(), key: "daxTxEnabled")
 
       case .dfmPreDeEmphasisEnabled:
-        update(&_dfmPreDeEmphasisEnabled, value: property.value.bValue(), key: "dfmPreDeEmphasisEnabled")
+        _api.update(self, property: &_dfmPreDeEmphasisEnabled, value: property.value.bValue(), key: "dfmPreDeEmphasisEnabled")
 
       case .digitalLowerOffset:
-        update(&_digitalLowerOffset, value: property.value.iValue(), key: "digitalLowerOffset")
+        _api.update(self, property: &_digitalLowerOffset, value: property.value.iValue(), key: "digitalLowerOffset")
 
       case .digitalUpperOffset:
-        update(&_digitalUpperOffset, value: property.value.iValue(), key: "digitalUpperOffset")
+        _api.update(self, property: &_digitalUpperOffset, value: property.value.iValue(), key: "digitalUpperOffset")
 
       case .diversityEnabled:
         if _diversityIsAllowed {
-          update(&_diversityEnabled, value: property.value.bValue(), key: "diversityEnabled")
+          _api.update(self, property: &_diversityEnabled, value: property.value.bValue(), key: "diversityEnabled")
         }
         
       case .diversityChild:
         if _diversityIsAllowed {
-          update(&_diversityChild, value: property.value.bValue(), key: "diversityChild")
+          _api.update(self, property: &_diversityChild, value: property.value.bValue(), key: "diversityChild")
         }
         
       case .diversityIndex:
         if _diversityIsAllowed {
-          update(&_diversityIndex, value: property.value.iValue(), key: "diversityIndex")
+          _api.update(self, property: &_diversityIndex, value: property.value.iValue(), key: "diversityIndex")
         }
         
       case .filterHigh:
-        update(&_filterHigh, value: property.value.iValue(), key: "filterHigh")
+        _api.update(self, property: &_filterHigh, value: property.value.iValue(), key: "filterHigh")
 
       case .filterLow:
-        update(&_filterLow, value: property.value.iValue(), key: "filterLow")
+        _api.update(self, property: &_filterLow, value: property.value.iValue(), key: "filterLow")
 
       case .fmDeviation:
-        update(&_fmDeviation, value: property.value.iValue(), key: "fmDeviation")
+        _api.update(self, property: &_fmDeviation, value: property.value.iValue(), key: "fmDeviation")
 
       case .fmRepeaterOffset:
-        update(&_fmRepeaterOffset, value: property.value.fValue(), key: "fmRepeaterOffset")
+        _api.update(self, property: &_fmRepeaterOffset, value: property.value.fValue(), key: "fmRepeaterOffset")
 
       case .fmToneBurstEnabled:
-        update(&_fmToneBurstEnabled, value: property.value.bValue(), key: "fmToneBurstEnabled")
+        _api.update(self, property: &_fmToneBurstEnabled, value: property.value.bValue(), key: "fmToneBurstEnabled")
 
       case .fmToneMode:
-        update(&_fmToneMode, value: property.value, key: "fmToneMode")
+        _api.update(self, property: &_fmToneMode, value: property.value, key: "fmToneMode")
 
       case .fmToneFreq:
-        update(&_fmToneFreq, value: property.value.fValue(), key: "fmToneFreq")
+        _api.update(self, property: &_fmToneFreq, value: property.value.fValue(), key: "fmToneFreq")
 
       case .frequency:
-        update(&_frequency, value: property.value.mhzToHz(), key: "frequency")
+        _api.update(self, property: &_frequency, value: property.value.mhzToHz(), key: "frequency")
 
       case .ghost:
         // FIXME: Is this needed?
         Log.sharedInstance.msg("Unknown token - \(property.key),\(property.value)", level: .debug, function: #function, file: #file, line: #line)
         
       case .inUse:
-        update(&_inUse, value: property.value.bValue(), key: "inUse")
+        _api.update(self, property: &_inUse, value: property.value.bValue(), key: "inUse")
 
       case .locked:
-        update(&_locked, value: property.value.bValue(), key: "locked")
+        _api.update(self, property: &_locked, value: property.value.bValue(), key: "locked")
 
       case .loopAEnabled:
-        update(&_loopAEnabled, value: property.value.bValue(), key: "loopAEnabled")
+        _api.update(self, property: &_loopAEnabled, value: property.value.bValue(), key: "loopAEnabled")
 
       case .loopBEnabled:
-        update(&_loopBEnabled, value: property.value.bValue(), key: "loopBEnabled")
+        _api.update(self, property: &_loopBEnabled, value: property.value.bValue(), key: "loopBEnabled")
 
       case .mode:
-        update(&_mode, value: property.value, key: "mode")
+        _api.update(self, property: &_mode, value: property.value, key: "mode")
 
       case .modeList:
-        update(&_modeList, value: property.value.components(separatedBy: ","), key: "modeList")
+        _api.update(self, property: &_modeList, value: property.value.components(separatedBy: ","), key: "modeList")
 
       case .nbEnabled:
-        update(&_nbEnabled, value: property.value.bValue(), key: "nbEnabled")
+        _api.update(self, property: &_nbEnabled, value: property.value.bValue(), key: "nbEnabled")
 
       case .nbLevel:
-        update(&_nbLevel, value: property.value.iValue(), key: "nbLevel")
+        _api.update(self, property: &_nbLevel, value: property.value.iValue(), key: "nbLevel")
 
       case .nrEnabled:
-        update(&_nrEnabled, value: property.value.bValue(), key: "nrEnabled")
+        _api.update(self, property: &_nrEnabled, value: property.value.bValue(), key: "nrEnabled")
 
       case .nrLevel:
-        update(&_nrLevel, value: property.value.iValue(), key: "nrLevel")
+        _api.update(self, property: &_nrLevel, value: property.value.iValue(), key: "nrLevel")
 
       case .owner:
-        update(&_owner, value: property.value.iValue(), key: "owner")
+        _api.update(self, property: &_owner, value: property.value.iValue(), key: "owner")
 
       case .panadapterId:     // does have leading "0x"
-        update(&_panadapterId, value: UInt32(property.value.dropFirst(2), radix: 16) ?? 0, key: "panadapterId")
+        _api.update(self, property: &_panadapterId, value: UInt32(property.value.dropFirst(2), radix: 16) ?? 0, key: "panadapterId")
 
       case .playbackEnabled:
-        update(&_playbackEnabled, value: (property.value == "enabled") || (property.value == "1"), key: "playbackEnabled")
+        _api.update(self, property: &_playbackEnabled, value: (property.value == "enabled") || (property.value == "1"), key: "playbackEnabled")
 
       case .postDemodBypassEnabled:
-        update(&_postDemodBypassEnabled, value: property.value.bValue(), key: "postDemodBypassEnabled")
+        _api.update(self, property: &_postDemodBypassEnabled, value: property.value.bValue(), key: "postDemodBypassEnabled")
 
       case .postDemodLow:
-         update(&_postDemodLow, value: property.value.iValue(), key: "postDemodLow")
+         _api.update(self, property: &_postDemodLow, value: property.value.iValue(), key: "postDemodLow")
 
       case .postDemodHigh:
-        update(&_postDemodHigh, value: property.value.iValue(), key: "postDemodHigh")
+        _api.update(self, property: &_postDemodHigh, value: property.value.iValue(), key: "postDemodHigh")
 
       case .qskEnabled:
-        update(&_qskEnabled, value: property.value.bValue(), key: "qskEnabled")
+        _api.update(self, property: &_qskEnabled, value: property.value.bValue(), key: "qskEnabled")
 
       case .recordEnabled:
-        update(&_recordEnabled, value: property.value.bValue(), key: "recordEnabled")
+        _api.update(self, property: &_recordEnabled, value: property.value.bValue(), key: "recordEnabled")
 
       case .repeaterOffsetDirection:
-        update(&_repeaterOffsetDirection, value: property.value, key: "repeaterOffsetDirection")
+        _api.update(self, property: &_repeaterOffsetDirection, value: property.value, key: "repeaterOffsetDirection")
 
       case .rfGain:
-        update(&_rfGain, value: property.value.iValue(), key: "rfGain")
+        _api.update(self, property: &_rfGain, value: property.value.iValue(), key: "rfGain")
 
       case .ritOffset:
-        update(&_ritOffset, value: property.value.iValue(), key: "ritOffset")
+        _api.update(self, property: &_ritOffset, value: property.value.iValue(), key: "ritOffset")
 
       case .ritEnabled:
-        update(&_ritEnabled, value: property.value.bValue(), key: "ritEnabled")
+        _api.update(self, property: &_ritEnabled, value: property.value.bValue(), key: "ritEnabled")
 
       case .rttyMark:
-         update(&_rttyMark, value: property.value.iValue(), key: "rttyMark")
+         _api.update(self, property: &_rttyMark, value: property.value.iValue(), key: "rttyMark")
 
       case .rttyShift:
-        update(&_rttyShift, value: property.value.iValue(), key: "rttyShift")
+        _api.update(self, property: &_rttyShift, value: property.value.iValue(), key: "rttyShift")
 
       case .rxAnt:
-        update(&_rxAnt, value: property.value, key: "rxAnt")
+        _api.update(self, property: &_rxAnt, value: property.value, key: "rxAnt")
 
       case .rxAntList:
-        update(&_rxAntList, value: property.value.components(separatedBy: ","), key: "rxAntList")
+        _api.update(self, property: &_rxAntList, value: property.value.components(separatedBy: ","), key: "rxAntList")
 
       case .squelchEnabled:
-        update(&_squelchEnabled, value: property.value.bValue(), key: "squelchEnabled")
+        _api.update(self, property: &_squelchEnabled, value: property.value.bValue(), key: "squelchEnabled")
 
       case .squelchLevel:
-        update(&_squelchLevel, value: property.value.iValue(), key: "squelchLevel")
+        _api.update(self, property: &_squelchLevel, value: property.value.iValue(), key: "squelchLevel")
 
       case .step:
-        update(&_step, value: property.value.iValue(), key: "step")
+        _api.update(self, property: &_step, value: property.value.iValue(), key: "step")
 
       case .stepList:
-        update(&_stepList, value: property.value, key: "stepList")
+        _api.update(self, property: &_stepList, value: property.value, key: "stepList")
 
       case .txEnabled:
-        update(&_txEnabled, value: property.value.bValue(), key: "txEnabled")
+        _api.update(self, property: &_txEnabled, value: property.value.bValue(), key: "txEnabled")
 
       case .txAnt:
-        update(&_txAnt, value: property.value, key: "txAnt")
+        _api.update(self, property: &_txAnt, value: property.value, key: "txAnt")
 
       case .txAntList:
-        update(&_txAntList, value: property.value.components(separatedBy: ","), key: "txAntList")
+        _api.update(self, property: &_txAntList, value: property.value.components(separatedBy: ","), key: "txAntList")
 
       case .txOffsetFreq:
-        update(&_txOffsetFreq, value: property.value.fValue(), key: "txOffsetFreq")
+        _api.update(self, property: &_txOffsetFreq, value: property.value.fValue(), key: "txOffsetFreq")
 
       case .wide:
-        update(&_wide, value: property.value.bValue(), key: "wide")
+        _api.update(self, property: &_wide, value: property.value.bValue(), key: "wide")
 
       case .wnbEnabled:
-        update(&_wnbEnabled, value: property.value.bValue(), key: "wnbEnabled")
+        _api.update(self, property: &_wnbEnabled, value: property.value.bValue(), key: "wnbEnabled")
 
       case .wnbLevel:
-        update(&_wnbLevel, value: property.value.iValue(), key: "wnbLevel")
+        _api.update(self, property: &_wnbLevel, value: property.value.iValue(), key: "wnbLevel")
 
       case .xitOffset:
-        update(&_xitOffset, value: property.value.iValue(), key: "xitOffset")
+        _api.update(self, property: &_xitOffset, value: property.value.iValue(), key: "xitOffset")
 
       case .xitEnabled:
-        update(&_xitEnabled, value: property.value.bValue(), key: "xitEnabled")
+        _api.update(self, property: &_xitEnabled, value: property.value.bValue(), key: "xitEnabled")
 
       case .daxClients, .diversityParent, .recordTime:
         // ignore these
@@ -665,22 +664,6 @@ public final class Slice                    : NSObject, StatusParser, Properties
       // notify all observers
       NC.post(.sliceHasBeenAdded, object: self)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 
@@ -1165,19 +1148,18 @@ extension xLib6000.Slice {
   
   public enum Mode : String {
     case am
+    case sam
     case cw
+    case usb
+    case lsb
+    case fm
+    case nfm
     case dfm
-    case digl
     case digu
+    case digl
+    case rtty
     case dsb
     case dstr
     case fdv
-    case fm
-    case lsb
-    case nfm
-    case rtty
-    case sam
-    case usb
   }
-  
 }

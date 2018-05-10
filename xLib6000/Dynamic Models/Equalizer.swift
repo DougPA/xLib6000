@@ -32,6 +32,7 @@ public final class Equalizer                : NSObject, StatusParser, Properties
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
@@ -141,49 +142,33 @@ public final class Equalizer                : NSObject, StatusParser, Properties
       switch token {
         
       case .level63Hz:
-        update(&_level63Hz, value: property.value.iValue(), key: "level63Hz")
+        _api.update(self, property: &_level63Hz, value: property.value.iValue(), key: "level63Hz")
 
       case .level125Hz:
-        update(&_level125Hz, value: property.value.iValue(), key: "level125Hz")
+        _api.update(self, property: &_level125Hz, value: property.value.iValue(), key: "level125Hz")
 
       case .level250Hz:
-        update(&_level250Hz, value: property.value.iValue(), key: "level250Hz")
+        _api.update(self, property: &_level250Hz, value: property.value.iValue(), key: "level250Hz")
 
       case .level500Hz:
-        update(&_level500Hz, value: property.value.iValue(), key: "level500Hz")
+        _api.update(self, property: &_level500Hz, value: property.value.iValue(), key: "level500Hz")
 
       case .level1000Hz:
-        update(&_level1000Hz, value: property.value.iValue(), key: "level1000Hz")
+        _api.update(self, property: &_level1000Hz, value: property.value.iValue(), key: "level1000Hz")
 
       case .level2000Hz:
-        update(&_level2000Hz, value: property.value.iValue(), key: "level2000Hz")
+        _api.update(self, property: &_level2000Hz, value: property.value.iValue(), key: "level2000Hz")
 
       case .level4000Hz:
-        update(&_level4000Hz, value: property.value.iValue(), key: "level4000Hz")
+        _api.update(self, property: &_level4000Hz, value: property.value.iValue(), key: "level4000Hz")
 
       case .level8000Hz:
-        update(&_level8000Hz, value: property.value.iValue(), key: "level8000Hz")
+        _api.update(self, property: &_level8000Hz, value: property.value.iValue(), key: "level8000Hz")
 
       case .enabled:
-        update(&_eqEnabled, value: property.value.bValue(), key: "eqEnabled")
+        _api.update(self, property: &_eqEnabled, value: property.value.bValue(), key: "eqEnabled")
       }
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 

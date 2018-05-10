@@ -22,6 +22,7 @@ public final class Wan                      : NSObject, PropertiesParser {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -70,28 +71,12 @@ public final class Wan                      : NSObject, PropertiesParser {
       switch token {
         
       case .serverConnected:
-        update(&_serverConnected, value: property.value.bValue(), key: "serverConnected")
+        _api.update(self, property: &_serverConnected, value: property.value.bValue(), key: "serverConnected")
 
       case .radioAuthenticated:
-        update(&_radioAuthenticated, value: property.value.bValue(), key: "radioAuthenticated")
+        _api.update(self, property: &_radioAuthenticated, value: property.value.bValue(), key: "radioAuthenticated")
       }
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 

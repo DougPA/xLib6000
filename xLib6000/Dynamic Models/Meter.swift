@@ -42,6 +42,7 @@ public final class Meter                    : NSObject, StatusParser, Properties
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
 
@@ -302,7 +303,7 @@ public final class Meter                    : NSObject, StatusParser, Properties
       if source == Meter.Source.slice.rawValue {
         
         // YES, get the Slice
-        if let slice = Api.sharedInstance.radio!.slices[number] {
+        if let slice = _api.radio!.slices[number] {
           
           // add it to the Slice
           slice.addMeter(self)

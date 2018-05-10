@@ -1,11 +1,19 @@
 xLib6000 Change Log
 
+
+
 v1.1.2
 
 Panadapter.swift - renamed daxChoices & daxChannels -> daxIqChoices & daxIqChanneld
 Slice.swift - added daxChoices & daxChannels
 Slice.swift - added txAntList property
-all models - removed "if property != value" from update(_:value:key:)
+all models - removed update(_:value:key:)
+Api.swift - added update(_:value:key:)
+all models - changed update(_:value:key:) to _api.update(_:value:key:)
+RadioCommands.swift - refactored Gateway commands
+Radio.swift - changed _api from "internal" to "private"
+RadioCommands.swift - changed usage of _api to Api.sharedInstance
+RadioCommands.swift - corrected "nickName", "radioScreensaver" & "startOffset" commands
 
 v1.1.1
 
@@ -36,7 +44,7 @@ v1.0.21
 Slice.swift - moved setRecord(_:) to SliceCommands.swift
 Slice.swift - moved setPlay(_:) to SliceCommands.swift
 Memory.swift - moved select() to MemoryCommands.swift
-MeterCommands.swift - added class func class subscribeToId(_:)
+MeterCommands.swift - added class func subscribeToId(_:)
 Radio.swift - used MeterCommands subscribeToId(_:) in parseMeterListReply
 
 v1.0.20

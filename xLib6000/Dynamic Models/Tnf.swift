@@ -32,6 +32,7 @@ public final class Tnf                      : NSObject, StatusParser, Properties
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
   
@@ -226,16 +227,16 @@ public final class Tnf                      : NSObject, StatusParser, Properties
       switch token {
         
       case .depth:
-        update(&_depth, value: Int(property.value) ?? 1, key: "depth")
+        _api.update(self, property: &_depth, value: Int(property.value) ?? 1, key: "depth")
 
       case .frequency:
-        update(&_frequency, value: property.value.mhzToHz(), key: "frequency")
+        _api.update(self, property: &_frequency, value: property.value.mhzToHz(), key: "frequency")
 
       case .permanent:
-        update(&_permanent, value: property.value.bValue(), key: "permanent")
+        _api.update(self, property: &_permanent, value: property.value.bValue(), key: "permanent")
 
       case .width:
-         update(&_width, value: property.value.mhzToHz(), key: "width")
+         _api.update(self, property: &_width, value: property.value.mhzToHz(), key: "width")
       }
     }
     // is the Tnf initialized?
@@ -247,22 +248,6 @@ public final class Tnf                      : NSObject, StatusParser, Properties
       // notify all observers
       NC.post(.tnfHasBeenAdded, object: self as Any?)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 

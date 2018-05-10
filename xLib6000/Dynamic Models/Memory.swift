@@ -29,6 +29,7 @@ public final class Memory                   : NSObject, StatusParser, Properties
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
   
@@ -136,7 +137,7 @@ public final class Memory                   : NSObject, StatusParser, Properties
       switch modeType {
         
       case .cw:
-        newValue = (newValue > 12_000 - Api.sharedInstance.radio!.transmit.cwPitch ? 12_000 - Api.sharedInstance.radio!.transmit.cwPitch : newValue)
+        newValue = (newValue > 12_000 - _api.radio!.transmit.cwPitch ? 12_000 - _api.radio!.transmit.cwPitch : newValue)
         
       case .rtty:
         newValue = (newValue > 4_000 ? 4_000 : newValue)
@@ -168,7 +169,7 @@ public final class Memory                   : NSObject, StatusParser, Properties
       switch modeType {
         
       case .cw:
-        newValue = (newValue < -12_000 - Api.sharedInstance.radio!.transmit.cwPitch ? -12_000 - Api.sharedInstance.radio!.transmit.cwPitch : newValue)
+        newValue = (newValue < -12_000 - _api.radio!.transmit.cwPitch ? -12_000 - _api.radio!.transmit.cwPitch : newValue)
         
       case .rtty:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
@@ -220,16 +221,16 @@ public final class Memory                   : NSObject, StatusParser, Properties
       switch (token) {
         
       case .digitalLowerOffset:
-        update(&_digitalLowerOffset, value: property.value.iValue(), key: "digitalLowerOffset")
+        _api.update(self, property: &_digitalLowerOffset, value: property.value.iValue(), key: "digitalLowerOffset")
 
       case .digitalUpperOffset:
-        update(&_digitalUpperOffset, value: property.value.iValue(), key: "digitalUpperOffset")
+        _api.update(self, property: &_digitalUpperOffset, value: property.value.iValue(), key: "digitalUpperOffset")
 
       case .frequency:
-        update(&_frequency, value: property.value.mhzToHz(), key: "frequency")
+        _api.update(self, property: &_frequency, value: property.value.mhzToHz(), key: "frequency")
 
       case .group:
-        update(&_group, value: property.value.replacingSpaces(), key: "group")
+        _api.update(self, property: &_group, value: property.value.replacingSpaces(), key: "group")
 
       case .highlight:            // not implemented
         break
@@ -238,49 +239,49 @@ public final class Memory                   : NSObject, StatusParser, Properties
         break
         
       case .mode:
-        update(&_mode, value: property.value.replacingSpaces(), key: "mode")
+        _api.update(self, property: &_mode, value: property.value.replacingSpaces(), key: "mode")
 
       case .name:
-        update(&_name, value: property.value.replacingSpaces(), key: "name")
+        _api.update(self, property: &_name, value: property.value.replacingSpaces(), key: "name")
 
       case .owner:
-        update(&_owner, value: property.value.replacingSpaces(), key: "owner")
+        _api.update(self, property: &_owner, value: property.value.replacingSpaces(), key: "owner")
 
       case .repeaterOffsetDirection:
-        update(&_offsetDirection, value: property.value.replacingSpaces(), key: "offsetDirection")
+        _api.update(self, property: &_offsetDirection, value: property.value.replacingSpaces(), key: "offsetDirection")
 
       case .repeaterOffset:
-        update(&_offset, value: property.value.iValue(), key: "offset")
+        _api.update(self, property: &_offset, value: property.value.iValue(), key: "offset")
 
       case .rfPower:
-        update(&_rfPower, value: property.value.iValue(), key: "rfPower")
+        _api.update(self, property: &_rfPower, value: property.value.iValue(), key: "rfPower")
 
       case .rttyMark:
-        update(&__rttyMark, value: property.value.iValue(), key: "rttyMark")
+        _api.update(self, property: &__rttyMark, value: property.value.iValue(), key: "rttyMark")
 
       case .rttyShift:
-        update(&_rttyShift, value: property.value.iValue(), key: "rttyShift")
+        _api.update(self, property: &_rttyShift, value: property.value.iValue(), key: "rttyShift")
 
       case .rxFilterHigh:
-        update(&_filterHigh, value: filterHighLimits(property.value.iValue()), key: "filterHigh")
+        _api.update(self, property: &_filterHigh, value: filterHighLimits(property.value.iValue()), key: "filterHigh")
 
       case .rxFilterLow:
-        update(&_filterLow, value: filterLowLimits(property.value.iValue()), key: "filterLow")
+        _api.update(self, property: &_filterLow, value: filterLowLimits(property.value.iValue()), key: "filterLow")
 
       case .squelchEnabled:
-        update(&_squelchEnabled, value: property.value.bValue(), key: "squelchEnabled")
+        _api.update(self, property: &_squelchEnabled, value: property.value.bValue(), key: "squelchEnabled")
 
       case .squelchLevel:
-        update(&_squelchLevel, value: property.value.iValue(), key: "squelchLevel")
+        _api.update(self, property: &_squelchLevel, value: property.value.iValue(), key: "squelchLevel")
 
       case .step:
-        update(&_step, value: property.value.iValue(), key: "step")
+        _api.update(self, property: &_step, value: property.value.iValue(), key: "step")
 
       case .toneMode:
-        update(&_toneMode, value: property.value.replacingSpaces(), key: "toneMode")
+        _api.update(self, property: &_toneMode, value: property.value.replacingSpaces(), key: "toneMode")
 
       case .toneValue:
-        update(&_toneValue, value: property.value.iValue(), key: "toneValue")
+        _api.update(self, property: &_toneValue, value: property.value.iValue(), key: "toneValue")
       }
     }
     // is the Memory initialized?
@@ -292,22 +293,6 @@ public final class Memory                   : NSObject, StatusParser, Properties
       // notify all observers
       NC.post(.memoryHasBeenAdded, object: self as Any?)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  private func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-//    if property != value {
-      willChangeValue(forKey: key)
-      property = value
-      didChangeValue(forKey: key)
-//    }
   }
 }
 
