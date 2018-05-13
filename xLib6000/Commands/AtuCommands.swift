@@ -10,6 +10,8 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Atu Class extensions
+//              - Static command prefix properties
+//              - Public methods that send Commands to the Radio (hardware)
 //              - Dynamic public properties that send Commands to the Radio
 // --------------------------------------------------------------------------------
 

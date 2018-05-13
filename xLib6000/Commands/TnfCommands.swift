@@ -10,18 +10,13 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Tnf Class extensions
+//              - Static command prefix properties
+//              - Public class methods that send Commands to the Radio (hardware)
+//              - Public instance methods that send Commands to the Radio (hardware)
 //              - Dynamic public properties that send Commands to the Radio
 // --------------------------------------------------------------------------------
 
 extension Tnf {
-  
-  //
-  //  NOTE:   Tnf Commands are in one of the following formats:
-  //
-  //              tnf set <TnfId> <valueName>=<value>
-  //              tnf create <valueName>=<value>
-  //              tnf remove <TnfId>
-  //
   
   static let kCreateCmd                     = "tnf create "                 // Command prefixes
   static let kRemoveCmd                     = "tnf remove "

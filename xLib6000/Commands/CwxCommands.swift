@@ -10,7 +10,8 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Cwx Class extensions
-//              - Public methods that send commands to the Radio
+//              - Static command prefix properties
+//              - Public instance methods that send Commands to the Radio (hardware)
 //              - Dynamic public properties that send commands to the Radio
 // --------------------------------------------------------------------------------
 

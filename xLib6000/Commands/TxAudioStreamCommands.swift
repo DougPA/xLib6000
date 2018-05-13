@@ -10,6 +10,9 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - TxAudioStream Class extensions
+//              - Static command prefix properties
+//              - Public class methods that send Commands to the Radio (hardware)
+//              - Public instance methods that send Commands to the Radio (hardware)
 //              - Dynamic public properties that send Commands to the Radio
 // --------------------------------------------------------------------------------
 

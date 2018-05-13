@@ -10,22 +10,13 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Panadapter Class extensions
-//              - Public methods that Request Information from the Radio
+//              - Static command prefix properties
+//              - Public class methods that send Commands to the Radio (hardware)
+//              - Public instance methods that send Commands to the Radio (hardware)
 //              - Dynamic public properties that send Commands to the Radio
 // --------------------------------------------------------------------------------
 
 extension Panadapter {
-  
-  //
-  //  NOTE:   Panadapter Commands are in one of the following formats:
-  //
-  //              display panafall set <StreamId> <valueName>=<value>
-  //              display pan create <valueName>=<value>...
-  //              display pan remove <StreamId>
-  
-  //
-  //          Panadapter Information Requests are in the following format:
-  //              "display pan <valueName> <StreamId> "
   
   static let kCreateCmd                     = "display pan create"          // Command prefixes
   static let kRemoveCmd                     = "display pan remove "

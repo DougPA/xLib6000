@@ -10,24 +10,11 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Transmit Class extensions
+//              - Static command prefix properties
 //              - Dynamic public properties that send Commands to the Radio
-//              - Internal methods
 // --------------------------------------------------------------------------------
 
 extension Transmit {
-  
-  //
-  //  NOTE:   Transmit Commands are in one of the following formats:
-  //
-  //              transmit <valueName> <value>
-  //              transmit set <valueName>=<value>
-  //              cw <valueName> <value>
-  //              mic <valueName>=<value>
-  //
-  
-  // NOTE:    most outgoing commands use the same Token value as is found
-  //          in the incoming Status messages, SOME DO NOT. The alternate
-  //          form of the ...Cmd methods were created to deal with this issue.
   
   static let kTuneCmd                       = "transmit "                   // command prefixes
   static let kSetCmd                        = "transmit set "
@@ -83,7 +70,6 @@ extension Transmit {
     
     Api.sharedInstance.send(Transmit.kCwCmd + token + " \(value)")
   }
-  
   /// Set a MIC property on the Radio
   ///
   /// - Parameters:

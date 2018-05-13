@@ -11,6 +11,7 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Interlock Class extensions
+//              - Static command prefix properties
 //              - Dynamic public properties that send Commands to the Radio
 // --------------------------------------------------------------------------------
 

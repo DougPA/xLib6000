@@ -10,6 +10,8 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Opus Class extensions
+//              - Static command prefix properties
+//              - Public instance methods that send Commands to the Radio (hardware)
 //              - Dynamic public properties that send Commands to the Radio
 // --------------------------------------------------------------------------------
 

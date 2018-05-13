@@ -10,20 +10,14 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Memory Class extensions
+//              - Static command prefix properties
+//              - Public class methods that send Commands to the Radio (hardware)
+//              - Public instance methods that send Commands to the Radio (hardware)
 //              - Dynamic public properties that send Commands to the Radio
 // --------------------------------------------------------------------------------
 
 extension Memory {
-  
-  //
-  //  NOTE:   Memory Commands are in the following format:
-  //
-  //              memory create
-  //              memory remove <MemoryId>
-  //              memory set <MemoryId> <valueName>=<value>
-  //              memory apply <MemoryId>
-  //
-  
+    
   static let kCreateCmd                     = "memory create"               // Command prefixes
   static let kRemoveCmd                     = "memory remove "
   static let kSetCmd                        = "memory set "

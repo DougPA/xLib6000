@@ -10,16 +10,12 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - UsbCable Class extensions
+//              - Static command prefix properties
+//              - Public instance methods that send Commands to the Radio (hardware)
 //              - Dynamic public properties that send Commands to the Radio
 // --------------------------------------------------------------------------------
 
 extension UsbCable {
-  
-  //
-  //  NOTE:   UsbCable Commands are in the following format:
-  //
-  //              usb_cable set  <Id> <valueName>=<value>
-  //
   
   // FIXME: Add additional UsbCable commands
   

@@ -10,9 +10,9 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Radio Class extensions
-//              - Public methods for sending data to the Radio
-//              - Public enum for Primary, Secondary & Subscription Command lists
-//              - Public methods that send commands to the Radio
+//              - Static command prefix properties
+//              - Public class methods that send Commands to the Radio (hardware)
+//              - Public instance methods that send Commands to the Radio (hardware)
 //              - Dynamic public properties that send commands to the Radio
 // --------------------------------------------------------------------------------
 
@@ -25,7 +25,6 @@ extension Radio {
   static let kUptimeCmd                     = "radio uptime"
   static let kLicenseCmd                    = "license "
   static let kXmitCmd                       = "xmit "
-
   
   // ----------------------------------------------------------------------------
   // MARK: - Class methods that send Commands to the Radio (hardware)

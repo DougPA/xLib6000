@@ -10,7 +10,7 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Meter Class extensions
-//              - Dynamic public properties that send Commands to the Radio
+//              - Public class methods that send Commands to the Radio (hardware)
 // --------------------------------------------------------------------------------
 
 extension Meter {

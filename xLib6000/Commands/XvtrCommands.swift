@@ -10,6 +10,9 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Xvtr Class extensions
+//              - Static command prefix properties
+//              - Public class methods that send Commands to the Radio (hardware)
+//              - Public instance methods that send Commands to the Radio (hardware)
 //              - Dynamic public properties that send commands to the Radio
 // --------------------------------------------------------------------------------
 

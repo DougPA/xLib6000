@@ -10,14 +10,13 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Slice Class extensions
+//              - Static command prefix properties
+//              - Public class methods that send Commands to the Radio (hardware)
+//              - Public instance methods that send Commands to the Radio (hardware)
 //              - Dynamic public properties that send Commands to the Radio
 // --------------------------------------------------------------------------------
 
 extension xLib6000.Slice {
-  
-  // NOTE:    most outgoing commands use the same Token value as is found
-  //          in the incoming Status messages, SOME DO NOT. The alternate
-  //          form of the ...Cmd methods were created to deal with this issue.
   
   static let kCreateCmd                     = "slice create "               // Command prefixes
   static let kRemoveCmd                     = "slice remove "
