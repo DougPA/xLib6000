@@ -120,7 +120,6 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - id:                 a Dax Stream Id
-  ///   - radio:              the Radio instance
   ///   - queue:              Concurrent queue
   ///
   init(id: DaxStreamId, queue: DispatchQueue) {

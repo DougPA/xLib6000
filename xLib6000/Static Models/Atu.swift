@@ -40,7 +40,6 @@ public final class Atu                      : NSObject, PropertiesParser {
   /// Initialize Atu
   ///
   /// - Parameters:
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///
   public init(queue: DispatchQueue) {

@@ -220,7 +220,6 @@ public final class Meter                    : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - id:                 a Meter Id
-  ///   - radio:              the parent Radio class
   ///   - queue:              Concurrent queue
   ///
   public init(id: MeterId, queue: DispatchQueue) {

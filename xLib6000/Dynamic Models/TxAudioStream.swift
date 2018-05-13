@@ -103,7 +103,6 @@ public final class TxAudioStream            : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - id:                 Dax stream Id
-  ///   - radio:              the Radio instance
   ///   - queue:              Concurrent queue
   ///
   init(id: DaxStreamId, queue: DispatchQueue) {

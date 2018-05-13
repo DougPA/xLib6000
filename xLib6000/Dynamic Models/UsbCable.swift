@@ -111,7 +111,6 @@ public final class UsbCable                 : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - id:                 a UsbCable serial number
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///   - cableType:          the type of UsbCable
   ///

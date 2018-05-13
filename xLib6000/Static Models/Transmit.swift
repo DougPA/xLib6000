@@ -84,7 +84,6 @@ public final class Transmit                 : NSObject, PropertiesParser {
   /// Initialize Transmit
   ///
   /// - Parameters:
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///
   public init(queue: DispatchQueue) {

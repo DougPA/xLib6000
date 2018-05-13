@@ -143,7 +143,6 @@ public final class IqStream                 : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - id:                 the Stream Id
-  ///   - radio:              the Radio instance
   ///   - queue:              Concurrent queue
   ///
   init(id: DaxStreamId, queue: DispatchQueue) {

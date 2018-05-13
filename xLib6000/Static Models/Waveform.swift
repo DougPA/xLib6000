@@ -37,7 +37,6 @@ public final class Waveform                 : NSObject, PropertiesParser {
   /// Initialize Waveform
   ///
   /// - Parameters:
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///
   public init(queue: DispatchQueue) {

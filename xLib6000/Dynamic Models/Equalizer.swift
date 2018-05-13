@@ -107,7 +107,6 @@ public final class Equalizer                : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - eqType:             the Equalizer type (rxsc or txsc)
-  ///   - radio:              the parent Radio class
   ///   - queue:              Concurrent queue
   ///
   init(id: EqualizerId, queue: DispatchQueue) {

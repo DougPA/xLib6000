@@ -178,7 +178,6 @@ public final class AudioStream              : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - id:                 the Stream Id
-  ///   - radio:              the Radio instance
   ///   - queue:              Concurrent queue
   ///
   init(id: DaxStreamId, queue: DispatchQueue) {

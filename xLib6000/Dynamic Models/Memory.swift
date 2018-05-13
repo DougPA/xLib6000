@@ -109,7 +109,6 @@ public final class Memory                   : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - id:                 a Memory Id
-  ///   - radio:              the parent Radio class
   ///   - queue:              Concurrent queue
   ///
   init(id: MemoryId, queue: DispatchQueue) {

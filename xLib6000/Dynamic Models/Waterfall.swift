@@ -128,7 +128,6 @@ public final class Waterfall                : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - streamId:           a Waterfall Id
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///
   public init(id: WaterfallId, queue: DispatchQueue) {

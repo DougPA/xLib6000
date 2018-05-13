@@ -266,7 +266,6 @@ public final class Slice                    : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - sliceId:            a Slice Id
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///
   public init(id: SliceId, queue: DispatchQueue) {

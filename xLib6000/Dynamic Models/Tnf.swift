@@ -163,7 +163,6 @@ public final class Tnf                      : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - id:                 a Tnf Id
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///
   public convenience init(id: TnfId, queue: DispatchQueue) {
@@ -173,7 +172,6 @@ public final class Tnf                      : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - id:                 a Tnf Id
-  ///   - radio:              parent Radio class
   ///   - frequency:          Tnf frequency (Hz)
   ///   - queue:              Concurrent queue
   ///
@@ -184,7 +182,6 @@ public final class Tnf                      : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - id:                 a Tnf Id
-  ///   - radio:              parent Radio class
   ///   - frequency:          Tnf frequency (Hz)
   ///   - depth:              a Depth value
   ///   - width:              a Width value

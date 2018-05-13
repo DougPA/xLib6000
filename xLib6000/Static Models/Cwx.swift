@@ -56,7 +56,6 @@ public final class Cwx                      : NSObject, PropertiesParser {
   /// Initialize Cwx
   ///
   /// - Parameters:
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///
   init(queue: DispatchQueue) {

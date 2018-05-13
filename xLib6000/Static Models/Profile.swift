@@ -43,7 +43,6 @@ public final class Profile                  : NSObject, PropertiesParser {
   /// Initialize Profile
   ///
   /// - Parameters:
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///
   public init(queue: DispatchQueue) {

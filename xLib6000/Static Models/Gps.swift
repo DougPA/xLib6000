@@ -73,7 +73,6 @@ public final class Gps                      : NSObject, PropertiesParser {
   /// Initialize Gps
   ///
   /// - Parameters:
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///
   public init(queue: DispatchQueue) {

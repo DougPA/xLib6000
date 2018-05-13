@@ -38,7 +38,6 @@ public final class Wan                      : NSObject, PropertiesParser {
   /// Initialize Wan
   ///
   /// - Parameters:
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///
   public init(queue: DispatchQueue) {

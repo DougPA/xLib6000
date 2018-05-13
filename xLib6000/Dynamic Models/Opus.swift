@@ -114,7 +114,6 @@ public final class Opus                     : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - id:                 an Opus Stream id
-  ///   - radio:              the parent Radio class
   ///   - queue:              Concurrent queue
   ///
   init(id: OpusId, queue: DispatchQueue) {

@@ -195,7 +195,6 @@ public final class Panadapter               : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - streamId:           a Panadapter Stream Id
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///
   init(id: PanadapterId, queue: DispatchQueue) {

@@ -104,7 +104,6 @@ public final class Xvtr                     : NSObject, StatusParser, Properties
   ///
   /// - Parameters:
   ///   - id:                 an Xvtr Id
-  ///   - radio:              parent Radio class
   ///   - queue:              Concurrent queue
   ///
   public init(id: XvtrId, queue: DispatchQueue) {
