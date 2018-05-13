@@ -710,11 +710,11 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   /// - Parameters:
   ///   - reply:          the reply
   ///
-  private func parseMeterListReply(_ reply: String) {
-
-    // nested function to add meter subscriptions
-    func addMeter(id: String, keyValues: KeyValuesArray) {
-
+//  private func parseMeterListReply(_ reply: String) {
+//
+//    // nested function to add meter subscriptions
+//    func addMeter(id: String, keyValues: KeyValuesArray) {
+//
 //      // is the meter Short Name valid?
 //      if let shortName = Api.MeterShortName(rawValue: keyValues[2].value.lowercased()) {
 //        
@@ -725,38 +725,38 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
 //          Meter.subscribe(id: id)
 //        }
 //      }
-    }
-    // drop the "meter " string
-    let meters = String(reply.dropFirst(6))
-    let keyValues = meters.keyValuesArray(delimiter: "#")
-    
-    var meterKeyValues = KeyValuesArray()
-    
-    // extract the first Meter Number
-    var id = keyValues[0].key.components(separatedBy: ".")[0]
-    
-    // loop through the kv pairs separating them into individual meters
-    for (i, kv) in keyValues.enumerated() {
-      
-      // is this the start of a different meter?
-      if id != kv.key.components(separatedBy: ".")[0] {
-        
-        // YES, add the current meter
-        addMeter(id: id, keyValues: meterKeyValues)
-        
-        // recycle the keyValues
-        meterKeyValues.removeAll(keepingCapacity: true)
-        
-        // get the new meter id
-        id = keyValues[i].key.components(separatedBy: ".")[0]
-        
-      }
-      // add the current kv pair to the current set of meter kv pairs
-      meterKeyValues.append(keyValues[i])
-    }
-    // add the final meter
-    addMeter(id: id, keyValues: meterKeyValues)
-  }
+//    }
+//    // drop the "meter " string
+//    let meters = String(reply.dropFirst(6))
+//    let keyValues = meters.keyValuesArray(delimiter: "#")
+//
+//    var meterKeyValues = KeyValuesArray()
+//
+//    // extract the first Meter Number
+//    var id = keyValues[0].key.components(separatedBy: ".")[0]
+//
+//    // loop through the kv pairs separating them into individual meters
+//    for (i, kv) in keyValues.enumerated() {
+//
+//      // is this the start of a different meter?
+//      if id != kv.key.components(separatedBy: ".")[0] {
+//
+//        // YES, add the current meter
+//        addMeter(id: id, keyValues: meterKeyValues)
+//
+//        // recycle the keyValues
+//        meterKeyValues.removeAll(keepingCapacity: true)
+//
+//        // get the new meter id
+//        id = keyValues[i].key.components(separatedBy: ".")[0]
+//
+//      }
+//      // add the current kv pair to the current set of meter kv pairs
+//      meterKeyValues.append(keyValues[i])
+//    }
+//    // add the final meter
+//    addMeter(id: id, keyValues: meterKeyValues)
+//  }
   /// Parse the Reply to a Version command, reply format: <key=value>#<key=value>#...<key=value>
   ///
   /// - Parameters:

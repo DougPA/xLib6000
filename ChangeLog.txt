@@ -7,6 +7,7 @@ Meter.swift - modified parseStatus(_:radio:queue:inUse:) to unsub from meters no
 Radio.swift - changed the private _metersToSubscribe property to public private(set) metersToSubscribe
 MeterCommands.swift - changed listRequest(callback: ) to NOT use the defaultReplyHandler
 Radio.swift - commented out the meterList case in defaultReplyHandler(_:seqNum:responseValue:reply:)
+Radio.swift - commented out the parseMeterListReply(_:) method
 
 v1.1.2
 
