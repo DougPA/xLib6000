@@ -87,6 +87,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   public private(set) var sliceList         = [SliceId]()                   // Array of available Slice id's
   
   public private(set) var sliceErrors       = [String]()                    // frequency error of a Slice (milliHz)
+  public private(set) var metersToSubscribe = [Api.MeterShortName]()
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -94,7 +95,6 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _radioInitialized = false
   private var _hardwareVersion              : String?                       // ???
-  private var _metersToSubscribe            = [Api.MeterShortName]()
 
   // GCD Queue
   private let _objectQ                      : DispatchQueue
@@ -210,7 +210,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
     
     _api = api
     _objectQ = objectQ
-    _metersToSubscribe = metersToSubscribe
+    self.metersToSubscribe = metersToSubscribe
 
     super.init()
 
@@ -715,16 +715,16 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
     // nested function to add meter subscriptions
     func addMeter(id: String, keyValues: KeyValuesArray) {
 
-      // is the meter Short Name valid?
-      if let shortName = Api.MeterShortName(rawValue: keyValues[2].value.lowercased()) {
-        
-        // YES, is it in the list needing subscription?
-        if _metersToSubscribe.contains(shortName) {
-          
-          // YES, send a subscription command
-          Meter.subscribe(id: id)
-        }
-      }
+//      // is the meter Short Name valid?
+//      if let shortName = Api.MeterShortName(rawValue: keyValues[2].value.lowercased()) {
+//        
+//        // YES, is it in the list needing subscription?
+//        if _metersToSubscribe.contains(shortName) {
+//          
+//          // YES, send a subscription command
+//          Meter.subscribe(id: id)
+//        }
+//      }
     }
     // drop the "meter " string
     let meters = String(reply.dropFirst(6))
@@ -1078,9 +1078,9 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
       // save the list
       antennaList = reply.valuesArray( delimiter: "," )
       
-    case Api.Command.meterList.rawValue:
-      // process the reply
-      parseMeterListReply( reply )
+//    case Api.Command.meterList.rawValue:                  // no longer in use
+//      // process the reply
+//      parseMeterListReply( reply )
       
     case Api.Command.micList.rawValue:
       // save the list

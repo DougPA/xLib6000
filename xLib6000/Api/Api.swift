@@ -160,6 +160,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   ///     - primaryCmdTypes:      array of "primary" command types (defaults to .all)
   ///     - secondaryCmdTYpes:    array of "secondary" command types (defaults to .all)
   ///     - subscriptionCmdTypes: array of "subscription" commandtypes (defaults to .all)
+  ///     - metersToSubscribe:    array of meter short type (defaults to .all)
   /// - Returns:                  Success / Failure
   ///
   public func connect(_ selectedRadio: RadioParameters, clientName: String, isGui: Bool = true,
@@ -842,7 +843,7 @@ extension Api {
               .profileTx, .profileMic, .eqRx, .eqTx]
     }
     static func allSubscriptionCommands() -> [Command] {
-      return [.subRadio, .subTx, .subAtu, .subPan, .subSlice, .subTnf, .subGps,
+      return [.subRadio, .subTx, .subAtu, .subPan, .subSlice, .subMeter, .subTnf, .subGps,
               .subAudioStream, .subCwx, .subXvtr, .subMemories, .subDaxIq, .subDax,
               .subUsbCable, .subAmplifier, .subFoundation, .subScu]
     }

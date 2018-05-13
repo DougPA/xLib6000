@@ -1,6 +1,12 @@
 xLib6000 Change Log
 
+v1.1.3
 
+Api.swift - added "sub meter all" into allSubscriptionCommands()
+Meter.swift - modified parseStatus(_:radio:queue:inUse:) to unsub from meters not in the metersToSubscribe list
+Radio.swift - changed the private _metersToSubscribe property to public private(set) metersToSubscribe
+MeterCommands.swift - changed listRequest(callback: ) to NOT use the defaultReplyHandler
+Radio.swift - commented out the meterList case in defaultReplyHandler(_:seqNum:responseValue:reply:)
 
 v1.1.2
 

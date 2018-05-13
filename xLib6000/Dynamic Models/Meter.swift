@@ -170,7 +170,7 @@ public final class Meter                    : NSObject, StatusParser, Properties
     // is the Meter in use?
     if inUse {
       
-      // YES, extract the Meter Number from the first KeyValues entry
+      // IN USE, extract the Meter Number from the first KeyValues entry
       let components = keyValues[0].key.components(separatedBy: ".")
       if components.count != 2 {return }
       
@@ -180,15 +180,26 @@ public final class Meter                    : NSObject, StatusParser, Properties
       // does the meter exist?
       if radio.meters[meterId] == nil {
         
-        // NO, create a new Meter & add it to the Meters collection
-        radio.meters[meterId] = Meter(id: meterId, queue: queue)
+        // NO, is the meter Short Name valid?
+        if let shortName = Api.MeterShortName(rawValue: keyValues[2].value.lowercased()) {
+          
+          // YES, is it in the list needing subscription?
+          if Api.sharedInstance.radio!.metersToSubscribe.contains(shortName) {
+            
+            // YES, create a new Meter & add it to the Meters collection
+            radio.meters[meterId] = Meter(id: meterId, queue: queue)
+            
+          } else {
+
+            // NO, send an un-subscription command
+            Meter.unSubscribe(id: meterId)
+          }
+        }
       }
-      // pass the key values to the Meter for parsing
-      radio.meters[meterId]!.parseProperties( keyValues )
       
     } else {
       
-      // NO, extract the Meter Number
+      // NOT IN USE, extract the Meter Number
       let meterId = keyValues[0].key.components(separatedBy: " ")[0]
       
       // does it exist?

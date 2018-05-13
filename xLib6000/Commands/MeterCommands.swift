@@ -24,6 +24,12 @@ extension Meter {
     Api.sharedInstance.send("sub meter \(id)")
     
   }
+  public class func unSubscribe(id: MeterId) {
+    
+    // un subscribe from the specified Meter
+    Api.sharedInstance.send("unsub meter \(id)")
+    
+  }
   /// Request a list of Meters
   ///
   /// - Parameter callback:   ReplyHandler (optional)
@@ -31,7 +37,7 @@ extension Meter {
   public class func listRequest(callback: ReplyHandler? = nil) {
     
     // ask the Radio for a list of Meters
-    Api.sharedInstance.send(Api.Command.meterList.rawValue, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+    Api.sharedInstance.send(Api.Command.meterList.rawValue, replyTo: callback)
   }
 
   // ----------------------------------------------------------------------------
