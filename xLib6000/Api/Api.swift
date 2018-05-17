@@ -85,7 +85,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   public private(set) var apiVersionMajor   = 0                             // numeric versions of Radio firmware version
   public private(set) var apiVersionMinor   = 0
   
-  public let kApiFirmwareSupport            = "2.1.33.x"                    // The Radio Firmware version supported by this API
+  public let kApiFirmwareSupport            = "2.2.8.x"                     // The Radio Firmware version supported by this API
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -166,8 +166,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   public func connect(_ selectedRadio: RadioParameters, clientName: String, isGui: Bool = true,
                       primaryCmdTypes: [Api.Command] = [.allPrimary],
                       secondaryCmdTypes: [Api.Command] = [.allSecondary],
-                      subscriptionCmdTypes: [Api.Command] = [.allSubscription],
-                      metersToSubscribe: [MeterShortName] = MeterShortName.allMeters() ) -> Bool {
+                      subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) -> Bool {
 
     _clientName = clientName
     _isGui = isGui
@@ -197,7 +196,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
       case .initialized:                      // not connected but initialized
         
         // Create a Radio class
-        radio = Radio(api: self, objectQ: _objectQ, metersToSubscribe: metersToSubscribe)
+        radio = Radio(api: self, objectQ: _objectQ)
         
         activeRadio = selectedRadio
         
@@ -839,11 +838,11 @@ extension Api {
       return [.clientProgram, .clientLowBW, .clientGui]
     }
     static func allSecondaryCommands() -> [Command] {
-      return [.info, .version, .antList, .meterList, .micList, .profileGlobal,
+      return [.info, .version, .antList, .micList, .profileGlobal,
               .profileTx, .profileMic, .eqRx, .eqTx]
     }
     static func allSubscriptionCommands() -> [Command] {
-      return [.subRadio, .subTx, .subAtu, .subPan, .subSlice, .subMeter, .subTnf, .subGps,
+      return [.subRadio, .subTx, .subAtu, .subPan, .subMeter, .subSlice, .subTnf, .subGps,
               .subAudioStream, .subCwx, .subXvtr, .subMemories, .subDaxIq, .subDax,
               .subUsbCable, .subAmplifier, .subFoundation, .subScu]
     }

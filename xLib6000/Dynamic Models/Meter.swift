@@ -42,8 +42,8 @@ public final class Meter                    : NSObject, StatusParser, Properties
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _api                          = Api.sharedInstance            // reference to the API singleton
-  private var _q                            : DispatchQueue                 // Q for object synchronization
+  private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
 
   private var _voltsAmpsDenom               : Float = 256.0                 // denominator for voltage/amperage depends on API version
@@ -117,21 +117,21 @@ public final class Meter                    : NSObject, StatusParser, Properties
 //      Swift.print("meter = \(meterNumber), count = \(count)")
 //    }
   }
-  /// Find a Meter by its Slice
+  /// Find a Meters by a Slice Id
   ///
   /// - Parameters:
-  ///   - slice:      a Slice id
-  /// - Returns:      a Meter reference
+  ///   - sliceId:    a Slice id
+  /// - Returns:      an array of Meters
   ///
-  public class func findBy(id: SliceId) -> Meter? {
-    var meter: Meter?
+  public class func findBy(sliceId: SliceId) -> [Meter] {
+    var meters = [Meter]()
     
-    for (_, aMeter) in Api.sharedInstance.radio!.meters where aMeter.source == "slc" && aMeter.number ==  id {
+    for (_, meter) in Api.sharedInstance.radio!.meters where meter.source == "slc" && meter.number ==  sliceId {
       
-      // get a reference to the Meter
-      meter = aMeter
+      // add it to the array
+      meters.append( meter )
     }
-    return meter
+    return meters
   }
   /// Find a Meter by its ShortName
   ///
@@ -173,30 +173,20 @@ public final class Meter                    : NSObject, StatusParser, Properties
       // IN USE, extract the Meter Number from the first KeyValues entry
       let components = keyValues[0].key.components(separatedBy: ".")
       if components.count != 2 {return }
-      
+
       // the Meter Id is the 0th item (MeterNumber)
       let meterId = components[0]
       
       // does the meter exist?
       if radio.meters[meterId] == nil {
         
-        // NO, is the meter Short Name valid?
-        if let shortName = Api.MeterShortName(rawValue: keyValues[2].value.lowercased()) {
-          
-          // YES, is it in the list needing subscription?
-          if Api.sharedInstance.radio!.metersToSubscribe.contains(shortName) {
-            
-            // YES, create a new Meter & add it to the Meters collection
-            radio.meters[meterId] = Meter(id: meterId, queue: queue)
-            
-          } else {
-
-            // NO, send an un-subscription command
-            Meter.unSubscribe(id: meterId)
-          }
-        }
+        // DOES NOT EXIST, create a new Meter & add it to the Meters collection
+        radio.meters[meterId] = Meter(id: meterId, queue: queue)
       }
       
+      // pass the key values to the Meter for parsing
+      radio.meters[meterId]!.parseProperties( keyValues )
+
     } else {
       
       // NOT IN USE, extract the Meter Number
@@ -312,17 +302,18 @@ public final class Meter                    : NSObject, StatusParser, Properties
       // is it a Slice meter?
       if source == Meter.Source.slice.rawValue {
         
-        // YES, get the Slice
+        // YES, does the Slice exist (yet)
         if let slice = _api.radio!.slices[number] {
           
-          // add it to the Slice
+          // YES, add it to the Slice
           slice.addMeter(self)
           
           // notify all observers
           NC.post(.sliceMeterHasBeenAdded, object: self as Any?)
         }
-        
+
       } else {
+        
         // notify all observers
         NC.post(.meterHasBeenAdded, object: self as Any?)
       }

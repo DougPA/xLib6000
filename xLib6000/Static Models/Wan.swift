@@ -22,8 +22,8 @@ public final class Wan                      : NSObject, PropertiesParser {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _api                          = Api.sharedInstance            // reference to the API singleton
-  private var _q                            : DispatchQueue                 // Q for object synchronization
+  private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _q                            : DispatchQueue                 // Q for object synchronization
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //

@@ -28,8 +28,8 @@ public final class TxAudioStream            : NSObject, StatusParser, Properties
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _api                          = Api.sharedInstance            // reference to the API singleton
-  private var _q                            : DispatchQueue                 // Q for object synchronization
+  private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
   private var _txSeq                        = 0                             // Tx sequence number (modulo 16)

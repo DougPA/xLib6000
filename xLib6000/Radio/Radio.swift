@@ -87,7 +87,6 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   public private(set) var sliceList         = [SliceId]()                   // Array of available Slice id's
   
   public private(set) var sliceErrors       = [String]()                    // frequency error of a Slice (milliHz)
-  public private(set) var metersToSubscribe = [Api.MeterShortName]()
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -206,11 +205,10 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
   /// - Parameters:
   ///   - api:        an Api instance
   ///
-  public init(api: Api, objectQ: DispatchQueue, metersToSubscribe: [Api.MeterShortName]) {
+  public init(api: Api, objectQ: DispatchQueue) {
     
     _api = api
     _objectQ = objectQ
-    self.metersToSubscribe = metersToSubscribe
 
     super.init()
 
@@ -397,7 +395,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
         
         // NO, log it if it is a non-zero Reply (i.e a possible error)
         if components[1] != Radio.kNoError {
-          Log.sharedInstance.msg("Unhandled non-zero reply, c\(components[0])|\(command), r\(replySuffix)", level: .warning, function: #function, file: #file, line: #line)
+          Log.sharedInstance.msg("Unhandled non-zero reply, c\(components[0])|\(command), r\(replySuffix), \(flexErrorString(errorCode: components[1]))", level: .warning, function: #function, file: #file, line: #line)
         }
       }
       // Remove the object from the notification list
@@ -408,7 +406,7 @@ public final class Radio                    : NSObject, PropertiesParser, ApiDel
       
       // no Object is waiting for this reply, log it if it is a non-zero Reply (i.e a possible error)
       if components[1] != Radio.kNoError {
-        Log.sharedInstance.msg("Unhandled non-zero reply, r\(replySuffix)", level: .warning, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Unhandled non-zero reply, c\(components[0]), r\(replySuffix), \(flexErrorString(errorCode: components[1]))", level: .warning, function: #function, file: #file, line: #line)
       }
     }
   }
