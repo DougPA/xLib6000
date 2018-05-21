@@ -19,7 +19,7 @@ import Foundation
 //
 // --------------------------------------------------------------------------------
 
-public final class Xvtr                     : NSObject, StatusParser, PropertiesParser {
+public final class Xvtr                     : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

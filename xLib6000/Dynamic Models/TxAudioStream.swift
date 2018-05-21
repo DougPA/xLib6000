@@ -18,7 +18,7 @@ import Cocoa
 //
 // ------------------------------------------------------------------------------
 
-public final class TxAudioStream            : NSObject, StatusParser, PropertiesParser {
+public final class TxAudioStream            : NSObject, DynamicModel {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties

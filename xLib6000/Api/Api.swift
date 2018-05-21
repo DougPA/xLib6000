@@ -7,49 +7,6 @@
 //
 
 // --------------------------------------------------------------------------------
-// MARK: - Api delegate protocol
-//
-// --------------------------------------------------------------------------------
-
-public protocol ApiDelegate {
-  
-  /// A message has been sent to the Radio (hardware)
-  ///
-  /// - Parameter text:           the text of the message
-  ///
-  func sentMessage(_ text: String)
-  
-  /// A message has been received from the Radio (hardware)
-  ///
-  /// - Parameter text:           the text of the message
-  func receivedMessage(_ text: String)
-  
-  /// A command sent to the Radio (hardware) needs to register a Reply Handler
-  ///
-  /// - Parameters:
-  ///   - sequenceId:             the sequence number of the Command
-  ///   - replyTuple:             a Reply Tuple
-  ///
-  func addReplyHandler(_ sequenceId: SequenceId, replyTuple: ReplyTuple)
-  
-  /// The default Reply Handler (to process replies to Commands sent to the Radio hardware)
-  ///
-  /// - Parameters:
-  ///   - command:                a Command string
-  ///   - seqNum:                 the Command's sequence number
-  ///   - responseValue:          the response contined in the Reply to the Command
-  ///   - reply:                  the descriptive text contained in the Reply to the Command
-  ///
-  func defaultReplyHandler(_ command: String, seqNum: String, responseValue: String, reply: String)
-  
-  /// Process received UDP Vita packets
-  ///
-  /// - Parameter vitaPacket:     a Vita packet
-  ///
-  func vitaParser(_ vitaPacket: Vita)
-}
-
-// --------------------------------------------------------------------------------
 // MARK: - API Class implementation
 //
 //      manages the connections to the Radio (hardware), responsible for the

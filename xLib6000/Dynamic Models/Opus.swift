@@ -11,20 +11,6 @@ import Foundation
 public typealias OpusId = UInt32
 
 // --------------------------------------------------------------------------------
-// MARK: - OpusStreamHandler protocol
-//
-// --------------------------------------------------------------------------------
-
-public protocol OpusStreamHandler           : class {
-  
-  /// Method to process an Opus stream (Opus audio from the Radio hardware)
-  ///
-  /// - Parameter frame:          an OpusFrame struct
-  ///
-  func streamHandler(_ frame: OpusFrame) -> Void
-}
-
-// --------------------------------------------------------------------------------
 // MARK: - Opus Class implementation
 //
 //      creates an Opus instance to be used by a Client to support the
@@ -34,7 +20,7 @@ public protocol OpusStreamHandler           : class {
 //
 // --------------------------------------------------------------------------------
 
-public final class Opus                     : NSObject, StatusParser, PropertiesParser, VitaProcessor {
+public final class Opus                     : NSObject, DynamicModelWithStream {
     
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
@@ -69,7 +55,7 @@ public final class Opus                     : NSObject, StatusParser, Properties
   private var __remoteTxOn                  = false                         // Opus for transmit
   private var __rxStreamStopped             = false                         // Rx stream stopped
   //
-  private weak var _delegate                : OpusStreamHandler? {    // Delegate for Opus Data Stream
+  private weak var _delegate                : StreamHandler? {              // Delegate for Opus Data Stream
     didSet { if _delegate == nil { _initialized = false ; rxSeq = nil } } }
   //                                                                                                  
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
@@ -354,7 +340,7 @@ extension Opus {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
   
-  public var delegate: OpusStreamHandler? {
+  public var delegate: StreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }
   

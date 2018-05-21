@@ -73,6 +73,7 @@
 		9185B087207FD11E004D4C40 /* xLib6000 Overview.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */; };
 		91A0ABF2209769B3008FDB3D /* Commands.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 91A0ABF1209769B2008FDB3D /* Commands.rtf */; };
 		91A2D8D7206944A000676728 /* ChangeLog.txt in Resources */ = {isa = PBXBuildFile; fileRef = 91A2D8D6206944A000676728 /* ChangeLog.txt */; };
+		91A9000620B264B900BFDCF9 /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A9000520B264B900BFDCF9 /* Protocols.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -144,6 +145,7 @@
 		9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "xLib6000 Overview.pdf"; sourceTree = "<group>"; };
 		91A0ABF1209769B2008FDB3D /* Commands.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Commands.rtf; sourceTree = "<group>"; };
 		91A2D8D6206944A000676728 /* ChangeLog.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ChangeLog.txt; sourceTree = "<group>"; };
+		91A9000520B264B900BFDCF9 /* Protocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -274,6 +276,7 @@
 				913EF04820669DA700AF99BE /* Log.swift */,
 				913EF04A20669DA700AF99BE /* Notifications.swift */,
 				913EF04920669DA700AF99BE /* RadioParameters.swift */,
+				91A9000520B264B900BFDCF9 /* Protocols.swift */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -421,6 +424,7 @@
 				913EF05E20669DA700AF99BE /* IqStream.swift in Sources */,
 				913EF07F20669DA700AF99BE /* TxAudioStreamCommands.swift in Sources */,
 				913EF08F20669DA700AF99BE /* UdpManager.swift in Sources */,
+				91A9000620B264B900BFDCF9 /* Protocols.swift in Sources */,
 				913EF07820669DA700AF99BE /* IqStreamCommands.swift in Sources */,
 				913EF07420669DA700AF99BE /* Interlock.swift in Sources */,
 				913EF06520669DA700AF99BE /* TxAudioStream.swift in Sources */,

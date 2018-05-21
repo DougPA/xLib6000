@@ -11,17 +11,6 @@ import simd
 
 public typealias PanadapterId = UInt32
 
-//// --------------------------------------------------------------------------------
-//// MARK: - PanadapterStreamHandler protocol
-////
-//// --------------------------------------------------------------------------------
-
-public protocol PanadapterStreamHandler     : class {
-
-  // method to process Panadapter data stream
-  func streamHandler(_ frame: PanadapterFrame) -> Void
-}
-
 // --------------------------------------------------------------------------------
 // MARK: - Panadapter implementation
 //
@@ -32,7 +21,7 @@ public protocol PanadapterStreamHandler     : class {
 //
 // --------------------------------------------------------------------------------
 
-public final class Panadapter               : NSObject, StatusParser, PropertiesParser, VitaProcessor {
+public final class Panadapter               : NSObject, DynamicModelWithStream {
   
   static let kMaxBins                       = 5120
   static let daxIqChannels                  = ["None", "1", "2", "3", "4"]
@@ -94,7 +83,7 @@ public final class Panadapter               : NSObject, StatusParser, Properties
   private var __yPixels                     : CGFloat = 0                   // frame height
   private var __xvtrLabel                   = ""                            // Label of selected XVTR profile
   //
-  private weak var _delegate                : PanadapterStreamHandler?      // Delegate for Panadapter stream
+  private weak var _delegate                : StreamHandler?                // Delegate for Panadapter stream
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
@@ -645,8 +634,7 @@ extension Panadapter {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
   
-//  public var delegate: PanadapterStreamHandler? {
-  public var delegate: PanadapterStreamHandler? {
+  public var delegate: StreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }
   

@@ -19,7 +19,7 @@ public typealias AmplifierId = String
 //
 // ------------------------------------------------------------------------------
 
-public final class Amplifier                : NSObject, StatusParser, PropertiesParser {
+public final class Amplifier                : NSObject, DynamicModel {
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

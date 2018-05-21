@@ -9,20 +9,6 @@
 import Foundation
 import Accelerate
 
-// --------------------------------------------------------------------------------
-// MARK: - IqStreamHandler protocol
-//
-// --------------------------------------------------------------------------------
-
-public protocol IqStreamHandler             : class {
-  
-  /// Method to process an IQ stream
-  ///
-  /// - Parameter frame:          an IqStreamFrame struct
-  ///
-  func streamHandler(_ frame: IqStreamFrame)
-}
-
 // ------------------------------------------------------------------------------
 // MARK: - IqStream Class implementation
 //
@@ -33,7 +19,7 @@ public protocol IqStreamHandler             : class {
 //
 // ------------------------------------------------------------------------------
 
-public final class IqStream                 : NSObject, StatusParser, PropertiesParser, VitaProcessor {
+public final class IqStream                 : NSObject, DynamicModelWithStream {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
@@ -66,7 +52,7 @@ public final class IqStream                 : NSObject, StatusParser, Properties
   private var __rate                        = 0                             // Stream rate
   private var __streaming                   = false                         // Stream state
   //
-  private weak var _delegate                : IqStreamHandler?              // Delegate for IQ stream
+  private weak var _delegate                : StreamHandler?                // Delegate for IQ stream
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -------
   
@@ -400,7 +386,7 @@ extension IqStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
   
-  public var delegate: IqStreamHandler? {
+  public var delegate: StreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }
   

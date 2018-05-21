@@ -19,7 +19,7 @@ public typealias MemoryId = String
 //
 // --------------------------------------------------------------------------------
 
-public final class Memory                   : NSObject, StatusParser, PropertiesParser {
+public final class Memory                   : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

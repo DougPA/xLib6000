@@ -17,7 +17,7 @@ import Foundation
 //
 // --------------------------------------------------------------------------------
 
-public final class Cwx                      : NSObject, PropertiesParser {
+public final class Cwx                      : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

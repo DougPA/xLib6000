@@ -17,7 +17,7 @@ import Foundation
 //
 // --------------------------------------------------------------------------------
 
-public final class Gps                      : NSObject, PropertiesParser {
+public final class Gps                      : NSObject, StaticModel {
 
   static let kGpsCmd                        = "radio gps "
 

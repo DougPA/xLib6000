@@ -22,7 +22,7 @@ public typealias EqualizerId = String
 //
 // ------------------------------------------------------------------------------
 
-public final class Equalizer                : NSObject, StatusParser, PropertiesParser {
+public final class Equalizer                : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

@@ -8,16 +8,6 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - VitaProcessor protocol
-//
-// --------------------------------------------------------------------------------
-
-protocol VitaProcessor {
-  
-  func vitaProcessor(_ vitaPacket: Vita) -> Void
-}
-
 // ------------------------------------------------------------------------------
 // MARK: - VITA header struct implementation
 //

@@ -17,7 +17,7 @@ import Foundation
 //
 // --------------------------------------------------------------------------------
 
-public final class Atu                      : NSObject, PropertiesParser {
+public final class Atu                      : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties

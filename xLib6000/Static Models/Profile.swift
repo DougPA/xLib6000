@@ -19,7 +19,7 @@ import Foundation
 
 public typealias ProfileString              = String
 
-public final class Profile                  : NSObject, PropertiesParser {
+public final class Profile                  : NSObject, StaticModel {
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties

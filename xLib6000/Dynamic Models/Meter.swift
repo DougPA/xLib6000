@@ -32,7 +32,7 @@ protocol MeterStreamHandler                 : class {
 //
 // ----------------------------------------------------------------------------------
 
-public final class Meter                    : NSObject, StatusParser, PropertiesParser, MeterStreamHandler {
+public final class Meter                    : NSObject, DynamicModel, MeterStreamHandler {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

@@ -8,20 +8,6 @@
 
 import Cocoa
 
-// --------------------------------------------------------------------------------
-// MARK: - MicAudioStreamHandler protocol
-//
-// --------------------------------------------------------------------------------
-
-public protocol MicAudioStreamHandler       : class {
-  
-  /// Method to process a Mic Audio stream (audio to the mic)
-  ///
-  /// - Parameter frame:          a MicAudioStreamFrame struct
-  ///
-  func streamHandler(_ frame: MicAudioStreamFrame)
-}
-
 // ------------------------------------------------------------------------------
 // MARK: - MicAudioStream Class implementation
 //
@@ -32,7 +18,7 @@ public protocol MicAudioStreamHandler       : class {
 //
 // ------------------------------------------------------------------------------
 
-public final class MicAudioStream           : NSObject, StatusParser, PropertiesParser, VitaProcessor {
+public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
@@ -58,7 +44,7 @@ public final class MicAudioStream           : NSObject, StatusParser, Properties
   private var __micGain                     = 50                            // rx gain of stream
   private var __micGainScalar               : Float = 1.0                   // scalar gain value for multiplying
   //
-  private weak var _delegate                : MicAudioStreamHandler?        // Delegate for Audio stream
+  private weak var _delegate                : StreamHandler?                // Delegate for Audio stream
   //                                                                                                  
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
@@ -358,7 +344,7 @@ extension MicAudioStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
   
-  public var delegate: MicAudioStreamHandler? {
+  public var delegate: StreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }
   

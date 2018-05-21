@@ -17,7 +17,7 @@ import Foundation
 //
 // --------------------------------------------------------------------------------
 
-public final class Interlock                : NSObject, PropertiesParser {
+public final class Interlock                : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties

@@ -19,7 +19,7 @@ public typealias UsbCableId = String
 //
 // --------------------------------------------------------------------------------
 
-public final class UsbCable                 : NSObject, StatusParser, PropertiesParser {
+public final class UsbCable                 : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

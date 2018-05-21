@@ -17,7 +17,7 @@ import Foundation
 //
 // --------------------------------------------------------------------------------
 
-public final class Wan                      : NSObject, PropertiesParser {
+public final class Wan                      : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties

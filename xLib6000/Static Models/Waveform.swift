@@ -17,7 +17,7 @@ import Foundation
 //
 // --------------------------------------------------------------------------------
 
-public final class Waveform                 : NSObject, PropertiesParser {
+public final class Waveform                 : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties

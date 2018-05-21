@@ -9,42 +9,6 @@
 import Foundation
 
 // --------------------------------------------------------------------------------
-// MARK: - StatusParser & PropertiesParser protocols
-//
-// --------------------------------------------------------------------------------
-
-  //  All Dynamic Models must implement both protocols. Static models only implement
-  //  the PropertiesParser protocol.
-  //
-  //  Dynamic Model objects are created / destroyed by the Model's StatusParser.
-  //  Static Model objects are created / destroyed by the Radio class.
-  //
-  //  Status Commands from the Radio (hardware) set the properties of all model
-  //  objects in the PropertiesParser.
-
-protocol StatusParser {
-  
-  /// Parse <key=value> arrays to determine object status
-  ///
-  /// - Parameters:
-  ///   - keyValues:            a KeyValues array containing a Status message for an object type
-  ///   - radio:                the current Radio object
-  ///   - queue:                the GCD queue associated with the object type in the status message
-  ///   - inUse:                a flag indicating whether the object in the status message is active
-  ///
-  static func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool)
-}
-
-protocol PropertiesParser {
-  
-  /// Parse <key=value> arrays to set object properties
-  ///
-  /// - Parameter keyValues:    a KeyValues array containing object property values
-  ///
-  func parseProperties(_ keyValues: KeyValuesArray)
-}
-
-// --------------------------------------------------------------------------------
 // MARK: - Radio Class implementation
 //
 //      as the object analog to the Radio (hardware), manages the use of all of
@@ -52,7 +16,7 @@ protocol PropertiesParser {
 //
 // --------------------------------------------------------------------------------
 
-public final class Radio                    : NSObject, PropertiesParser, ApiDelegate {
+public final class Radio                    : NSObject, StaticModel, ApiDelegate {
   
   // ----------------------------------------------------------------------------
   // MARK: - Static properties

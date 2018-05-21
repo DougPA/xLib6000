@@ -12,20 +12,6 @@ public typealias DaxStreamId = UInt32
 public typealias DaxChannel = Int
 public typealias DaxIqChannel = Int
 
-// --------------------------------------------------------------------------------
-// MARK: - AudioStreamHandler protocol
-//
-// --------------------------------------------------------------------------------
-
-public protocol AudioStreamHandler          : class {
-  
-  /// Method to process an Audio stream
-  ///
-  /// - Parameter frame:          an AudioStreamFrame struct
-  ///
-  func streamHandler(_ frame: AudioStreamFrame)
-}
-
 // ------------------------------------------------------------------------------
 // MARK: - AudioStream Class implementation
 //
@@ -36,7 +22,7 @@ public protocol AudioStreamHandler          : class {
 //
 // ------------------------------------------------------------------------------
 
-public final class AudioStream              : NSObject, StatusParser, PropertiesParser, VitaProcessor {
+public final class AudioStream              : NSObject, DynamicModelWithStream {
 
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
@@ -64,7 +50,7 @@ public final class AudioStream              : NSObject, StatusParser, Properties
   private var __rxGain                      = 50                            // rx gain of stream
   private var __slice                       : xLib6000.Slice?               // Source Slice
   //
-  private weak var _delegate                : AudioStreamHandler? // Delegate for Audio stream
+  private weak var _delegate                : StreamHandler?                // Delegate for Audio stream
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
@@ -431,7 +417,7 @@ extension AudioStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
   
-  public var delegate: AudioStreamHandler? {
+  public var delegate: StreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }
   

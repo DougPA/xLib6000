@@ -15,11 +15,11 @@ public typealias WaterfallId = UInt32
 //
 // --------------------------------------------------------------------------------
 
-public protocol WaterfallStreamHandler      : class {
-  
-  // method to process Waterfall data stream
-  func streamHandler(_ dataFrame: WaterfallFrame ) -> Void
-}
+//public protocol WaterfallStreamHandler      : class {
+//
+//  // method to process Waterfall data stream
+//  func streamHandler(_ dataFrame: WaterfallFrame ) -> Void
+//}
 
 // --------------------------------------------------------------------------------
 // MARK: - Waterfall Class implementation
@@ -31,7 +31,7 @@ public protocol WaterfallStreamHandler      : class {
 //
 // --------------------------------------------------------------------------------
 
-public final class Waterfall                : NSObject, StatusParser, PropertiesParser, VitaProcessor {
+public final class Waterfall                : NSObject, DynamicModelWithStream {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -61,7 +61,7 @@ public final class Waterfall                : NSObject, StatusParser, Properties
   private var __lineDuration                = 0                             // Line duration (milliseconds)
   private var __panadapterId                : PanadapterId = 0              // Panadaptor above this waterfall
   //
-  private weak var _delegate                : WaterfallStreamHandler?       // Delegate for Waterfall stream
+  private weak var _delegate                : StreamHandler?                // Delegate for Waterfall stream
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
@@ -373,7 +373,7 @@ extension Waterfall {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
   
-  public var delegate: WaterfallStreamHandler? {
+  public var delegate: StreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }
   

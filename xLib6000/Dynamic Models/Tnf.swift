@@ -19,7 +19,7 @@ public typealias TnfId = String
 //
 // ------------------------------------------------------------------------------
 
-public final class Tnf                      : NSObject, StatusParser, PropertiesParser {
+public final class Tnf                      : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

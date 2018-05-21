@@ -19,7 +19,7 @@ public typealias SliceId = String
 //
 // ------------------------------------------------------------------------------
 
-public final class Slice                    : NSObject, StatusParser, PropertiesParser {
+public final class Slice                    : NSObject, DynamicModel {
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

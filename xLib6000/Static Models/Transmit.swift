@@ -17,7 +17,7 @@ import Foundation
 //
 // --------------------------------------------------------------------------------
 
-public final class Transmit                 : NSObject, PropertiesParser {
+public final class Transmit                 : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
