@@ -275,8 +275,8 @@
 				913EF04B20669DA700AF99BE /* FlexErrors.swift */,
 				913EF04820669DA700AF99BE /* Log.swift */,
 				913EF04A20669DA700AF99BE /* Notifications.swift */,
-				913EF04920669DA700AF99BE /* RadioParameters.swift */,
 				91A9000520B264B900BFDCF9 /* Protocols.swift */,
+				913EF04920669DA700AF99BE /* RadioParameters.swift */,
 			);
 			path = Misc;
 			sourceTree = "<group>";

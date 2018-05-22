@@ -83,7 +83,10 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
   ///   - vita:        a Vita struct
   ///
   class func vitaProcessor(_ vita: Vita) {
-//    var meterCount: [UInt16:Int] = [:]
+    var metersFound = [UInt16]()
+
+    // NOTE:  there is a bug in the Radio (as of v2.2.8) that sends
+    //        multiple copies of meters, this code ignores the duplicates
     
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
@@ -92,30 +95,28 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
     
     // pointer to the first Meter number / Meter value pair
     let ptr16 = payloadPtr.bindMemory(to: UInt16.self, capacity: 2)
+    
+    // for each meter in the Meters packet
+    for i in 0..<numberOfMeters {
       
-      // for each meter in the Meters packet
-      for i in 0..<numberOfMeters {
+      // get the Meter number and the Meter value
+      let meterNumber: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: 2 * i).pointee)
+      let meterValue: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: (2 * i) + 1).pointee)
+      
+      // is this a duplicate?
+      if !metersFound.contains(meterNumber) {
         
-        // get the Meter number and the Meter value
-        let meterNumber: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: 2 * i).pointee)
-        let meterValue: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: (2 * i) + 1).pointee)
-
-//        if let count = meterCount[meterNumber] {
-//          meterCount[meterNumber] = count + 1
-//        } else {
-//          meterCount[meterNumber] = 1
-//        }
-
-        // Find the meter (if present) & update it
+        // NO, add it to the list
+        metersFound.append(meterNumber)
+        
+        // find the meter (if present) & update it
         if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", meterNumber)] {
           
           // interpret it as a signed value
           meter.streamHandler( Int16(bitPattern: meterValue) )
         }
       }
-//    for (meterNumber, count) in meterCount where count > 1 {
-//      Swift.print("meter = \(meterNumber), count = \(count)")
-//    }
+    }
   }
   /// Find a Meters by a Slice Id
   ///
