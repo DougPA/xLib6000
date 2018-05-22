@@ -2,6 +2,9 @@ xLib6000 Change Log
 
 v1.1.4
 
+*** Client Facing ****
+all dynamic models with streams - changed the function signature of the StreamHandler method (see Protocols.swift)
+
 refactored many of the protocols and moved them to the Protocols.swift file
 Meters.swift - added code to vitaProcessor(_:) to ignore duplicate meters in a single Vita packet
 
