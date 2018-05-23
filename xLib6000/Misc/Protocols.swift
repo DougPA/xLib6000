@@ -95,7 +95,7 @@ protocol DynamicModelWithStream             : DynamicModel {
 
 public protocol StreamHandler               : class {
   
-  /// A delegate to process the Stream data
+  /// A delegate (pointing to a Client method) that processes Stream data
   ///
   /// - Parameter streamFrame:              a frame of data
   ///

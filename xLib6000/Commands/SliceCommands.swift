@@ -41,10 +41,11 @@ extension xLib6000.Slice {
   ///   - mode:               selected mode
   ///   - callback:           ReplyHandler (optional)
   ///
-  public class func create(frequency: Int, antenna: String, mode: String, callback: ReplyHandler? = nil) { if Api.sharedInstance.radio!.availableSlices > 0 {
-    
-    // tell the Radio to create a Slice
-    Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "\(frequency.hzToMhz()) \(antenna) \(mode)", replyTo: callback) }
+  public class func create(frequency: Int, antenna: String, mode: String, callback: ReplyHandler? = nil) {
+    if Api.sharedInstance.radio!.availableSlices > 0 {
+      // tell the Radio to create a Slice
+      Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "\(frequency.hzToMhz()) \(antenna) \(mode)", replyTo: callback)
+    }
   }
   /// Create a new Slice
   ///
@@ -53,10 +54,11 @@ extension xLib6000.Slice {
   ///   - frequency:          frequency (Hz)
   ///   - callback:           ReplyHandler (optional)
   ///
-  public class func create(panadapter: Panadapter, frequency: Int = 0, callback: ReplyHandler? = nil) { if Api.sharedInstance.radio!.availableSlices > 0 {
-    
-    // tell the Radio to create a Slice
-    Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "pan" + "=\(panadapter.id.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz())")", replyTo: callback) }
+  public class func create(panadapter: Panadapter, frequency: Int = 0, callback: ReplyHandler? = nil) {
+    if Api.sharedInstance.radio!.availableSlices > 0 {
+      // tell the Radio to create a Slice
+      Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "pan" + "=\(panadapter.id.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz())")", replyTo: callback)
+    }
   }
   
   // ----------------------------------------------------------------------------
