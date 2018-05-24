@@ -225,6 +225,21 @@ public final class Slice                    : NSObject, DynamicModel {
     }
     return slice
   }
+  /// Return the Active Slice (if any)
+  ///
+  /// - Returns:      a Slice reference (or nil)
+  ///
+  public class func findActive() -> Slice? {
+    var slice: Slice?
+    
+    // is the Slice Active?
+    for (_, s) in Api.sharedInstance.radio!.slices where s.active {
+      
+      // YES, return the Slice
+      slice = s
+    }
+    return slice
+  }
   /// Return the Active Slice on the specified Panadapter (if any)
   ///
   /// - Parameters:
