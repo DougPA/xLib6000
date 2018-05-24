@@ -24,8 +24,8 @@ extension Panadapter {
   static let kSetCmd                        = "display panafall set "
   
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+
   /// Create a Panafall
   ///
   /// - Parameters:
@@ -60,8 +60,8 @@ extension Panadapter {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Remove this Panafall
   ///
   /// - Parameters:

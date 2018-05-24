@@ -22,8 +22,8 @@ extension Opus {
   static let kStreamRemoveCmd               = "stream remove "
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Turn Opus Rx On/Off
   ///
   /// - Parameters:

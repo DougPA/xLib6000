@@ -23,8 +23,8 @@ extension AudioStream {
   static let kStreamRemoveCmd               = "stream remove "
 
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+
   /// Create an Audio Stream
   ///
   /// - Parameters:
@@ -39,8 +39,8 @@ extension AudioStream {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Remove this Audio Stream
   ///
   /// - Parameters:

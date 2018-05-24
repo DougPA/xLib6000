@@ -23,8 +23,8 @@ extension Atu {
   static let kSetCmd                        = "atu set "
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Clear the ATU
   ///
   /// - Parameter callback:   ReplyHandler (optional)

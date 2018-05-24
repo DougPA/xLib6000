@@ -23,8 +23,8 @@ extension IqStream {
   static let kStreamRemoveCmd               = "stream remove "
 
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+
   /// Create an IQ Stream
   ///
   /// - Parameters:
@@ -52,8 +52,8 @@ extension IqStream {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Remove this IQ Stream
   ///
   /// - Parameters:

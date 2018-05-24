@@ -24,8 +24,8 @@ extension UsbCable {
   static let kSetBitCmd                     = "usb_cable set bit "
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Remove this UsbCable
   ///
   /// - Parameters:

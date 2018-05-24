@@ -24,8 +24,8 @@ extension Memory {
   static let kApplyCmd                      = "memory apply "
 
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+
   /// Create a Memory
   ///
   /// - Parameter callback:   ReplyHandler (optional)
@@ -37,8 +37,8 @@ extension Memory {
   }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Apply a Memory
   ///
   /// - Parameter callback:   ReplyHandler (optional)

@@ -22,8 +22,8 @@ extension Cwx {
   static let kSendCmd                       = "cwx send "
 
   // ------------------------------------------------------------------------------
-  // MARK: - Public methods that send commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Clear the character buffer
   ///
   public func clearBuffer() {

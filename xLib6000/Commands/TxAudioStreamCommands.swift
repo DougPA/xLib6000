@@ -23,8 +23,8 @@ extension TxAudioStream {
   static let kStreamRemoveCmd               = "stream remove "
 
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+
   /// Create a Tx Audio Stream
   ///
   /// - Parameter callback:   ReplyHandler (optional)
@@ -37,8 +37,8 @@ extension TxAudioStream {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Remove this Tx Audio Stream
   ///
   /// - Parameters:

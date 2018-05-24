@@ -24,8 +24,8 @@ extension Amplifier {
   static let kStandby                       = "STANDBY"
   
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+
   /// Create an Amplifier record
   ///
   /// - Parameters:
@@ -42,8 +42,8 @@ extension Amplifier {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Remove this Amplifier record
   ///
   /// - Parameter callback:   ReplyHandler (optional)

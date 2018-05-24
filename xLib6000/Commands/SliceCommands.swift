@@ -31,7 +31,7 @@ extension xLib6000.Slice {
   static let kMaxOffset                     = 99_999
   
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
   
   /// Create a new Slice
   ///
@@ -62,7 +62,7 @@ extension xLib6000.Slice {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
   
   /// Remove this Slice
   ///

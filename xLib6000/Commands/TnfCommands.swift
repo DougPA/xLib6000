@@ -23,8 +23,8 @@ extension Tnf {
   static let kSetCmd                        = "tnf set "
   
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+
   /// Create a Tnf
   ///
   /// - Parameters:
@@ -38,8 +38,8 @@ extension Tnf {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Remove a Tnf
   ///
   /// - Parameters:

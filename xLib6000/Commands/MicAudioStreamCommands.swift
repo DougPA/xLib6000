@@ -22,8 +22,8 @@ extension MicAudioStream {
   static let kStreamRemoveCmd               = "stream remove "
 
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+
   /// Create a Mic Audio Stream
   ///
   /// - Parameter callback:   ReplyHandler (optional)
@@ -45,8 +45,8 @@ extension MicAudioStream {
   }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Remove this Mic Audio Stream
   ///
   /// - Parameters:

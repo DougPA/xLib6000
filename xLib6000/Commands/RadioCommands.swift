@@ -27,8 +27,8 @@ extension Radio {
   static let kXmitCmd                       = "xmit "
   
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+
   /// Request a list of antenns
   ///
   /// - Parameter callback:   ReplyHandler (optional)
@@ -40,8 +40,8 @@ extension Radio {
   }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Identify a low Bandwidth connection
   ///
   /// - Parameter callback:   ReplyHandler (optional)

@@ -20,8 +20,8 @@ extension Profile {
   static let kCmd                           = "profile "                    // Command prefixes
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+
   /// Delete a Global profile
   ///
   /// - Parameters:

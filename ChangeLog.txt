@@ -7,7 +7,7 @@ all dynamic models with streams - changed the function signature of the StreamHa
 
 refactored many of the protocols and moved them to the Protocols.swift file
 Meters.swift - added code to vitaProcessor(_:) to ignore duplicate meters in a single Vita packet
-
+Slice.swift - added findActive()
 
 v1.1.3
 

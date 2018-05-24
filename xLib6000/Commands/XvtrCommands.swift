@@ -23,8 +23,8 @@ extension Xvtr {
   static let kSetCmd                        = "xvtr set "
   
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+
   /// Create an Xvtr
   ///
   /// - Parameter callback:   ReplyHandler (optional)
@@ -37,7 +37,7 @@ extension Xvtr {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
+  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
   
   /// Remove this Xvtr
   ///

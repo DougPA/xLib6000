@@ -26,7 +26,7 @@ extension Equalizer {
   static let kCmd                           = "eq "                         // Command prefixes
   
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
   
   /// Return a list of Equalizer values
   ///

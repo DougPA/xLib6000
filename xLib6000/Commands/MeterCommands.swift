@@ -16,8 +16,8 @@ import Foundation
 extension Meter {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
-  
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+
   public class func subscribe(id: MeterId) {
     
     // subscribe to the specified Meter
