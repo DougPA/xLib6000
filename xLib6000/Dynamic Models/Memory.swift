@@ -141,14 +141,14 @@ public final class Memory                   : NSObject, DynamicModel {
       case .rtty:
         newValue = (newValue > 4_000 ? 4_000 : newValue)
         
-      case .dsb, .am, .sam, .fm, .nfm, .dfm, .dstr:
+      case .am, .sam, .fm, .nfm, .dfm:
         newValue = (newValue > 12_000 ? 12_000 : newValue)
         newValue = (newValue < 10 ? 10 : newValue)
         
       case .lsb, .digl:
         newValue = (newValue > 0 ? 0 : newValue)
         
-      case .usb, .digu, .fdv:
+      case .usb, .digu:
         newValue = (newValue > 12_000 ? 12_000 : newValue)
       }
     }
@@ -173,14 +173,14 @@ public final class Memory                   : NSObject, DynamicModel {
       case .rtty:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
         
-      case .dsb, .am, .sam, .fm, .nfm, .dfm, .dstr:
+      case .am, .sam, .fm, .nfm, .dfm:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
         newValue = (newValue > -10 ? -10 : newValue)
         
       case .lsb, .digl:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
         
-      case .usb, .digu, .fdv:
+      case .usb, .digu:
         newValue = (newValue < 0 ? 0 : newValue)
       }
     }

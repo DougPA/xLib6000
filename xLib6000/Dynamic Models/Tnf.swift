@@ -65,14 +65,26 @@ public final class Tnf                      : NSObject, DynamicModel {
     // get the Tnf Id
     let tnfId = keyValues[0].key
     
-    // does the TNF exist?
-    if radio.tnfs[tnfId] == nil {
+    // is the Tnf in use?
+    if inUse {
       
-      // NO, create a new Tnf & add it to the Tnfs collection
-      radio.tnfs[tnfId] = Tnf(id: tnfId, queue: queue)
+      // does the TNF exist?
+      if radio.tnfs[tnfId] == nil {
+        
+        // NO, create a new Tnf & add it to the Tnfs collection
+        radio.tnfs[tnfId] = Tnf(id: tnfId, queue: queue)
+      }
+      // pass the remaining key values to the Tnf for parsing (dropping the Id)
+      radio.tnfs[tnfId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+
+    } else {
+      
+      // NO, notify all observers
+      NC.post(.tnfWillBeRemoved, object: Api.sharedInstance.radio!.tnfs[tnfId] as Any?)
+      
+      // remove it
+      Api.sharedInstance.radio!.tnfs[tnfId]  = nil
     }
-    // pass the remaining key values to the Tnf for parsing (dropping the Id)
-    radio.tnfs[tnfId]!.parseProperties( Array(keyValues.dropFirst(1)) )
   }
   /// Given a Frequency, return a reference to the Tnf containing it (if any)
   ///
@@ -83,8 +95,6 @@ public final class Tnf                      : NSObject, DynamicModel {
   ///
   class public func findBy(frequency freq: Int, minWidth: Int) -> Tnf? {
     var tnfFound: Tnf?
-    
-//    let minWidth = Int( CGFloat(panafallBandwidth) * kTnfFindWidth )
     
     for (_, tnf) in Api.sharedInstance.radio!.tnfs {
       

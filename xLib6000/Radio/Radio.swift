@@ -287,11 +287,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     sliceList.removeAll()
   }
   
-  deinit {
-    
-//    Swift.print("Radio - deinit")
-  }
-
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
@@ -357,10 +352,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
       } else {
         
-        // NO, log it if it is a non-zero Reply (i.e a possible error)
-        if components[1] != Radio.kNoError {
-          Log.sharedInstance.msg("Unhandled non-zero reply, c\(components[0])|\(command), r\(replySuffix), \(flexErrorString(errorCode: components[1]))", level: .warning, function: #function, file: #file, line: #line)
-        }
+        // send it to the default reply handler
+        defaultReplyHandler(replyTuple.command, seqNum: "", responseValue: components[1], reply: replySuffix)
       }
       // Remove the object from the notification list
       replyHandlers[components[0]] = nil
@@ -518,7 +511,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .tnf:
       //     format: <tnfId> <key=value> <key=value> ...<key=value>
-      Tnf.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ)
+      Tnf.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kRemoved))
       
     case .transmit:
       //      format: <key=value> <key=value> ...<key=value>
@@ -1067,6 +1060,21 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         // ignore, Panadapter & Waterfall will be created when Status reply is seen
         break
         
+      } else if command.hasPrefix("tnf " + "r") {
+
+        // parse the reply
+        let components = command.components(separatedBy: " ")
+        
+        // if it's valid and the Tnf has not been removed
+        if components.count == 3 && _api.radio?.tnfs[components[2]] != nil{
+          
+          // notify all observers
+          NC.post(.tnfWillBeRemoved, object: _api.radio?.tnfs[components[2]] as Any?)
+
+          // remove the Tnf
+          _api.radio?.tnfs[components[2]] = nil
+        }
+        
       } else if command.hasPrefix(AudioStream.kStreamCreateCmd + "dax=") {
         
         // TODO: add code
@@ -1091,9 +1099,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
         // save the errors, format: <rx_error_value>,<tx_error_value>
         sliceErrors = reply.valuesArray( delimiter: "," )
-        
-      } else {
-        Log.sharedInstance.msg(command + ", unprocessed reply - \(reply)", level: .error, function: #function, file: #file, line: #line)
       }
     }
   }

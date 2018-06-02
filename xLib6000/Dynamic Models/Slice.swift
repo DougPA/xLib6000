@@ -337,15 +337,11 @@ public final class Slice                    : NSObject, DynamicModel {
         _filterLow = -285
         _filterHigh = 115
         
-      case .dsb:
-        _filterLow = -2_400
-        _filterHigh = 2_400
-        
       case .am, .sam:
         _filterLow = -3_000
         _filterHigh = 3_000
         
-      case .fm, .nfm, .dfm, .dstr:
+      case .fm, .nfm, .dfm:
         _filterLow = -8_000
         _filterHigh = 8_000
         
@@ -353,7 +349,7 @@ public final class Slice                    : NSObject, DynamicModel {
         _filterLow = -2_400
         _filterHigh = -300
         
-      case .usb, .digu, .fdv:
+      case .usb, .digu:
         _filterLow = 300
         _filterHigh = 2_400
       }
@@ -383,14 +379,14 @@ public final class Slice                    : NSObject, DynamicModel {
         newValue = (newValue > rttyMark ? rttyMark : newValue)
         newValue = (newValue < 50 ? 50 : newValue)
         
-      case .dsb, .am, .sam, .dfm, .dstr:
+      case .am, .sam, .dfm:
         newValue = (newValue > 12_000 ? 12_000 : newValue)
         newValue = (newValue < 10 ? 10 : newValue)
         
       case .lsb, .digl:
         newValue = (newValue > 0 ? 0 : newValue)
         
-      case .usb, .digu, .fdv:
+      case .usb, .digu:
         newValue = (newValue > 12_000 ? 12_000 : newValue)
       }
     }
@@ -420,14 +416,14 @@ public final class Slice                    : NSObject, DynamicModel {
         newValue = (newValue < -12_000 + rttyMark ? -12_000 + rttyMark : newValue)
         newValue = (newValue > -(50 + rttyShift) ? -(50 + rttyShift) : newValue)
         
-      case .dsb, .am, .sam, .dfm, .dstr:
+      case .am, .sam, .dfm:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
         newValue = (newValue > -10 ? -10 : newValue)
         
       case .lsb, .digl:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
         
-      case .usb, .digu, .fdv:
+      case .usb, .digu:
         newValue = (newValue < 0 ? 0 : newValue)
       }
     }
@@ -1172,8 +1168,8 @@ extension xLib6000.Slice {
     case digu
     case digl
     case rtty
-    case dsb
-    case dstr
-    case fdv
+//    case dsb
+//    case dstr
+//    case fdv
   }
 }

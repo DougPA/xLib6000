@@ -22,6 +22,8 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   static let kBundleIdentifier              = Api.kDomainId + "." + Api.kId
   static let kTcpTimeout                    = 0.5                           // seconds
   static let daxChannels                    = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
+  static let daxIqChannels                  = ["None", "1", "2", "3", "4"]
+  static let kNoError                       = "0"
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -76,8 +78,6 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   private var _clientName                   = ""
   private var _isGui                        = true                          // GUI enable
   private var _lowBW                        = false                         // low bandwidth connect
-
-  private let kNoError                      = "0"
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
@@ -535,7 +535,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   private func clientIpReplyHandler(_ command: String, seqNum: String, responseValue: String, reply: String) {
     
     // was an error code returned?
-    if responseValue == kNoError {
+    if responseValue == Api.kNoError {
       
       // NO, the reply value is the IP address
       localIP = reply.isValidIP4() ? reply : "0.0.0.0"
