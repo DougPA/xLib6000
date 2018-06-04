@@ -113,13 +113,13 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
   /// - Returns:          an IQ Stream reference (or nil)
   ///
   public class func findBy(daxIqChannel: DaxIqChannel) -> IqStream? {
-    var iqStream: IqStream?
+
+    // find the IQ Streams with the specified Channel (if any)
+    let streams = Api.sharedInstance.radio!.iqStreams.values.filter { $0.daxIqChannel == daxIqChannel }
+    guard streams.count >= 1 else { return nil }
     
-    // find the matching IqStream (if any)
-    for (_, stream) in Api.sharedInstance.radio!.iqStreams where stream.daxIqChannel == daxIqChannel {
-      iqStream = stream
-    }
-    return iqStream
+    // return the first one
+    return streams[0]
   }
 
   // ----------------------------------------------------------------------------

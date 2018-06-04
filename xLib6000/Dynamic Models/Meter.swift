@@ -118,21 +118,16 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       }
     }
   }
-  /// Find a Meters by a Slice Id
+  /// Find Meters by a Slice Id
   ///
   /// - Parameters:
   ///   - sliceId:    a Slice id
   /// - Returns:      an array of Meters
   ///
   public class func findBy(sliceId: SliceId) -> [Meter] {
-    var meters = [Meter]()
     
-    for (_, meter) in Api.sharedInstance.radio!.meters where meter.source == "slc" && meter.number ==  sliceId {
-      
-      // add it to the array
-      meters.append( meter )
-    }
-    return meters
+    // find the Meters on the specified Slice (if any)
+    return Api.sharedInstance.radio!.meters.values.filter { $0.source == "slc" && $0.number == sliceId }
   }
   /// Find a Meter by its ShortName
   ///
@@ -141,14 +136,13 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
   /// - Returns:      a Meter reference
   ///
   public class func findBy(shortName name: MeterName) -> Meter? {
-    var meter: Meter?
+
+    // find the Meters with the specified Name (if any)
+    let meters = Api.sharedInstance.radio!.meters.values.filter { $0.name == name }
+    guard meters.count >= 1 else { return nil }
     
-    for (_, aMeter) in Api.sharedInstance.radio!.meters where aMeter.name == name {
-      
-      // get a reference to the Meter
-      meter = aMeter
-    }
-    return meter
+    // return the first one
+    return meters[0]
   }
 
   // ----------------------------------------------------------------------------

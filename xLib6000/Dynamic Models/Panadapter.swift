@@ -24,7 +24,7 @@ public typealias PanadapterId = UInt32
 public final class Panadapter               : NSObject, DynamicModelWithStream {
   
   static let kMaxBins                       = 5120
-  static let daxIqChannels                  = ["None", "1", "2", "3", "4"]
+//  static let daxIqChannels                  = ["None", "1", "2", "3", "4"]
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -34,7 +34,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   public private(set) var lastFrameIndex    = 0                             // Frame index of previous Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
   
-  @objc dynamic public let daxIqChoices     = Panadapter.daxIqChannels
+  @objc dynamic public let daxIqChoices     = Api.daxIqChannels
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -146,16 +146,13 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   /// - Returns:      a reference to a Panadapter (or nil)
   ///
   public class func findActive() -> Panadapter? {
-    var panadapter: Panadapter?
-    
-    // find the active Panadapter (if any)
-    for (_, pan) in Api.sharedInstance.radio!.panadapters where Slice.findActive(with: pan.id) != nil {
-      
-      // return it
-      panadapter = pan
-    }
-    
-    return panadapter
+
+    // find the Panadapters with an active Slice (if any)
+    let panadapters = Api.sharedInstance.radio!.panadapters.values.filter { Slice.findActive(with: $0.id) != nil }
+    guard panadapters.count >= 1 else { return nil }
+
+    // return the first one
+    return panadapters[0]
   }
   /// Find the Panadapter for a DaxIqChannel
   ///
@@ -164,17 +161,13 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   /// - Returns:          a Panadapter reference (or nil)
   ///
   public class func find(with channel: DaxIqChannel) -> Panadapter? {
-    var panadapter: Panadapter?
+
+    // find the Panadapters with the specified Channel (if any)
+    let panadapters = Api.sharedInstance.radio!.panadapters.values.filter { $0.daxIqChannel == channel }
+    guard panadapters.count >= 1 else { return nil }
     
-    // find the matching Panadapter (if any)
-    for (_, pan) in Api.sharedInstance.radio!.panadapters where pan.daxIqChannel == channel {
-      
-      // return it
-      panadapter = pan
-      break
-    }
-    
-    return panadapter
+    // return the first one
+    return panadapters[0]
   }
 
   // ------------------------------------------------------------------------------
@@ -369,7 +362,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     lastFrameIndex = _dataframes[_dataframeIndex].frameIndex
     
     // Pass the data frame to this Panadapter's delegate
-//    delegate?.panadapterStreamHandler(_dataframes[_dataframeIndex])
     delegate?.streamHandler(_dataframes[_dataframeIndex])
   }
 }

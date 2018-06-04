@@ -176,7 +176,7 @@ public final class Slice                    : NSObject, DynamicModel {
   public class func disableAllTx() {
     
     // for all Slices, turn off txEnabled
-    for (_, slice) in Api.sharedInstance.radio!.slices {
+    for (_, slice) in Api.sharedInstance.radio!.slices where slice.txEnabled {
       
       slice.txEnabled = false
     }
@@ -206,39 +206,30 @@ public final class Slice                    : NSObject, DynamicModel {
   /// - Returns:      a reference to a Slice (or nil)
   ///
   public class func find(with id: PanadapterId, byFrequency freq: Int, minWidth: Int) -> Slice? {
-    var slice: Slice?
     
-//    let minWidth = Int( CGFloat(panafallBandwidth) * kSliceFindWidth )
+    // find the Slices on the Panadapter (if any)
+    let slices = Api.sharedInstance.radio!.slices.values.filter { $0.panadapterId == id }
+    guard slices.count >= 1 else { return nil }
     
-    // find the Panadapter containing the Slice (if any)
-    for (_, s) in Api.sharedInstance.radio!.slices where s.panadapterId == id {
-      
-      let widthDown = min(-minWidth/2, s.filterLow)
-      let widthUp = max(minWidth/2, s.filterHigh)
-      
-      if freq >= s.frequency + widthDown && freq <= s.frequency + widthUp {
-        
-        // YES, return the Slice
-        slice = s
-        break
-      }
-    }
-    return slice
+    // find the ones in the frequency range
+    let selected = slices.filter { freq >= $0.frequency + min(-minWidth/2, $0.filterLow) && freq <= $0.frequency + max(minWidth/2, $0.filterHigh)}
+    guard selected.count >= 1 else { return nil }
+    
+    // return the first one
+    return selected[0]
   }
   /// Return the Active Slice (if any)
   ///
   /// - Returns:      a Slice reference (or nil)
   ///
   public class func findActive() -> Slice? {
-    var slice: Slice?
+
+    // find the active Slices (if any)
+    let slices = Api.sharedInstance.radio!.slices.values.filter { $0.active }
+    guard slices.count >= 1 else { return nil }
     
-    // is the Slice Active?
-    for (_, s) in Api.sharedInstance.radio!.slices where s.active {
-      
-      // YES, return the Slice
-      slice = s
-    }
-    return slice
+    // return the first one
+    return slices[0]
   }
   /// Return the Active Slice on the specified Panadapter (if any)
   ///
@@ -247,15 +238,13 @@ public final class Slice                    : NSObject, DynamicModel {
   /// - Returns:      a Slice reference (or nil)
   ///
   public class func findActive(with id: PanadapterId) -> Slice? {
-    var slice: Slice?
     
-    // is the Slice on the Panadapter and Active?
-    for (_, s) in Api.sharedInstance.radio!.slices where s.panadapterId == id && s.active {
-      
-      // YES, return the Slice
-      slice = s
-    }
-    return slice
+    // find the active Slices on the specified Panadapter (if any)
+    let slices = Api.sharedInstance.radio!.slices.values.filter { $0.active && $0.panadapterId == id }
+    guard slices.count >= 1 else { return nil }
+    
+    // return the first one
+    return slices[0]
   }
   /// Find a Slice by DAX Channel
   ///
@@ -263,15 +252,13 @@ public final class Slice                    : NSObject, DynamicModel {
   /// - Returns:              a Slice (if any)
   ///
   public class func find(with channel: DaxChannel) -> Slice? {
-    var slice: Slice?
+
+    // find the Slices with the specified Channel (if any)
+    let slices = Api.sharedInstance.radio!.slices.values.filter { $0.active && $0.daxChannel == channel }
+    guard slices.count >= 1 else { return nil }
     
-    // find the Slice for the Dax Channel (if any)
-    for (_, s) in Api.sharedInstance.radio!.slices where s.daxChannel == channel {
-      
-      // YES, return the Slice
-      slice = s
-    }
-    return slice
+    // return the first one
+    return slices[0]
   }
 
   // ----------------------------------------------------------------------------

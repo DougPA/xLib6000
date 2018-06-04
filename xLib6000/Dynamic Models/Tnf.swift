@@ -94,17 +94,13 @@ public final class Tnf                      : NSObject, DynamicModel {
   /// - Returns:      a Tnf reference (or nil)
   ///
   class public func findBy(frequency freq: Int, minWidth: Int) -> Tnf? {
-    var tnfFound: Tnf?
+
+    // return the Tnfs within the specified Frequency / minimum width (if any)
+    let tnfs = Api.sharedInstance.radio!.tnfs.values.filter { freq >= ($0.frequency - max(minWidth, $0.width/2)) && freq <= ($0.frequency + max(minWidth, $0.width/2)) }
+    guard tnfs.count >= 1 else { return nil }
     
-    for (_, tnf) in Api.sharedInstance.radio!.tnfs {
-      
-      let halfwidth = max(minWidth, tnf.width/2)
-      if freq >= (tnf.frequency - halfwidth) && freq <= (tnf.frequency + halfwidth) {
-        tnfFound = tnf
-        break
-      }
-    }
-    return tnfFound
+    // return the first one
+    return tnfs[0]
   }
   /// Determine a frequency for a Tnf
   ///
