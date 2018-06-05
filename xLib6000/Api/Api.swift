@@ -24,6 +24,12 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   static let daxChannels                    = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
   static let daxIqChannels                  = ["None", "1", "2", "3", "4"]
   static let kNoError                       = "0"
+  static let kControlMin                    = 0                             // control ranges
+  static let kControlMax                    = 100
+  static let kMinApfQ                       = 0
+  static let kMaxApfQ                       = 33
+  static let kNotInUse                      = "in_use=0"                    // removal indicators
+  static let kRemoved                       = "removed"
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

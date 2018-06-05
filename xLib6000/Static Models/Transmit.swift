@@ -266,7 +266,7 @@ extension Transmit {
   // listed in alphabetical order
   internal var _carrierLevel: Int {
     get { return _q.sync { __carrierLevel } }
-    set { _q.sync(flags: .barrier) { __carrierLevel = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _q.sync(flags: .barrier) { __carrierLevel = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _companderEnabled: Bool {
     get { return _q.sync { __companderEnabled } }
@@ -274,7 +274,7 @@ extension Transmit {
   
   internal var _companderLevel: Int {
     get { return _q.sync { __companderLevel } }
-    set { _q.sync(flags: .barrier) { __companderLevel = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _q.sync(flags: .barrier) { __companderLevel = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _cwAutoSpaceEnabled: Bool {
     get { return _q.sync { __cwAutoSpaceEnabled } }
@@ -342,7 +342,7 @@ extension Transmit {
   
   internal var _maxPowerLevel: Int {
     get { return _q.sync { __maxPowerLevel } }
-    set { _q.sync(flags: .barrier) { __maxPowerLevel = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _q.sync(flags: .barrier) { __maxPowerLevel = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _metInRxEnabled: Bool {
     get { return _q.sync { __metInRxEnabled } }
@@ -362,7 +362,7 @@ extension Transmit {
   
   internal var _micLevel: Int {
     get { return _q.sync { __micLevel } }
-    set { _q.sync(flags: .barrier) { __micLevel = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _q.sync(flags: .barrier) { __micLevel = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _micSelection: String {
     get { return _q.sync { __micSelection } }
@@ -378,7 +378,7 @@ extension Transmit {
   
   internal var _rfPower: Int {
     get { return _q.sync { __rfPower } }
-    set { _q.sync(flags: .barrier) { __rfPower = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _q.sync(flags: .barrier) { __rfPower = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _speechProcessorEnabled: Bool {
     get { return _q.sync { __speechProcessorEnabled } }
@@ -418,19 +418,19 @@ extension Transmit {
   
   internal var _txMonitorGainCw: Int {
     get { return _q.sync { __txMonitorGainCw } }
-    set { _q.sync(flags: .barrier) { __txMonitorGainCw = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _q.sync(flags: .barrier) { __txMonitorGainCw = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _txMonitorGainSb: Int {
     get { return _q.sync { __txMonitorGainSb } }
-    set { _q.sync(flags: .barrier) { __txMonitorGainSb = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _q.sync(flags: .barrier) { __txMonitorGainSb = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _txMonitorPanCw: Int {
     get { return _q.sync { __txMonitorPanCw } }
-    set { _q.sync(flags: .barrier) { __txMonitorPanCw = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _q.sync(flags: .barrier) { __txMonitorPanCw = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _txMonitorPanSb: Int {
     get { return _q.sync { __txMonitorPanSb } }
-    set { _q.sync(flags: .barrier) { __txMonitorPanSb = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _q.sync(flags: .barrier) { __txMonitorPanSb = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _txRfPowerChanges: Bool {
     get { return _q.sync { __txRfPowerChanges } }
@@ -442,7 +442,7 @@ extension Transmit {
   
   internal var _tunePower: Int {
     get { return _q.sync { __tunePower } }
-    set { _q.sync(flags: .barrier) { __tunePower = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _q.sync(flags: .barrier) { __tunePower = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _voxEnabled: Bool {
     get { return _q.sync { __voxEnabled } }
@@ -450,11 +450,11 @@ extension Transmit {
   
   internal var _voxDelay: Int {
     get { return _q.sync { __voxDelay } }
-    set { _q.sync(flags: .barrier) { __voxDelay = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _q.sync(flags: .barrier) { __voxDelay = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _voxLevel: Int {
     get { return _q.sync { __voxLevel } }
-    set { _q.sync(flags: .barrier) { __voxLevel = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _q.sync(flags: .barrier) { __voxLevel = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant (no message to Radio)

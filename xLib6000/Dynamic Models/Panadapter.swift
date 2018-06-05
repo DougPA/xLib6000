@@ -203,7 +203,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///
   func replyHandler(_ command: String, seqNum: String, responseValue: String, reply: String) {
     
-    guard responseValue == Radio.kNoError else {
+    guard responseValue == Api.kNoError else {
       // Anything other than 0 is an error, log it and ignore the Reply
       Log.sharedInstance.msg(command + ", non-zero reply - \(responseValue)", level: .error, function: #function, file: #file, line: #line)
       return

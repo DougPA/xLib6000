@@ -195,17 +195,17 @@ extension Radio {
   
   @objc dynamic public var apfQFactor: Int {
     get {  return _apfQFactor }
-    set { if _apfQFactor != newValue { _apfQFactor = newValue.bound(Radio.kMinApfQ, Radio.kMaxApfQ) ; apfCmd( .qFactor, newValue) } } }
+    set { if _apfQFactor != newValue { _apfQFactor = newValue.bound(Api.kMinApfQ, Api.kMaxApfQ) ; apfCmd( .qFactor, newValue) } } }
   
   @objc dynamic public var apfGain: Int {
     get {  return _apfGain }
-    set { if _apfGain != newValue { _apfGain = newValue.bound(Radio.kMin, Radio.kMax) ; apfCmd( .gain, newValue) } } }
+    set { if _apfGain != newValue { _apfGain = newValue.bound(Api.kControlMin, Api.kControlMax) ; apfCmd( .gain, newValue) } } }
   
   // ***** MIXER COMMANDS *****
   
   @objc dynamic public var headphoneGain: Int {
     get {  return _headphoneGain }
-    set { if _headphoneGain != newValue { _headphoneGain = newValue.bound(Radio.kMin, Radio.kMax) ; mixerCmd( "headphone gain", newValue) } } }
+    set { if _headphoneGain != newValue { _headphoneGain = newValue.bound(Api.kControlMin, Api.kControlMax) ; mixerCmd( "headphone gain", newValue) } } }
   
   @objc dynamic public var headphoneMute: Bool {
     get {  return _headphoneMute }
@@ -213,7 +213,7 @@ extension Radio {
   
   @objc dynamic public var lineoutGain: Int {
     get {  return _lineoutGain }
-    set { if _lineoutGain != newValue { _lineoutGain = newValue.bound(Radio.kMin, Radio.kMax) ; mixerCmd( "lineout gain", newValue) } } }
+    set { if _lineoutGain != newValue { _lineoutGain = newValue.bound(Api.kControlMin, Api.kControlMax) ; mixerCmd( "lineout gain", newValue) } } }
   
   @objc dynamic public var lineoutMute: Bool {
     get {  return _lineoutMute }

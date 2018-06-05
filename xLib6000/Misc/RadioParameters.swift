@@ -62,7 +62,7 @@ public final class RadioParameters          : Equatable {
   private let kMaxLicensedVersion           = "maxLicensedVersion"
   private let kModel                        = "model"
   private let kName                         = "name"
-  private let kNegotiatedHolePunchPort     = "negotiatedHolePunchPort"
+  private let kNegotiatedHolePunchPort      = "negotiatedHolePunchPort"
   private let kNickname                     = "nickname"
   private let kPort                         = "port"
   private let kProtocolVersion              = "protocolVersion"

@@ -24,15 +24,15 @@ public struct VitaHeader {
   //
   //      all of the UInt16 & UInt32 fields must be BigEndian
   //
-  var packetDesc                      : UInt8 = 0
-  var timeStampDesc                   : UInt8 = 0                           // the lsb four bits are used for sequence number
-  var packetSize                      : UInt16 = 0
-  var streamId                        : UInt32 = 0
-  var oui                             : UInt32 = 0
-  var classCodes                      : UInt32 = 0
-  var integerTimeStamp                : UInt32 = 0
-  var fractionalTimeStampMsb          : UInt32 = 0
-  var fractionalTimeStampLsb          : UInt32 = 0
+  var packetDesc                            : UInt8 = 0
+  var timeStampDesc                         : UInt8 = 0                           // the lsb four bits are used for sequence number
+  var packetSize                            : UInt16 = 0
+  var streamId                              : UInt32 = 0
+  var oui                                   : UInt32 = 0
+  var classCodes                            : UInt32 = 0
+  var integerTimeStamp                      : UInt32 = 0
+  var fractionalTimeStampMsb                : UInt32 = 0
+  var fractionalTimeStampLsb                : UInt32 = 0
 }
 
 // ------------------------------------------------------------------------------
@@ -52,25 +52,25 @@ public class Vita {
   // filled with defaults, values are changed when created
   //      Types are shown for clarity
   
-  var packetType                      : PacketType = .extDataWithStream     // Packet type
-  var classCode                       : PacketClassCode = .panadapter       // Packet class code
-  var streamId                        : UInt32 = 0                          // Stream ID
+  var packetType                            : PacketType = .extDataWithStream     // Packet type
+  var classCode                             : PacketClassCode = .panadapter       // Packet class code
+  var streamId                              : UInt32 = 0                          // Stream ID
   
-  var classIdPresent                  : Bool = true                         // Class ID present
-  var trailerPresent                  : Bool = false                        // Trailer present
-  var tsiType                         : TsiType = .utc                      // Integer timestamp type
-  var tsfType                         : TsfType = .sampleCount              // Fractional timestamp type
-  var sequence                        : Int = 0                             // Mod 16 packet sequence number
-  var packetSize                      : Int = 0                             // Size of packet (bytes)
-  var integerTimestamp                : UInt32 = 0                          // Integer portion
-  var fracTimeStampMsb                : UInt32 = 0                          // fractional portion - MSB 32 bits
-  var fracTimeStampLsb                : UInt32 = 0                          // fractional portion -LSB 32 bits
-  var oui                             : UInt32 = kFlexOui                   // Flex Radio oui
-  var informationClassCode            : UInt32 = kFlexInformationClassCode  // Flex Radio classCode
-  var payloadData                     = [UInt8]()                           // Array of bytes in payload
-  var payloadSize                     : Int = 0                             // Size of payload (bytes)
-  var trailer                         : UInt32 = 0                          // Trailer, 4 bytes (if used)
-  var headerSize                      : Int = MemoryLayout<VitaHeader>.size // Header size (bytes)
+  var classIdPresent                        : Bool = true                         // Class ID present
+  var trailerPresent                        : Bool = false                        // Trailer present
+  var tsiType                               : TsiType = .utc                      // Integer timestamp type
+  var tsfType                               : TsfType = .sampleCount              // Fractional timestamp type
+  var sequence                              : Int = 0                             // Mod 16 packet sequence number
+  var packetSize                            : Int = 0                             // Size of packet (bytes)
+  var integerTimestamp                      : UInt32 = 0                          // Integer portion
+  var fracTimeStampMsb                      : UInt32 = 0                          // fractional portion - MSB 32 bits
+  var fracTimeStampLsb                      : UInt32 = 0                          // fractional portion -LSB 32 bits
+  var oui                                   : UInt32 = kFlexOui                   // Flex Radio oui
+  var informationClassCode                  : UInt32 = kFlexInformationClassCode  // Flex Radio classCode
+  var payloadData                           = [UInt8]()                           // Array of bytes in payload
+  var payloadSize                           : Int = 0                             // Size of payload (bytes)
+  var trailer                               : UInt32 = 0                          // Trailer, 4 bytes (if used)
+  var headerSize                            : Int = MemoryLayout<VitaHeader>.size // Header size (bytes)
   
   // ----------------------------------------------------------------------------
   // MARK: - Class methods
@@ -120,17 +120,17 @@ public class Vita {
   ///
   public class func decodeFrom(data: Data) -> Vita? {
     
-    let kVitaMinimumBytes = 28          // Minimum size of a Vita packet (bytes)
-    let kPacketTypeMask: UInt8 = 0xf0   // Bit masks
-    let kClassIdPresentMask: UInt8 = 0x08
-    let kTrailerPresentMask: UInt8 = 0x04
-    let kTsiTypeMask: UInt8 = 0xc0
-    let kTsfTypeMask: UInt8 = 0x30
-    let kPacketSequenceMask: UInt8 = 0x0f
-    let kInformationClassCodeMask: UInt32 = 0xffff0000
-    let kPacketClassCodeMask: UInt32 = 0x0000ffff
-    let kOffsetOptionals = 4            // byte offset to optional header section
-    let kTrailerSize = 4                // Size of a trailer (bytes)
+    let kVitaMinimumBytes                   = 28                                  // Minimum size of a Vita packet (bytes)
+    let kPacketTypeMask                     : UInt8 = 0xf0                        // Bit masks
+    let kClassIdPresentMask                 : UInt8 = 0x08
+    let kTrailerPresentMask                 : UInt8 = 0x04
+    let kTsiTypeMask                        : UInt8 = 0xc0
+    let kTsfTypeMask                        : UInt8 = 0x30
+    let kPacketSequenceMask                 : UInt8 = 0x0f
+    let kInformationClassCodeMask           : UInt32 = 0xffff0000
+    let kPacketClassCodeMask                : UInt32 = 0x0000ffff
+    let kOffsetOptionals                    = 4                                   // byte offset to optional header section
+    let kTrailerSize                        = 4                                   // Size of a trailer (bytes)
     
     var headerCount = 0
     

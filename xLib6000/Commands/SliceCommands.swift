@@ -160,7 +160,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var audioGain: Int {
     get { return _audioGain }
-    set { if _audioGain != newValue { if newValue.within(Radio.kMin, Radio.kMax) { _audioGain = newValue ; audioCmd("gain", value: newValue) } } } }
+    set { if _audioGain != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioGain = newValue ; audioCmd("gain", value: newValue) } } } }
   
   @objc dynamic public var audioMute: Bool {
     get { return _audioMute }
@@ -168,7 +168,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var audioPan: Int {
     get { return _audioPan }
-    set { if _audioPan != newValue { if newValue.within(Radio.kMin, Radio.kMax) { _audioGain = newValue ; audioCmd("pan", value: newValue) } } } }
+    set { if _audioPan != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioGain = newValue ; audioCmd("pan", value: newValue) } } } }
   
   // ***** FILTER COMMANDS *****
 
@@ -199,11 +199,11 @@ extension xLib6000.Slice {
   
   @objc dynamic public var agcOffLevel: Int {
     get { return _agcOffLevel }
-    set { if _agcOffLevel != newValue { if newValue.within(Radio.kMin, Radio.kMax) {  _agcOffLevel = newValue ; sliceCmd( .agcOffLevel, newValue) } } } }
+    set { if _agcOffLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) {  _agcOffLevel = newValue ; sliceCmd( .agcOffLevel, newValue) } } } }
   
   @objc dynamic public var agcThreshold: Int {
     get { return _agcThreshold }
-    set { if _agcThreshold != newValue { if newValue.within(Radio.kMin, Radio.kMax) { _agcThreshold = newValue ; sliceCmd( .agcThreshold, newValue) } } } }
+    set { if _agcThreshold != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _agcThreshold = newValue ; sliceCmd( .agcThreshold, newValue) } } } }
   
   @objc dynamic public var anfEnabled: Bool {
     get { return _anfEnabled }
@@ -211,7 +211,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var anfLevel: Int {
     get { return _anfLevel }
-    set { if _anfLevel != newValue { if newValue.within(Radio.kMin, Radio.kMax) { _anfLevel = newValue ; sliceCmd( .anfLevel, newValue) } } } }
+    set { if _anfLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _anfLevel = newValue ; sliceCmd( .anfLevel, newValue) } } } }
   
   @objc dynamic public var apfEnabled: Bool {
     get { return _apfEnabled }
@@ -219,7 +219,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var apfLevel: Int {
     get { return _apfLevel }
-    set { if _apfLevel != newValue { if newValue.within(Radio.kMin, Radio.kMax) { _apfLevel = newValue ; sliceCmd( .apfLevel, newValue) } } } }
+    set { if _apfLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _apfLevel = newValue ; sliceCmd( .apfLevel, newValue) } } } }
   
   @objc dynamic public var daxChannel: Int {
     get { return _daxChannel }
@@ -279,7 +279,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var nbLevel: Int {
     get { return _nbLevel }
-    set { if _nbLevel != newValue { if newValue.within(Radio.kMin, Radio.kMax) {  _nbLevel = newValue ; sliceCmd( .nbLevel, newValue) } } } }
+    set { if _nbLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) {  _nbLevel = newValue ; sliceCmd( .nbLevel, newValue) } } } }
   
   @objc dynamic public var nrEnabled: Bool {
     get { return _nrEnabled }
@@ -287,7 +287,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var nrLevel: Int {
     get { return _nrLevel }
-    set { if _nrLevel != newValue { if newValue.within(Radio.kMin, Radio.kMax) {  _nrLevel = newValue ; sliceCmd( .nrLevel, newValue) } } } }
+    set { if _nrLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) {  _nrLevel = newValue ; sliceCmd( .nrLevel, newValue) } } } }
   
   @objc dynamic public var playbackEnabled: Bool {
     get { return _playbackEnabled }
@@ -339,7 +339,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var squelchLevel: Int {
     get { return _squelchLevel }
-    set { if _squelchLevel != newValue { if newValue.within(Radio.kMin, Radio.kMax) {  _squelchLevel = newValue ; sliceCmd( .squelchLevel, newValue) } } } }
+    set { if _squelchLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) {  _squelchLevel = newValue ; sliceCmd( .squelchLevel, newValue) } } } }
   
   @objc dynamic public var txAnt: String {
     get { return _txAnt }
@@ -359,7 +359,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var wnbLevel: Int {
     get { return _wnbLevel }
-    set { if wnbLevel != newValue { if newValue.within(Radio.kMin, Radio.kMax) {  _wnbLevel = newValue ; sliceCmd( .wnbLevel, newValue) } } } }
+    set { if wnbLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) {  _wnbLevel = newValue ; sliceCmd( .wnbLevel, newValue) } } } }
   
   @objc dynamic public var xitEnabled: Bool {
     get { return _xitEnabled }

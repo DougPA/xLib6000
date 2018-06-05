@@ -104,7 +104,7 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
       }
     }
   }
-  /// Check if an audio stream belongs to us
+  /// Check if an Audio Stream belongs to us
   ///
   /// - Parameters:
   ///   - keyValues:          a KeyValuesArray of the status message
@@ -113,6 +113,7 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   ///
   public class func isStatusForThisClient(_ properties: KeyValuesArray) -> Bool {
     
+    // allow a Tester app to see all Streams
     guard Api.sharedInstance.testerModeEnabled == false else { return true }
     
     var statusIpStr = ""

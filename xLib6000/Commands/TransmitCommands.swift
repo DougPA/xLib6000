@@ -157,7 +157,7 @@ extension Transmit {
   
   @objc dynamic public var carrierLevel: Int {
     get {  return _carrierLevel }
-    set { if _carrierLevel != newValue { _carrierLevel = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( "am_carrier", newValue) } } }
+    set { if _carrierLevel != newValue { _carrierLevel = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( "am_carrier", newValue) } } }
   
   @objc dynamic public var companderEnabled: Bool {
     get {  return _companderEnabled }
@@ -165,7 +165,7 @@ extension Transmit {
   
   @objc dynamic public var companderLevel: Int {
     get {  return _companderLevel }
-    set { if _companderLevel != newValue { _companderLevel = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( .companderLevel, newValue) } } }
+    set { if _companderLevel != newValue { _companderLevel = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( .companderLevel, newValue) } } }
   
   @objc dynamic public var cwAutoSpaceEnabled: Bool {
     get {  return _cwAutoSpaceEnabled }
@@ -185,7 +185,7 @@ extension Transmit {
   
   @objc dynamic public var maxPowerLevel: Int {
     get {  return _maxPowerLevel }
-    set { if _maxPowerLevel != newValue { _maxPowerLevel = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( .maxPowerLevel, newValue) } } }
+    set { if _maxPowerLevel != newValue { _maxPowerLevel = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( .maxPowerLevel, newValue) } } }
   
   @objc dynamic public var metInRxEnabled: Bool {
     get {  return _metInRxEnabled }
@@ -193,7 +193,7 @@ extension Transmit {
   
   @objc dynamic public var micLevel: Int {
     get {  return _micLevel }
-    set { if _micLevel != newValue { _micLevel = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( "miclevel", newValue) } } }
+    set { if _micLevel != newValue { _micLevel = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( "miclevel", newValue) } } }
   
   @objc dynamic public var moxEnabled: Bool {
     get { return _moxEnabled }
@@ -201,7 +201,7 @@ extension Transmit {
   
   @objc dynamic public var rfPower: Int {
     get {  return _rfPower }
-    set { if _rfPower != newValue { _rfPower = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( .rfPower, newValue) } } }
+    set { if _rfPower != newValue { _rfPower = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( .rfPower, newValue) } } }
   
   @objc dynamic public var speechProcessorEnabled: Bool {
     get {  return _speechProcessorEnabled }
@@ -217,7 +217,7 @@ extension Transmit {
   
   @objc dynamic public var tunePower: Int {
     get {  return _tunePower }
-    set { if _tunePower != newValue { _tunePower = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( .tunePower, newValue) } } }
+    set { if _tunePower != newValue { _tunePower = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( .tunePower, newValue) } } }
   
   @objc dynamic public var txFilterHigh: Int {
     get { return _txFilterHigh }
@@ -237,19 +237,19 @@ extension Transmit {
   
   @objc dynamic public var txMonitorGainCw: Int {
     get {  return _txMonitorGainCw }
-    set { if _txMonitorGainCw != newValue { _txMonitorGainCw = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( .txMonitorGainCw, newValue) } } }
+    set { if _txMonitorGainCw != newValue { _txMonitorGainCw = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( .txMonitorGainCw, newValue) } } }
   
   @objc dynamic public var txMonitorGainSb: Int {
     get {  return _txMonitorGainSb }
-    set { if _txMonitorGainSb != newValue { _txMonitorGainSb = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( .txMonitorGainSb, newValue) } } }
+    set { if _txMonitorGainSb != newValue { _txMonitorGainSb = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( .txMonitorGainSb, newValue) } } }
   
   @objc dynamic public var txMonitorPanCw: Int {
     get {  return _txMonitorPanCw }
-    set { if _txMonitorPanCw != newValue { _txMonitorPanCw = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( .txMonitorPanCw, newValue) } } }
+    set { if _txMonitorPanCw != newValue { _txMonitorPanCw = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( .txMonitorPanCw, newValue) } } }
   
   @objc dynamic public var txMonitorPanSb: Int {
     get {  return _txMonitorPanSb }
-    set { if _txMonitorPanSb != newValue { _txMonitorPanSb = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( .txMonitorPanSb, newValue) } } }
+    set { if _txMonitorPanSb != newValue { _txMonitorPanSb = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( .txMonitorPanSb, newValue) } } }
   
   @objc dynamic public var voxEnabled: Bool {
     get { return _voxEnabled }
@@ -257,11 +257,11 @@ extension Transmit {
   
   @objc dynamic public var voxDelay: Int {
     get { return _voxDelay }
-    set { if _voxDelay != newValue { _voxDelay = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( .voxDelay, newValue) } } }
+    set { if _voxDelay != newValue { _voxDelay = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( .voxDelay, newValue) } } }
   
   @objc dynamic public var voxLevel: Int {
     get { return _voxLevel }
-    set { if _voxLevel != newValue { _voxLevel = newValue.bound(Radio.kMin, Radio.kMax) ; transmitCmd( .voxLevel, newValue) } } }
+    set { if _voxLevel != newValue { _voxLevel = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( .voxLevel, newValue) } } }
   
   // ***** TUNE COMMANDS *****
   

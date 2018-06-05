@@ -21,13 +21,13 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let kNoError                       = "0"                           // response without error
-  static let kMin                           = 0                             // control ranges
-  static let kMax                           = 100
-  static let kMinApfQ                       = 0
-  static let kMaxApfQ                       = 33
-  static let kNotInUse                      = "in_use=0"                    // removal indicators
-  static let kRemoved                       = "removed"
+//  static let kNoError                       = "0"                           // response without error
+//  static let kMin                           = 0                             // control ranges
+//  static let kMax                           = 100
+//  static let kMinApfQ                       = 0
+//  static let kMaxApfQ                       = 33
+//  static let kNotInUse                      = "in_use=0"                    // removal indicators
+//  static let kRemoved                       = "removed"
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (Read Only)
@@ -362,7 +362,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     } else {
       
       // no Object is waiting for this reply, log it if it is a non-zero Reply (i.e a possible error)
-      if components[1] != Radio.kNoError {
+      if components[1] != Api.kNoError {
         Log.sharedInstance.msg("Unhandled non-zero reply, c\(components[0]), r\(replySuffix), \(flexErrorString(errorCode: components[1]))", level: .warning, function: #function, file: #file, line: #line)
       }
     }
@@ -408,11 +408,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .amplifier:
       // FIXME: Need format(s)
-      Amplifier.parseStatus(remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kRemoved))
+      Amplifier.parseStatus(remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kRemoved))
       
     case .audioStream:
       //      format: <AudioStreamId> <key=value> <key=value> ...<key=value>
-      AudioStream.parseStatus(remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kNotInUse))
+      AudioStream.parseStatus(remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kNotInUse))
       
     case .atu:
       //      format: <key=value> <key=value> ...<key=value>
@@ -441,10 +441,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // what Display Type is it?
       switch keyValues[0].key {
       case DisplayToken.panadapter.rawValue:
-        Panadapter.parseStatus(keyValues, radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kRemoved))
+        Panadapter.parseStatus(keyValues, radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kRemoved))
         
       case DisplayToken.waterfall.rawValue:
-        Waterfall.parseStatus(keyValues, radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kRemoved))
+        Waterfall.parseStatus(keyValues, radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kRemoved))
         
       default:
         // unknown Display Type, log it and ignore the message
@@ -470,15 +470,15 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .memory:
       //      format: <memoryId> <key=value>,<key=value>,...<key=value>
-      Memory.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kRemoved))
+      Memory.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kRemoved))
       
     case .meter:
       //     format: <meterNumber.key=value>#<meterNumber.key=value>#...<meterNumber.key=value>
-      Meter.parseStatus( remainder.keyValuesArray(delimiter: "#"), radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kRemoved))
+      Meter.parseStatus( remainder.keyValuesArray(delimiter: "#"), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kRemoved))
       
     case .micAudioStream:
       //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
-      MicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kNotInUse))
+      MicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kNotInUse))
       
     case .mixer:
       
@@ -503,15 +503,15 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .slice:
       //     format: <sliceId> <key=value> <key=value> ...<key=value>
-      xLib6000.Slice.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kNotInUse))
+      xLib6000.Slice.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kNotInUse))
       
     case .stream:
       //     format: <streamId> <key=value> <key=value> ...<key=value>
-      IqStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kNotInUse))
+      IqStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kNotInUse))
       
     case .tnf:
       //     format: <tnfId> <key=value> <key=value> ...<key=value>
-      Tnf.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kRemoved))
+      Tnf.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kRemoved))
       
     case .transmit:
       //      format: <key=value> <key=value> ...<key=value>
@@ -523,7 +523,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .txAudioStream:
       //      format: <TxAudioStreamId> <key=value> <key=value> ...<key=value>
-      TxAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kNotInUse))
+      TxAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kNotInUse))
       
     case .usbCable:
       //      format:
@@ -538,7 +538,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .xvtr:
       //      format: <name> <key=value> <key=value> ...<key=value>
-      Xvtr.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Radio.kNotInUse))
+      Xvtr.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kNotInUse))
     }
   }
   /// Parse a Client status message
@@ -1008,7 +1008,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///
   public func defaultReplyHandler(_ command: String, seqNum: String, responseValue: String, reply: String) {
     
-    guard responseValue == Radio.kNoError else {
+    guard responseValue == Api.kNoError else {
       
       // ignore non-zero reply from "client program" command
       if !command.hasPrefix(Api.Command.clientProgram.rawValue) {
@@ -1179,11 +1179,11 @@ extension Radio {
   
   internal var _apfQFactor: Int {
     get { return _objectQ.sync { __apfQFactor } }
-    set { _objectQ.sync(flags: .barrier) { __apfQFactor = newValue.bound(Radio.kMinApfQ, Radio.kMaxApfQ) } } }
+    set { _objectQ.sync(flags: .barrier) { __apfQFactor = newValue.bound(Api.kMinApfQ, Api.kMaxApfQ) } } }
   
   internal var _apfGain: Int {
     get { return _objectQ.sync { __apfGain } }
-    set { _objectQ.sync(flags: .barrier) { __apfGain = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _objectQ.sync(flags: .barrier) { __apfGain = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _availablePanadapters: Int {
     get { return _objectQ.sync { __availablePanadapters } }
@@ -1275,7 +1275,7 @@ extension Radio {
   
   internal var _headphoneGain: Int {
     get { return _objectQ.sync { __headphoneGain } }
-    set { _objectQ.sync(flags: .barrier) { __headphoneGain = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _objectQ.sync(flags: .barrier) { __headphoneGain = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _headphoneMute: Bool {
     get { return _objectQ.sync { __headphoneMute } }
@@ -1295,7 +1295,7 @@ extension Radio {
   
   internal var _lineoutGain: Int {
     get { return _objectQ.sync { __lineoutGain } }
-    set { _objectQ.sync(flags: .barrier) { __lineoutGain = newValue.bound(Radio.kMin, Radio.kMax) } } }
+    set { _objectQ.sync(flags: .barrier) { __lineoutGain = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _lineoutMute: Bool {
     get { return _objectQ.sync { __lineoutMute } }

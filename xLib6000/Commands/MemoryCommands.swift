@@ -129,7 +129,7 @@ extension Memory {
   
   @objc dynamic public var rfPower: Int {
     get { return _rfPower }
-    set { if _rfPower != newValue && newValue.within(Radio.kMin, Radio.kMax) { _rfPower = newValue ; memCmd( .rfPower, newValue) } } }
+    set { if _rfPower != newValue && newValue.within(Api.kControlMin, Api.kControlMax) { _rfPower = newValue ; memCmd( .rfPower, newValue) } } }
   
   @objc dynamic public var rttyMark: Int {
     get { return _rttyMark }
@@ -145,7 +145,7 @@ extension Memory {
   
   @objc dynamic public var squelchLevel: Int {
     get { return _squelchLevel }
-    set { if _squelchLevel != newValue && newValue.within(Radio.kMin, Radio.kMax) { _squelchLevel = newValue ; memCmd( .squelchLevel, newValue) } } }
+    set { if _squelchLevel != newValue && newValue.within(Api.kControlMin, Api.kControlMax) { _squelchLevel = newValue ; memCmd( .squelchLevel, newValue) } } }
   
   @objc dynamic public var step: Int {
     get { return _step }
