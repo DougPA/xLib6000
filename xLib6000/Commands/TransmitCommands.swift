@@ -50,9 +50,15 @@ extension Transmit {
     
     Api.sharedInstance.send(Transmit.kSetCmd + token.rawValue + "=\(value)")
   }
-  // alternate form for commands that do not use the Token raw value in outgoing messages
+  /// Set a Transmit property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      a String
+  ///   - value:      the new value
+  ///
   private func transmitCmd(_ token: String, _ value: Any) {
-    
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
     Api.sharedInstance.send(Transmit.kSetCmd + token + "=\(value)")
   }
   /// Set a CW property on the Radio

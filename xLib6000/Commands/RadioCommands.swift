@@ -158,7 +158,8 @@ extension Radio {
   ///   - value:      the new value
   ///
   private func radioCmd( _ token: String, _ value: Any) {
-    
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
     Api.sharedInstance.send(Radio.kCmd + token + " \(value)")
   }
   /// Set a Radio Filter property on the Radio

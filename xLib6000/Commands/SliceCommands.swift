@@ -129,11 +129,12 @@ extension xLib6000.Slice {
   /// Set an Audio property on the Radio
   ///
   /// - Parameters:
-  ///   - token:      the parse token
+  ///   - token:      a String
   ///   - value:      the new value
   ///
   private func audioCmd(_ token: String, value: Any) {
-    
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
     Api.sharedInstance.send(xLib6000.Slice.kAudioCmd + "0x\(id) " + token + " \(value)")
   }
   /// Set a Filter property on the Radio

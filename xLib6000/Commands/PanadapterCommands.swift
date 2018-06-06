@@ -97,9 +97,15 @@ extension Panadapter {
     
     Api.sharedInstance.send(Panadapter.kSetCmd + "\(id.hex) " + token.rawValue + "=\(value)")
   }
-  // alternate form for commands that do not use the Token raw value in outgoing messages
+  /// Set a Panadapter property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      a String
+  ///   - value:      the new value
+  ///
   private func panadapterSet(_ token: String, _ value: Any) {
-    
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
     Api.sharedInstance.send(Panadapter.kSetCmd + "\(id.hex) " + token + "=\(value)")
   }
   

@@ -148,9 +148,15 @@ extension Cwx {
     
     Api.sharedInstance.send(Cwx.kCmd + token.rawValue + " \(value)")
   }
-  // alternate form for commands that do not use the Token raw value in outgoing messages
+  /// Set a Cwx property on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      a String
+  ///   - value:      the new value
+  ///
   private func cwxCmd(_ token: String, _ value: Any) {
-    
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
     Api.sharedInstance.send(Cwx.kCmd + token + " \(value)")
   }
   
