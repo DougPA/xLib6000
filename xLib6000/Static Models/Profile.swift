@@ -29,12 +29,14 @@ public final class Profile                  : NSObject, StaticModel {
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
-  private var __currentGlobalProfile        = ""                            // Global profile name
-  private var __currentMicProfile           = ""                            // Mic profile name
-  private var __currentTxProfile            = ""                            // TX profile name
+  private var __globalProfileSelection      = ""                            // Global profile name
+  private var __micProfileSelection         = ""                            // Mic profile name
+  private var __txProfileSelection          = ""                            // TX profile name
   //
-  private var _profiles                     = [Token: [ProfileString]]()    // Dictionary of Profiles
-  //                                                                                              
+  private var _globalProfileList            = [ProfileString]()             // Array of Global Profiles
+  private var _micProfileList               = [ProfileString]()             // Array of Mic Profiles
+  private var _txProfileList                = [ProfileString]()             // Array of Tx Profiles
+  //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   
   // ------------------------------------------------------------------------------
@@ -60,49 +62,39 @@ public final class Profile                  : NSObject, StaticModel {
   /// - Parameter properties:       a KeyValuesArray
   ///
   func parseProperties(_ properties: KeyValuesArray) {
-    // Format:  <profileType, > <"list",value^value...^value>
-    //      OR
-    // Format:  <profileType, > <"current", value>
-    
-    let values = properties[1].value.valuesArray( delimiter: "^" )
-    
-    // determine the type of Profile & save it
-    if let token = Token(rawValue: properties[0].key), let subToken = SubToken(rawValue: properties[1].key) {
+    //              <-properties[0]->     <--- properties[1] (if any) --->
+    //     format:  <global list, "">     <value, "">^<value, "">^...<value, "">^
+    //     format:  <global current, "">  <value, "">
+    //     format:  <tx list, "">         <value, "">^<value, "">^...<value, "">^
+    //     format:  <tx current, "">      <value, "">
+    //     format:  <mic list, "">        <value, "">^<value, "">^...<value, "">^
+    //     format:  <mic current, "">     <value, "">
+
+    // determine the type of Profile status
+    if let token = Token(rawValue: properties[0].key) {
       
       switch token {
         
-      case .global:
-        switch subToken {
-        case .list:
-          // Global List
-          _api.update(self, property: &_profiles[.global], value: values, key: "profiles")
-
-        case .current:
-          // Global Current
-          _api.update(self, property: &_currentGlobalProfile, value: values[0], key: "currentGlobalProfile")
-        }
+      case .globalList:
+        _api.update(self, property: &globalProfileList, value: Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast()), key: "globalProfileList")
         
-      case .mic:
-        switch subToken {
-        case .list:
-          // Mic List
-          _api.update(self, property: &_profiles[.mic], value: values, key: "profiles")
-
-        case .current:
-          // Mic Current
-          _api.update(self, property: &_currentMicProfile, value: values[0], key: "currentMicProfile")
-        }
+      case .globalSelection:
+        let value = (properties.count == 2 ? properties[1].key : "")
+        _api.update(self, property: &globalProfileSelection, value: value, key: "globalProfileSelection")
         
-      case .tx:
-        switch subToken {
-        case .list:
-          // Tx List
-          _api.update(self, property: &_profiles[.tx] , value: values, key: "profiles")
-
-        case .current:
-          // Tx Current
-          _api.update(self, property: &_currentTxProfile, value: values[0], key: "currentTxProfile")
-        }
+      case .micList:
+        _api.update(self, property: &micProfileList, value: Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast()), key: "micProfileList")
+        
+      case .micSelection:
+        let value = (properties.count == 2 ? properties[1].key : "")
+        _api.update(self, property: &micProfileSelection, value: value, key: "micProfileSelection")
+        
+      case .txList:
+        _api.update(self, property: &txProfileList, value: Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast()), key: "txProfileList")
+        
+      case .txSelection:
+        let value = (properties.count == 2 ? properties[1].key : "")
+        _api.update(self, property: &txProfileSelection, value: value, key: "txProfileSelection")
       }
     } else {
       // unknown type
@@ -124,36 +116,43 @@ extension Profile {
   // MARK: - Internal properties - with synchronization
   
   // listed in alphabetical order
-  internal var _currentGlobalProfile: String {
-    get { return _q.sync { __currentGlobalProfile } }
-    set { _q.sync(flags: .barrier) { __currentGlobalProfile = newValue } } }
+  internal var _globalProfileSelection: String {
+    get { return _q.sync { __globalProfileSelection } }
+    set { _q.sync(flags: .barrier) { __globalProfileSelection = newValue } } }
   
-  internal var _currentMicProfile: String {
-    get { return _q.sync { __currentMicProfile } }
-    set { _q.sync(flags: .barrier) { __currentMicProfile = newValue } } }
+  internal var _micProfileSelection: String {
+    get { return _q.sync { __micProfileSelection } }
+    set { _q.sync(flags: .barrier) { __micProfileSelection = newValue } } }
   
-  internal var _currentTxProfile: String {
-    get { return _q.sync { __currentTxProfile } }
-    set { _q.sync(flags: .barrier) { __currentTxProfile = newValue } } }
+  internal var _txProfileSelection: String {
+    get { return _q.sync { __txProfileSelection } }
+    set { _q.sync(flags: .barrier) { __txProfileSelection = newValue } } }
   
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant (no message to Radio)
   
-  public var profiles: [Token: [ProfileString]] {
-    get { return _q.sync { _profiles } }
-    set { _q.sync(flags: .barrier) { _profiles = newValue } } }
+  @objc dynamic public var globalProfileList: [ProfileString] {
+    get { return _q.sync { _globalProfileList } }
+    set { _q.sync(flags: .barrier) { _globalProfileList = newValue } } }
+  
+  @objc dynamic public var micProfileList: [ProfileString] {
+    get { return _q.sync { _micProfileList } }
+    set { _q.sync(flags: .barrier) { _micProfileList = newValue } } }
+  
+  @objc dynamic public var txProfileList: [ProfileString] {
+    get { return _q.sync { _txProfileList } }
+    set { _q.sync(flags: .barrier) { _txProfileList = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Profile Tokens
   
   public enum Token: String {
-    case global
-    case mic
-    case tx
-  }
-  internal enum SubToken: String {
-    case current
-    case list
+    case globalList       = "global list"
+    case globalSelection  = "global current"
+    case micList          = "mic list"
+    case micSelection     = "mic current"
+    case txList           = "tx list"
+    case txSelection      = "tx current"
   }
 }

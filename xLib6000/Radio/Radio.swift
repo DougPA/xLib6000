@@ -19,36 +19,25 @@ import Foundation
 public final class Radio                    : NSObject, StaticModel, ApiDelegate {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-//  static let kNoError                       = "0"                           // response without error
-//  static let kMin                           = 0                             // control ranges
-//  static let kMax                           = 100
-//  static let kMinApfQ                       = 0
-//  static let kMaxApfQ                       = 33
-//  static let kNotInUse                      = "in_use=0"                    // removal indicators
-//  static let kRemoved                       = "removed"
-  
-  // ----------------------------------------------------------------------------
   // MARK: - Public properties (Read Only)
   
   public private(set) var uptime            = 0
   @objc dynamic public var radioVersion     : String { return _api.activeRadio?.firmwareVersion ?? "" }
   
   // Static models
-  @objc dynamic public private(set) var atu       : Atu!                    // Atu model
-  @objc dynamic public private(set) var cwx       : Cwx!                    // Cwx model
-  @objc dynamic public private(set) var gps       : Gps!                    // Gps model
-  @objc dynamic public private(set) var interlock : Interlock!              // Interlock model
-  @objc dynamic public private(set) var profile   : Profile!                // Profile model
-  @objc dynamic public private(set) var transmit  : Transmit!               // Transmit model
-  @objc dynamic public private(set) var wan       : Wan!                    // Wan model
-  @objc dynamic public private(set) var waveform  : Waveform!               // Waveform model
+  @objc dynamic public private(set) var atu         : Atu!                  // Atu model
+  @objc dynamic public private(set) var cwx         : Cwx!                  // Cwx model
+  @objc dynamic public private(set) var gps         : Gps!                  // Gps model
+  @objc dynamic public private(set) var interlock   : Interlock!            // Interlock model
+  @objc dynamic public private(set) var profile     : Profile!              // Profile model
+  @objc dynamic public private(set) var transmit    : Transmit!             // Transmit model
+  @objc dynamic public private(set) var wan         : Wan!                  // Wan model
+  @objc dynamic public private(set) var waveform    : Waveform!             // Waveform model
   
-  public private(set) var antennaList       = [AntennaPort]()               // Array of available Antenna ports
-  public private(set) var micList           = [MicrophonePort]()            // Array of Microphone ports
-  public private(set) var rfGainList        = [RfGainValue]()               // Array of RfGain parameters
-  public private(set) var sliceList         = [SliceId]()                   // Array of available Slice id's
+  @objc dynamic public private(set) var antennaList = [AntennaPort]()       // Array of available Antenna ports
+  @objc dynamic public private(set) var micList     = [MicrophonePort]()    // Array of Microphone ports
+  @objc dynamic public private(set) var rfGainList  = [RfGainValue]()       // Array of RfGain parameters
+  @objc dynamic public private(set) var sliceList   = [SliceId]()           // Array of available Slice id's
   
   public private(set) var sliceErrors       = [String]()                    // frequency error of a Slice (milliHz)
 
@@ -256,12 +245,15 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     panadapters.removeAll()
     waterfalls.removeAll()
     
-    for (_, profile) in profile.profiles {
-      // notify all observers
-      NC.post(.profileWillBeRemoved, object: profile as Any?)
-    }
-    profile.profiles.removeAll()
-    
+    NC.post(.globalProfileWillBeRemoved, object: profile.globalProfileList as Any?)
+    profile.globalProfileList.removeAll()
+
+    NC.post(.micProfileWillBeRemoved, object: profile.micProfileList as Any?)
+    profile.micProfileList.removeAll()
+
+    NC.post(.txProfileWillBeRemoved, object: profile.txProfileList as Any?)
+    profile.txProfileList.removeAll()
+
     equalizers.removeAll()
     
     memories.removeAll()
@@ -495,7 +487,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       //     format: tx current=<value>
       //     format: mic list=<value>^<value>^...<value>^
       //     format: mic current=<value>
-      profile.parseProperties( remainder.keyValuesArray())
+      profile.parseProperties( remainder.keyValuesArray(delimiter: "="))
       
     case .radio:
       //     format: <key=value> <key=value> ...<key=value>
@@ -1018,6 +1010,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
       return
     }
+
     // which command?
     switch command {
       
@@ -1052,7 +1045,20 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case Api.Command.version.rawValue:
       // process the reply
       parseVersionReply( reply.keyValuesArray(delimiter: "#") )
+
+//    case Api.Command.profileMic.rawValue:
+//      // save the list
+//      profile.profiles[.mic] = reply.valuesArray(  delimiter: "^" )
+//
+//    case Api.Command.profileGlobal.rawValue:
+//      // save the list
+//      profile.profiles[.global] = reply.valuesArray(  delimiter: "^" )
+//
+//    case Api.Command.profileTx.rawValue:
+//      // save the list
+//      profile.profiles[.tx] = reply.valuesArray(  delimiter: "^" )
       
+
     default:
       
       if command.hasPrefix(Panadapter.kCmd + "create") {

@@ -84,12 +84,12 @@ extension Transmit {
   ///
   private func micCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Transmit.kMicCmd + token.rawValue + "=\(value)")
+    Api.sharedInstance.send(Transmit.kMicCmd + token.rawValue + " \(value)")
   }
   // alternate form for commands that do not use the Token raw value in outgoing messages
   private func micCmd(_ token: String, _ value: Any) {
     
-    Api.sharedInstance.send(Transmit.kMicCmd + token + "=\(value)")
+    Api.sharedInstance.send(Transmit.kMicCmd + token + " \(value)")
   }
   
   // ----------------------------------------------------------------------------
@@ -145,15 +145,15 @@ extension Transmit {
   
   @objc dynamic public var micAccEnabled: Bool {
     get {  return _micAccEnabled }
-    set { if _micAccEnabled != newValue { _micAccEnabled = newValue ; micCmd( "acc", newValue.asNumber()) } } }
+    set { if _micAccEnabled != newValue { _micAccEnabled = newValue ; micCmd( "acc", newValue.asOnOff()) } } }
   
   @objc dynamic public var micBiasEnabled: Bool {
     get {  return _micBiasEnabled }
-    set { if _micBiasEnabled != newValue { _micBiasEnabled = newValue ; micCmd( "bias", newValue.asNumber()) } } }
+    set { if _micBiasEnabled != newValue { _micBiasEnabled = newValue ; micCmd( "bias", newValue.asOnOff()) } } }
   
   @objc dynamic public var micBoostEnabled: Bool {
     get {  return _micBoostEnabled }
-    set { if _micBoostEnabled != newValue { _micBoostEnabled = newValue ; micCmd( "boost", newValue.asNumber()) } } }
+    set { if _micBoostEnabled != newValue { _micBoostEnabled = newValue ; micCmd( "boost", newValue.asOnOff()) } } }
   
   @objc dynamic public var micSelection: String {
     get {  return _micSelection }

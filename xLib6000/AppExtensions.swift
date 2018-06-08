@@ -310,6 +310,13 @@ public extension Bool {
   func asLetter() -> String {
     return (self ? "T" : "F")
   }
+  /// Return "on" / "off" Strings for true / false Booleans
+  ///
+  /// - Returns:      a String
+  ///
+  func asOnOff() -> String {
+    return (self ? "on" : "off")
+  }
 }
 
 // ----------------------------------------------------------------------------

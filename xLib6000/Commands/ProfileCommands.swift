@@ -51,27 +51,28 @@ extension Profile {
   /// Set a Profile property on the Radio
   ///
   /// - Parameters:
-  ///   - token:      the parse token
+  ///   - token:      a String
   ///   - value:      the new value
   ///
-  private func profileCmd(_ token: Token, _ value: Any) {
-    
-    Api.sharedInstance.send(Profile.kCmd + token.rawValue + " load \"\(value)\"")
+  private func profileCmd(_ token: String, _ value: Any) {
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
+    Api.sharedInstance.send(Profile.kCmd + token + " load \"\(value)\"")
   }
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
   
   // listed in alphabetical order
-  @objc dynamic public var currentGlobalProfile: String {
-    get {  return _currentGlobalProfile }
-    set { if _currentGlobalProfile != newValue { _currentGlobalProfile = newValue ; profileCmd( .global, newValue) } } }
+  @objc dynamic public var globalProfileSelection: String {
+    get {  return _globalProfileSelection }
+    set { if _globalProfileSelection != newValue { _globalProfileSelection = newValue ; profileCmd( "global", newValue) } } }
   
-  @objc dynamic public var currentMicProfile: String {
-    get {  return _currentMicProfile }
-    set { if _currentMicProfile != newValue { _currentMicProfile = newValue ; profileCmd( .mic, newValue) } } }
+  @objc dynamic public var micProfileSelection: String {
+    get {  return _micProfileSelection }
+    set { if _micProfileSelection != newValue { _micProfileSelection = newValue ; profileCmd( "mic", newValue) } } }
   
-  @objc dynamic public var currentTxProfile: String {
-    get {  return _currentTxProfile }
-    set { if _currentTxProfile != newValue { _currentTxProfile = newValue  ; profileCmd( .tx, newValue) } } }
+  @objc dynamic public var txProfileSelection: String {
+    get {  return _txProfileSelection }
+    set { if _txProfileSelection != newValue { _txProfileSelection = newValue  ; profileCmd( "tx", newValue) } } }
   
 }

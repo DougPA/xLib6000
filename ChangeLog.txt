@@ -3,7 +3,13 @@ xLib6000 Change Log
 v1.1.7
 
 EqualizerCommands.swift - corrected level commands ("<band>Hz" vs "<band>hz")
-
+Api.swift - made statics kId, kDomainId & kBundleIdentifier public
+Api.swift - added "@objc dynamic" to public var radio
+TransmitCommands.swift - corrected micAccEnabled, micBiasEnabled, micBoostEnabled commands
+Radio.swift - made antList, rfGainList, micList, sliceList "@objc dynamic"
+Radio.swift - refactored Profiles throughout
+Profile.swift, ProfileCommands.swift - refactored
+Notifications.swift - refactored profile notifications
 
 v1.1.6
 

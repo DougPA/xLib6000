@@ -17,9 +17,10 @@
 
 public final class Api                      : TcpManagerDelegate, UdpManagerDelegate {
   
-  static let kId                            = "xLib6000"                    // API Name
-  static let kDomainId                      = "net.k3tzr"                   // Domain name
-  static let kBundleIdentifier              = Api.kDomainId + "." + Api.kId
+  public static let kId                     = "xLib6000"                    // API Name
+  public static let kDomainId               = "net.k3tzr"                   // Domain name
+  public static let kBundleIdentifier       = Api.kDomainId + "." + Api.kId
+  
   static let kTcpTimeout                    = 0.5                           // seconds
   static let daxChannels                    = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
   static let daxIqChannels                  = ["None", "1", "2", "3", "4"]
@@ -40,7 +41,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   public var delegate                       : ApiDelegate?                  // API delegate
   public var testerModeEnabled              = false                         // Library being used by xAPITester
   public var testerDelegate                 : ApiDelegate?                  // API delegate for xAPITester
-  public var radio                          : Radio?                        // current Radio class
+  @objc dynamic public var radio            : Radio?                        // current Radio class
   public var activeRadio                    : RadioParameters?              // Radio params
   public var pingerEnabled                  = true                          // Pinger enable
   public var isWan                          = false                         // Remote connection
