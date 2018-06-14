@@ -254,7 +254,7 @@ public final class Slice                    : NSObject, DynamicModel {
   public class func find(with channel: DaxChannel) -> Slice? {
 
     // find the Slices with the specified Channel (if any)
-    let slices = Api.sharedInstance.radio!.slices.values.filter { $0.active && $0.daxChannel == channel }
+    let slices = Api.sharedInstance.radio!.slices.values.filter { $0.daxChannel == channel }
     guard slices.count >= 1 else { return nil }
     
     // return the first one
@@ -473,6 +473,12 @@ public final class Slice                    : NSObject, DynamicModel {
         _api.update(self, property: &_audioPan, value: property.value.iValue(), key: "audioPan")
 
       case .daxChannel:
+        if _daxChannel != 0 && property.value.iValue() == 0 {
+          // remove this slice from the AudioStream it was using
+          if let audioStream = AudioStream.find(with: _daxChannel) {
+            audioStream.slice = nil
+          }
+        }
         _api.update(self, property: &_daxChannel, value: property.value.iValue(), key: "daxChannel")
 
       case .daxTxEnabled:

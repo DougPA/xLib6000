@@ -77,7 +77,7 @@ extension AudioStream {
       let value = newValue.bound(0, 100)
       if _rxGain != value {
         _rxGain = value
-        if _slice != nil { audioStreamCmd( "gain", value) }
+        if _slice != nil && !Api.sharedInstance.testerModeEnabled { audioStreamCmd( "gain", value) }
       }
       }
     }

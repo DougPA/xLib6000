@@ -157,7 +157,21 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
     
     return false
   }
-
+  /// Find an AudioStream by DAX Channel
+  ///
+  /// - Parameter channel:    Dax channel number
+  /// - Returns:              an AudioStream (if any)
+  ///
+  public class func find(with channel: DaxChannel) -> AudioStream? {
+    
+    // find the AudioStream with the specified Channel (if any)
+    let streams = Api.sharedInstance.radio!.audioStreams.values.filter { $0.daxChannel == channel }
+    guard streams.count >= 1 else { return nil }
+    
+    // return the first one
+    return streams[0]
+  }
+  
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -219,7 +233,7 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
         _rxGain = 0
         rxGain = gain
       }
-    }
+    }    
     // if this is not yet initialized and inUse becomes true
     if !_initialized && _inUse && _ip != "" {
       

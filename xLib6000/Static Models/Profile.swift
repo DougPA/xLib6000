@@ -76,25 +76,25 @@ public final class Profile                  : NSObject, StaticModel {
       switch token {
         
       case .globalList:
-        _api.update(self, property: &globalProfileList, value: Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast()), key: "globalProfileList")
+        _api.update(self, property: &_globalProfileList, value: Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast()), key: "globalProfileList")
         
       case .globalSelection:
         let value = (properties.count == 2 ? properties[1].key : "")
-        _api.update(self, property: &globalProfileSelection, value: value, key: "globalProfileSelection")
+        _api.update(self, property: &_globalProfileSelection, value: value, key: "globalProfileSelection")
         
       case .micList:
-        _api.update(self, property: &micProfileList, value: Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast()), key: "micProfileList")
+        _api.update(self, property: &_micProfileList, value: Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast()), key: "micProfileList")
         
       case .micSelection:
         let value = (properties.count == 2 ? properties[1].key : "")
-        _api.update(self, property: &micProfileSelection, value: value, key: "micProfileSelection")
+        _api.update(self, property: &_micProfileSelection, value: value, key: "micProfileSelection")
         
       case .txList:
-        _api.update(self, property: &txProfileList, value: Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast()), key: "txProfileList")
+        _api.update(self, property: &_txProfileList, value: Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast()), key: "txProfileList")
         
       case .txSelection:
         let value = (properties.count == 2 ? properties[1].key : "")
-        _api.update(self, property: &txProfileSelection, value: value, key: "txProfileSelection")
+        _api.update(self, property: &_txProfileSelection, value: value, key: "txProfileSelection")
       }
     } else {
       // unknown type
