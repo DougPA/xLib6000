@@ -1,5 +1,11 @@
 xLib6000 Change Log
 
+v1.1.9
+
+Slice.swift - uppercased mode in parseProperties(_:)
+Slice.swift - changed Mode enum to be all uppercase
+various - changed all uses of the Mode enum to be uppercase
+
 v1.1.8
 
 AudioStreamCommands.swift - made sending of gain command conditional on !Api.sharedInstance.testerModeEnabled

@@ -135,20 +135,20 @@ public final class Memory                   : NSObject, DynamicModel {
     if let modeType = Slice.Mode(rawValue: mode.lowercased()) {
       switch modeType {
         
-      case .cw:
+      case .CW:
         newValue = (newValue > 12_000 - _api.radio!.transmit.cwPitch ? 12_000 - _api.radio!.transmit.cwPitch : newValue)
         
-      case .rtty:
+      case .RTTY:
         newValue = (newValue > 4_000 ? 4_000 : newValue)
         
-      case .am, .sam, .fm, .nfm, .dfm:
+      case .AM, .SAM, .FM, .NFM, .DFM:
         newValue = (newValue > 12_000 ? 12_000 : newValue)
         newValue = (newValue < 10 ? 10 : newValue)
         
-      case .lsb, .digl:
+      case .LSB, .DIGL:
         newValue = (newValue > 0 ? 0 : newValue)
         
-      case .usb, .digu:
+      case .USB, .DIGU:
         newValue = (newValue > 12_000 ? 12_000 : newValue)
       }
     }
@@ -167,20 +167,20 @@ public final class Memory                   : NSObject, DynamicModel {
     if let modeType = Slice.Mode(rawValue: mode.lowercased()) {
       switch modeType {
         
-      case .cw:
+      case .CW:
         newValue = (newValue < -12_000 - _api.radio!.transmit.cwPitch ? -12_000 - _api.radio!.transmit.cwPitch : newValue)
         
-      case .rtty:
+      case .RTTY:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
         
-      case .am, .sam, .fm, .nfm, .dfm:
+      case .AM, .SAM, .FM, .NFM, .DFM:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
         newValue = (newValue > -10 ? -10 : newValue)
         
-      case .lsb, .digl:
+      case .LSB, .DIGL:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
         
-      case .usb, .digu:
+      case .USB, .DIGU:
         newValue = (newValue < 0 ? 0 : newValue)
       }
     }

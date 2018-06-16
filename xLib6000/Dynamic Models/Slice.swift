@@ -79,7 +79,7 @@ public final class Slice                    : NSObject, DynamicModel {
   private var __locked                      = false                         // Slice frequency locked
   private var __loopAEnabled                = false                         // Loop A enable
   private var __loopBEnabled                = false                         // Loop B enable
-  private var __mode                        = Mode.lsb.rawValue             // Slice mode
+  private var __mode                        = Mode.LSB.rawValue             // Slice mode
   private var __modeList                    = [String]()                    // Array of Strings with available modes
   private var __nbEnabled                   = false                         // State of DSP Noise Blanker
   private var __nbLevel                     = 0                             // DSP Noise Blanker level (0 -100)
@@ -316,27 +316,27 @@ public final class Slice                    : NSObject, DynamicModel {
       
       switch modeValue {
         
-      case .cw:
+      case .CW:
         _filterLow = 450
         _filterHigh = 750
         
-      case .rtty:
+      case .RTTY:
         _filterLow = -285
         _filterHigh = 115
         
-      case .am, .sam:
+      case .AM, .SAM:
         _filterLow = -3_000
         _filterHigh = 3_000
         
-      case .fm, .nfm, .dfm:
+      case .FM, .NFM, .DFM:
         _filterLow = -8_000
         _filterHigh = 8_000
         
-      case .lsb, .digl:
+      case .LSB, .DIGL:
         _filterLow = -2_400
         _filterHigh = -300
         
-      case .usb, .digu:
+      case .USB, .DIGU:
         _filterLow = 300
         _filterHigh = 2_400
       }
@@ -355,25 +355,25 @@ public final class Slice                    : NSObject, DynamicModel {
     if let modeType = Mode(rawValue: mode.lowercased()) {
       switch modeType {
         
-      case .fm, .nfm:
+      case .FM, .NFM:
         Log.sharedInstance.msg("Cannot change Filter width in FM mode", level: .warning, function: #function, file: #file, line: #line)
         newValue = value
         
-      case .cw:
+      case .CW:
         newValue = (newValue > 12_000 - _api.radio!.transmit.cwPitch ? 12_000 - _api.radio!.transmit.cwPitch : newValue)
         
-      case .rtty:
+      case .RTTY:
         newValue = (newValue > rttyMark ? rttyMark : newValue)
         newValue = (newValue < 50 ? 50 : newValue)
         
-      case .am, .sam, .dfm:
+      case .AM, .SAM, .DFM:
         newValue = (newValue > 12_000 ? 12_000 : newValue)
         newValue = (newValue < 10 ? 10 : newValue)
         
-      case .lsb, .digl:
+      case .LSB, .DIGL:
         newValue = (newValue > 0 ? 0 : newValue)
         
-      case .usb, .digu:
+      case .USB, .DIGU:
         newValue = (newValue > 12_000 ? 12_000 : newValue)
       }
     }
@@ -392,25 +392,25 @@ public final class Slice                    : NSObject, DynamicModel {
     if let modeType = Mode(rawValue: mode.lowercased()) {
       switch modeType {
         
-      case .fm, .nfm:
+      case .FM, .NFM:
         Log.sharedInstance.msg("Cannot change Filter width in FM mode", level: .warning, function: #function, file: #file, line: #line)
         newValue = value
         
-      case .cw:
+      case .CW:
         newValue = (newValue < -12_000 - _api.radio!.transmit.cwPitch ? -12_000 - _api.radio!.transmit.cwPitch : newValue)
         
-      case .rtty:
+      case .RTTY:
         newValue = (newValue < -12_000 + rttyMark ? -12_000 + rttyMark : newValue)
         newValue = (newValue > -(50 + rttyShift) ? -(50 + rttyShift) : newValue)
         
-      case .am, .sam, .dfm:
+      case .AM, .SAM, .DFM:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
         newValue = (newValue > -10 ? -10 : newValue)
         
-      case .lsb, .digl:
+      case .LSB, .DIGL:
         newValue = (newValue < -12_000 ? -12_000 : newValue)
         
-      case .usb, .digu:
+      case .USB, .DIGU:
         newValue = (newValue < 0 ? 0 : newValue)
       }
     }
@@ -549,7 +549,7 @@ public final class Slice                    : NSObject, DynamicModel {
         _api.update(self, property: &_loopBEnabled, value: property.value.bValue(), key: "loopBEnabled")
 
       case .mode:
-        _api.update(self, property: &_mode, value: property.value, key: "mode")
+        _api.update(self, property: &_mode, value: property.value.uppercased(), key: "mode")
 
       case .modeList:
         _api.update(self, property: &_modeList, value: property.value.components(separatedBy: ","), key: "modeList")
@@ -1150,17 +1150,17 @@ extension xLib6000.Slice {
   }
   
   public enum Mode : String {
-    case am
-    case sam
-    case cw
-    case usb
-    case lsb
-    case fm
-    case nfm
-    case dfm
-    case digu
-    case digl
-    case rtty
+    case AM
+    case SAM
+    case CW
+    case USB
+    case LSB
+    case FM
+    case NFM
+    case DFM
+    case DIGU
+    case DIGL
+    case RTTY
 //    case dsb
 //    case dstr
 //    case fdv
