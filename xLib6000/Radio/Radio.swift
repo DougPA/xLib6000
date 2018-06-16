@@ -93,6 +93,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __daxIqCapacity               = 0                             //
   // E
   private var __enforcePrivateIpEnabled     = false                         //
+  private var __extPresent                  = false                         //
   // F
   private var __filterCwAutoLevel           = 0                             //
   private var __filterCwLevel               = 0                             //
@@ -102,9 +103,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __filterVoiceLevel            = 0                             //
   private var __fpgaMbVersion               = ""                            // FPGA version (read only)
   private var __freqErrorPpb                = 0                             // Calibration error (Hz)
+  private var __frontSpeakerMute            = false                         //
   private var __fullDuplexEnabled           = false                         // Full duplex enable
   // G
   private var __gateway                     = ""                            // (read only)
+  private var __gpsdoPresent                = false                         //
   // H
   private var __headphoneGain               = 0                             // Headset gain (1-100)
   private var __headphoneMute               = false                         // Headset muted
@@ -126,6 +129,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // O
   private var __oscillator                  = ""                            //
   // P
+  private var __picDecpuVersion             = ""                            // 
   private var __psocMbPa100Version          = ""                            // Power amplifier software version
   private var __psocMbtrxVersion            = ""                            // System supervisor software version
   // R
@@ -146,6 +150,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __staticIp                    = ""                            // Static IpAddress
   private var __staticNetmask               = ""                            // Static Netmask
   // T
+  private var __tcxoPresent                 = false                         //
   private var __tnfEnabled                  = false                         // TNF's enable
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -726,6 +731,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       case .smartSdrMB:
         _api.update(self, property: &_smartSdrMB, value: property.value, key: "smartSdrMB")
 
+      case .picDecpu:
+        _api.update(self, property: &_picDecpuVersion, value: property.value, key: "picDecpuVersion")
+
       case .psocMbTrx:
         _api.update(self, property: &_psocMbtrxVersion, value: property.value, key: "psocMbtrxVersion")
 
@@ -748,167 +756,105 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - properties:      a KeyValuesArray
   ///
   func parseProperties(_ properties: KeyValuesArray) {
-    var filterSharpness = false
-    var cw = false
-    var digital = false
-    var voice = false
-    var staticNetParams = false
-    var oscillator = false
     
     // FIXME: What about a 6700 with two scu's?
     
-    // process each key/value pair, <key=value>
-    for property in properties {
+    // separate by category
+    if let category = RadioTokenCategory(rawValue: properties[0].key) {
       
-      // Check for Unknown token
-      guard let token = RadioToken(rawValue: property.key)  else {
+      // drop the first property
+      let adjustedProperties = Array(properties[1...])
+      
+      switch category {
         
-        // unknown Display Type, log it and ignore this token
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
-        continue
-      }
-      // Known tokens, in alphabetical order
-      switch token {
-        
-      case .autoLevel:
-        if filterSharpness && cw {
-          _api.update(self, property: &_filterCwAutoLevel, value: property.value.iValue(), key: "filterCwAutoLevel")
-          cw = false
-        }
-        if filterSharpness && digital {
-          _api.update(self, property: &_filterDigitalAutoLevel, value: property.value.iValue(), key: "filterDigitalAutoLevel")
-          digital = false
-        }
-        if filterSharpness && voice {
-          _api.update(self, property: &_filterVoiceAutoLevel, value: property.value.iValue(), key: "filterVoiceAutoLevel")
-          voice = false
-        }
-        filterSharpness = false
-        
-      case .backlight:
-        _api.update(self, property: &_backlight, value: property.value.iValue(), key: "backlight")
-
-      case .bandPersistenceEnabled:
-        _api.update(self, property: &_bandPersistenceEnabled, value: property.value.bValue(), key: "bandPersistenceEnabled")
-
-      case .binauralRxEnabled:
-        _api.update(self, property: &_binauralRxEnabled, value: property.value.bValue(), key: "binauralRxEnabled")
-
-      case .calFreq:
-        _api.update(self, property: &_calFreq, value: property.value.iValue(), key: "calFreq")
-
-      case .callsign:
-        _api.update(self, property: &_callsign, value: property.value, key: "callsign")
-
-      case .cw, .CW:
-        cw = true
-        
-      case .digital, .DIGITAL:
-        digital = true
-        
-      case .enforcePrivateIpEnabled:
-        _api.update(self, property: &_enforcePrivateIpEnabled, value: property.value.bValue(), key: "enforcePrivateIpEnabled")
-
       case .filterSharpness:
-        filterSharpness = true
-        
-      case .freqErrorPpb:
-         _api.update(self, property: &_freqErrorPpb, value: property.value.iValue(), key: "freqErrorPpb")
-
-      case .fullDuplexEnabled:
-        _api.update(self, property: &_fullDuplexEnabled, value: property.value.bValue(), key: "fullDuplexEnabled")
-
-      case .gateway:
-        if staticNetParams {
-          _api.update(self, property: &_staticGateway, value: property.value, key: "staticGateway")
-        }
-        
-      case .headphoneGain:
-        _api.update(self, property: &_headphoneGain, value: property.value.iValue(), key: "headphoneGain")
-
-      case .headphoneMute:
-        _api.update(self, property: &_headphoneMute, value: property.value.bValue(), key: "headphoneMute")
-
-      case .ip:
-        if staticNetParams {
-          _api.update(self, property: &_staticIp, value: property.value, key: "staticIp")
-        }
-        
-      case .level:
-        if filterSharpness && cw {
-          _api.update(self, property: &_filterCwLevel, value: property.value.iValue(), key: "filterCwLevel")
-          cw = false
-        }
-        if filterSharpness && digital {
-          _api.update(self, property: &_filterDigitalLevel, value: property.value.iValue(), key: "filterDigitalLevel")
-          digital = false
-        }
-        if filterSharpness && voice {
-          _api.update(self, property: &_filterVoiceLevel, value: property.value.iValue(), key: "filterVoiceLevel")
-          voice = false
-        }
-        filterSharpness = false
-        
-      case .lineoutGain:
-         _api.update(self, property: &_lineoutGain, value: property.value.iValue(), key: "lineoutGain")
-
-      case .lineoutMute:
-        _api.update(self, property: &_lineoutMute, value: property.value.bValue(), key: "lineoutMute")
-
-      case .locked:
-        if oscillator {
-          _api.update(self, property: &_locked, value: property.value.bValue(), key: "locked")
-        }
-        
-      case .netmask:
-        if staticNetParams {
-          _api.update(self, property: &_staticNetmask, value: property.value, key: "staticNetmask")
-          staticNetParams = false
-        }
-        
-      case .nickname:
-        _api.update(self, property: &_nickname, value: property.value, key: "nickname")
-
-      case .oscillator:
-        oscillator = true
-        
-      case .panadapters:
-        _api.update(self, property: &_availablePanadapters, value: property.value.iValue(), key: "availablePanadapters")
-
-      case .pllDone:
-        _api.update(self, property: &_startOffset, value: property.value.bValue(), key: "startOffset")
-
-      case .remoteOnEnabled:
-        _api.update(self, property: &_remoteOnEnabled, value: property.value.bValue(), key: "remoteOnEnabled")
-
-      case .rttyMark:
-        _api.update(self, property: &_rttyMark, value: property.value.iValue(), key: "rttyMark")
-
-      case .setting:
-        if oscillator {
-          _api.update(self, property: &_setting, value: property.value, key: "setting")
-        }
-        
-      case .slices:
-        _api.update(self, property: &_availableSlices, value: property.value.iValue(), key: "availableSlices")
-
-      case .snapTuneEnabled:
-        _api.update(self, property: &_snapTuneEnabled, value: property.value.bValue(), key: "snapTuneEnabled")
-
-      case .state:
-        if oscillator {
-          _api.update(self, property: &_state, value: property.value, key: "state")
-        }
+        parseFilterProperties( adjustedProperties )
         
       case .staticNetParams:
-        staticNetParams = true
+        parseStaticNetProperties( adjustedProperties )
         
-      case .tnfEnabled:
-        _api.update(self, property: &_tnfEnabled, value: property.value.bValue(), key: "tnfEnabled")
+      case .oscillator:
+        parseOscillatorProperties( adjustedProperties )
+      }
+      
+    } else {
+    
+      // process each key/value pair, <key=value>
+      for property in properties {
+        
+        // Check for Unknown token
+        guard let token = RadioToken(rawValue: property.key)  else {
+          
+          // unknown Display Type, log it and ignore this token
+          Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+          continue
+        }
+        // Known tokens, in alphabetical order
+        switch token {
+          
+        case .backlight:
+          _api.update(self, property: &_backlight, value: property.value.iValue(), key: "backlight")
+          
+        case .bandPersistenceEnabled:
+          _api.update(self, property: &_bandPersistenceEnabled, value: property.value.bValue(), key: "bandPersistenceEnabled")
+          
+        case .binauralRxEnabled:
+          _api.update(self, property: &_binauralRxEnabled, value: property.value.bValue(), key: "binauralRxEnabled")
+          
+        case .calFreq:
+          _api.update(self, property: &_calFreq, value: property.value.iValue(), key: "calFreq")
+          
+        case .callsign:
+          _api.update(self, property: &_callsign, value: property.value, key: "callsign")
+          
+        case .enforcePrivateIpEnabled:
+          _api.update(self, property: &_enforcePrivateIpEnabled, value: property.value.bValue(), key: "enforcePrivateIpEnabled")
+          
+        case .freqErrorPpb:
+          _api.update(self, property: &_freqErrorPpb, value: property.value.iValue(), key: "freqErrorPpb")
+          
+        case .fullDuplexEnabled:
+          _api.update(self, property: &_fullDuplexEnabled, value: property.value.bValue(), key: "fullDuplexEnabled")
+         
+        case .frontSpeakerMute:
+          _api.update(self, property: &_frontSpeakerMute, value: property.value.bValue(), key: "frontSpeakerMute")
 
-      case .voice, .VOICE:
-        voice = true
-        
+        case .headphoneGain:
+          _api.update(self, property: &_headphoneGain, value: property.value.iValue(), key: "headphoneGain")
+          
+        case .headphoneMute:
+          _api.update(self, property: &_headphoneMute, value: property.value.bValue(), key: "headphoneMute")
+          
+        case .lineoutGain:
+          _api.update(self, property: &_lineoutGain, value: property.value.iValue(), key: "lineoutGain")
+          
+        case .lineoutMute:
+          _api.update(self, property: &_lineoutMute, value: property.value.bValue(), key: "lineoutMute")
+          
+        case .nickname:
+          _api.update(self, property: &_nickname, value: property.value, key: "nickname")
+          
+        case .panadapters:
+          _api.update(self, property: &_availablePanadapters, value: property.value.iValue(), key: "availablePanadapters")
+          
+        case .pllDone:
+          _api.update(self, property: &_startOffset, value: property.value.bValue(), key: "startOffset")
+          
+        case .remoteOnEnabled:
+          _api.update(self, property: &_remoteOnEnabled, value: property.value.bValue(), key: "remoteOnEnabled")
+          
+        case .rttyMark:
+          _api.update(self, property: &_rttyMark, value: property.value.iValue(), key: "rttyMark")
+          
+        case .slices:
+          _api.update(self, property: &_availableSlices, value: property.value.iValue(), key: "availableSlices")
+          
+        case .snapTuneEnabled:
+          _api.update(self, property: &_snapTuneEnabled, value: property.value.bValue(), key: "snapTuneEnabled")
+          
+        case .tnfEnabled:
+          _api.update(self, property: &_tnfEnabled, value: property.value.bValue(), key: "tnfEnabled")
+        }
       }
     }
     // is the Radio initialized?
@@ -921,7 +867,141 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       NC.post(.radioHasBeenAdded, object: self as Any?)
     }
   }
+  /// Parse a Filter Properties status message
+  ///
+  /// - Parameters:
+  ///   - properties:      a KeyValuesArray
+  ///
+  private func parseFilterProperties(_ properties: KeyValuesArray) {
+    var cw = false
+    var digital = false
+    var voice = false
 
+    // process each key/value pair, <key=value>
+    for property in properties {
+      
+      // Check for Unknown token
+      guard let token = RadioFilterSharpness(rawValue: property.key)  else {
+        
+        // unknown Display Type, log it and ignore this token
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        continue
+      }
+      // Known tokens, in alphabetical order
+      switch token {
+        
+      case .autoLevel:
+        if cw {
+          _api.update(self, property: &_filterCwAutoLevel, value: property.value.iValue(), key: "filterCwAutoLevel")
+          cw = false
+        }
+        if digital {
+          _api.update(self, property: &_filterDigitalAutoLevel, value: property.value.iValue(), key: "filterDigitalAutoLevel")
+          digital = false
+        }
+        if voice {
+          _api.update(self, property: &_filterVoiceAutoLevel, value: property.value.iValue(), key: "filterVoiceAutoLevel")
+          voice = false
+        }
+        
+      case .cw, .CW:
+        cw = true
+        
+      case .digital, .DIGITAL:
+        digital = true
+        
+      case .level:
+        if cw {
+          _api.update(self, property: &_filterCwLevel, value: property.value.iValue(), key: "filterCwLevel")
+          cw = false
+        }
+        if digital {
+          _api.update(self, property: &_filterDigitalLevel, value: property.value.iValue(), key: "filterDigitalLevel")
+          digital = false
+        }
+        if voice {
+          _api.update(self, property: &_filterVoiceLevel, value: property.value.iValue(), key: "filterVoiceLevel")
+          voice = false
+        }
+        
+      case .voice, .VOICE:
+        voice = true
+      }
+    }
+  }
+  /// Parse a Static Net Properties status message
+  ///
+  /// - Parameters:
+  ///   - properties:      a KeyValuesArray
+  ///
+  private func parseStaticNetProperties(_ properties: KeyValuesArray) {
+    
+    // process each key/value pair, <key=value>
+    for property in properties {
+      
+      // Check for Unknown token
+      guard let token = RadioStaticNet(rawValue: property.key)  else {
+        
+        // unknown Display Type, log it and ignore this token
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        continue
+      }
+      // Known tokens, in alphabetical order
+      switch token {
+        
+      case .gateway:
+        _api.update(self, property: &_staticGateway, value: property.value, key: "staticGateway")
+        
+      case .ip:
+        _api.update(self, property: &_staticIp, value: property.value, key: "staticIp")
+        
+      case .netmask:
+        _api.update(self, property: &_staticNetmask, value: property.value, key: "staticNetmask")
+      }
+    }
+  }
+  /// Parse an Oscillator Properties status message
+  ///
+  /// - Parameters:
+  ///   - properties:      a KeyValuesArray
+  ///
+  private func parseOscillatorProperties(_ properties: KeyValuesArray) {
+      
+      // process each key/value pair, <key=value>
+      for property in properties {
+        
+        // Check for Unknown token
+        guard let token = RadioOscillator(rawValue: property.key)  else {
+          
+          // unknown Display Type, log it and ignore this token
+          Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+          continue
+        }
+        // Known tokens, in alphabetical order
+        switch token {
+          
+        case .extPresent:
+          _api.update(self, property: &_extPresent, value: property.value.bValue(), key: "extPresent")
+
+        case .gpsdoPresent:
+          _api.update(self, property: &_gpsdoPresent, value: property.value.bValue(), key: "gpsdoPresent")
+          
+       case .locked:
+          _api.update(self, property: &_locked, value: property.value.bValue(), key: "locked")
+          
+        case .setting:
+          _api.update(self, property: &_setting, value: property.value, key: "setting")
+          
+        case .state:
+          _api.update(self, property: &_state, value: property.value, key: "state")
+
+        case .tcxoPresent:
+          _api.update(self, property: &_tcxoPresent, value: property.value.bValue(), key: "tcxoPresent")
+        }
+      }
+    }
+    
+  
   // ----------------------------------------------------------------------------
   // MARK: - Api delegate methods
   
@@ -1239,6 +1319,10 @@ extension Radio {
     get { return _objectQ.sync { __enforcePrivateIpEnabled } }
     set { _objectQ.sync(flags: .barrier) { __enforcePrivateIpEnabled = newValue } } }
   
+  internal var _extPresent: Bool {
+    get { return _objectQ.sync { __extPresent } }
+    set { _objectQ.sync(flags: .barrier) { __extPresent = newValue } } }
+  
   internal var _filterCwAutoLevel: Int {
     get { return _objectQ.sync { __filterCwAutoLevel } }
     set { _objectQ.sync(flags: .barrier) { __filterCwAutoLevel = newValue } } }
@@ -1271,6 +1355,10 @@ extension Radio {
     get { return _objectQ.sync { __freqErrorPpb } }
     set { _objectQ.sync(flags: .barrier) { __freqErrorPpb = newValue } } }
   
+  internal var _frontSpeakerMute: Bool {
+    get { return _objectQ.sync { __frontSpeakerMute } }
+    set { _objectQ.sync(flags: .barrier) { __frontSpeakerMute = newValue } } }
+  
   internal var _fullDuplexEnabled: Bool {
     get { return _objectQ.sync { __fullDuplexEnabled } }
     set { _objectQ.sync(flags: .barrier) { __fullDuplexEnabled = newValue } } }
@@ -1278,6 +1366,10 @@ extension Radio {
   internal var _gateway: String {
     get { return _objectQ.sync { __gateway } }
     set { _objectQ.sync(flags: .barrier) { __gateway = newValue } } }
+  
+  internal var _gpsdoPresent: Bool {
+    get { return _objectQ.sync { __gpsdoPresent } }
+    set { _objectQ.sync(flags: .barrier) { __gpsdoPresent = newValue } } }
   
   internal var _headphoneGain: Int {
     get { return _objectQ.sync { __headphoneGain } }
@@ -1334,6 +1426,10 @@ extension Radio {
   internal var _oscillator: String {
     get { return _objectQ.sync { __oscillator } }
     set { _objectQ.sync(flags: .barrier) { __oscillator = newValue } } }
+  
+  internal var _picDecpuVersion: String {
+    get { return _objectQ.sync { __picDecpuVersion } }
+    set { _objectQ.sync(flags: .barrier) { __picDecpuVersion = newValue } } }
   
   internal var _psocMbPa100Version: String {
     get { return _objectQ.sync { __psocMbPa100Version } }
@@ -1403,6 +1499,10 @@ extension Radio {
     get { return _objectQ.sync { __staticNetmask } }
     set { _objectQ.sync(flags: .barrier) { __staticNetmask = newValue } } }
   
+  internal var _tcxoPresent: Bool {
+    get { return _objectQ.sync { __tcxoPresent } }
+    set { _objectQ.sync(flags: .barrier) { __tcxoPresent = newValue } } }
+  
   internal var _tnfEnabled: Bool {
     get { return _objectQ.sync { __tnfEnabled } }
     set { _objectQ.sync(flags: .barrier) { __tnfEnabled = newValue } } }
@@ -1432,11 +1532,17 @@ extension Radio {
   @objc dynamic public var daxIqCapacity: Int {
     return _daxIqCapacity }
   
+  @objc dynamic public var extPresent: Bool {
+    return _extPresent }
+  
   @objc dynamic public var fpgaMbVersion: String {
     return _fpgaMbVersion }
   
   @objc dynamic public var gateway: String {
     return _gateway }
+  
+  @objc dynamic public var gpsdoPresent: Bool {
+    return _gpsdoPresent }
   
   @objc dynamic public var ipAddress: String {
     return _ipAddress }
@@ -1459,6 +1565,9 @@ extension Radio {
   @objc dynamic public var numberOfTx: Int {
     return _numberOfTx }
   
+  @objc dynamic public var picDecpuVersion: String {
+    return _picDecpuVersion }
+  
   @objc dynamic public var psocMbPa100Version: String {
     return _psocMbPa100Version }
   
@@ -1479,6 +1588,9 @@ extension Radio {
   
   @objc dynamic public var softwareVersion: String {
     return _softwareVersion }
+
+  @objc dynamic public var tcxoPresent: Bool {
+    return _tcxoPresent }
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
@@ -1594,44 +1706,61 @@ extension Radio {
   // MARK: - Radio tokens
   
   internal enum RadioToken: String {
-    case autoLevel                          = "auto_level"
     case backlight
     case bandPersistenceEnabled             = "band_persistence_enabled"
     case binauralRxEnabled                  = "binaural_rx"
     case calFreq                            = "cal_freq"
     case callsign
-    case cw
-    case CW
-    case digital
-    case DIGITAL
     case enforcePrivateIpEnabled            = "enforce_private_ip_connections"
-    case filterSharpness                    = "filter_sharpness"
     case freqErrorPpb                       = "freq_error_ppb"
+    case frontSpeakerMute                   = "front_speaker_mute"
     case fullDuplexEnabled                  = "full_duplex_enabled"
-    case gateway
     case headphoneGain                      = "headphone_gain"
     case headphoneMute                      = "headphone_mute"
-    case ip
-    case level
     case lineoutGain                        = "lineout_gain"
     case lineoutMute                        = "lineout_mute"
-    case locked
-    case netmask
     case nickname
-    case oscillator
     case panadapters
     case pllDone                            = "pll_done"
     case remoteOnEnabled                    = "remote_on_enabled"
     case rttyMark                           = "rtty_mark_default"
-    case setting
     case slices
     case snapTuneEnabled                    = "snap_tune_enabled"
-    case state
-    case staticNetParams                    = "static_net_params"
     case tnfEnabled                         = "tnf_enabled"
+  }
+  
+  internal enum RadioTokenCategory: String {
+    case filterSharpness                    = "filter_sharpness"
+    case staticNetParams                    = "static_net_params"
+    case oscillator
+  }
+  
+  internal enum RadioFilterSharpness: String {
+    case cw
+    case CW
+    case digital
+    case DIGITAL
     case voice
     case VOICE
+    case autoLevel                          = "auto_level"
+    case level
   }
+  
+  internal enum RadioStaticNet: String {
+    case gateway
+    case ip
+    case netmask
+  }
+  
+  internal enum RadioOscillator: String {
+    case extPresent                         = "ext_present"
+    case gpsdoPresent                       = "gpsdo_present"
+    case locked
+    case setting
+    case state
+    case tcxoPresent                        = "tcxo_present"
+  }
+  
   // ----------------------------------------------------------------------------
   // MARK: - Status tokens
   
@@ -1673,6 +1802,7 @@ extension Radio {
     case psocMbPa100                        = "psoc-mbpa100"
     case psocMbTrx                          = "psoc-mbtrx"
     case smartSdrMB                         = "smartsdr-mb"
+    case picDecpu                           = "pic-decpu"
   }
   
   // ----------------------------------------------------------------------------

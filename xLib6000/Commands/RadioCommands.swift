@@ -89,7 +89,7 @@ extension Radio {
   public func staticNetParamsReset(callback: ReplyHandler? = nil) {
     
     // tell the Radio to reset the Static Net Params
-   Api.sharedInstance.send(Radio.kCmd + RadioToken.staticNetParams.rawValue + " reset", replyTo: callback)
+   Api.sharedInstance.send(Radio.kCmd + "static_net_params" + " reset", replyTo: callback)
   }
   /// Reboot the Radio
   ///
@@ -98,7 +98,7 @@ extension Radio {
   public func rebootRequest(callback: ReplyHandler? = nil) {
     
     // tell the Radio to reboot
-   Api.sharedInstance.send(Radio.kCmd + RadioToken.staticNetParams.rawValue + " reset", replyTo: callback)
+   Api.sharedInstance.send(Radio.kCmd + "reboot", replyTo: callback)
   }
   /// Request the elapsed uptime
   ///
@@ -168,9 +168,9 @@ extension Radio {
   ///   - token:      the parse token
   ///   - value:      the new value
   ///
-  private func radioFilterCmd( _ token1: RadioToken,  _ token2: RadioToken, _ token3: RadioToken,_ value: Any) {
+  private func radioFilterCmd( _ token1: RadioFilterSharpness,  _ token2: RadioFilterSharpness, _ value: Any) {
     
-   Api.sharedInstance.send(Radio.kCmd + token1.rawValue + " " + token2.rawValue + " " + token3.rawValue + "=\(value)")
+   Api.sharedInstance.send(Radio.kCmd + "filter_sharpness" + " " + token1.rawValue + " " + token2.rawValue + "=\(value)")
   }
   /// Set Static Network properties on the Radio
   ///
@@ -180,7 +180,7 @@ extension Radio {
   ///
   private func radioStaticCmd(_ value1: Any,_ value2: Any,_ value3: Any) {
     
-    Api.sharedInstance.send(Radio.kCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\(value1) " + RadioToken.gateway.rawValue + "=\(value2) " + RadioToken.netmask.rawValue + "=\(value3)")
+    Api.sharedInstance.send(Radio.kCmd + "static_net_params" + " " + RadioStaticNet.ip.rawValue + "=\(value1) " + RadioStaticNet.gateway.rawValue + "=\(value2) " + RadioStaticNet.netmask.rawValue + "=\(value3)")
   }
 
   // ----------------------------------------------------------------------------
@@ -242,6 +242,12 @@ extension Radio {
     get {  return _freqErrorPpb }
     set { if _freqErrorPpb != newValue { _freqErrorPpb = newValue ; radioSetCmd( .freqErrorPpb, newValue) } } }
   
+  // FIXME: is there an ability to send a command for this?
+  
+//  @objc dynamic public var frontSpeakerMute: Bool {
+//    get {  return _frontSpeakerMute }
+//    set { if _frontSpeakerMute != newValue { _frontSpeakerMute = newValue ; radioSetCmd( .frontSpeakerMute, newValue.asNumber()) } } }
+  
   @objc dynamic public var fullDuplexEnabled: Bool {
     get {  return _fullDuplexEnabled }
     set { if _fullDuplexEnabled != newValue { _fullDuplexEnabled = newValue ; radioSetCmd( .fullDuplexEnabled, newValue.asNumber()) } } }
@@ -289,27 +295,27 @@ extension Radio {
   
   @objc dynamic public var filterCwAutoLevel: Int {
     get {  return _filterCwAutoLevel }
-    set { if _filterCwAutoLevel != newValue { _filterCwAutoLevel = newValue ; radioFilterCmd( .filterSharpness, .cw, .autoLevel, newValue) } } }
+    set { if _filterCwAutoLevel != newValue { _filterCwAutoLevel = newValue ; radioFilterCmd( .cw, .autoLevel, newValue) } } }
   
   @objc dynamic public var filterDigitalAutoLevel: Int {
     get {  return _filterDigitalAutoLevel }
-    set { if _filterDigitalAutoLevel != newValue { _filterDigitalAutoLevel = newValue ; radioFilterCmd( .filterSharpness, .digital, .autoLevel, newValue) } } }
+    set { if _filterDigitalAutoLevel != newValue { _filterDigitalAutoLevel = newValue ; radioFilterCmd( .digital, .autoLevel, newValue) } } }
   
   @objc dynamic public var filterVoiceAutoLevel: Int {
     get {  return _filterVoiceAutoLevel }
-    set { if _filterVoiceAutoLevel != newValue { _filterVoiceAutoLevel = newValue ; radioFilterCmd( .filterSharpness, .voice, .autoLevel, newValue) } } }
+    set { if _filterVoiceAutoLevel != newValue { _filterVoiceAutoLevel = newValue ; radioFilterCmd( .voice, .autoLevel, newValue) } } }
   
   @objc dynamic public var filterCwLevel: Int {
     get {  return _filterCwLevel }
-    set { if _filterCwLevel != newValue { _filterCwLevel = newValue ; radioFilterCmd( .filterSharpness, .cw, .level, newValue) } } }
+    set { if _filterCwLevel != newValue { _filterCwLevel = newValue ; radioFilterCmd( .cw, .level, newValue) } } }
   
   @objc dynamic public var filterDigitalLevel: Int {
     get {  return _filterDigitalLevel }
-    set { if _filterDigitalLevel != newValue { _filterDigitalLevel = newValue ; radioFilterCmd( .filterSharpness, .digital, .level, newValue) } } }
+    set { if _filterDigitalLevel != newValue { _filterDigitalLevel = newValue ; radioFilterCmd( .digital, .level, newValue) } } }
   
   @objc dynamic public var filterVoiceLevel: Int {
     get {  return _filterVoiceLevel }
-    set { if _filterVoiceLevel != newValue { _filterVoiceLevel = newValue ; radioFilterCmd( .filterSharpness, .voice, .level, newValue) } } }
+    set { if _filterVoiceLevel != newValue { _filterVoiceLevel = newValue ; radioFilterCmd( .voice, .level, newValue) } } }
   
   // ***** RADIO GATEWAY COMMANDS *****
   
