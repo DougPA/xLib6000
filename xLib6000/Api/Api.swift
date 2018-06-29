@@ -402,6 +402,9 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
       // TCP connection was disconnected, inform observers
       NC.post(.tcpDidDisconnect, object: reason)
       
+      // remove the currently active radio
+      activeRadio = nil
+      
     case .update( _, _):
       
       // FIXME: need to handle Update State ???

@@ -60,6 +60,7 @@ public final class Slice                    : NSObject, DynamicModel {
   private var __autoPan                     = false                         // panadapter frequency follows slice
   private var __daxChannel                  = 0                             // DAX channel for this slice (1-8)
   private var __daxTxEnabled                = false                         // DAX for transmit
+  private var __detached                    = false                         //
   private var __dfmPreDeEmphasisEnabled     = false                         //
   private var __digitalLowerOffset          = 0                             //
   private var __digitalUpperOffset          = 0                             //
@@ -85,6 +86,7 @@ public final class Slice                    : NSObject, DynamicModel {
   private var __nbLevel                     = 0                             // DSP Noise Blanker level (0 -100)
   private var __nrEnabled                   = false                         // State of DSP Noise Reduction
   private var __nrLevel                     = 0                             // DSP Noise Reduction level (0 - 100)
+  private var __nr2                         = 0                             //
   private var __owner                       = 0                             // Slice owner - RESERVED for FUTURE use
   private var __panadapterId                : PanadapterId = 0              // Panadaptor StreamID for this slice
   private var __playbackEnabled             = false                         // Quick playback enable
@@ -484,7 +486,10 @@ public final class Slice                    : NSObject, DynamicModel {
       case .daxTxEnabled:
         _api.update(self, property: &_daxTxEnabled, value: property.value.bValue(), key: "daxTxEnabled")
 
-      case .dfmPreDeEmphasisEnabled:
+      case .detached:
+        _api.update(self, property: &_detached, value: property.value.bValue(), key: "detached")
+        
+     case .dfmPreDeEmphasisEnabled:
         _api.update(self, property: &_dfmPreDeEmphasisEnabled, value: property.value.bValue(), key: "dfmPreDeEmphasisEnabled")
 
       case .digitalLowerOffset:
@@ -566,6 +571,9 @@ public final class Slice                    : NSObject, DynamicModel {
       case .nrLevel:
         _api.update(self, property: &_nrLevel, value: property.value.iValue(), key: "nrLevel")
 
+      case .nr2:
+        _api.update(self, property: &_nr2, value: property.value.iValue(), key: "nr2")
+        
       case .owner:
         _api.update(self, property: &_owner, value: property.value.iValue(), key: "owner")
 
@@ -748,6 +756,10 @@ extension xLib6000.Slice {
     get { return _q.sync { __daxTxEnabled } }
     set { _q.sync(flags: .barrier) { __daxTxEnabled = newValue } } }
   
+  internal var _detached: Bool {
+    get { return _q.sync { __detached } }
+    set { _q.sync(flags: .barrier) { __detached = newValue } } }
+  
   internal var _digitalLowerOffset: Int {
     get { return _q.sync { __digitalLowerOffset } }
     set { _q.sync(flags: .barrier) { __digitalLowerOffset = newValue } } }
@@ -843,6 +855,10 @@ extension xLib6000.Slice {
   internal var _nrLevel: Int {
     get { return _q.sync { __nrLevel } }
     set { _q.sync(flags: .barrier) { __nrLevel = newValue } } }
+  
+  internal var _nr2: Int {
+    get { return _q.sync { __nr2 } }
+    set { _q.sync(flags: .barrier) { __nr2 = newValue } } }
   
   internal var _owner: Int {
     get { return _q.sync { __owner } }
@@ -987,6 +1003,10 @@ extension xLib6000.Slice {
     get { return _daxTxEnabled }
     set { if _daxTxEnabled != newValue { _daxTxEnabled = newValue } } }
   
+  @objc dynamic public var detached: Bool {
+    get { return _detached }
+    set { if _detached != newValue { _detached = newValue } } }
+  
   @objc dynamic public var diversityChild: Bool {
     get { return _diversityChild }
     set { if _diversityChild != newValue { if _diversityIsAllowed { _diversityChild = newValue } } } }
@@ -1005,6 +1025,10 @@ extension xLib6000.Slice {
   @objc dynamic public var modeList: [String] {
     get { return _modeList }
     set { if _modeList != newValue { _modeList = newValue } } }
+  
+  @objc dynamic public var nr2: Int {
+    get { return _nr2 }
+    set { if _nr2 != newValue { _nr2 = newValue } } }
   
   @objc dynamic public var owner: Int {
     get { return _owner }
@@ -1071,6 +1095,7 @@ extension xLib6000.Slice {
     case daxChannel                 = "dax"
     case daxClients                 = "dax_clients"
     case daxTxEnabled               = "dax_tx"
+    case detached
     case dfmPreDeEmphasisEnabled    = "dfm_pre_de_emphasis"
     case digitalLowerOffset         = "digl_offset"
     case digitalUpperOffset         = "digu_offset"
@@ -1097,6 +1122,7 @@ extension xLib6000.Slice {
     case nbLevel                    = "nb_level"
     case nrEnabled                  = "nr"
     case nrLevel                    = "nr_level"
+    case nr2
     case owner
     case panadapterId               = "pan"
     case playbackEnabled            = "play"
