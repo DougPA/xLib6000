@@ -1,5 +1,12 @@
 xLib6000 Change Log
 
+v1.1.12
+
+Api.swift - changed kApiFirmwareSupport to 2.3.7.x
+Panadapter.swift - added band_zoom & segment_zoom tokens and parsing
+Waterfall.swift - added band_zoom & segment_zoom tokens and parsing
+Interlock.swift - added amplifier token and parsing
+
 v1.1.11
 
 Slice.swift - added properties "detached" and "nr2" (not sure what their usage should be)

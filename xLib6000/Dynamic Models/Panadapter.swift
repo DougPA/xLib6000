@@ -53,6 +53,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private var __average                     = 0                             // Setting of average (1 -> 100)
   private var __band                        = ""                            // Band encompassed by this pan
   private var __bandwidth                   = 0                             // Bandwidth in Hz
+  private var __bandZoomEnabled             = false                         //
   private var __center                      = 0                             // Center in Hz
   private var __daxIqChannel                = 0                             // DAX IQ channel number (0=none)
   private var __fps                         = 0                             // Refresh rate (frames/second)
@@ -73,6 +74,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private var __rfGainStep                  = 0                             // RF Gain step value
   private var __rfGainValues                = ""                            // Possible Rf Gain values
   private var __rxAnt                       = ""                            // Receive antenna name
+  private var __segmentZoomEnabled          = false                         //
   private var __waterfallId                 : UInt32 = 0                    // Waterfall below this Panadapter
   private var __weightedAverageEnabled      = false                         // Enable weighted averaging
   private var __wide                        = false                         // Preselector state
@@ -249,6 +251,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       case .bandwidth:
         _api.update(self, property: &_bandwidth, value: property.value.mhzToHz(), key: "bandwidth")
 
+      case .bandZoomEnabled:
+        _api.update(self, property: &_bandZoomEnabled, value: property.value.bValue(), key: "bandZoomEnabled")
+        
       case .center:
         _api.update(self, property: &_center, value: property.value.mhzToHz(), key: "center")
 
@@ -285,6 +290,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       case .rxAnt:
         _api.update(self, property: &_rxAnt, value: property.value, key: "rxAnt")
 
+      case .segmentZoomEnabled:
+        _api.update(self, property: &_segmentZoomEnabled, value: property.value.bValue(), key: "segmentZoomEnabled")
+        
       case .waterfallId:
         _api.update(self, property: &_waterfallId, value: UInt32(property.value, radix: 16) ?? 0, key: "waterfallId")
 
@@ -462,6 +470,10 @@ extension Panadapter {
     get { return _q.sync { __bandwidth } }
     set { _q.sync(flags: .barrier) { __bandwidth = newValue } } }
   
+  internal var _bandZoomEnabled: Bool {
+    get { return _q.sync { __bandZoomEnabled } }
+    set { _q.sync(flags: .barrier) { __bandZoomEnabled = newValue } } }
+  
   internal var _center: Int {
     get { return _q.sync { __center } }
     set { _q.sync(flags: .barrier) { __center = newValue } } }
@@ -541,6 +553,10 @@ extension Panadapter {
   internal var _rxAnt: String {
     get { return _q.sync { __rxAnt } }
     set { _q.sync(flags: .barrier) { __rxAnt = newValue } } }
+  
+  internal var _segmentZoomEnabled: Bool {
+    get { return _q.sync { __segmentZoomEnabled } }
+    set { _q.sync(flags: .barrier) { __segmentZoomEnabled = newValue } } }
   
   internal var _waterfallId: WaterfallId {
     get { return _q.sync { __waterfallId } }
@@ -639,6 +655,7 @@ extension Panadapter {
     case average
     case band
     case bandwidth
+    case bandZoomEnabled            = "band_zoom"
     case center
     case daxIqChannel               = "daxiq"
     case fps
@@ -651,6 +668,7 @@ extension Panadapter {
     case preamp                     = "pre"
     case rfGain                     = "rfgain"
     case rxAnt                      = "rxant"
+    case segmentZoomEnabled         = "segment_zoom"
     case waterfallId                = "waterfall"
     case weightedAverageEnabled     = "weighted_average"
     case wide

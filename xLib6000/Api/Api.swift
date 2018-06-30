@@ -51,7 +51,7 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   public private(set) var apiVersionMajor   = 0                             // numeric versions of Radio firmware version
   public private(set) var apiVersionMinor   = 0
   
-  public let kApiFirmwareSupport            = "2.2.8.x"                     // The Radio Firmware version supported by this API
+  public let kApiFirmwareSupport            = "2.3.7.x"                     // The Radio Firmware version supported by this API
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties

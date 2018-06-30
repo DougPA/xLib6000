@@ -31,6 +31,7 @@ public final class Interlock                : NSObject, StaticModel {
   private var __accTxDelay                  = 0                             //
   private var __accTxReqEnabled             = false                         //
   private var __accTxReqPolarity            = false                         //
+  private var __amplifier                   = ""                            //
   private var __rcaTxReqEnabled             = false                         //
   private var __rcaTxReqPolarity            = false                         //
   private var __reason                      = ""                            //
@@ -102,6 +103,9 @@ public final class Interlock                : NSObject, StaticModel {
       case .accTxReqPolarity:
        _api.update(self, property: &_accTxReqPolarity, value: property.value.bValue(), key: "accTxReqPolarity")
 
+      case .amplifier:
+        _api.update(self, property: &_amplifier, value: property.value, key: "amplifier")
+        
       case .rcaTxReqEnabled:
         _api.update(self, property: &_rcaTxReqEnabled, value: property.value.bValue(), key: "rcaTxReqEnabled")
 
@@ -176,6 +180,10 @@ extension Interlock {
   internal var _accTxReqPolarity: Bool {
     get { return _q.sync { __accTxReqPolarity } }
     set { _q.sync(flags: .barrier) { __accTxReqPolarity = newValue } } }
+  
+  internal var _amplifier: String {
+    get { return _q.sync { __amplifier } }
+    set { _q.sync(flags: .barrier) { __amplifier = newValue } } }
   
   internal var _rcaTxReqEnabled: Bool {
     get { return _q.sync { __rcaTxReqEnabled } }
@@ -259,6 +267,7 @@ extension Interlock {
     case accTxDelay         = "acc_tx_delay"
     case accTxReqEnabled    = "acc_txreq_enable"
     case accTxReqPolarity   = "acc_txreq_polarity"
+    case amplifier
     case rcaTxReqEnabled    = "rca_txreq_enable"
     case rcaTxReqPolarity   = "rca_txreq_polarity"
     case reason

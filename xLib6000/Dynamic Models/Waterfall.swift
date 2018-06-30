@@ -183,8 +183,8 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       case .panadapterId:     // does not have leading "0x"
         _api.update(self, property: &_panadapterId, value: UInt32(property.value, radix: 16) ?? 0, key: "panadapterId")
 
-      case .available, .band, .bandwidth, .capacity, .center, .daxIq, .daxIqRate,
-           .loopA, .loopB, .rfGain, .rxAnt, .wide, .xPixels, .xvtr:
+      case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqRate,
+           .loopA, .loopB, .rfGain, .rxAnt, .segmentZoomEnabled, .wide, .xPixels, .xvtr:
         // ignored here
         break
       }
@@ -390,6 +390,7 @@ extension Waterfall {
     // unused here
     case available
     case band
+    case bandZoomEnabled      = "band_zoom"
     case bandwidth
     case capacity
     case center
@@ -400,6 +401,7 @@ extension Waterfall {
     case panadapterId         = "panadapter"
     case rfGain               = "rfgain"
     case rxAnt                = "rxant"
+    case segmentZoomEnabled   = "segment_zoom"
     case wide
     case xPixels              = "x_pixels"
     case xvtr
