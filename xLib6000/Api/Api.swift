@@ -15,7 +15,7 @@
 //
 // --------------------------------------------------------------------------------
 
-public final class Api                      : TcpManagerDelegate, UdpManagerDelegate {
+public final class Api                      : NSObject, TcpManagerDelegate, UdpManagerDelegate {
   
   public static let kId                     = "xLib6000"                    // API Name
   public static let kDomainId               = "net.k3tzr"                   // Domain name
@@ -35,13 +35,14 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
+  @objc dynamic public var radio            : Radio?                        // current Radio class
+
   public var availableRadios                : [RadioParameters] {           // Radios discovered
     return _radioFactory.availableRadios }
   public let log                            = Log.sharedInstance
   public var delegate                       : ApiDelegate?                  // API delegate
   public var testerModeEnabled              = false                         // Library being used by xAPITester
   public var testerDelegate                 : ApiDelegate?                  // API delegate for xAPITester
-  @objc dynamic public var radio            : Radio?                        // current Radio class
   public var activeRadio                    : RadioParameters?              // Radio params
   public var pingerEnabled                  = true                          // Pinger enable
   public var isWan                          = false                         // Remote connection
@@ -99,9 +100,11 @@ public final class Api                      : TcpManagerDelegate, UdpManagerDele
   
   /// Provide access to the API singleton
   ///
-  public static var sharedInstance = Api()
+  @objc dynamic public static var sharedInstance = Api()
   
-  private init() {
+  private override init() {
+    super.init()
+    
     // "private" prevents others from calling init()
     
     // initialize a Manager for the TCP Command stream
@@ -779,6 +782,7 @@ extension Api {
     case profileGlobal                      = "profile global info"
     case profileTx                          = "profile tx info"
     case profileMic                         = "profile mic info"
+    case setMtu                             = "client set enforce_network_mtu=1 network_mtu=1500"
     case subAmplifier                       = "sub amplifier all"
     case subAudioStream                     = "sub audio_stream all"
     case subAtu                             = "sub atu all"
@@ -805,7 +809,7 @@ extension Api {
       return [.clientProgram, .clientLowBW, .clientGui]
     }
     static func allSecondaryCommands() -> [Command] {
-      return [.info, .version, .antList, .micList, .profileGlobal,
+      return [.setMtu, .info, .version, .antList, .micList, .profileGlobal,
               .profileTx, .profileMic, .eqRx, .eqTx]
     }
     static func allSubscriptionCommands() -> [Command] {

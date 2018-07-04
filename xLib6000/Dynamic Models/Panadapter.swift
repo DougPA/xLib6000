@@ -355,22 +355,24 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///
   func vitaProcessor(_ vita: Vita) {
     
-    // use the next dataframe
-    _dataframeIndex = (_dataframeIndex + 1) % 2
     
-    // convert the Vita struct to s PanadapterFrame
-    _dataframes[_dataframeIndex].populate(vita: vita)
+//    // If the frame index is out-of-sequence, ignore the packet
+//    if _dataframes[_dataframeIndex].frameIndex < lastFrameIndex {
+//      droppedPackets += 1
+//      Log.sharedInstance.msg("Missing packet(s), frameIndex: \(_dataframes[_dataframeIndex].frameIndex) < last frameIndex: \(lastFrameIndex)", level: .warning, function: #function, file: #file, line: #line)
+//      return
+//    }
+//    lastFrameIndex = _dataframes[_dataframeIndex].frameIndex
     
-    // If the frame index is out-of-sequence, ignore the packet
-    if _dataframes[_dataframeIndex].frameIndex < lastFrameIndex {
-      droppedPackets += 1
-      Log.sharedInstance.msg("Missing packet(s), frameIndex: \(_dataframes[_dataframeIndex].frameIndex) < last frameIndex: \(lastFrameIndex)", level: .warning, function: #function, file: #file, line: #line)
-      return
+    // convert the Vita struct to a PanadapterFrame
+    if _dataframes[_dataframeIndex].accumulate(vita: vita) {
+      
+      // Pass the data frame to this Panadapter's delegate
+      delegate?.streamHandler(_dataframes[_dataframeIndex])
+
+      // use the next dataframe
+      _dataframeIndex = (_dataframeIndex + 1) % 2
     }
-    lastFrameIndex = _dataframes[_dataframeIndex].frameIndex
-    
-    // Pass the data frame to this Panadapter's delegate
-    delegate?.streamHandler(_dataframes[_dataframeIndex])
   }
 }
 
@@ -383,20 +385,30 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
 
 public class PanadapterFrame {
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
   public private(set) var startingBinIndex  = 0                             // Index of first bin
   public private(set) var numberOfBins      = 0                             // Number of bins
   public private(set) var binSize           = 0                             // Bin size in bytes
+  public private(set) var totalBinsInFrame  = 0                             // number of bins in the complete frame
   public private(set) var frameIndex        = 0                             // Frame index
   public var bins                           = [UInt16]()                    // Array of bin values
   
-  private struct PanadapterPayload {                                        // struct to mimic payload layout
-    var startingBinIndex                    : UInt32
-    var numberOfBins                        : UInt32
-    var binSize                             : UInt32
+  // ----------------------------------------------------------------------------
+  // MARK: - Private properties
+  
+  private var _binsProcessed                 = 0
+  
+  private struct PayloadHeader {                                            // struct to mimic payload layout
+    var startingBinIndex                    : UInt16
+    var numberOfBins                        : UInt16
+    var binSize                             : UInt16
+    var totalBinsInFrame                    : UInt16
     var frameIndex                          : UInt32
   }
 
-  private let kByteOffsetToBins = 16                                        // Bins are located  16 bytes into payload
+  private let kByteOffsetToBins = MemoryLayout<PayloadHeader>.size          // Bins are just beyond the payload
 
   /// Initialize a PanadapterFrame
   ///
@@ -407,38 +419,40 @@ public class PanadapterFrame {
     // allocate the bins array
     self.bins = [UInt16](repeating: 0, count: frameSize)
   }
-  /// Convert a Vita object into a PanadapterFrame object
+  /// Accumulate Vita object(s) into a PanadapterFrame
   ///
   /// - Parameter vita:         incoming Vita object
+  /// - Returns:                true if entire frame processed
   ///
-  public func populate(vita: Vita) {
+  public func accumulate(vita: Vita) -> Bool {
   
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
     // map the payload to the PanadapterPayload struct
-    let p = payloadPtr.bindMemory(to: PanadapterPayload.self, capacity: 1)
+    let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
     
     // byte swap and convert each payload component
-    startingBinIndex = Int(CFSwapInt32BigToHost(p.pointee.startingBinIndex))
-    numberOfBins = Int(CFSwapInt32BigToHost(p.pointee.numberOfBins))
-    binSize = Int(CFSwapInt32BigToHost(p.pointee.binSize))
+    startingBinIndex = Int(CFSwapInt16BigToHost(p.pointee.startingBinIndex))
+    numberOfBins = Int(CFSwapInt16BigToHost(p.pointee.numberOfBins))
+    binSize = Int(CFSwapInt16BigToHost(p.pointee.binSize))
+    totalBinsInFrame = Int(CFSwapInt16BigToHost(p.pointee.totalBinsInFrame))
     frameIndex = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
     
-    if numberOfBins >= Panadapter.kMaxBins {
-      
-      Swift.print("Vita = \(vita.desc())")
-      Swift.print("startingBinIndex = \(startingBinIndex), numberOfBins = \(numberOfBins), binSize = \(binSize), frameIndex = \(frameIndex)")
-      
-    } else {
-      
-      // get a pointer to the data in the payload
-      let binsPtr = payloadPtr.advanced(by: kByteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
-        
-      // Swap the byte ordering of the data & place it in the bins
-      for i in 0..<numberOfBins {
-        bins[i] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
-      }
+    // update the count of bins processed
+    _binsProcessed += numberOfBins
+    
+    // get a pointer to the Bins in the payload
+    let binsPtr = payloadPtr.advanced(by: kByteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
+    
+    // Swap the byte ordering of the data & place it in the bins
+    for i in 0..<numberOfBins {
+      bins[i+startingBinIndex] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
     }
+    // reset the count if the entire frame has been accumulated
+    if _binsProcessed == totalBinsInFrame { _binsProcessed = 0 }
+    
+    // return true if the entire frame has been accumulated
+    return _binsProcessed == 0
   }
 }
 

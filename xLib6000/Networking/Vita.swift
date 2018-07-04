@@ -24,6 +24,8 @@ public struct VitaHeader {
   //
   //      all of the UInt16 & UInt32 fields must be BigEndian
   //
+  //      This header is 28 bytes
+  //
   var packetDesc                            : UInt8 = 0
   var timeStampDesc                         : UInt8 = 0                           // the lsb four bits are used for sequence number
   var packetSize                            : UInt16 = 0
