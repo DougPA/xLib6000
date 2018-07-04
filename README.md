@@ -9,7 +9,7 @@
 
 **This version supports SmartLink (TM).**
 
-**Version 1.1.13 and later REQUIRES a radio with v2.3.7 or later firnware**
+**Version 1.1.13 and later REQUIRES a radio with v2.3.7 or later firmware**
 
 
 ## Usage
