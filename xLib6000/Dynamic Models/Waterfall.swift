@@ -313,9 +313,8 @@ public class WaterfallFrame {
     
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
 
-    switch (Api.sharedInstance.radioVersionMajor,  Api.sharedInstance.radioVersionMinor) {
-      
-    case (2,3...999):
+    if Api.sharedInstance.radioVersionMajor == 2 && Api.sharedInstance.radioVersionMinor >= 3 {
+      // 2.3.x or greater
       // map the payload to the New Payload struct
       let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
       
@@ -330,7 +329,8 @@ public class WaterfallFrame {
       totalBinsInFrame = Int( CFSwapInt16BigToHost(p.pointee.totalBinsInFrame) )
       startingBinIndex = Int( CFSwapInt16BigToHost(p.pointee.firstBinIndex) )
       
-    default: // pre 2.3.x
+    } else {
+      // pre 2.3.x
       // map the payload to the Old Payload struct
       let p = payloadPtr.bindMemory(to: PayloadHeaderOld.self, capacity: 1)
       

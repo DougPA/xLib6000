@@ -507,6 +507,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         
         switch command {
           
+        case .setMtu:
+          if radioVersionMajor == 2 && radioVersionMinor >= 3 {
+            // the MTU command is only used for radio firmware versions >= 2.3.x
+            array.append( (command.rawValue, false, nil) )
+          }
+
         case .clientProgram:
           array.append( (command.rawValue + _clientName, false, delegate?.defaultReplyHandler) )
           

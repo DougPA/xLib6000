@@ -433,9 +433,8 @@ public class PanadapterFrame {
   
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
-    switch (Api.sharedInstance.radioVersionMajor,  Api.sharedInstance.radioVersionMinor) {
-
-    case (2,3...999):
+    if Api.sharedInstance.radioVersionMajor == 2 && Api.sharedInstance.radioVersionMinor >= 3 {
+      // 2.3.x or greater
       // Bins are just beyond the payload
       _byteOffsetToBins = MemoryLayout<PayloadHeader>.size
 
@@ -448,8 +447,9 @@ public class PanadapterFrame {
       binSize = Int(CFSwapInt16BigToHost(p.pointee.binSize))
       totalBinsInFrame = Int(CFSwapInt16BigToHost(p.pointee.totalBinsInFrame))
       frameIndex = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
-
-    default: // pre 2.3.x
+    
+    } else {
+      // pre 2.3.x
       // Bins are just beyond the payload
       _byteOffsetToBins = MemoryLayout<PayloadHeaderOld>.size
 

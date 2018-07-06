@@ -1,5 +1,11 @@
 xLib6000 Change Log
 
+v1.2.3
+
+Panadapter.swift - "switch" changed to "if" in accumulate(vita:)
+Waterfall.swift - "switch" changed to "if" in accumulate(vita:)
+Api.swift - in setupCommands(_:) suppressed MTU command for versions prior to 2.3.x
+
 v1.2.2
 
 PanadapterCommands.swift - added bandZoomEnabled & segmentZoomEnabled
