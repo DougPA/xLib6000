@@ -267,6 +267,16 @@ public class WaterfallFrame {
   
   private var _binsProcessed                = 0
   
+  private struct PayloadHeaderOld {                                         // struct to mimic payload layout
+    var firstBinFreq                        : UInt64                        // 8 bytes
+    var binBandwidth                        : UInt64                        // 8 bytes
+    var lineDuration                        : UInt32                        // 4 bytes
+    var numberOfBins                        : UInt16                        // 2 bytes
+    var lineHeight                          : UInt16                        // 2 bytes
+    var timeCode                            : UInt32                        // 4 bytes
+    var autoBlackLevel                      : UInt32                        // 4 bytes
+  }
+
   private struct PayloadHeader {                                            // struct to mimic payload layout
     var firstBinFreq                        : UInt64                        // 8 bytes
     var binBandwidth                        : UInt64                        // 8 bytes
@@ -303,20 +313,38 @@ public class WaterfallFrame {
     
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
 
-    // map the payload to the WaterfallPayload struct
-    let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
-    
-    // byte swap and convert each payload component
-    firstBinFreq = CGFloat(CFSwapInt64BigToHost(p.pointee.firstBinFreq)) / 1.048576E6
-    binBandwidth = CGFloat(CFSwapInt64BigToHost(p.pointee.binBandwidth)) / 1.048576E6
-    lineDuration = Int( CFSwapInt32BigToHost(p.pointee.lineDuration) )
-    numberOfBins = Int( CFSwapInt16BigToHost(p.pointee.numberOfBins) )
-    height = Int( CFSwapInt16BigToHost(p.pointee.height) )
-    timeCode = Int( CFSwapInt32BigToHost(p.pointee.timeCode) )
-    autoBlackLevel = CFSwapInt32BigToHost(p.pointee.autoBlackLevel)
-    totalBinsInFrame = Int( CFSwapInt16BigToHost(p.pointee.totalBinsInFrame) )
-    startingBinIndex = Int( CFSwapInt16BigToHost(p.pointee.firstBinIndex) )
-
+    switch (Api.sharedInstance.radioVersionMajor,  Api.sharedInstance.radioVersionMinor) {
+      
+    case (2,3...999):
+      // map the payload to the New Payload struct
+      let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
+      
+      // byte swap and convert each payload component
+      firstBinFreq = CGFloat(CFSwapInt64BigToHost(p.pointee.firstBinFreq)) / 1.048576E6
+      binBandwidth = CGFloat(CFSwapInt64BigToHost(p.pointee.binBandwidth)) / 1.048576E6
+      lineDuration = Int( CFSwapInt32BigToHost(p.pointee.lineDuration) )
+      numberOfBins = Int( CFSwapInt16BigToHost(p.pointee.numberOfBins) )
+      height = Int( CFSwapInt16BigToHost(p.pointee.height) )
+      timeCode = Int( CFSwapInt32BigToHost(p.pointee.timeCode) )
+      autoBlackLevel = CFSwapInt32BigToHost(p.pointee.autoBlackLevel)
+      totalBinsInFrame = Int( CFSwapInt16BigToHost(p.pointee.totalBinsInFrame) )
+      startingBinIndex = Int( CFSwapInt16BigToHost(p.pointee.firstBinIndex) )
+      
+    default: // pre 2.3.x
+      // map the payload to the Old Payload struct
+      let p = payloadPtr.bindMemory(to: PayloadHeaderOld.self, capacity: 1)
+      
+      // byte swap and convert each payload component
+      firstBinFreq = CGFloat(CFSwapInt64BigToHost(p.pointee.firstBinFreq)) / 1.048576E6
+      binBandwidth = CGFloat(CFSwapInt64BigToHost(p.pointee.binBandwidth)) / 1.048576E6
+      lineDuration = Int( CFSwapInt32BigToHost(p.pointee.lineDuration) )
+      numberOfBins = Int( CFSwapInt16BigToHost(p.pointee.numberOfBins) )
+      height = Int( CFSwapInt16BigToHost(p.pointee.lineHeight) )
+      timeCode = Int( CFSwapInt32BigToHost(p.pointee.timeCode) )
+      autoBlackLevel = CFSwapInt32BigToHost(p.pointee.autoBlackLevel)
+      totalBinsInFrame = numberOfBins
+      startingBinIndex = 0
+    }
     // update the count of bins processed
     _binsProcessed += numberOfBins * height
 

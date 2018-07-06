@@ -1,5 +1,12 @@
 xLib6000 Change Log
 
+v1.2.2
+
+PanadapterCommands.swift - added bandZoomEnabled & segmentZoomEnabled
+Api.swift - added radioVersionMajor & radioVersionMinor properties
+Panadapter.swift - changed PanadapterFrame accumulate(vita:) to check radio version
+Waterfall.swift - changed WaterfallFrame accumulate(vita:) to check radio version
+
 v1.2.1
 
 Changed version number due to major change in UDP handling

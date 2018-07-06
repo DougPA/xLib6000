@@ -130,6 +130,10 @@ extension Panadapter {
     get { return _bandwidth }
     set { if _bandwidth != newValue { _bandwidth = newValue ; panadapterSet( .bandwidth, newValue.hzToMhz() + " autocenter=1") } } }
   
+  @objc dynamic public var bandZoomEnabled: Bool {
+    get { return _bandZoomEnabled }
+    set { if _bandZoomEnabled != newValue { _bandZoomEnabled = newValue ; panadapterSet( .bandZoomEnabled, newValue.asNumber()) } } }
+  
   // FIXME: Where does autoCenter come from?
   
   @objc dynamic public var center: Int {
@@ -183,6 +187,10 @@ extension Panadapter {
   @objc dynamic public var rxAnt: String {
     get { return _rxAnt }
     set { if _rxAnt != newValue { _rxAnt = newValue ; panadapterSet( .rxAnt, newValue) } } }
+  
+  @objc dynamic public var segmentZoomEnabled: Bool {
+    get { return _segmentZoomEnabled }
+    set { if _segmentZoomEnabled != newValue { _segmentZoomEnabled = newValue ; panadapterSet( .segmentZoomEnabled, newValue.asNumber()) } } }
   
   @objc dynamic public var weightedAverageEnabled: Bool {
     get { return _weightedAverageEnabled }

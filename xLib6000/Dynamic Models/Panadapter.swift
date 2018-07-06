@@ -398,8 +398,12 @@ public class PanadapterFrame {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _binsProcessed                 = 0
-  
+  private struct PayloadHeaderOld {                                        // struct to mimic payload layout
+    var startingBinIndex                    : UInt32
+    var numberOfBins                        : UInt32
+    var binSize                             : UInt32
+    var frameIndex                          : UInt32
+  }
   private struct PayloadHeader {                                            // struct to mimic payload layout
     var startingBinIndex                    : UInt16
     var numberOfBins                        : UInt16
@@ -408,8 +412,9 @@ public class PanadapterFrame {
     var frameIndex                          : UInt32
   }
 
-  private let kByteOffsetToBins = MemoryLayout<PayloadHeader>.size          // Bins are just beyond the payload
-
+  private var _binsProcessed                = 0
+  private var _byteOffsetToBins             = 0
+  
   /// Initialize a PanadapterFrame
   ///
   /// - Parameter frameSize:    max number of Panadapter samples
@@ -428,21 +433,42 @@ public class PanadapterFrame {
   
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
-    // map the payload to the PanadapterPayload struct
-    let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
-    
-    // byte swap and convert each payload component
-    startingBinIndex = Int(CFSwapInt16BigToHost(p.pointee.startingBinIndex))
-    numberOfBins = Int(CFSwapInt16BigToHost(p.pointee.numberOfBins))
-    binSize = Int(CFSwapInt16BigToHost(p.pointee.binSize))
-    totalBinsInFrame = Int(CFSwapInt16BigToHost(p.pointee.totalBinsInFrame))
-    frameIndex = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
+    switch (Api.sharedInstance.radioVersionMajor,  Api.sharedInstance.radioVersionMinor) {
+
+    case (2,3...999):
+      // Bins are just beyond the payload
+      _byteOffsetToBins = MemoryLayout<PayloadHeader>.size
+
+      // map the payload to the New Payload struct
+      let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
+
+      // byte swap and convert each payload component
+      startingBinIndex = Int(CFSwapInt16BigToHost(p.pointee.startingBinIndex))
+      numberOfBins = Int(CFSwapInt16BigToHost(p.pointee.numberOfBins))
+      binSize = Int(CFSwapInt16BigToHost(p.pointee.binSize))
+      totalBinsInFrame = Int(CFSwapInt16BigToHost(p.pointee.totalBinsInFrame))
+      frameIndex = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
+
+    default: // pre 2.3.x
+      // Bins are just beyond the payload
+      _byteOffsetToBins = MemoryLayout<PayloadHeaderOld>.size
+
+      // map the payload to the Old Payload struct
+      let p = payloadPtr.bindMemory(to: PayloadHeaderOld.self, capacity: 1)
+      
+      // byte swap and convert each payload component
+      startingBinIndex = Int(CFSwapInt32BigToHost(p.pointee.startingBinIndex))
+      numberOfBins = Int(CFSwapInt32BigToHost(p.pointee.numberOfBins))
+      binSize = Int(CFSwapInt32BigToHost(p.pointee.binSize))
+      totalBinsInFrame = numberOfBins
+      frameIndex = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
+    }
     
     // update the count of bins processed
     _binsProcessed += numberOfBins
     
     // get a pointer to the Bins in the payload
-    let binsPtr = payloadPtr.advanced(by: kByteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
+    let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
     
     // Swap the byte ordering of the data & place it in the bins
     for i in 0..<numberOfBins {

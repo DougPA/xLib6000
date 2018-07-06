@@ -49,9 +49,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var wanConnectionHandle            = ""                            // Wan connection handle
   public var connectionHandle               = ""                            // Status messages handle
 
-  public private(set) var apiVersionMajor   = 0                             // numeric versions of Radio firmware version
+  public private(set) var apiVersionMajor   = 0                             // numeric versions of Api firmware version
   public private(set) var apiVersionMinor   = 0
-  
+  public private(set) var radioVersionMajor = 0                             // numeric versions of Radio firmware version
+  public private(set) var radioVersionMinor = 0
+
   public let kApiFirmwareSupport            = "2.3.7.x"                     // The Radio Firmware version supported by this API
   
   // ----------------------------------------------------------------------------
@@ -453,6 +455,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // set integer numbers for major and minor for fast comparision
     apiVersionMajor = Int(apiVersionParts[0]) ?? 0
     apiVersionMinor = Int(apiVersionParts[1]) ?? 0
+    radioVersionMajor = Int(radioVersionParts[0]) ?? 0
+    radioVersionMinor = Int(radioVersionParts[1]) ?? 0
   }
   /// Send a command list to the Radio
   ///
