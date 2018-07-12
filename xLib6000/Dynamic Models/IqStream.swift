@@ -214,10 +214,10 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
   ///
   func vitaProcessor(_ vita: Vita) {
     
-    if vita.classCode != .daxIq24 && vita.classCode != .daxIq48 && vita.classCode != .daxIq96 && vita.classCode != .daxIq192 {
-      // not for us
-      return
-    }
+//    guard vita.classCode == .daxIq24 ||
+//          vita.classCode == .daxIq48 ||
+//          vita.classCode == .daxIq96 ||
+//          vita.classCode == .daxIq192  else { return }
     
     // if there is a delegate, process the Panadapter stream
     if let delegate = delegate {

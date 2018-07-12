@@ -54,7 +54,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public private(set) var radioVersionMajor = 0                             // numeric versions of Radio firmware version
   public private(set) var radioVersionMinor = 0
 
-  public let kApiFirmwareSupport            = "2.3.7.x"                     // The Radio Firmware version supported by this API
+  public let kApiFirmwareSupport            = "2.3.9.x"                     // The Radio Firmware version supported by this API
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -233,7 +233,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public func send(_ command: String, diagnostic flag: Bool = false, replyTo callback: ReplyHandler? = nil) {
     
     // tell the TcpManager to send the command (and optionally setup a callback)
-    let seqNumber = _tcp.send(command, diagnostic: flag, replyTo: callback)
+//    let seqNumber = _tcp.send(command, diagnostic: flag, replyTo: callback)
+    let seqNumber = _tcp.send(command, diagnostic: flag)
 
     // register to be notified when reply received
     delegate?.addReplyHandler( String(seqNumber), replyTuple: (replyTo: callback, command: command) )
@@ -409,7 +410,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // remove the currently active radio
       activeRadio = nil
-      
+
     case .update( _, _):
       
       // FIXME: need to handle Update State ???
@@ -435,8 +436,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
-  
-  
+    
   /// Determine if the Radio (hardware) Firmware version is compatable with the API version
   ///
   /// - Parameters:
@@ -679,9 +679,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       }
     }
   }
-  func addReplyHandler(_ sequenceId: SequenceId, replyTuple: ReplyTuple) {
-    // not used
-  }
+//  func addReplyHandler(_ sequenceId: SequenceId, replyTuple: ReplyTuple) {
+//    // not used
+//  }
 
   // ----------------------------------------------------------------------------
   // MARK: - UdpManager delegate methods
@@ -716,16 +716,16 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // TODO: should there be a udpUnbound state ?
     
   }
-  /// Receive a State Change message from UDP Manager
-  ///
-  /// - Parameters:
-  ///   - active:     the state
-  ///
-  func udpStreamStatus(active: Bool) {
-
-    // UDP port active / timed out
-    log.msg("\(active)", level: .verbose, function: #function, file: #file, line: #line)
-  }
+//  /// Receive a State Change message from UDP Manager
+//  ///
+//  /// - Parameters:
+//  ///   - active:     the state
+//  ///
+//  func udpStreamStatus(active: Bool) {
+//
+//    // UDP port active / timed out
+//    log.msg("\(active)", level: .verbose, function: #function, file: #file, line: #line)
+//  }
   /// Receive a UDP Stream packet
   ///
   /// - Parameter vita: a Vita packet

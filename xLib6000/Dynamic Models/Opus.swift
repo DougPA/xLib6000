@@ -14,14 +14,16 @@ public typealias OpusId = UInt32
 // MARK: - Opus Class implementation
 //
 //      creates an Opus instance to be used by a Client to support the
-//      processing of a stream of Audio to/from the Radio from/to the client. Opus
+//      processing of a stream of Audio to/from the Radio. Opus
 //      objects are added / removed by the incoming TCP messages. Opus
 //      objects periodically receive/send Opus Audio in a UDP stream.
 //
 // --------------------------------------------------------------------------------
 
 public final class Opus                     : NSObject, DynamicModelWithStream {
-    
+
+  public static let kTxPacketSize           = 240                           // Tx packet size (bytes)
+
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
@@ -36,27 +38,19 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
 
   private var _ip                           = ""                            // IP Address of ???
   private var _port                         = 0                             // port number used by Opus
-  
-  private var rxSeq                         : Int?                          // Rx sequence number
-  private var rxByteCount                   = 0                             // Rx byte count
-  private var rxPacketCount                 = 0                             // Rx packet count
-  private var rxBytesPerSec                 = 0                             // Rx rate
-  private var rxLostPacketCount             = 0                             // Rx lost packet count
-  
-  private var txSeq                         = 0                             // Tx sequence number
-  private var txByteCount                   = 0                             // Tx byte count
-  private var _txPacketSize                 = 240                           // Tx packet size (bytes)
-  private var txBytesPerSec                 = 0                             // Tx rate
-  
+  private var _vita                         : Vita?                         // a Vita class
+  private var _rxLostPacketCount            = 0                             // Rx lost packet count
+  private var _rxSeq                        : Int?                          // Rx sequence number
+  private var _txSeq                        = 0                             // Tx sequence number
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
-  private var __remoteRxOn                  = false                         // Opus for receive
-  private var __remoteTxOn                  = false                         // Opus for transmit
-  private var __rxStreamStopped             = false                         // Rx stream stopped
+  private var __rxEnabled                   = false                         // Opus for receive
+  private var __txEnabled                   = false                         // Opus for transmit
+  private var __rxStopped                   = false                         // Rx stream stopped
   //
   private weak var _delegate                : StreamHandler? {              // Delegate for Opus Data Stream
-    didSet { if _delegate == nil { _initialized = false ; rxSeq = nil } } }
+    didSet { if _delegate == nil { _initialized = false ; _rxSeq = nil } } }
   //                                                                                                  
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
@@ -70,17 +64,17 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   /// Parse an Opus status message
   ///
   /// - Parameters:
-  ///   - keyValues:      a KeyValuesArray
-  ///   - radio:          the current Radio class
-  ///   - queue:          a parse Queue for the object
-  ///   - inUse:          false = "to be deleted"
+  ///   - keyValues:          a KeyValuesArray
+  ///   - radio:              the current Radio class
+  ///   - queue:              a parse Queue for the object
+  ///   - inUse:              false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     // Format:  <streamId, > <"ip", ip> <"port", port> <"opus_rx_stream_stopped", 1|0>  <"rx_on", 1|0> <"tx_on", 1|0>
     
     // get the Opus Id (without the "0x" prefix)
     //        let opusId = String(keyValues[0].key.characters.dropFirst(2))
-    if let streamId =  UInt32(String(keyValues[1].key.dropFirst(2)), radix: 16) {
+    if let streamId =  UInt32(String(keyValues[0].key.dropFirst(2)), radix: 16) {
       
       // does the Opus exist?
       if  radio.opusStreams[streamId] == nil {
@@ -113,29 +107,28 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public methods
   
-  private var _vita: Vita?
   /// Send Opus encoded TX audio to the Radio (hardware)
   ///
   /// - Parameters:
-  ///   - buffer:     array of encoded audio samples
-  ///   - samples:    number of samples to be sent
-  /// - Returns:      success / failure
+  ///   - buffer:             array of encoded audio samples
+  ///   - samples:            number of samples to be sent
+  /// - Returns:              success / failure
   ///
-  public func sendOpusTxAudio(buffer: [UInt8], samples: Int) {
+  public func sendTxAudio(buffer: [UInt8], samples: Int) {
     
     if _vita == nil {
-      // get a new Vita struct (w/defaults & IfDataWithStream, daxAudio, StreamId, tsi.other)
+      // get a new Vita class (w/defaults & IfDataWithStream, daxAudio, StreamId, tsi.other)
       _vita = Vita(packetType: .ifDataWithStream, classCode: .daxAudio, streamId: id, tsi: .other)
     }
     // create new array for payload (interleaved L/R samples)
-    _vita!.payloadData = [UInt8](repeating: 0, count: _txPacketSize)
+    _vita!.payloadData = [UInt8](repeating: 0, count: Opus.kTxPacketSize)
     
     // set the length of the packet
-    _vita!.payloadSize = _txPacketSize                                      // 8-Bit encoded samples
+    _vita!.payloadSize = Opus.kTxPacketSize                                      // 8-Bit encoded samples
     _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size     // payload size + header size
     
     // set the sequence number
-    _vita!.sequence = txSeq
+    _vita!.sequence = _txSeq
     
     // encode the Vita class as data and send to radio
     if let data = Vita.encodeAsData(_vita!) {
@@ -144,7 +137,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       _api.sendVitaData(data)
     }
     // increment the sequence number (mod 16)
-    txSeq = (txSeq + 1) % 16
+    _txSeq = (_txSeq + 1) % 16
   }
   
   // ------------------------------------------------------------------------------
@@ -154,7 +147,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   
   ///  Parse Opus key/value pairs
   ///
-  /// - Parameter properties:       a KeyValuesArray
+  /// - Parameter properties: a KeyValuesArray
   ///
   func parseProperties(_ properties: KeyValuesArray) {
     
@@ -177,14 +170,14 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       case .port:
         _api.update(self, property: &_port, value: property.value.iValue(), key: "port")
 
-      case .remoteRxOn:
-        _api.update(self, property: &_remoteRxOn, value: property.value.bValue(), key: "remoteRxOn")
+      case .rxEnabled:
+        _api.update(self, property: &_rxEnabled, value: property.value.bValue(), key: "rxEnabled")
 
-      case .remoteTxOn:
-        _api.update(self, property: &_remoteTxOn, value: property.value.bValue(), key: "remoteTxOn")
+      case .txEnabled:
+        _api.update(self, property: &_txEnabled, value: property.value.bValue(), key: "txEnabled")
 
-      case .rxStreamStopped:
-        _api.update(self, property: &_rxStreamStopped, value: property.value.bValue(), key: "rxStreamStopped")
+      case .rxStopped:
+        _api.update(self, property: &_rxStopped, value: property.value.bValue(), key: "rxStopped")
       }
     }
     // the Radio (hardware) has acknowledged this Opus
@@ -209,35 +202,35 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   /// Receive Opus encoded RX audio from the Radio (hardware)
   ///
   /// - Parameters:
-  ///   - vita:       an Opus Vita struct
+  ///   - vita:               an Opus Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
     
     // is this the first packet?
-    if rxSeq == nil { rxSeq = vita.sequence }
+    if _rxSeq == nil { _rxSeq = vita.sequence ; _rxLostPacketCount = 0}
     
     // is the received Sequence Number correct?
-    if vita.sequence != rxSeq {
+    if vita.sequence != _rxSeq {
       
       // NO, log the issue
-      Log.sharedInstance.msg("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(rxSeq!)", level: .warning, function: #function, file: #file, line: #line)
+      Log.sharedInstance.msg("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(_rxSeq!)", level: .warning, function: #function, file: #file, line: #line)
       
-      if vita.sequence < rxSeq! {
+      if vita.sequence < _rxSeq! {
         
         // less than expected, packet is old, ignore it
-        rxSeq = nil
-        rxLostPacketCount += 1
+        _rxSeq = nil
+        _rxLostPacketCount += 1
         return
         
       } else {
         
         // greater than expected, one or more packets were lost, resync & process it
-        rxSeq = vita.sequence
-        rxLostPacketCount += 1
+        _rxSeq = vita.sequence
+        _rxLostPacketCount += 1
       }
     }
     // calculate the next Sequence Number
-    rxSeq = (rxSeq! + 1) % 16
+    _rxSeq = (_rxSeq! + 1) % 16
     
     // Pass the data frame to the Opus delegate
     delegate?.streamHandler( OpusFrame(payload: vita.payloadData, numberOfSamples: vita.payloadSize) )
@@ -247,9 +240,6 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
 // ------------------------------------------------------------------------------
 // MARK: - OpusFrame struct implementation
 // ------------------------------------------------------------------------------
-//
-//  Populated by the Opus vitaHandler
-//
 
 /// Struct containing Opus Stream data
 ///
@@ -259,9 +249,9 @@ public struct OpusFrame {
   public var numberOfSamples: Int                 // number of samples
   
   /*
-   public var duration: Float                      // frame duration (ms)
-   public var channels: Int                        // number of channels (1 or 2)
-   */
+   public var duration: Float                     // frame duration (ms)
+   public var channels: Int                       // number of channels (1 or 2)
+  */
   
   /// Initialize an OpusFrame
   ///
@@ -281,6 +271,10 @@ public struct OpusFrame {
     /*
      // MARK: This code unneeded at this time
      
+     // Flex 6000 series uses:
+     //     duration = 10 ms
+     //     channels = 2 (stereo)
+     
      // determine the frame duration
      let durationCode = (samples[0] & 0xF8)
      switch durationCode {
@@ -289,15 +283,15 @@ public struct OpusFrame {
      case 0xC8:
      duration = 5.0
      case 0xD0:
-     duration = 10.0                                 // Flex uses 10 ms
+     duration = 10.0
      case 0xD8:
      duration = 20.0
      default:
      duration = 0
      }
      // determine the number of channels (mono = 1, stereo = 2)
-     channels = (samples[0] & 0x04) == 0x04 ? 2 : 1      // Flex uses stereo
-     */
+     channels = (samples[0] & 0x04) == 0x04 ? 2 : 1
+    */
   }
 }
 
@@ -314,17 +308,17 @@ extension Opus {
   // MARK: - Internal properties - with synchronization
   
   // listed in alphabetical order
-  internal var _remoteRxOn: Bool {
-    get { return _q.sync { __remoteRxOn } }
-    set { _q.sync(flags: .barrier) { __remoteRxOn = newValue } } }
+  internal var _rxEnabled: Bool {
+    get { return _q.sync { __rxEnabled } }
+    set { _q.sync(flags: .barrier) { __rxEnabled = newValue } } }
   
-  internal var _remoteTxOn: Bool {
-    get { return _q.sync { __remoteTxOn } }
-    set { _q.sync(flags: .barrier) { __remoteTxOn = newValue } } }
+  internal var _txEnabled: Bool {
+    get { return _q.sync { __txEnabled } }
+    set { _q.sync(flags: .barrier) { __txEnabled = newValue } } }
   
-  private var _rxStreamStopped: Bool {
-    get { return _q.sync { __rxStreamStopped } }
-    set { _q.sync(flags: .barrier) { __rxStreamStopped = newValue } } }
+  private var _rxStopped: Bool {
+    get { return _q.sync { __rxStopped } }
+    set { _q.sync(flags: .barrier) { __rxStopped = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -333,9 +327,9 @@ extension Opus {
   //          If yes, implement it, if not should they be "get" only?
   
   // listed in alphabetical order
-  @objc dynamic public var rxStreamStopped: Bool {
-    get { return _rxStreamStopped }
-    set { if _rxStreamStopped != newValue { _rxStreamStopped = newValue } } }
+  @objc dynamic public var rxStopped: Bool {
+    get { return _rxStopped }
+    set { if _rxStopped != newValue { _rxStopped = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
@@ -348,11 +342,11 @@ extension Opus {
   // MARK: - Opus tokens
   
   internal enum Token : String {
-    case ipAddress          = "ip"
+    case ipAddress            = "ip"
     case port
-    case remoteRxOn         = "rx_on"
-    case remoteTxOn         = "tx_on"
-    case rxStreamStopped    = "opus_rx_stream_stopped"
+    case rxEnabled            = "rx_on"
+    case txEnabled            = "tx_on"
+    case rxStopped            = "opus_rx_stream_stopped"
   }
 }
 

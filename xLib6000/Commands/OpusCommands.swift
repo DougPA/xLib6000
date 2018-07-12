@@ -30,21 +30,21 @@ extension Opus {
   ///   - value:              On/Off
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func remoteRxAudioRequest(_ value: Bool, callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to enable Opus Rx
-    Api.sharedInstance.send(Opus.kCmd + Opus.Token.remoteRxOn.rawValue + " \(value.asNumber())", replyTo: callback)
-  }
+//  public func create(callback: ReplyHandler? = nil) {
+//
+//    // tell the Radio to enable Opus Rx
+//    Api.sharedInstance.send(Opus.kCmd + Opus.Token.remoteRxOn.rawValue + " \(value.asNumber())", replyTo: callback)
+//  }
   /// Remove this Opus Stream
   ///
   /// - Parameters:
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func remove(callback: ReplyHandler? = nil) {
-    
-    // tell the Radio to remove the Stream
-    Api.sharedInstance.send(Opus.kStreamRemoveCmd + "0x\(id)", replyTo: callback)
-  }
+//  public func remove(callback: ReplyHandler? = nil) {
+//
+//    // tell the Radio to remove the Stream
+//    Api.sharedInstance.send(Opus.kStreamRemoveCmd + "0x\(id)", replyTo: callback)
+//  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
@@ -57,18 +57,18 @@ extension Opus {
   ///
   private func opusCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Opus.kCmd + token.rawValue + "=\(value)")
+    Api.sharedInstance.send(Opus.kCmd + token.rawValue + " \(value)")
   }
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
   
   // listed in alphabetical order
-  @objc dynamic public var remoteRxOn: Bool {
-    get { return _remoteRxOn }
-    set { if _remoteRxOn != newValue { _remoteRxOn = newValue ; opusCmd( .remoteRxOn, newValue.asNumber()) } } }
+  @objc dynamic public var rxEnabled: Bool {
+    get { return _rxEnabled }
+    set { if _rxEnabled != newValue { _rxEnabled = newValue ; opusCmd( .rxEnabled, newValue.asNumber()) } } }
   
-  @objc dynamic public var remoteTxOn: Bool {
-    get { return _remoteTxOn }
-    set { if _remoteTxOn != newValue { _remoteTxOn = newValue ; opusCmd( .remoteTxOn, newValue.asNumber()) } } }
+  @objc dynamic public var txEnabled: Bool {
+    get { return _txEnabled }
+    set { if _txEnabled != newValue { _txEnabled = newValue ; opusCmd( .txEnabled, newValue.asNumber()) } } }
 }

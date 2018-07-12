@@ -19,8 +19,7 @@ protocol UdpManagerDelegate                 : class {
   
   func udpError(_ message: String)                                          // report a UDP error
   func udpState(bound: Bool, port: UInt16, error: String)                   // report a UDP state change
-  
-  func udpStreamHandler(_ vita: Vita)
+  func udpStreamHandler(_ vita: Vita)                                       // process a Vita stream
 }
 
 // ------------------------------------------------------------------------------

@@ -51,10 +51,8 @@ public protocol ApiDelegate {
 
 protocol StaticModel                        : class {
   
-  //  Static Model objects are created / destroyed by the Radio class.
-  //
-  //  Status Commands from the Radio (hardware) set the properties of all model
-  //  objects in the PropertiesParser.
+  //  Static Model objects are created / destroyed in the Radio class.
+  //  Static Model object properties are set in the instance's parseProperties method.
   
   /// Parse <key=value> arrays to set object properties
   ///
@@ -65,10 +63,8 @@ protocol StaticModel                        : class {
 
 protocol DynamicModel                       : StaticModel {
   
-  //  Dynamic Model objects are created / destroyed by the Model's StatusParser.
-  //
-  //  Status Commands from the Radio (hardware) set the properties of all model
-  //  objects in the PropertiesParser.
+  //  Dynamic Model objects are created / destroyed in the Model's parseStatus static method.
+  //  Dynamic Model object properties are set in the instance's parseProperties method.
   
   /// Parse <key=value> arrays to determine object status
   ///
@@ -95,7 +91,7 @@ protocol DynamicModelWithStream             : DynamicModel {
 
 public protocol StreamHandler               : class {
   
-  /// A delegate (pointing to a Client method) that processes Stream data
+  /// Process a frame of Stream data
   ///
   /// - Parameter streamFrame:              a frame of data
   ///
