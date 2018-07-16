@@ -84,7 +84,7 @@ public final class Atu                      : NSObject, StaticModel {
 
       case .status:
         willChangeValue(for: \.status)
-        _status = ( property.value == "present" ? true : false )
+        _status = property.value.bValue()
         didChangeValue(for: \.status)
 
       case .usingMemories:

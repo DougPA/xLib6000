@@ -1,5 +1,10 @@
 xLib6000 Change Log
 
+v1.2.6
+
+Atu.swift - corrected "status"
+Radio.swift - corrected parseInfoReply(_:)
+
 v1.2.5
 
 ALL MODELS - replaced usage of update(_:property:value:key:) with this style

@@ -600,52 +600,52 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
       case .callsign:
         willChangeValue(for: \.callsign)
-        _callsign = property.value.replacingOccurrences(of: "\"", with:"")
+        _callsign = property.value
         didChangeValue(for: \.callsign)
 
       case .chassisSerial:
         willChangeValue(for: \.chassisSerial)
-        _chassisSerial = property.value.replacingOccurrences(of: "\"", with:"")
+        _chassisSerial = property.value
         didChangeValue(for: \.chassisSerial)
 
       case .gateway:
         willChangeValue(for: \.gateway)
-        _gateway = property.value.replacingOccurrences(of: "\"", with:"")
+        _gateway = property.value
         didChangeValue(for: \.gateway)
 
       case .gps:
         willChangeValue(for: \.gpsPresent)
-        _gpsPresent = property.value.bValue()
+        _gpsPresent = (property.value != "Not Present")
         didChangeValue(for: \.gpsPresent)
 
       case .ipAddress:
         willChangeValue(for: \.ipAddress)
-        _ipAddress = property.value.replacingOccurrences(of: "\"", with:"")
+        _ipAddress = property.value
         didChangeValue(for: \.ipAddress)
 
       case .location:
         willChangeValue(for: \.location)
-        _location = property.value.replacingOccurrences(of: "\"", with:"")
+        _location = property.value
         didChangeValue(for: \.location)
 
       case .macAddress:
         willChangeValue(for: \.macAddress)
-        _macAddress = property.value.replacingOccurrences(of: "\"", with:"")
+        _macAddress = property.value
         didChangeValue(for: \.macAddress)
 
       case .model:
          willChangeValue(for: \.radioModel)
-         _radioModel = property.value.replacingOccurrences(of: "\"", with:"")
+         _radioModel = property.value
          didChangeValue(for: \.radioModel)
 
       case .netmask:
         willChangeValue(for: \.netmask)
-        _netmask = property.value.replacingOccurrences(of: "\"", with:"")
+        _netmask = property.value
         didChangeValue(for: \.netmask)
 
       case .name:
         willChangeValue(for: \.nickname)
-        _nickname = property.value.replacingOccurrences(of: "\"", with:"")
+        _nickname = property.value
         didChangeValue(for: \.nickname)
 
       case .numberOfScus:
@@ -665,22 +665,22 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
       case .options:
         willChangeValue(for: \.radioOptions)
-        _radioOptions = property.value.replacingOccurrences(of: "\"", with:"")
+        _radioOptions = property.value
         didChangeValue(for: \.radioOptions)
 
       case .region:
         willChangeValue(for: \.region)
-        _region = property.value.replacingOccurrences(of: "\"", with:"")
+        _region = property.value
         didChangeValue(for: \.region)
 
       case .screensaver:
         willChangeValue(for: \.radioScreenSaver)
-        _radioScreenSaver = property.value.replacingOccurrences(of: "\"", with:"")
+        _radioScreenSaver = property.value
         didChangeValue(for: \.radioScreenSaver)
 
       case .softwareVersion:
         willChangeValue(for: \.softwareVersion)
-        _softwareVersion = property.value.replacingOccurrences(of: "\"", with:"")
+        _softwareVersion = property.value
         didChangeValue(for: \.softwareVersion)
       }
     }
@@ -1221,7 +1221,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case Api.Command.info.rawValue:
       // process the reply
-      parseInfoReply( reply.keyValuesArray() )
+      parseInfoReply( (reply.replacingOccurrences(of: "\"", with: "")).keyValuesArray(delimiter: ",") )
       
     case Api.Command.antList.rawValue:
       // save the list
