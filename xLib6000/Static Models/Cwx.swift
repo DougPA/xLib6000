@@ -187,7 +187,9 @@ public final class Cwx                      : NSObject, StaticModel {
         switch token {
           
         case .breakInDelay:
-          _api.update(self, property: &_breakInDelay, value: property.value.iValue(), key: "breakInDelay")
+          willChangeValue(for: \.breakInDelay)
+          _breakInDelay = property.value.iValue()
+          didChangeValue(for: \.breakInDelay)
 
         case .erase:
           let values = property.value.components(separatedBy: ",")
@@ -200,14 +202,18 @@ public final class Cwx                      : NSObject, StaticModel {
           }
           
         case .qskEnabled:
-          _api.update(self, property: &_qskEnabled, value: property.value.bValue(), key: "qskEnabled")
+          willChangeValue(for: \.qskEnabled)
+          _qskEnabled = property.value.bValue()
+          didChangeValue(for: \.qskEnabled)
 
         case .sent:
           // inform the Event Handler (if any)
           charSentEventHandler?(property.value.iValue())
           
         case .wpm:
-          _api.update(self, property: &_wpm, value: property.value.iValue(), key: "wpm")
+          willChangeValue(for: \.wpm)
+          _wpm = property.value.iValue()
+          didChangeValue(for: \.wpm)
         }
       }
     }

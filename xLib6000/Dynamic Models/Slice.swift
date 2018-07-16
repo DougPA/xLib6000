@@ -442,37 +442,59 @@ public final class Slice                    : NSObject, DynamicModel {
       switch token {
         
       case .active:
-        update(&_active, value: property.value.bValue(), key: "active")
+        willChangeValue(for: \.active)
+        _active = property.value.bValue()
+        didChangeValue(for: \.active)
 
       case .agcMode:
-        update(&_agcMode, value: property.value, key: "agcMode")
+        willChangeValue(for: \.agcMode)
+        _agcMode = property.value
+        didChangeValue(for: \.agcMode)
 
       case .agcOffLevel:
-        update(&_agcOffLevel, value: property.value.iValue(), key: "agcOffLevel")
+        willChangeValue(for: \.agcOffLevel)
+        _agcOffLevel = property.value.iValue()
+        didChangeValue(for: \.agcOffLevel)
 
       case .agcThreshold:
-        update(&_agcThreshold, value: property.value.iValue(), key: "agcThreshold")
+        willChangeValue(for: \.agcThreshold)
+        _agcThreshold = property.value.iValue()
+        didChangeValue(for: \.agcThreshold)
 
       case .anfEnabled:
-        update(&_anfEnabled, value: property.value.bValue(), key: "anfEnabled")
+        willChangeValue(for: \.anfEnabled)
+        _anfEnabled = property.value.bValue()
+        didChangeValue(for: \.anfEnabled)
 
       case .anfLevel:
-        update(&_anfLevel, value: property.value.iValue(), key: "anfLevel")
+        willChangeValue(for: \.anfLevel)
+        _anfLevel = property.value.iValue()
+        didChangeValue(for: \.anfLevel)
 
       case .apfEnabled:
-        update(&_apfEnabled, value: property.value.bValue(), key: "apfEnabled")
+        willChangeValue(for: \.apfEnabled)
+        _apfEnabled = property.value.bValue()
+        didChangeValue(for: \.apfEnabled)
 
       case .apfLevel:
-        update(&_apfLevel, value: property.value.iValue(), key: "apfLevel")
+        willChangeValue(for: \.apfLevel)
+        _apfLevel = property.value.iValue()
+        didChangeValue(for: \.apfLevel)
 
       case .audioGain:
-        update(&_audioGain, value: property.value.iValue(), key: "audioGain")
+        willChangeValue(for: \.audioGain)
+        _audioGain = property.value.iValue()
+        didChangeValue(for: \.audioGain)
 
       case .audioMute:
-        update(&_audioMute, value: property.value.bValue(), key: "audioMute")
+        willChangeValue(for: \.audioMute)
+        _audioMute = property.value.bValue()
+        didChangeValue(for: \.audioMute)
 
       case .audioPan:
-        update(&_audioPan, value: property.value.iValue(), key: "audioPan")
+        willChangeValue(for: \.audioPan)
+        _audioPan = property.value.iValue()
+        didChangeValue(for: \.audioPan)
 
       case .daxChannel:
         if _daxChannel != 0 && property.value.iValue() == 0 {
@@ -481,189 +503,299 @@ public final class Slice                    : NSObject, DynamicModel {
             audioStream.slice = nil
           }
         }
-        update(&_daxChannel, value: property.value.iValue(), key: "daxChannel")
+        willChangeValue(for: \.daxChannel)
+        _daxChannel = property.value.iValue()
+        didChangeValue(for: \.daxChannel)
 
       case .daxTxEnabled:
-        update(&_daxTxEnabled, value: property.value.bValue(), key: "daxTxEnabled")
+        willChangeValue(for: \.daxTxEnabled)
+        _daxTxEnabled = property.value.bValue()
+        didChangeValue(for: \.daxTxEnabled)
 
       case .detached:
-        update(&_detached, value: property.value.bValue(), key: "detached")
-        
+        willChangeValue(for: \.detached)
+        _detached = property.value.bValue()
+        didChangeValue(for: \.detached)
+
      case .dfmPreDeEmphasisEnabled:
-        update(&_dfmPreDeEmphasisEnabled, value: property.value.bValue(), key: "dfmPreDeEmphasisEnabled")
+        willChangeValue(for: \.dfmPreDeEmphasisEnabled)
+        _dfmPreDeEmphasisEnabled = property.value.bValue()
+        didChangeValue(for: \.dfmPreDeEmphasisEnabled)
 
       case .digitalLowerOffset:
-        update(&_digitalLowerOffset, value: property.value.iValue(), key: "digitalLowerOffset")
+        willChangeValue(for: \.digitalLowerOffset)
+        _digitalLowerOffset = property.value.iValue()
+        didChangeValue(for: \.digitalLowerOffset)
 
       case .digitalUpperOffset:
-        update(&_digitalUpperOffset, value: property.value.iValue(), key: "digitalUpperOffset")
+        willChangeValue(for: \.digitalUpperOffset)
+        _digitalUpperOffset = property.value.iValue()
+        didChangeValue(for: \.digitalUpperOffset)
 
       case .diversityEnabled:
         if _diversityIsAllowed {
-          update(&_diversityEnabled, value: property.value.bValue(), key: "diversityEnabled")
+          willChangeValue(for: \.diversityEnabled)
+          _diversityEnabled = property.value.bValue()
+          didChangeValue(for: \.diversityEnabled)
         }
         
       case .diversityChild:
         if _diversityIsAllowed {
-          update(&_diversityChild, value: property.value.bValue(), key: "diversityChild")
+          willChangeValue(for: \.diversityChild)
+          _diversityChild = property.value.bValue()
+          didChangeValue(for: \.diversityChild)
         }
         
       case .diversityIndex:
         if _diversityIsAllowed {
-          update(&_diversityIndex, value: property.value.iValue(), key: "diversityIndex")
+          willChangeValue(for: \.diversityIndex)
+          _diversityIndex = property.value.iValue()
+          didChangeValue(for: \.diversityIndex)
         }
         
       case .filterHigh:
-        update(&_filterHigh, value: property.value.iValue(), key: "filterHigh")
+        willChangeValue(for: \.filterHigh)
+        _filterHigh = property.value.iValue()
+        didChangeValue(for: \.filterHigh)
 
       case .filterLow:
-        update(&_filterLow, value: property.value.iValue(), key: "filterLow")
+        willChangeValue(for: \.filterLow)
+        _filterLow = property.value.iValue()
+        didChangeValue(for: \.filterLow)
 
       case .fmDeviation:
-        update(&_fmDeviation, value: property.value.iValue(), key: "fmDeviation")
+        willChangeValue(for: \.fmDeviation)
+        _fmDeviation = property.value.iValue()
+        didChangeValue(for: \.fmDeviation)
 
       case .fmRepeaterOffset:
-        update(&_fmRepeaterOffset, value: property.value.fValue(), key: "fmRepeaterOffset")
+        willChangeValue(for: \.fmRepeaterOffset)
+        _fmRepeaterOffset = property.value.fValue()
+        didChangeValue(for: \.fmRepeaterOffset)
 
       case .fmToneBurstEnabled:
-        update(&_fmToneBurstEnabled, value: property.value.bValue(), key: "fmToneBurstEnabled")
+         willChangeValue(for: \.fmToneBurstEnabled)
+        _fmToneBurstEnabled = property.value.bValue()
+        didChangeValue(for: \.fmToneBurstEnabled)
 
       case .fmToneMode:
-        update(&_fmToneMode, value: property.value, key: "fmToneMode")
+        willChangeValue(for: \.fmToneMode)
+        _fmToneMode = property.value
+        didChangeValue(for: \.fmToneMode)
 
       case .fmToneFreq:
-        update(&_fmToneFreq, value: property.value.fValue(), key: "fmToneFreq")
+        willChangeValue(for: \.fmToneFreq)
+        _fmToneFreq = property.value.fValue()
+        didChangeValue(for: \.fmToneFreq)
 
       case .frequency:
-//        _api.update(self, property: &_frequency, value: property.value.mhzToHz(), key: "frequency")
-          update(&_frequency, value: property.value.mhzToHz(), key: "frequency")
-//        willChangeValue(for: \.frequency)
-//        _frequency = property.value.mhzToHz()
-//        didChangeValue(for: \.frequency)
+        willChangeValue(for: \.frequency)
+        _frequency = property.value.mhzToHz()
+        didChangeValue(for: \.frequency)
 
       case .ghost:
         // FIXME: Is this needed?
         Log.sharedInstance.msg("Unknown token - \(property.key),\(property.value)", level: .debug, function: #function, file: #file, line: #line)
         
       case .inUse:
-        update(&_inUse, value: property.value.bValue(), key: "inUse")
+        willChangeValue(for: \.inUse)
+        _inUse = property.value.bValue()
+        didChangeValue(for: \.inUse)
 
       case .locked:
-        update(&_locked, value: property.value.bValue(), key: "locked")
+        willChangeValue(for: \.locked)
+        _locked = property.value.bValue()
+        didChangeValue(for: \.locked)
 
       case .loopAEnabled:
-        update(&_loopAEnabled, value: property.value.bValue(), key: "loopAEnabled")
+        willChangeValue(for: \.loopAEnabled)
+        _loopAEnabled = property.value.bValue()
+        didChangeValue(for: \.loopAEnabled)
 
       case .loopBEnabled:
-        update(&_loopBEnabled, value: property.value.bValue(), key: "loopBEnabled")
+        willChangeValue(for: \.loopBEnabled)
+        _loopBEnabled = property.value.bValue()
+        didChangeValue(for: \.loopBEnabled)
 
       case .mode:
-        update(&_mode, value: property.value.uppercased(), key: "mode")
+        willChangeValue(for: \.mode)
+        _mode = property.value.uppercased()
+        didChangeValue(for: \.mode)
 
       case .modeList:
-        update(&_modeList, value: property.value.components(separatedBy: ","), key: "modeList")
+        willChangeValue(for: \.modeList)
+        _modeList = property.value.components(separatedBy: ",")
+        didChangeValue(for: \.modeList)
 
       case .nbEnabled:
-        update(&_nbEnabled, value: property.value.bValue(), key: "nbEnabled")
+        willChangeValue(for: \.nbEnabled)
+        _nbEnabled = property.value.bValue()
+        didChangeValue(for: \.nbEnabled)
 
       case .nbLevel:
-        update(&_nbLevel, value: property.value.iValue(), key: "nbLevel")
+        willChangeValue(for: \.nbLevel)
+        _nbLevel = property.value.iValue()
+        didChangeValue(for: \.nbLevel)
 
       case .nrEnabled:
-        update(&_nrEnabled, value: property.value.bValue(), key: "nrEnabled")
+         willChangeValue(for: \.nrEnabled)
+        _nrEnabled = property.value.bValue()
+        didChangeValue(for: \.nrEnabled)
 
       case .nrLevel:
-        update(&_nrLevel, value: property.value.iValue(), key: "nrLevel")
+        willChangeValue(for: \.nrLevel)
+        _nrLevel = property.value.iValue()
+        didChangeValue(for: \.nrLevel)
 
       case .nr2:
-        update(&_nr2, value: property.value.iValue(), key: "nr2")
-        
+        willChangeValue(for: \.nr2)
+        _nr2 = property.value.iValue()
+        didChangeValue(for: \.nr2)
+
       case .owner:
-        update(&_owner, value: property.value.iValue(), key: "owner")
+        willChangeValue(for: \.owner)
+        _owner = property.value.iValue()
+        didChangeValue(for: \.owner)
 
       case .panadapterId:     // does have leading "0x"
-        update(&_panadapterId, value: UInt32(property.value.dropFirst(2), radix: 16) ?? 0, key: "panadapterId")
+        willChangeValue(for: \.panadapterId)
+        _panadapterId = UInt32(property.value.dropFirst(2), radix: 16) ?? 0
+        didChangeValue(for: \.panadapterId)
 
       case .playbackEnabled:
-        update(&_playbackEnabled, value: (property.value == "enabled") || (property.value == "1"), key: "playbackEnabled")
+        willChangeValue(for: \.playbackEnabled)
+        _playbackEnabled = (property.value == "enabled") || (property.value == "1")
+        didChangeValue(for: \.playbackEnabled)
 
       case .postDemodBypassEnabled:
-        update(&_postDemodBypassEnabled, value: property.value.bValue(), key: "postDemodBypassEnabled")
+        willChangeValue(for: \.postDemodBypassEnabled)
+        _postDemodBypassEnabled = property.value.bValue()
+        didChangeValue(for: \.postDemodBypassEnabled)
 
       case .postDemodLow:
-         update(&_postDemodLow, value: property.value.iValue(), key: "postDemodLow")
+         willChangeValue(for: \.postDemodLow)
+         _postDemodLow = property.value.iValue()
+         didChangeValue(for: \.postDemodLow)
 
       case .postDemodHigh:
-        update(&_postDemodHigh, value: property.value.iValue(), key: "postDemodHigh")
+        willChangeValue(for: \.postDemodHigh)
+        _postDemodHigh = property.value.iValue()
+        didChangeValue(for: \.postDemodHigh)
 
       case .qskEnabled:
-        update(&_qskEnabled, value: property.value.bValue(), key: "qskEnabled")
+        willChangeValue(for: \.qskEnabled)
+        _qskEnabled = property.value.bValue()
+        didChangeValue(for: \.qskEnabled)
 
       case .recordEnabled:
-        update(&_recordEnabled, value: property.value.bValue(), key: "recordEnabled")
+         willChangeValue(for: \.recordEnabled)
+        _recordEnabled = property.value.bValue()
+        didChangeValue(for: \.recordEnabled)
 
       case .repeaterOffsetDirection:
-        update(&_repeaterOffsetDirection, value: property.value, key: "repeaterOffsetDirection")
+        willChangeValue(for: \.repeaterOffsetDirection)
+        _repeaterOffsetDirection = property.value
+        didChangeValue(for: \.repeaterOffsetDirection)
 
       case .rfGain:
-        update(&_rfGain, value: property.value.iValue(), key: "rfGain")
+        willChangeValue(for: \.rfGain)
+        _rfGain = property.value.iValue()
+        didChangeValue(for: \.rfGain)
 
       case .ritOffset:
-        update(&_ritOffset, value: property.value.iValue(), key: "ritOffset")
+        willChangeValue(for: \.ritOffset)
+        _ritOffset = property.value.iValue()
+        didChangeValue(for: \.ritOffset)
 
       case .ritEnabled:
-        update(&_ritEnabled, value: property.value.bValue(), key: "ritEnabled")
+        willChangeValue(for: \.ritEnabled)
+        _ritEnabled = property.value.bValue()
+        didChangeValue(for: \.ritEnabled)
 
       case .rttyMark:
-         update(&_rttyMark, value: property.value.iValue(), key: "rttyMark")
+         willChangeValue(for: \.rttyMark)
+         _rttyMark = property.value.iValue()
+         didChangeValue(for: \.rttyMark)
 
       case .rttyShift:
-        update(&_rttyShift, value: property.value.iValue(), key: "rttyShift")
+        willChangeValue(for: \.rttyShift)
+        _rttyShift = property.value.iValue()
+        didChangeValue(for: \.rttyShift)
 
       case .rxAnt:
-        update(&_rxAnt, value: property.value, key: "rxAnt")
+        willChangeValue(for: \.rxAnt)
+        _rxAnt = property.value
+        didChangeValue(for: \.rxAnt)
 
       case .rxAntList:
-        update(&_rxAntList, value: property.value.components(separatedBy: ","), key: "rxAntList")
+        willChangeValue(for: \.rxAntList)
+        _rxAntList = property.value.components(separatedBy: ",")
+        didChangeValue(for: \.rxAntList)
 
       case .squelchEnabled:
-        update(&_squelchEnabled, value: property.value.bValue(), key: "squelchEnabled")
+         willChangeValue(for: \.squelchEnabled)
+        _squelchEnabled = property.value.bValue()
+        didChangeValue(for: \.squelchEnabled)
 
       case .squelchLevel:
-        update(&_squelchLevel, value: property.value.iValue(), key: "squelchLevel")
+        willChangeValue(for: \.squelchLevel)
+        _squelchLevel = property.value.iValue()
+        didChangeValue(for: \.squelchLevel)
 
       case .step:
-        update(&_step, value: property.value.iValue(), key: "step")
+        willChangeValue(for: \.step)
+        _step = property.value.iValue()
+        didChangeValue(for: \.step)
 
       case .stepList:
-        update(&_stepList, value: property.value, key: "stepList")
+        willChangeValue(for: \.stepList)
+        _stepList = property.value
+        didChangeValue(for: \.stepList)
 
       case .txEnabled:
-        update(&_txEnabled, value: property.value.bValue(), key: "txEnabled")
+        willChangeValue(for: \.txEnabled)
+        _txEnabled = property.value.bValue()
+        didChangeValue(for: \.txEnabled)
 
       case .txAnt:
-        update(&_txAnt, value: property.value, key: "txAnt")
+        willChangeValue(for: \.txAnt)
+        _txAnt = property.value
+        didChangeValue(for: \.txAnt)
 
       case .txAntList:
-        update(&_txAntList, value: property.value.components(separatedBy: ","), key: "txAntList")
+        willChangeValue(for: \.txAntList)
+        _txAntList = property.value.components(separatedBy: ",")
+        didChangeValue(for: \.txAntList)
 
       case .txOffsetFreq:
-        update(&_txOffsetFreq, value: property.value.fValue(), key: "txOffsetFreq")
+        willChangeValue(for: \.txOffsetFreq)
+        _txOffsetFreq = property.value.fValue()
+        didChangeValue(for: \.txOffsetFreq)
 
       case .wide:
-        update(&_wide, value: property.value.bValue(), key: "wide")
+        willChangeValue(for: \.wide)
+        _wide = property.value.bValue()
+        didChangeValue(for: \.wide)
 
       case .wnbEnabled:
-        update(&_wnbEnabled, value: property.value.bValue(), key: "wnbEnabled")
+         willChangeValue(for: \.wnbEnabled)
+        _wnbEnabled = property.value.bValue()
+        didChangeValue(for: \.wnbEnabled)
 
       case .wnbLevel:
-        update(&_wnbLevel, value: property.value.iValue(), key: "wnbLevel")
+        willChangeValue(for: \.wnbLevel)
+        _wnbLevel = property.value.iValue()
+        didChangeValue(for: \.wnbLevel)
 
       case .xitOffset:
-        update(&_xitOffset, value: property.value.iValue(), key: "xitOffset")
+        willChangeValue(for: \.xitOffset)
+        _xitOffset = property.value.iValue()
+        didChangeValue(for: \.xitOffset)
 
       case .xitEnabled:
-        update(&_xitEnabled, value: property.value.bValue(), key: "xitEnabled")
+        willChangeValue(for: \.xitEnabled)
+        _xitEnabled = property.value.bValue()
+        didChangeValue(for: \.xitEnabled)
 
       case .daxClients, .diversityParent, .recordTime:
         // ignore these

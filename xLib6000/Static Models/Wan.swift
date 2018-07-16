@@ -70,10 +70,14 @@ public final class Wan                      : NSObject, StaticModel {
       switch token {
         
       case .serverConnected:
-        _api.update(self, property: &_serverConnected, value: property.value.bValue(), key: "serverConnected")
+        willChangeValue(for: \.serverConnected)
+        _serverConnected = property.value.bValue()
+        didChangeValue(for: \.serverConnected)
 
       case .radioAuthenticated:
-        _api.update(self, property: &_radioAuthenticated, value: property.value.bValue(), key: "radioAuthenticated")
+        willChangeValue(for: \.radioAuthenticated)
+        _radioAuthenticated = property.value.bValue()
+        didChangeValue(for: \.radioAuthenticated)
       }
     }
   }

@@ -242,11 +242,11 @@ extension Radio {
     get {  return _freqErrorPpb }
     set { if _freqErrorPpb != newValue { _freqErrorPpb = newValue ; radioSetCmd( .freqErrorPpb, newValue) } } }
   
-  // FIXME: is there an ability to send a command for this?
+  // FIXME: is the command for this correct?
   
-//  @objc dynamic public var frontSpeakerMute: Bool {
-//    get {  return _frontSpeakerMute }
-//    set { if _frontSpeakerMute != newValue { _frontSpeakerMute = newValue ; radioSetCmd( .frontSpeakerMute, newValue.asNumber()) } } }
+  @objc dynamic public var frontSpeakerMute: Bool {
+    get {  return _frontSpeakerMute }
+    set { if _frontSpeakerMute != newValue { _frontSpeakerMute = newValue ; radioSetCmd( .frontSpeakerMute, newValue.asNumber()) } } }
   
   @objc dynamic public var fullDuplexEnabled: Bool {
     get {  return _fullDuplexEnabled }

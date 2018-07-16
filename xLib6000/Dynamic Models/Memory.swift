@@ -220,16 +220,24 @@ public final class Memory                   : NSObject, DynamicModel {
       switch (token) {
         
       case .digitalLowerOffset:
-        _api.update(self, property: &_digitalLowerOffset, value: property.value.iValue(), key: "digitalLowerOffset")
+        willChangeValue(for: \.digitalLowerOffset)
+        _digitalLowerOffset = property.value.iValue()
+        didChangeValue(for: \.digitalLowerOffset)
 
       case .digitalUpperOffset:
-        _api.update(self, property: &_digitalUpperOffset, value: property.value.iValue(), key: "digitalUpperOffset")
+        willChangeValue(for: \.digitalUpperOffset)
+        _digitalUpperOffset = property.value.iValue()
+        didChangeValue(for: \.digitalUpperOffset)
 
       case .frequency:
-        _api.update(self, property: &_frequency, value: property.value.mhzToHz(), key: "frequency")
+        willChangeValue(for: \.frequency)
+        _frequency = property.value.mhzToHz()
+        didChangeValue(for: \.frequency)
 
       case .group:
-        _api.update(self, property: &_group, value: property.value.replacingSpaces(), key: "group")
+        willChangeValue(for: \.group)
+        _group = property.value.replacingSpaces()
+        didChangeValue(for: \.group)
 
       case .highlight:            // not implemented
         break
@@ -238,49 +246,79 @@ public final class Memory                   : NSObject, DynamicModel {
         break
         
       case .mode:
-        _api.update(self, property: &_mode, value: property.value.replacingSpaces(), key: "mode")
+        willChangeValue(for: \.mode)
+        _mode = property.value.replacingSpaces()
+        didChangeValue(for: \.mode)
 
       case .name:
-        _api.update(self, property: &_name, value: property.value.replacingSpaces(), key: "name")
+        willChangeValue(for: \.name)
+        _name = property.value.replacingSpaces()
+        didChangeValue(for: \.name)
 
       case .owner:
-        _api.update(self, property: &_owner, value: property.value.replacingSpaces(), key: "owner")
+        willChangeValue(for: \.owner)
+        _owner = property.value.replacingSpaces()
+        didChangeValue(for: \.owner)
 
       case .repeaterOffsetDirection:
-        _api.update(self, property: &_offsetDirection, value: property.value.replacingSpaces(), key: "offsetDirection")
+        willChangeValue(for: \.offsetDirection)
+        _offsetDirection = property.value.replacingSpaces()
+        didChangeValue(for: \.offsetDirection)
 
       case .repeaterOffset:
-        _api.update(self, property: &_offset, value: property.value.iValue(), key: "offset")
+        willChangeValue(for: \.offset)
+        _offset = property.value.iValue()
+        didChangeValue(for: \.offset)
 
       case .rfPower:
-        _api.update(self, property: &_rfPower, value: property.value.iValue(), key: "rfPower")
+        willChangeValue(for: \.rfPower)
+        _rfPower = property.value.iValue()
+        didChangeValue(for: \.rfPower)
 
       case .rttyMark:
-        _api.update(self, property: &__rttyMark, value: property.value.iValue(), key: "rttyMark")
+        willChangeValue(for: \.rttyMark)
+        _rttyMark = property.value.iValue()
+        didChangeValue(for: \.rttyMark)
 
       case .rttyShift:
-        _api.update(self, property: &_rttyShift, value: property.value.iValue(), key: "rttyShift")
+        willChangeValue(for: \.rttyShift)
+        _rttyShift = property.value.iValue()
+        didChangeValue(for: \.rttyShift)
 
       case .rxFilterHigh:
-        _api.update(self, property: &_filterHigh, value: filterHighLimits(property.value.iValue()), key: "filterHigh")
+        willChangeValue(for: \.filterHigh)
+        _filterHigh = filterHighLimits(property.value.iValue())
+        didChangeValue(for: \.filterHigh)
 
       case .rxFilterLow:
-        _api.update(self, property: &_filterLow, value: filterLowLimits(property.value.iValue()), key: "filterLow")
+        willChangeValue(for: \.filterLow)
+        _filterLow = filterLowLimits(property.value.iValue())
+        didChangeValue(for: \.filterLow)
 
       case .squelchEnabled:
-        _api.update(self, property: &_squelchEnabled, value: property.value.bValue(), key: "squelchEnabled")
+        willChangeValue(for: \.squelchEnabled)
+        _squelchEnabled = property.value.bValue()
+        didChangeValue(for: \.squelchEnabled)
 
       case .squelchLevel:
-        _api.update(self, property: &_squelchLevel, value: property.value.iValue(), key: "squelchLevel")
+        willChangeValue(for: \.squelchLevel)
+        _squelchLevel = property.value.iValue()
+        didChangeValue(for: \.squelchLevel)
 
       case .step:
-        _api.update(self, property: &_step, value: property.value.iValue(), key: "step")
+        willChangeValue(for: \.step)
+        _step = property.value.iValue()
+        didChangeValue(for: \.step)
 
       case .toneMode:
-        _api.update(self, property: &_toneMode, value: property.value.replacingSpaces(), key: "toneMode")
+        willChangeValue(for: \.toneMode)
+        _toneMode = property.value.replacingSpaces()
+        didChangeValue(for: \.toneMode)
 
       case .toneValue:
-        _api.update(self, property: &_toneValue, value: property.value.iValue(), key: "toneValue")
+        willChangeValue(for: \.toneValue)
+        _toneValue = property.value.iValue()
+        didChangeValue(for: \.toneValue)
       }
     }
     // is the Memory initialized?

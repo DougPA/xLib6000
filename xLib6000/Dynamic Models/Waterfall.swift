@@ -166,22 +166,34 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       switch token {
         
       case .autoBlackEnabled:
-        _api.update(self, property: &_autoBlackEnabled, value: property.value.bValue(), key: "autoBlackEnabled")
+        willChangeValue(for: \.autoBlackEnabled)
+        _autoBlackEnabled = property.value.bValue()
+        didChangeValue(for: \.autoBlackEnabled)
 
       case .blackLevel:
-        _api.update(self, property: &_blackLevel, value: property.value.iValue(), key: "blackLevel")
+        willChangeValue(for: \.blackLevel)
+        _blackLevel = property.value.iValue()
+        didChangeValue(for: \.blackLevel)
 
       case .colorGain:
-        _api.update(self, property: &_colorGain, value: property.value.iValue(), key: "colorGain")
+        willChangeValue(for: \.colorGain)
+        _colorGain = property.value.iValue()
+        didChangeValue(for: \.colorGain)
 
       case .gradientIndex:
-        _api.update(self, property: &_gradientIndex, value: property.value.iValue(), key: "gradientIndex")
+         willChangeValue(for: \.gradientIndex)
+        _gradientIndex = property.value.iValue()
+        didChangeValue(for: \.gradientIndex)
 
       case .lineDuration:
-        _api.update(self, property: &_lineDuration, value: property.value.iValue(), key: "lineDuration")
+        willChangeValue(for: \.lineDuration)
+        _lineDuration = property.value.iValue()
+        didChangeValue(for: \.lineDuration)
 
       case .panadapterId:     // does not have leading "0x"
-        _api.update(self, property: &_panadapterId, value: UInt32(property.value, radix: 16) ?? 0, key: "panadapterId")
+        willChangeValue(for: \.panadapterId)
+        _panadapterId = UInt32(property.value, radix: 16) ?? 0
+        didChangeValue(for: \.panadapterId)
 
       case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqRate,
            .loopA, .loopB, .rfGain, .rxAnt, .segmentZoomEnabled, .wide, .xPixels, .xvtr:

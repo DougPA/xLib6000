@@ -71,7 +71,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var _usbCables                    = [UsbCableId: UsbCable]()      // Dictionary of UsbCables
   private var _waterfalls                   = [WaterfallId: Waterfall]()    // Dictionary of Waterfalls
   private var _xvtrs                        = [XvtrId: Xvtr]()              // Dictionary of Xvtrs
-    
+  
+  private var _gpsPresent                   = false
+  private var _atuPresent                   = false
+  
   // individual values
   // A
   private var __apfEnabled                  = false                         // auto-peaking filter enable
@@ -591,58 +594,94 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       switch token {
         
       case .atuPresent:
-        _api.update(self, property: &atu._status, value: property.value.bValue(), key: "atuPresent")
+        willChangeValue(for: \.atuPresent)
+        _atuPresent = property.value.bValue()
+        didChangeValue(for: \.atuPresent)
 
       case .callsign:
-        _api.update(self, property: &_callsign, value: property.value.replacingOccurrences(of: "\"", with:""), key: "callsign")
+        willChangeValue(for: \.callsign)
+        _callsign = property.value.replacingOccurrences(of: "\"", with:"")
+        didChangeValue(for: \.callsign)
 
       case .chassisSerial:
-        _api.update(self, property: &_chassisSerial, value: property.value.replacingOccurrences(of: "\"", with:""), key: "chassisSerial")
+        willChangeValue(for: \.chassisSerial)
+        _chassisSerial = property.value.replacingOccurrences(of: "\"", with:"")
+        didChangeValue(for: \.chassisSerial)
 
       case .gateway:
-        _api.update(self, property: &_gateway, value: property.value.replacingOccurrences(of: "\"", with:""), key: "gateway")
+        willChangeValue(for: \.gateway)
+        _gateway = property.value.replacingOccurrences(of: "\"", with:"")
+        didChangeValue(for: \.gateway)
 
       case .gps:
-        _api.update(self, property: &gps._status, value: property.value.bValue(), key: "gpsPresent")
+        willChangeValue(for: \.gpsPresent)
+        _gpsPresent = property.value.bValue()
+        didChangeValue(for: \.gpsPresent)
 
       case .ipAddress:
-        _api.update(self, property: &_ipAddress, value: property.value.replacingOccurrences(of: "\"", with:""), key: "ipAddress")
+        willChangeValue(for: \.ipAddress)
+        _ipAddress = property.value.replacingOccurrences(of: "\"", with:"")
+        didChangeValue(for: \.ipAddress)
 
       case .location:
-        _api.update(self, property: &_location, value: property.value.replacingOccurrences(of: "\"", with:""), key: "location")
+        willChangeValue(for: \.location)
+        _location = property.value.replacingOccurrences(of: "\"", with:"")
+        didChangeValue(for: \.location)
 
       case .macAddress:
-        _api.update(self, property: &_macAddress, value: property.value.replacingOccurrences(of: "\"", with:""), key: "macAddress")
+        willChangeValue(for: \.macAddress)
+        _macAddress = property.value.replacingOccurrences(of: "\"", with:"")
+        didChangeValue(for: \.macAddress)
 
       case .model:
-         _api.update(self, property: &_radioModel, value: property.value.replacingOccurrences(of: "\"", with:""), key: "radioModel")
+         willChangeValue(for: \.radioModel)
+         _radioModel = property.value.replacingOccurrences(of: "\"", with:"")
+         didChangeValue(for: \.radioModel)
 
       case .netmask:
-        _api.update(self, property: &_netmask, value: property.value.replacingOccurrences(of: "\"", with:""), key: "netmask")
+        willChangeValue(for: \.netmask)
+        _netmask = property.value.replacingOccurrences(of: "\"", with:"")
+        didChangeValue(for: \.netmask)
 
       case .name:
-        _api.update(self, property: &_nickname, value: property.value.replacingOccurrences(of: "\"", with:""), key: "nickname")
+        willChangeValue(for: \.nickname)
+        _nickname = property.value.replacingOccurrences(of: "\"", with:"")
+        didChangeValue(for: \.nickname)
 
       case .numberOfScus:
-        _api.update(self, property: &_numberOfScus, value: property.value.iValue(), key: "numberOfScus")
+        willChangeValue(for: \.numberOfScus)
+        _numberOfScus = property.value.iValue()
+        didChangeValue(for: \.numberOfScus)
 
       case .numberOfSlices:
-        _api.update(self, property: &_numberOfSlices, value: property.value.iValue(), key: "numberOfSlices")
+        willChangeValue(for: \.numberOfSlices)
+        _numberOfSlices = property.value.iValue()
+        didChangeValue(for: \.numberOfSlices)
 
       case .numberOfTx:
-        _api.update(self, property: &_numberOfTx, value: property.value.iValue(), key: "numberOfTx")
+        willChangeValue(for: \.numberOfTx)
+        _numberOfTx = property.value.iValue()
+        didChangeValue(for: \.numberOfTx)
 
       case .options:
-        _api.update(self, property: &_radioOptions, value: property.value.replacingOccurrences(of: "\"", with:""), key: "radioOptions")
+        willChangeValue(for: \.radioOptions)
+        _radioOptions = property.value.replacingOccurrences(of: "\"", with:"")
+        didChangeValue(for: \.radioOptions)
 
       case .region:
-        _api.update(self, property: &_region, value: property.value.replacingOccurrences(of: "\"", with:""), key: "region")
+        willChangeValue(for: \.region)
+        _region = property.value.replacingOccurrences(of: "\"", with:"")
+        didChangeValue(for: \.region)
 
       case .screensaver:
-        _api.update(self, property: &_radioScreenSaver, value: property.value.replacingOccurrences(of: "\"", with:""), key: "radioScreenSaver")
+        willChangeValue(for: \.radioScreenSaver)
+        _radioScreenSaver = property.value.replacingOccurrences(of: "\"", with:"")
+        didChangeValue(for: \.radioScreenSaver)
 
       case .softwareVersion:
-        _api.update(self, property: &_softwareVersion, value: property.value.replacingOccurrences(of: "\"", with:""), key: "softwareVersion")
+        willChangeValue(for: \.softwareVersion)
+        _softwareVersion = property.value.replacingOccurrences(of: "\"", with:"")
+        didChangeValue(for: \.softwareVersion)
       }
     }
   }
@@ -729,19 +768,29 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       switch token {
         
       case .smartSdrMB:
-        _api.update(self, property: &_smartSdrMB, value: property.value, key: "smartSdrMB")
+        willChangeValue(for: \.smartSdrMB)
+        _smartSdrMB = property.value
+        didChangeValue(for: \.smartSdrMB)
 
       case .picDecpu:
-        _api.update(self, property: &_picDecpuVersion, value: property.value, key: "picDecpuVersion")
+        willChangeValue(for: \.picDecpuVersion)
+        _picDecpuVersion = property.value
+        didChangeValue(for: \.picDecpuVersion)
 
       case .psocMbTrx:
-        _api.update(self, property: &_psocMbtrxVersion, value: property.value, key: "psocMbtrxVersion")
+        willChangeValue(for: \.psocMbtrxVersion)
+        _psocMbtrxVersion = property.value
+        didChangeValue(for: \.psocMbtrxVersion)
 
       case .psocMbPa100:
-        _api.update(self, property: &_psocMbPa100Version, value: property.value, key: "psocMbPa100Version")
+        willChangeValue(for: \.psocMbPa100Version)
+        _psocMbPa100Version = property.value
+        didChangeValue(for: \.psocMbPa100Version)
 
       case .fpgaMb:
-        _api.update(self, property: &_fpgaMbVersion, value: property.value, key: "fpgaMbVersion")
+        willChangeValue(for: \.fpgaMbVersion)
+        _fpgaMbVersion = property.value
+        didChangeValue(for: \.fpgaMbVersion)
       }
     }
   }
@@ -793,67 +842,109 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         switch token {
           
         case .backlight:
-          _api.update(self, property: &_backlight, value: property.value.iValue(), key: "backlight")
-          
+          willChangeValue(for: \.backlight)
+          _backlight = property.value.iValue()
+          didChangeValue(for: \.backlight)
+
         case .bandPersistenceEnabled:
-          _api.update(self, property: &_bandPersistenceEnabled, value: property.value.bValue(), key: "bandPersistenceEnabled")
-          
+          willChangeValue(for: \.bandPersistenceEnabled)
+          _bandPersistenceEnabled = property.value.bValue()
+          didChangeValue(for: \.bandPersistenceEnabled)
+
         case .binauralRxEnabled:
-          _api.update(self, property: &_binauralRxEnabled, value: property.value.bValue(), key: "binauralRxEnabled")
-          
+          willChangeValue(for: \.binauralRxEnabled)
+          _binauralRxEnabled = property.value.bValue()
+          didChangeValue(for: \.binauralRxEnabled)
+
         case .calFreq:
-          _api.update(self, property: &_calFreq, value: property.value.iValue(), key: "calFreq")
-          
+          willChangeValue(for: \.calFreq)
+          _calFreq = property.value.iValue()
+          didChangeValue(for: \.calFreq)
+
         case .callsign:
-          _api.update(self, property: &_callsign, value: property.value, key: "callsign")
-          
+          willChangeValue(for: \.callsign)
+          _callsign = property.value
+          didChangeValue(for: \.callsign)
+
         case .enforcePrivateIpEnabled:
-          _api.update(self, property: &_enforcePrivateIpEnabled, value: property.value.bValue(), key: "enforcePrivateIpEnabled")
-          
+          willChangeValue(for: \.enforcePrivateIpEnabled)
+          _enforcePrivateIpEnabled = property.value.bValue()
+          didChangeValue(for: \.enforcePrivateIpEnabled)
+
         case .freqErrorPpb:
-          _api.update(self, property: &_freqErrorPpb, value: property.value.iValue(), key: "freqErrorPpb")
-          
+          willChangeValue(for: \.freqErrorPpb)
+          _freqErrorPpb = property.value.iValue()
+          didChangeValue(for: \.freqErrorPpb)
+
         case .fullDuplexEnabled:
-          _api.update(self, property: &_fullDuplexEnabled, value: property.value.bValue(), key: "fullDuplexEnabled")
-         
+          willChangeValue(for: \.fullDuplexEnabled)
+          _fullDuplexEnabled = property.value.bValue()
+          didChangeValue(for: \.fullDuplexEnabled)
+
         case .frontSpeakerMute:
-          _api.update(self, property: &_frontSpeakerMute, value: property.value.bValue(), key: "frontSpeakerMute")
+          willChangeValue(for: \.frontSpeakerMute)
+          _frontSpeakerMute = property.value.bValue()
+          didChangeValue(for: \.frontSpeakerMute)
 
         case .headphoneGain:
-          _api.update(self, property: &_headphoneGain, value: property.value.iValue(), key: "headphoneGain")
-          
+          willChangeValue(for: \.headphoneGain)
+          _headphoneGain = property.value.iValue()
+          didChangeValue(for: \.headphoneGain)
+
         case .headphoneMute:
-          _api.update(self, property: &_headphoneMute, value: property.value.bValue(), key: "headphoneMute")
-          
+          willChangeValue(for: \.headphoneMute)
+          _headphoneMute = property.value.bValue()
+          didChangeValue(for: \.headphoneMute)
+
         case .lineoutGain:
-          _api.update(self, property: &_lineoutGain, value: property.value.iValue(), key: "lineoutGain")
-          
+          willChangeValue(for: \.lineoutGain)
+          _lineoutGain = property.value.iValue()
+          didChangeValue(for: \.lineoutGain)
+
         case .lineoutMute:
-          _api.update(self, property: &_lineoutMute, value: property.value.bValue(), key: "lineoutMute")
-          
+          willChangeValue(for: \.lineoutMute)
+          _lineoutMute = property.value.bValue()
+          didChangeValue(for: \.lineoutMute)
+
         case .nickname:
-          _api.update(self, property: &_nickname, value: property.value, key: "nickname")
-          
+          willChangeValue(for: \.nickname)
+          _nickname = property.value
+          didChangeValue(for: \.nickname)
+
         case .panadapters:
-          _api.update(self, property: &_availablePanadapters, value: property.value.iValue(), key: "availablePanadapters")
-          
+          willChangeValue(for: \.availablePanadapters)
+          _availablePanadapters = property.value.iValue()
+          didChangeValue(for: \.availablePanadapters)
+
         case .pllDone:
-          _api.update(self, property: &_startOffset, value: property.value.bValue(), key: "startOffset")
-          
+          willChangeValue(for: \.startOffset)
+          _startOffset = property.value.bValue()
+          didChangeValue(for: \.startOffset)
+
         case .remoteOnEnabled:
-          _api.update(self, property: &_remoteOnEnabled, value: property.value.bValue(), key: "remoteOnEnabled")
-          
+          willChangeValue(for: \.remoteOnEnabled)
+          _remoteOnEnabled = property.value.bValue()
+          didChangeValue(for: \.remoteOnEnabled)
+
         case .rttyMark:
-          _api.update(self, property: &_rttyMark, value: property.value.iValue(), key: "rttyMark")
-          
+          willChangeValue(for: \.rttyMark)
+          _rttyMark = property.value.iValue()
+          didChangeValue(for: \.rttyMark)
+
         case .slices:
-          _api.update(self, property: &_availableSlices, value: property.value.iValue(), key: "availableSlices")
-          
+          willChangeValue(for: \.availableSlices)
+          _availableSlices = property.value.iValue()
+          didChangeValue(for: \.availableSlices)
+
         case .snapTuneEnabled:
-          _api.update(self, property: &_snapTuneEnabled, value: property.value.bValue(), key: "snapTuneEnabled")
-          
+          willChangeValue(for: \.snapTuneEnabled)
+          _snapTuneEnabled = property.value.bValue()
+          didChangeValue(for: \.snapTuneEnabled)
+
         case .tnfEnabled:
-          _api.update(self, property: &_tnfEnabled, value: property.value.bValue(), key: "tnfEnabled")
+          willChangeValue(for: \.tnfEnabled)
+          _tnfEnabled = property.value.bValue()
+          didChangeValue(for: \.tnfEnabled)
         }
       }
     }
@@ -892,15 +983,21 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
       case .autoLevel:
         if cw {
-          _api.update(self, property: &_filterCwAutoLevel, value: property.value.iValue(), key: "filterCwAutoLevel")
+          willChangeValue(for: \.filterCwAutoLevel)
+          _filterCwAutoLevel = property.value.iValue()
+          didChangeValue(for: \.filterCwAutoLevel)
           cw = false
         }
         if digital {
-          _api.update(self, property: &_filterDigitalAutoLevel, value: property.value.iValue(), key: "filterDigitalAutoLevel")
+          willChangeValue(for: \.filterDigitalAutoLevel)
+          _filterDigitalAutoLevel = property.value.iValue()
+          didChangeValue(for: \.filterDigitalAutoLevel)
           digital = false
         }
         if voice {
-          _api.update(self, property: &_filterVoiceAutoLevel, value: property.value.iValue(), key: "filterVoiceAutoLevel")
+          willChangeValue(for: \.filterVoiceAutoLevel)
+          _filterVoiceAutoLevel = property.value.iValue()
+          didChangeValue(for: \.filterVoiceAutoLevel)
           voice = false
         }
         
@@ -912,15 +1009,21 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
       case .level:
         if cw {
-          _api.update(self, property: &_filterCwLevel, value: property.value.iValue(), key: "filterCwLevel")
+          willChangeValue(for: \.filterCwLevel)
+          _filterCwLevel = property.value.iValue()
+          didChangeValue(for: \.filterCwLevel)
           cw = false
         }
         if digital {
-          _api.update(self, property: &_filterDigitalLevel, value: property.value.iValue(), key: "filterDigitalLevel")
+          willChangeValue(for: \.filterDigitalLevel)
+          _filterDigitalLevel = property.value.iValue()
+          didChangeValue(for: \.filterDigitalLevel)
           digital = false
         }
         if voice {
-          _api.update(self, property: &_filterVoiceLevel, value: property.value.iValue(), key: "filterVoiceLevel")
+          willChangeValue(for: \.filterVoiceLevel)
+          _filterVoiceLevel = property.value.iValue()
+          didChangeValue(for: \.filterVoiceLevel)
           voice = false
         }
         
@@ -950,13 +1053,19 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       switch token {
         
       case .gateway:
-        _api.update(self, property: &_staticGateway, value: property.value, key: "staticGateway")
-        
+        willChangeValue(for: \.staticGateway)
+        _staticGateway = property.value
+        didChangeValue(for: \.staticGateway)
+
       case .ip:
-        _api.update(self, property: &_staticIp, value: property.value, key: "staticIp")
-        
+        willChangeValue(for: \.staticIp)
+        _staticIp = property.value
+        didChangeValue(for: \.staticIp)
+
       case .netmask:
-        _api.update(self, property: &_staticNetmask, value: property.value, key: "staticNetmask")
+        willChangeValue(for: \.staticNetmask)
+        _staticNetmask = property.value
+        didChangeValue(for: \.staticNetmask)
       }
     }
   }
@@ -981,22 +1090,34 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         switch token {
           
         case .extPresent:
-          _api.update(self, property: &_extPresent, value: property.value.bValue(), key: "extPresent")
+          willChangeValue(for: \.extPresent)
+          _extPresent = property.value.bValue()
+          didChangeValue(for: \.extPresent)
 
         case .gpsdoPresent:
-          _api.update(self, property: &_gpsdoPresent, value: property.value.bValue(), key: "gpsdoPresent")
-          
+          willChangeValue(for: \.gpsdoPresent)
+          _gpsdoPresent = property.value.bValue()
+          didChangeValue(for: \.gpsdoPresent)
+
        case .locked:
-          _api.update(self, property: &_locked, value: property.value.bValue(), key: "locked")
-          
+          willChangeValue(for: \.locked)
+          _locked = property.value.bValue()
+          didChangeValue(for: \.locked)
+
         case .setting:
-          _api.update(self, property: &_setting, value: property.value, key: "setting")
-          
+          willChangeValue(for: \.setting)
+          _setting = property.value
+          didChangeValue(for: \.setting)
+
         case .state:
-          _api.update(self, property: &_state, value: property.value, key: "state")
+          willChangeValue(for: \.state)
+          _state = property.value
+          didChangeValue(for: \.state)
 
         case .tcxoPresent:
-          _api.update(self, property: &_tcxoPresent, value: property.value.bValue(), key: "tcxoPresent")
+          willChangeValue(for: \.tcxoPresent)
+          _tcxoPresent = property.value.bValue()
+          didChangeValue(for: \.tcxoPresent)
         }
       }
     }
@@ -1514,6 +1635,9 @@ extension Radio {
   //          If yes, implement it, if not should they be "get" only?
   
   // listed in alphabetical order
+  @objc dynamic public var atuPresent: Bool {
+    return _atuPresent }
+  
   @objc dynamic public var availablePanadapters: Int {
     return _availablePanadapters }
   
@@ -1541,6 +1665,9 @@ extension Radio {
   @objc dynamic public var gateway: String {
     return _gateway }
   
+  @objc dynamic public var gpsPresent: Bool {
+    return _gpsPresent }
+  
   @objc dynamic public var gpsdoPresent: Bool {
     return _gpsdoPresent }
   
@@ -1549,6 +1676,9 @@ extension Radio {
   
   @objc dynamic public var location: String {
     return _location }
+  
+  @objc dynamic public var locked: Bool {
+    return _locked }
   
   @objc dynamic public var macAddress: String {
     return _macAddress }
@@ -1583,8 +1713,14 @@ extension Radio {
   @objc dynamic public var region: String {
     return _region }
   
+  @objc dynamic public var setting: String {
+    return _setting }
+  
   @objc dynamic public var smartSdrMB: String {
     return _smartSdrMB }
+  
+  @objc dynamic public var state: String {
+    return _state }
   
   @objc dynamic public var softwareVersion: String {
     return _softwareVersion }

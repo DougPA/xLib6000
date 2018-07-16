@@ -76,25 +76,34 @@ public final class Profile                  : NSObject, StaticModel {
       switch token {
         
       case .globalList:
-        _api.update(self, property: &_globalProfileList, value: Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast()), key: "globalProfileList")
-        
+        willChangeValue(for: \.globalProfileList)
+        _globalProfileList = Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast())
+        didChangeValue(for: \.globalProfileList)
+
       case .globalSelection:
-        let value = (properties.count == 2 ? properties[1].key : "")
-        _api.update(self, property: &_globalProfileSelection, value: value, key: "globalProfileSelection")
-        
+        willChangeValue(for: \.globalProfileSelection)
+        _globalProfileSelection = (properties.count == 2 ? properties[1].key : "")
+        didChangeValue(for: \.globalProfileSelection)
+
       case .micList:
-        _api.update(self, property: &_micProfileList, value: Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast()), key: "micProfileList")
-        
+        willChangeValue(for: \.micProfileList)
+        _micProfileList = Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast())
+        didChangeValue(for: \.micProfileList)
+
       case .micSelection:
-        let value = (properties.count == 2 ? properties[1].key : "")
-        _api.update(self, property: &_micProfileSelection, value: value, key: "micProfileSelection")
-        
+        willChangeValue(for: \.micProfileSelection)
+        _micProfileSelection = (properties.count == 2 ? properties[1].key : "")
+        didChangeValue(for: \.micProfileSelection)
+
       case .txList:
-        _api.update(self, property: &_txProfileList, value: Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast()), key: "txProfileList")
-        
+        willChangeValue(for: \.txProfileList)
+        _txProfileList = Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast())
+        didChangeValue(for: \.txProfileList)
+
       case .txSelection:
-        let value = (properties.count == 2 ? properties[1].key : "")
-        _api.update(self, property: &_txProfileSelection, value: value, key: "txProfileSelection")
+        willChangeValue(for: \.txProfileSelection)
+        _txProfileSelection = (properties.count == 2 ? properties[1].key : "")
+        didChangeValue(for: \.txProfileSelection)
       }
     } else {
       // unknown type

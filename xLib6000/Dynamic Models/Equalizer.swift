@@ -141,31 +141,49 @@ public final class Equalizer                : NSObject, DynamicModel {
       switch token {
         
       case .level63Hz:
-        _api.update(self, property: &_level63Hz, value: property.value.iValue(), key: "level63Hz")
+        willChangeValue(for: \.level63Hz)
+        _level63Hz = property.value.iValue()
+        didChangeValue(for: \.level63Hz)
 
       case .level125Hz:
-        _api.update(self, property: &_level125Hz, value: property.value.iValue(), key: "level125Hz")
+        willChangeValue(for: \.level125Hz)
+        _level125Hz = property.value.iValue()
+        didChangeValue(for: \.level125Hz)
 
       case .level250Hz:
-        _api.update(self, property: &_level250Hz, value: property.value.iValue(), key: "level250Hz")
+        willChangeValue(for: \.level250Hz)
+        _level250Hz = property.value.iValue()
+        didChangeValue(for: \.level250Hz)
 
       case .level500Hz:
-        _api.update(self, property: &_level500Hz, value: property.value.iValue(), key: "level500Hz")
+        willChangeValue(for: \.level500Hz)
+        _level500Hz = property.value.iValue()
+        didChangeValue(for: \.level500Hz)
 
       case .level1000Hz:
-        _api.update(self, property: &_level1000Hz, value: property.value.iValue(), key: "level1000Hz")
+        willChangeValue(for: \.level1000Hz)
+        _level1000Hz = property.value.iValue()
+        didChangeValue(for: \.level1000Hz)
 
       case .level2000Hz:
-        _api.update(self, property: &_level2000Hz, value: property.value.iValue(), key: "level2000Hz")
+        willChangeValue(for: \.level2000Hz)
+        _level2000Hz = property.value.iValue()
+        didChangeValue(for: \.level2000Hz)
 
       case .level4000Hz:
-        _api.update(self, property: &_level4000Hz, value: property.value.iValue(), key: "level4000Hz")
+        willChangeValue(for: \.level4000Hz)
+        _level4000Hz = property.value.iValue()
+        didChangeValue(for: \.level4000Hz)
 
       case .level8000Hz:
-        _api.update(self, property: &_level8000Hz, value: property.value.iValue(), key: "level8000Hz")
+        willChangeValue(for: \.level8000Hz)
+        _level8000Hz = property.value.iValue()
+        didChangeValue(for: \.level8000Hz)
 
       case .enabled:
-        _api.update(self, property: &_eqEnabled, value: property.value.bValue(), key: "eqEnabled")
+        willChangeValue(for: \.eqEnabled)
+        _eqEnabled = property.value.bValue()
+        didChangeValue(for: \.eqEnabled)
       }
     }
   }

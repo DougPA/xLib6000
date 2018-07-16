@@ -92,61 +92,99 @@ public final class Interlock                : NSObject, StaticModel {
       switch token {
         
       case .accTxEnabled:
-        _api.update(self, property: &_accTxEnabled, value: property.value.bValue(), key: "accTxEnabled")
+        willChangeValue(for: \.accTxEnabled)
+        _accTxEnabled = property.value.bValue()
+        didChangeValue(for: \.accTxEnabled)
 
       case .accTxDelay:
-        _api.update(self, property: &_accTxDelay, value: property.value.iValue(), key: "accTxDelay")
+        willChangeValue(for: \.accTxDelay)
+        _accTxDelay = property.value.iValue()
+        didChangeValue(for: \.accTxDelay)
 
       case .accTxReqEnabled:
-         _api.update(self, property: &_accTxReqEnabled, value: property.value.bValue(), key: "accTxReqEnabled")
+          willChangeValue(for: \.accTxReqEnabled)
+         _accTxReqEnabled = property.value.bValue()
+         didChangeValue(for: \.accTxReqEnabled)
 
       case .accTxReqPolarity:
-       _api.update(self, property: &_accTxReqPolarity, value: property.value.bValue(), key: "accTxReqPolarity")
+       willChangeValue(for: \.accTxReqPolarity)
+       _accTxReqPolarity = property.value.bValue()
+       didChangeValue(for: \.accTxReqPolarity)
 
       case .amplifier:
-        _api.update(self, property: &_amplifier, value: property.value, key: "amplifier")
-        
+        willChangeValue(for: \.amplifier)
+        _amplifier = property.value
+        didChangeValue(for: \.amplifier)
+
       case .rcaTxReqEnabled:
-        _api.update(self, property: &_rcaTxReqEnabled, value: property.value.bValue(), key: "rcaTxReqEnabled")
+        willChangeValue(for: \.rcaTxReqEnabled)
+        _rcaTxReqEnabled = property.value.bValue()
+        didChangeValue(for: \.rcaTxReqEnabled)
 
       case .rcaTxReqPolarity:
-         _api.update(self, property: &_rcaTxReqPolarity, value: property.value.bValue(), key: "rcaTxReqPolarity")
+         willChangeValue(for: \.rcaTxReqPolarity)
+         _rcaTxReqPolarity = property.value.bValue()
+         didChangeValue(for: \.rcaTxReqPolarity)
 
       case .reason:
-        _api.update(self, property: &_reason, value: property.value, key: "reason")
+        willChangeValue(for: \.reason)
+        _reason = property.value
+        didChangeValue(for: \.reason)
 
       case .source:
-        _api.update(self, property: &_source, value: property.value, key: "source")
+        willChangeValue(for: \.source)
+        _source = property.value
+        didChangeValue(for: \.source)
 
       case .state:
-        _api.update(self, property: &_state, value: property.value, key: "state")
+        willChangeValue(for: \.state)
+        _state = property.value
+        didChangeValue(for: \.state)
 
       case .timeout:
-        _api.update(self, property: &_timeout, value: property.value.iValue(), key: "timeout")
+        willChangeValue(for: \.timeout)
+        _timeout = property.value.iValue()
+        didChangeValue(for: \.timeout)
 
       case .txAllowed:
-        _api.update(self, property: &_txAllowed, value: property.value.bValue(), key: "txAllowed")
+        willChangeValue(for: \.txAllowed)
+        _txAllowed = property.value.bValue()
+        didChangeValue(for: \.txAllowed)
 
       case .txDelay:
-        _api.update(self, property: &_txDelay, value: property.value.iValue(), key: "txDelay")
+        willChangeValue(for: \.txDelay)
+        _txDelay = property.value.iValue()
+        didChangeValue(for: \.txDelay)
 
       case .tx1Delay:
-        _api.update(self, property: &_tx1Delay, value: property.value.iValue(), key: "tx1Delay")
+        willChangeValue(for: \.tx1Delay)
+        _tx1Delay = property.value.iValue()
+        didChangeValue(for: \.tx1Delay)
 
       case .tx1Enabled:
-        _api.update(self, property: &_tx1Enabled, value: property.value.bValue(), key: "tx1Enabled")
+        willChangeValue(for: \.tx1Enabled)
+        _tx1Enabled = property.value.bValue()
+        didChangeValue(for: \.tx1Enabled)
 
       case .tx2Delay:
-        _api.update(self, property: &_tx2Delay, value: property.value.iValue(), key: "tx2Delay")
+        willChangeValue(for: \.tx2Delay)
+        _tx2Delay = property.value.iValue()
+        didChangeValue(for: \.tx2Delay)
 
       case .tx2Enabled:
-        _api.update(self, property: &_tx2Enabled, value: property.value.bValue(), key: "tx2Enabled")
+        willChangeValue(for: \.tx2Enabled)
+        _tx2Enabled = property.value.bValue()
+        didChangeValue(for: \.tx2Enabled)
 
       case .tx3Delay:
-        _api.update(self, property: &_tx3Delay, value: property.value.iValue(), key: "tx3Delay")
+        willChangeValue(for: \.tx3Delay)
+        _tx3Delay = property.value.iValue()
+        didChangeValue(for: \.tx3Delay)
 
       case .tx3Enabled:
-        _api.update(self, property: &_tx3Enabled, value: property.value.bValue(), key: "tx3Enabled")
+        willChangeValue(for: \.tx3Enabled)
+        _tx3Enabled = property.value.bValue()
+        didChangeValue(for: \.tx3Enabled)
       }
     }
   }
@@ -249,7 +287,10 @@ extension Interlock {
   
   @objc dynamic public var source: String {
     return _source }
-  
+
+  @objc dynamic public var amplifier: String {
+    return _amplifier }
+
   @objc dynamic public var state: String {
     return _state }
   

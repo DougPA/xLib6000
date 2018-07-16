@@ -161,31 +161,49 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
       switch token {
         
       case .available:
-        _api.update(self, property: &_available, value: property.value.iValue(), key: "available")
+        willChangeValue(for: \.available)
+        _available = property.value.iValue()
+        didChangeValue(for: \.available)
 
       case .capacity:
-        _api.update(self, property: &_capacity, value: property.value.iValue(), key: "capacity")
+        willChangeValue(for: \.capacity)
+        _capacity = property.value.iValue()
+        didChangeValue(for: \.capacity)
 
       case .daxIqChannel:
-        _api.update(self, property: &_daxIqChannel, value: property.value.iValue(), key: "daxIqChannel")
+        willChangeValue(for: \.daxIqChannel)
+        _daxIqChannel = property.value.iValue()
+        didChangeValue(for: \.daxIqChannel)
 
       case .inUse:
-        _api.update(self, property: &_inUse, value: property.value.bValue(), key: "inUse")
+        willChangeValue(for: \.inUse)
+        _inUse = property.value.bValue()
+        didChangeValue(for: \.inUse)
 
       case .ip:
-        _api.update(self, property: &_ip, value: property.value, key: "ip")
+        willChangeValue(for: \.ip)
+        _ip = property.value
+        didChangeValue(for: \.ip)
 
       case .pan:
-        _api.update(self, property: &_pan, value:  UInt32(property.value.dropFirst(2), radix: 16) ?? 0, key: "pan")
+        willChangeValue(for: \.pan)
+        _pan = UInt32(property.value.dropFirst(2), radix: 16) ?? 0
+        didChangeValue(for: \.pan)
 
       case .port:
-        _api.update(self, property: &_port, value: property.value.iValue(), key: "port")
+        willChangeValue(for: \.port)
+        _port = property.value.iValue()
+        didChangeValue(for: \.port)
 
       case .rate:
-        _api.update(self, property: &_rate, value: property.value.iValue(), key: "rate")
+        willChangeValue(for: \.rate)
+        _rate = property.value.iValue()
+        didChangeValue(for: \.rate)
 
       case .streaming:
-        _api.update(self, property: &_streaming, value: property.value.bValue(), key: "streaming")
+        willChangeValue(for: \.streaming)
+        _streaming = property.value.bValue()
+        didChangeValue(for: \.streaming)
       }
     }
     // is the Stream initialized?

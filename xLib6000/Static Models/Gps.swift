@@ -107,37 +107,59 @@ public final class Gps                      : NSObject, StaticModel {
       switch token {
         
       case .altitude:
-        _api.update(self, property: &_altitude, value: property.value, key: "altitude")
+        willChangeValue(for: \.altitude)
+        _altitude = property.value
+        didChangeValue(for: \.altitude)
 
       case .frequencyError:
-        _api.update(self, property: &_frequencyError, value: property.value.dValue(), key: "frequencyError")
+        willChangeValue(for: \.frequencyError)
+        _frequencyError = property.value.dValue()
+        didChangeValue(for: \.frequencyError)
 
       case .grid:
-        _api.update(self, property: &_grid, value: property.value, key: "grid")
+        willChangeValue(for: \.grid)
+        _grid = property.value
+        didChangeValue(for: \.grid)
 
       case .latitude:
-        _api.update(self, property: &_latitude, value: property.value, key: "latitude")
+        willChangeValue(for: \.latitude)
+        _latitude = property.value
+        didChangeValue(for: \.latitude)
 
       case .longitude:
-        _api.update(self, property: &_longitude, value: property.value, key: "longitude")
+        willChangeValue(for: \.longitude)
+        _longitude = property.value
+        didChangeValue(for: \.longitude)
 
       case .speed:
-        _api.update(self, property: &_speed, value: property.value, key: "speed")
+        willChangeValue(for: \.speed)
+        _speed = property.value
+        didChangeValue(for: \.speed)
 
       case .status:
-        _api.update(self, property: &_status, value: ( property.value == "present" ? true : false ), key: "status")
+        willChangeValue(for: \.status)
+        _status = ( property.value == "present" ? true : false )
+        didChangeValue(for: \.status)
 
       case .time:
-        _api.update(self, property: &_time, value: property.value, key: "time")
+        willChangeValue(for: \.time)
+        _time = property.value
+        didChangeValue(for: \.time)
 
       case .track:
-        _api.update(self, property: &_track, value: property.value.dValue(), key: "track")
+        willChangeValue(for: \.track)
+        _track = property.value.dValue()
+        didChangeValue(for: \.track)
 
       case .tracked:
-        _api.update(self, property: &_tracked, value: property.value.bValue(), key: "tracked")
+        willChangeValue(for: \.tracked)
+        _tracked = property.value.bValue()
+        didChangeValue(for: \.tracked)
 
       case .visible:
-        _api.update(self, property: &_visible, value: property.value.bValue(), key: "visible")
+        willChangeValue(for: \.visible)
+        _visible = property.value.bValue()
+        didChangeValue(for: \.visible)
       }
     }
   }

@@ -165,20 +165,30 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       switch token {
         
       case .ipAddress:
-        _api.update(self, property: &_ip, value: property.value.trimmingCharacters(in: CharacterSet.whitespaces), key: "ip")
+        willChangeValue(for: \.ip)
+        _ip = property.value.trimmingCharacters(in: CharacterSet.whitespaces)
+        didChangeValue(for: \.ip)
 
       case .port:
-        _api.update(self, property: &_port, value: property.value.iValue(), key: "port")
+        willChangeValue(for: \.port)
+        _port = property.value.iValue()
+        didChangeValue(for: \.port)
 
       case .rxEnabled:
-        _api.update(self, property: &_rxEnabled, value: property.value.bValue(), key: "rxEnabled")
+        willChangeValue(for: \.rxEnabled)
+        _rxEnabled = property.value.bValue()
+        didChangeValue(for: \.rxEnabled)
 
       case .txEnabled:
-        _api.update(self, property: &_txEnabled, value: property.value.bValue(), key: "txEnabled")
+        willChangeValue(for: \.txEnabled)
+        _txEnabled = property.value.bValue()
+        didChangeValue(for: \.txEnabled)
 
       case .rxStopped:
-        _api.update(self, property: &_rxStopped, value: property.value.bValue(), key: "rxStopped")
-      }
+        willChangeValue(for: \.rxStopped)
+        _rxStopped = property.value.bValue()
+        didChangeValue(for: \.rxStopped)
+     }
     }
     // the Radio (hardware) has acknowledged this Opus
     if !_initialized && _ip != "" {
@@ -327,6 +337,14 @@ extension Opus {
   //          If yes, implement it, if not should they be "get" only?
   
   // listed in alphabetical order
+  @objc dynamic public var ip: String {
+    get { return _ip }
+    set { if _ip != newValue { _ip = newValue } } }
+
+  @objc dynamic public var port: Int {
+    get { return _port }
+    set { if _port != newValue { _port = newValue } } }
+
   @objc dynamic public var rxStopped: Bool {
     get { return _rxStopped }
     set { if _rxStopped != newValue { _rxStopped = newValue } } }

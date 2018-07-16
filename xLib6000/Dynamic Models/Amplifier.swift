@@ -132,19 +132,29 @@ public final class Amplifier                : NSObject, DynamicModel {
       switch token {
         
       case .ant:
-        _api.update(self, property: &_ant, value: property.value, key: "ant")
-        
+        willChangeValue(for: \.ant)
+        _ant = property.value
+        didChangeValue(for: \.ant)
+
       case .ip:
-        _api.update(self, property: &_ip, value: property.value, key: "ip")
+        willChangeValue(for: \.ip)
+        _ip = property.value
+        didChangeValue(for: \.ip)
 
       case .model:
-        _api.update(self, property: &_model, value: property.value, key: "model")
+        willChangeValue(for: \.model)
+        _model = property.value
+        didChangeValue(for: \.model)
 
       case .port:
-        _api.update(self, property: &_port, value: property.value.iValue(), key: "port")
+        willChangeValue(for: \.port)
+        _port = property.value.iValue()
+        didChangeValue(for: \.port)
 
       case .serialNumber:
-       _api.update(self, property: &_serialNumber, value: property.value, key: "serialNumber")
+       willChangeValue(for: \.serialNumber)
+       _serialNumber = property.value
+       didChangeValue(for: \.serialNumber)
 
       case .mode:      // never received from Radio
         break

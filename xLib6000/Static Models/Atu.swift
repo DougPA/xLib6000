@@ -73,16 +73,24 @@ public final class Atu                      : NSObject, StaticModel {
       switch token {
         
       case .enabled:
-        _api.update(self, property: &_enabled, value: property.value.bValue(), key: "enabled")
+        willChangeValue(for: \.enabled)
+        _enabled = property.value.bValue()
+        didChangeValue(for: \.enabled)
 
       case .memoriesEnabled:
-        _api.update(self, property: &_memoriesEnabled, value: property.value.bValue(), key: "memoriesEnabled")
+        willChangeValue(for: \.memoriesEnabled)
+        _memoriesEnabled = property.value.bValue()
+        didChangeValue(for: \.memoriesEnabled)
 
       case .status:
-        _api.update(self, property: &_status, value: ( property.value == "present" ? true : false ), key: "status")
+        willChangeValue(for: \.status)
+        _status = ( property.value == "present" ? true : false )
+        didChangeValue(for: \.status)
 
       case .usingMemories:
-        _api.update(self, property: &_usingMemories, value: property.value.bValue(), key: "usingMemories")
+        willChangeValue(for: \.usingMemories)
+        _usingMemories = property.value.bValue()
+        didChangeValue(for: \.usingMemories)
       }
     }
   }

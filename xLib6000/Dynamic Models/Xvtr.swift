@@ -138,40 +138,64 @@ public final class Xvtr                     : NSObject, DynamicModel {
       switch token {
         
       case .name:
-        _api.update(self, property: &_name, value: property.value, key: "name")
+        willChangeValue(for: \.name)
+        _name = property.value
+        didChangeValue(for: \.name)
 
       case .ifFrequency:
-        _api.update(self, property: &_ifFrequency, value: property.value.iValue(), key: "ifFrequency")
+        willChangeValue(for: \.ifFrequency)
+        _ifFrequency = property.value.iValue()
+        didChangeValue(for: \.ifFrequency)
 
       case .inUse:
-        _api.update(self, property: &_inUse, value: property.value.bValue(), key: "inUse")
+        willChangeValue(for: \.inUse)
+        _inUse = property.value.bValue()
+        didChangeValue(for: \.inUse)
 
       case .isValid:
-        _api.update(self, property: &_isValid, value: property.value.bValue(), key: "isValid")
+        willChangeValue(for: \.isValid)
+        _isValid = property.value.bValue()
+        didChangeValue(for: \.isValid)
 
       case .loError:
-        _api.update(self, property: &_loError, value: property.value.iValue(), key: "loError")
+        willChangeValue(for: \.loError)
+        _loError = property.value.iValue()
+        didChangeValue(for: \.loError)
 
       case .maxPower:
-        _api.update(self, property: &_maxPower, value: property.value.iValue(), key: "maxPower")
+        willChangeValue(for: \.maxPower)
+        _maxPower = property.value.iValue()
+        didChangeValue(for: \.maxPower)
 
       case .order:
-        _api.update(self, property: &_order, value: property.value.iValue(), key: "order")
+        willChangeValue(for: \.order)
+        _order = property.value.iValue()
+        didChangeValue(for: \.order)
 
       case .preferred:
-        _api.update(self, property: &_preferred, value: property.value.bValue(), key: "preferred")
+        willChangeValue(for: \.preferred)
+        _preferred = property.value.bValue()
+        didChangeValue(for: \.preferred)
 
       case .rfFrequency:
-        _api.update(self, property: &_rfFrequency, value: property.value.iValue(), key: "rfFrequency")
+        willChangeValue(for: \.rfFrequency)
+        _rfFrequency = property.value.iValue()
+        didChangeValue(for: \.rfFrequency)
 
       case .rxGain:
-        _api.update(self, property: &_rxGain, value: property.value.iValue(), key: "rxGain")
+        willChangeValue(for: \.rxGain)
+        _rxGain = property.value.iValue()
+        didChangeValue(for: \.rxGain)
 
       case .rxOnly:
-        _api.update(self, property: &_rxOnly, value: property.value.bValue(), key: "rxOnly")
+        willChangeValue(for: \.rxOnly)
+        _rxOnly = property.value.bValue()
+        didChangeValue(for: \.rxOnly)
 
       case .twoMeterInt:
-        _api.update(self, property: &_twoMeterInt, value: property.value.iValue(), key: "twoMeterInt")
+        willChangeValue(for: \.twoMeterInt)
+        _twoMeterInt = property.value.iValue()
+        didChangeValue(for: \.twoMeterInt)
       }
     }
     // is the waterfall initialized?

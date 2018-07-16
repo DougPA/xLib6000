@@ -417,22 +417,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       log.msg("Update in process", level: .info, function: #function, file: #file, line: #line)
     }
   }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  func update<T: Equatable>(_ object: AnyObject, property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-    //    if property != value {
-    object.willChangeValue(forKey: key)
-    property = value
-    object.didChangeValue(forKey: key)
-    //    }
-  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Private methods

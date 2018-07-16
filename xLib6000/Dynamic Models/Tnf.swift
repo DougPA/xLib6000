@@ -230,16 +230,24 @@ public final class Tnf                      : NSObject, DynamicModel {
       switch token {
         
       case .depth:
-        _api.update(self, property: &_depth, value: Int(property.value) ?? 1, key: "depth")
+        willChangeValue(for: \.depth)
+        _depth = property.value.iValue()
+        didChangeValue(for: \.depth)
 
       case .frequency:
-        _api.update(self, property: &_frequency, value: property.value.mhzToHz(), key: "frequency")
+        willChangeValue(for: \.frequency)
+        _frequency = property.value.mhzToHz()
+        didChangeValue(for: \.frequency)
 
       case .permanent:
-        _api.update(self, property: &_permanent, value: property.value.bValue(), key: "permanent")
+        willChangeValue(for: \.permanent)
+        _permanent = property.value.bValue()
+        didChangeValue(for: \.permanent)
 
       case .width:
-         _api.update(self, property: &_width, value: property.value.mhzToHz(), key: "width")
+         willChangeValue(for: \.width)
+         _width = property.value.mhzToHz()
+         didChangeValue(for: \.width)
       }
     }
     // is the Tnf initialized?

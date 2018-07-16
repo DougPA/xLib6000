@@ -240,85 +240,139 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       switch token {
         
       case .antList:
-        _api.update(self, property: &_antList, value: property.value.components(separatedBy: ","), key: "antList")
+        willChangeValue(for: \.antList)
+        _antList = property.value.components(separatedBy: ",")
+        didChangeValue(for: \.antList)
 
       case .average:
-        _api.update(self, property: &_average, value: property.value.iValue(), key: "average")
+        willChangeValue(for: \.average)
+        _average = property.value.iValue()
+        didChangeValue(for: \.average)
 
       case .band:
-        _api.update(self, property: &_band, value: property.value, key: "band")
+        willChangeValue(for: \.band)
+        _band = property.value
+        didChangeValue(for: \.band)
 
       case .bandwidth:
-        _api.update(self, property: &_bandwidth, value: property.value.mhzToHz(), key: "bandwidth")
+        willChangeValue(for: \.bandwidth)
+        _bandwidth = property.value.mhzToHz()
+        didChangeValue(for: \.bandwidth)
 
       case .bandZoomEnabled:
-        _api.update(self, property: &_bandZoomEnabled, value: property.value.bValue(), key: "bandZoomEnabled")
-        
+        willChangeValue(for: \.bandZoomEnabled)
+        _bandZoomEnabled = property.value.bValue()
+        didChangeValue(for: \.bandZoomEnabled)
+
       case .center:
-        _api.update(self, property: &_center, value: property.value.mhzToHz(), key: "center")
+        willChangeValue(for: \.center)
+        _center = property.value.mhzToHz()
+        didChangeValue(for: \.center)
 
       case .daxIqChannel:
-        _api.update(self, property: &_daxIqChannel, value: property.value.iValue(), key: "daxIqChannel")
+        willChangeValue(for: \.daxIqChannel)
+        _daxIqChannel = property.value.iValue()
+        didChangeValue(for: \.daxIqChannel)
 
       case .fps:
-        _api.update(self, property: &_fps, value: property.value.iValue(), key: "fps")
+        willChangeValue(for: \.fps)
+        _fps = property.value.iValue()
+        didChangeValue(for: \.fps)
 
       case .loopAEnabled:
-        _api.update(self, property: &_loopAEnabled, value: property.value.bValue(), key: "loopAEnabled")
+        willChangeValue(for: \.loopAEnabled)
+        _loopAEnabled = property.value.bValue()
+        didChangeValue(for: \.loopAEnabled)
 
       case .loopBEnabled:
-        _api.update(self, property: &_loopBEnabled, value: property.value.bValue(), key: "loopBEnabled")
+        willChangeValue(for: \.loopBEnabled)
+        _loopBEnabled = property.value.bValue()
+        didChangeValue(for: \.loopBEnabled)
 
       case .maxBw:
-        _api.update(self, property: &_maxBw, value: property.value.mhzToHz(), key: "maxBw")
+        willChangeValue(for: \.maxBw)
+        _maxBw = property.value.mhzToHz()
+        didChangeValue(for: \.maxBw)
 
       case .maxDbm:
-        _api.update(self, property: &_maxDbm, value: CGFloat(property.value.fValue()), key: "maxDbm")
+        willChangeValue(for: \.maxDbm)
+        _maxDbm = CGFloat(property.value.fValue())
+        didChangeValue(for: \.maxDbm)
 
       case .minBw:
-        _api.update(self, property: &_minBw, value: property.value.mhzToHz(), key: "minBw")
+        willChangeValue(for: \.minBw)
+        _minBw = property.value.mhzToHz()
+        didChangeValue(for: \.minBw)
 
       case .minDbm:
-        _api.update(self, property: &_minDbm, value: CGFloat(property.value.fValue()), key: "minDbm")
+        willChangeValue(for: \.minDbm)
+        _minDbm = CGFloat(property.value.fValue())
+        didChangeValue(for: \.minDbm)
 
       case .preamp:
-        _api.update(self, property: &_preamp, value: property.value, key: "preamp")
+        willChangeValue(for: \.preamp)
+        _preamp = property.value
+        didChangeValue(for: \.preamp)
 
       case .rfGain:
-        _api.update(self, property: &_rfGain, value: property.value.iValue(), key: "rfGain")
+        willChangeValue(for: \.rfGain)
+        _rfGain = property.value.iValue()
+        didChangeValue(for: \.rfGain)
 
       case .rxAnt:
-        _api.update(self, property: &_rxAnt, value: property.value, key: "rxAnt")
+        willChangeValue(for: \.rxAnt)
+        _rxAnt = property.value
+        didChangeValue(for: \.rxAnt)
 
       case .segmentZoomEnabled:
-        _api.update(self, property: &_segmentZoomEnabled, value: property.value.bValue(), key: "segmentZoomEnabled")
-        
+        willChangeValue(for: \.segmentZoomEnabled)
+        _segmentZoomEnabled = property.value.bValue()
+        didChangeValue(for: \.segmentZoomEnabled)
+
       case .waterfallId:
-        _api.update(self, property: &_waterfallId, value: UInt32(property.value, radix: 16) ?? 0, key: "waterfallId")
+         willChangeValue(for: \.waterfallId)
+        _waterfallId = UInt32(property.value, radix: 16) ?? 0
+        didChangeValue(for: \.waterfallId)
 
       case .wide:
-        _api.update(self, property: &_wide, value: property.value.bValue(), key: "wide")
+        willChangeValue(for: \.wide)
+        _wide = property.value.bValue()
+        didChangeValue(for: \.wide)
 
       case .weightedAverageEnabled:
-        _api.update(self, property: &_weightedAverageEnabled, value: property.value.bValue(), key: "weightedAverageEnabled")
+        willChangeValue(for: \.weightedAverageEnabled)
+        _weightedAverageEnabled = property.value.bValue()
+        didChangeValue(for: \.weightedAverageEnabled)
 
       case .wnbEnabled:
-        _api.update(self, property: &_wnbEnabled, value: property.value.bValue(), key: "wnbEnabled")
+        willChangeValue(for: \.wnbEnabled)
+        _wnbEnabled = property.value.bValue()
+        didChangeValue(for: \.wnbEnabled)
 
       case .wnbLevel:
-        _api.update(self, property: &_wnbLevel, value: property.value.iValue(), key: "wnbLevel")
+        willChangeValue(for: \.wnbLevel)
+        _wnbLevel = property.value.iValue()
+        didChangeValue(for: \.wnbLevel)
 
       case .wnbUpdating:
-        _api.update(self, property: &_wnbUpdating, value: property.value.bValue(), key: "wnbUpdating")
+        willChangeValue(for: \.wnbUpdating)
+        _wnbUpdating = property.value.bValue()
+        didChangeValue(for: \.wnbUpdating)
 
       case .xPixels:
-        _api.update(self, property: &_xPixels, value: CGFloat(property.value.fValue()), key: "xPixels")
+        willChangeValue(for: \.xPixels)
+        _xPixels = CGFloat(property.value.fValue())
+        didChangeValue(for: \.xPixels)
 
       case .xvtrLabel:
-        _api.update(self, property: &_xvtrLabel, value: property.value, key: "xvtrLabel")
+        willChangeValue(for: \.xvtrLabel)
+        _xvtrLabel = property.value
+        didChangeValue(for: \.xvtrLabel)
 
       case .yPixels:
-        _api.update(self, property: &_yPixels, value: CGFloat(property.value.fValue()), key: "yPixels")
+        willChangeValue(for: \.yPixels)
+        _yPixels = CGFloat(property.value.fValue())
+        didChangeValue(for: \.yPixels)
 
       case .available, .capacity, .daxIqRate:
         // ignored by Panadapter

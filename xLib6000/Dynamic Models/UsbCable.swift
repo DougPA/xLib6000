@@ -160,59 +160,93 @@ public final class UsbCable                 : NSObject, DynamicModel {
         switch token {
           
         case .autoReport:
-          _api.update(self, property: &_autoReport, value: property.value.bValue(), key: "autoReport")
+          willChangeValue(for: \.autoReport)
+          _autoReport = property.value.bValue()
+          didChangeValue(for: \.autoReport)
 
         case .band:
-          _api.update(self, property: &_band, value: property.value, key: "band")
+          willChangeValue(for: \.band)
+          _band = property.value
+          didChangeValue(for: \.band)
 
         case .cableType:
           // ignore this token's value (set by init)
           break
           
         case .dataBits:
-          _api.update(self, property: &_dataBits, value: property.value.iValue(), key: "dataBits")
+          willChangeValue(for: \.dataBits)
+          _dataBits = property.value.iValue()
+          didChangeValue(for: \.dataBits)
 
         case .enable:
-          _api.update(self, property: &_enable, value: property.value.bValue(), key: "enable")
+          willChangeValue(for: \.enable)
+          _enable = property.value.bValue()
+          didChangeValue(for: \.enable)
 
         case .flowControl:
-          _api.update(self, property: &_flowControl, value: property.value, key: "flowControl")
+          willChangeValue(for: \.flowControl)
+          _flowControl = property.value
+          didChangeValue(for: \.flowControl)
 
         case .name:
-          _api.update(self, property: &_name, value: property.value, key: "name")
+          willChangeValue(for: \.name)
+          _name = property.value
+          didChangeValue(for: \.name)
 
         case .parity:
-          _api.update(self, property: &_parity, value: property.value, key: "parity")
+          willChangeValue(for: \.parity)
+          _parity = property.value
+          didChangeValue(for: \.parity)
 
         case .pluggedIn:
-          _api.update(self, property: &_pluggedIn, value: property.value.bValue(), key: "pluggedIn")
+          willChangeValue(for: \.pluggedIn)
+          _pluggedIn = property.value.bValue()
+          didChangeValue(for: \.pluggedIn)
 
         case .polarity:
-          _api.update(self, property: &_polarity, value: property.value, key: "polarity")
+          willChangeValue(for: \.polarity)
+          _polarity = property.value
+          didChangeValue(for: \.polarity)
 
         case .preamp:
-          _api.update(self, property: &_preamp, value: property.value, key: "preamp")
+          willChangeValue(for: \.preamp)
+          _preamp = property.value
+          didChangeValue(for: \.preamp)
 
         case .source:
-          _api.update(self, property: &_source, value: property.value, key: "source")
+          willChangeValue(for: \.source)
+          _source = property.value
+          didChangeValue(for: \.source)
 
         case .sourceRxAnt:
-          _api.update(self, property: &_sourceRxAnt, value: property.value, key: "sourceRxAnt")
+          willChangeValue(for: \.sourceRxAnt)
+          _sourceRxAnt = property.value
+          didChangeValue(for: \.sourceRxAnt)
 
         case .sourceSlice:
-          _api.update(self, property: &_sourceSlice, value: property.value.iValue(), key: "sourceSlice")
+         willChangeValue(for: \.sourceSlice)
+          _sourceSlice = property.value.iValue()
+          didChangeValue(for: \.sourceSlice)
 
         case .sourceTxAnt:
-          _api.update(self, property: &_sourceTxAnt, value: property.value, key: "sourceTxAnt")
+          willChangeValue(for: \.sourceTxAnt)
+          _sourceTxAnt = property.value
+          didChangeValue(for: \.sourceTxAnt)
 
         case .speed:
-          _api.update(self, property: &_speed, value: property.value.iValue(), key: "speed")
+          willChangeValue(for: \.speed)
+          _speed = property.value.iValue()
+          didChangeValue(for: \.speed)
 
         case .stopBits:
-          _api.update(self, property: &_stopBits, value: property.value.iValue(), key: "stopBits")
+          willChangeValue(for: \.stopBits)
+          _stopBits = property.value.iValue()
+          didChangeValue(for: \.stopBits)
 
         case .usbLog:
-          _api.update(self, property: &_usbLog, value: property.value.bValue(), key: "usbLog")
+          willChangeValue(for: \.usbLog)
+          _usbLog = property.value.bValue()
+          didChangeValue(for: \.usbLog)
 
           //                case .usbLogLine:
           //                    willChangeValue(forKey: "usbLogLine")

@@ -139,13 +139,19 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       switch token {
         
       case .inUse:
-        _api.update(self, property: &_inUse, value: property.value.bValue(), key: "inUse")
+        willChangeValue(for: \.inUse)
+        _inUse = property.value.bValue()
+        didChangeValue(for: \.inUse)
 
       case .ip:
-        _api.update(self, property: &_ip, value: property.value, key: "ip")
+        willChangeValue(for: \.ip)
+        _ip = property.value
+        didChangeValue(for: \.ip)
 
       case .port:
-        _api.update(self, property: &_port, value: property.value.iValue(), key: "port")
+        willChangeValue(for: \.port)
+        _port = property.value.iValue()
+        didChangeValue(for: \.port)
 
       }
     }
