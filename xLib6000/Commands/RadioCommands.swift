@@ -182,6 +182,16 @@ extension Radio {
     
     Api.sharedInstance.send(Radio.kCmd + "static_net_params" + " " + RadioStaticNet.ip.rawValue + "=\(value1) " + RadioStaticNet.gateway.rawValue + "=\(value2) " + RadioStaticNet.netmask.rawValue + "=\(value3)")
   }
+  /// Set Xmit on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func xmitCmd(_ value: Any) {
+    
+    Api.sharedInstance.send(Radio.kXmitCmd + "\(value)")
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant (with message sent to Radio)
@@ -330,4 +340,11 @@ extension Radio {
   @objc dynamic public var staticNetmask: String {
     get {  return _staticNetmask }
     set { if _staticNetmask != newValue { _staticNetmask = newValue ; radioStaticCmd(_staticIp,  _staticGateway , newValue) } } }
+  
+  // ***** XMIT COMMANDS *****
+  
+  @objc dynamic public var mox: Bool {
+    get { return _mox }
+    set { if _mox != newValue { _mox = newValue ; xmitCmd( newValue.asNumber()) } } }
+  
 }

@@ -165,7 +165,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       case .initialized:                      // not connected but initialized
         
         // Create a Radio class
-        radio = Radio(api: self, objectQ: _objectQ)
+        radio = Radio(api: self, queue: _objectQ)
         
         activeRadio = selectedRadio
         

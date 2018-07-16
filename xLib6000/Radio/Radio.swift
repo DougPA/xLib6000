@@ -49,7 +49,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var _hardwareVersion              : String?                       // ???
 
   // GCD Queue
-  private let _objectQ                      : DispatchQueue
+  private let _q                            : DispatchQueue
   private let _streamQ                      = DispatchQueue(label: Api.kId + ".streamQ", qos: .userInteractive)
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -123,6 +123,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __locked                      = false                         //
   // M
   private var __macAddress                  = ""                            // Radio Mac Address (read only)
+  private var __mox                         = false                         // manual Transmit
   // N
   private var __netmask                     = ""                            //
   private var __nickname                    = ""                            // User assigned name
@@ -166,28 +167,28 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   /// - Parameters:
   ///   - api:        an Api instance
   ///
-  public init(api: Api, objectQ: DispatchQueue) {
+  public init(api: Api, queue: DispatchQueue) {
     
     _api = api
-    _objectQ = objectQ
+    _q = queue
 
     super.init()
 
     _api.delegate = self
     
     // initialize the static models (only one of each is ever created)
-    atu = Atu(queue: _objectQ)
-    cwx = Cwx(queue: _objectQ)
-    gps = Gps(queue: _objectQ)
-    interlock = Interlock(queue: _objectQ)
-    profile = Profile(queue: _objectQ)
-    transmit = Transmit(queue: _objectQ)
-    wan = Wan(queue: _objectQ)
-    waveform = Waveform(queue: _objectQ)
+    atu = Atu(queue: _q)
+    cwx = Cwx(queue: _q)
+    gps = Gps(queue: _q)
+    interlock = Interlock(queue: _q)
+    profile = Profile(queue: _q)
+    transmit = Transmit(queue: _q)
+    wan = Wan(queue: _q)
+    waveform = Waveform(queue: _q)
     
     // initialize Equalizers (use the newer "sc" type)
-    equalizers[.rxsc] = Equalizer(id: Equalizer.EqType.rxsc.rawValue, queue: _objectQ)
-    equalizers[.txsc] = Equalizer(id: Equalizer.EqType.txsc.rawValue, queue: _objectQ)
+    equalizers[.rxsc] = Equalizer(id: Equalizer.EqType.rxsc.rawValue, queue: _q)
+    equalizers[.txsc] = Equalizer(id: Equalizer.EqType.txsc.rawValue, queue: _q)
   }
   /// Remove all Radio objects
   ///
@@ -408,11 +409,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .amplifier:
       // FIXME: Need format(s)
-      Amplifier.parseStatus(remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kRemoved))
+      Amplifier.parseStatus(remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       
     case .audioStream:
       //      format: <AudioStreamId> <key=value> <key=value> ...<key=value>
-      AudioStream.parseStatus(remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kNotInUse))
+      AudioStream.parseStatus(remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
       
     case .atu:
       //      format: <key=value> <key=value> ...<key=value>
@@ -422,7 +423,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       //      kv                0         1            2
       //      format: client <handle> connected
       //      format: client <handle> disconnected <forced=1/0>      
-      parseClient(remainder.keyValuesArray(), radio: self, queue: _objectQ)
+      parseClient(remainder.keyValuesArray(), radio: self, queue: _q)
       
     case .cwx:
       // replace some characters to avoid parsing conflicts
@@ -441,10 +442,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // what Display Type is it?
       switch keyValues[0].key {
       case DisplayToken.panadapter.rawValue:
-        Panadapter.parseStatus(keyValues, radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kRemoved))
+        Panadapter.parseStatus(keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
         
       case DisplayToken.waterfall.rawValue:
-        Waterfall.parseStatus(keyValues, radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kRemoved))
+        Waterfall.parseStatus(keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
         
       default:
         // unknown Display Type, log it and ignore the message
@@ -454,7 +455,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .eq:
       //      format: txsc <key=value> <key=value> ...<key=value>
       //      format: rxsc <key=value> <key=value> ...<key=value>
-      Equalizer.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ )
+      Equalizer.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q )
       
     case .file:
       
@@ -470,15 +471,15 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .memory:
       //      format: <memoryId> <key=value>,<key=value>,...<key=value>
-      Memory.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kRemoved))
+      Memory.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       
     case .meter:
       //     format: <meterNumber.key=value>#<meterNumber.key=value>#...<meterNumber.key=value>
-      Meter.parseStatus( remainder.keyValuesArray(delimiter: "#"), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kRemoved))
+      Meter.parseStatus( remainder.keyValuesArray(delimiter: "#"), radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       
     case .micAudioStream:
       //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
-      MicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kNotInUse))
+      MicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
       
     case .mixer:
       
@@ -486,7 +487,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .opusStream:
       //     format: <opusId> <key=value> <key=value> ...<key=value>
-      Opus.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ)
+      Opus.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q)
       
     case .profile:
       //     format: global list=<value>^<value>^...<value>^
@@ -503,15 +504,15 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .slice:
       //     format: <sliceId> <key=value> <key=value> ...<key=value>
-      xLib6000.Slice.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kNotInUse))
+      xLib6000.Slice.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
       
     case .stream:
       //     format: <streamId> <key=value> <key=value> ...<key=value>
-      IqStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kNotInUse))
+      IqStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
       
     case .tnf:
       //     format: <tnfId> <key=value> <key=value> ...<key=value>
-      Tnf.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kRemoved))
+      Tnf.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       
     case .transmit:
       //      format: <key=value> <key=value> ...<key=value>
@@ -523,11 +524,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .txAudioStream:
       //      format: <TxAudioStreamId> <key=value> <key=value> ...<key=value>
-      TxAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kNotInUse))
+      TxAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
       
     case .usbCable:
       //      format:
-      UsbCable.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ)
+      UsbCable.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q)
       
     case .wan:
       wan.parseProperties( remainder.keyValuesArray() )
@@ -538,7 +539,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .xvtr:
       //      format: <name> <key=value> <key=value> ...<key=value>
-      Xvtr.parseStatus( remainder.keyValuesArray(), radio: self, queue: _objectQ, inUse: !remainder.contains(Api.kNotInUse))
+      Xvtr.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
     }
   }
   /// Parse a Client status message
@@ -1381,252 +1382,256 @@ extension Radio {
   
   // listed in alphabetical order
   internal var _apfEnabled: Bool {
-    get { return _objectQ.sync { __apfEnabled } }
-    set { _objectQ.sync(flags: .barrier) { __apfEnabled = newValue } } }
+    get { return _q.sync { __apfEnabled } }
+    set { _q.sync(flags: .barrier) { __apfEnabled = newValue } } }
   
   internal var _apfQFactor: Int {
-    get { return _objectQ.sync { __apfQFactor } }
-    set { _objectQ.sync(flags: .barrier) { __apfQFactor = newValue.bound(Api.kMinApfQ, Api.kMaxApfQ) } } }
+    get { return _q.sync { __apfQFactor } }
+    set { _q.sync(flags: .barrier) { __apfQFactor = newValue.bound(Api.kMinApfQ, Api.kMaxApfQ) } } }
   
   internal var _apfGain: Int {
-    get { return _objectQ.sync { __apfGain } }
-    set { _objectQ.sync(flags: .barrier) { __apfGain = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
+    get { return _q.sync { __apfGain } }
+    set { _q.sync(flags: .barrier) { __apfGain = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _availablePanadapters: Int {
-    get { return _objectQ.sync { __availablePanadapters } }
-    set { _objectQ.sync(flags: .barrier) { __availablePanadapters = newValue } } }
+    get { return _q.sync { __availablePanadapters } }
+    set { _q.sync(flags: .barrier) { __availablePanadapters = newValue } } }
   
   internal var _availableSlices: Int {
-    get { return _objectQ.sync { __availableSlices } }
-    set { _objectQ.sync(flags: .barrier) { __availableSlices = newValue } } }
+    get { return _q.sync { __availableSlices } }
+    set { _q.sync(flags: .barrier) { __availableSlices = newValue } } }
   
   internal var _backlight: Int {
-    get { return _objectQ.sync { __backlight } }
-    set { _objectQ.sync(flags: .barrier) { __backlight = newValue } } }
+    get { return _q.sync { __backlight } }
+    set { _q.sync(flags: .barrier) { __backlight = newValue } } }
   
   internal var _bandPersistenceEnabled: Bool {
-    get { return _objectQ.sync { __bandPersistenceEnabled } }
-    set { _objectQ.sync(flags: .barrier) { __bandPersistenceEnabled = newValue } } }
+    get { return _q.sync { __bandPersistenceEnabled } }
+    set { _q.sync(flags: .barrier) { __bandPersistenceEnabled = newValue } } }
   
   internal var _binauralRxEnabled: Bool {
-    get { return _objectQ.sync { __binauralRxEnabled } }
-    set { _objectQ.sync(flags: .barrier) { __binauralRxEnabled = newValue } } }
+    get { return _q.sync { __binauralRxEnabled } }
+    set { _q.sync(flags: .barrier) { __binauralRxEnabled = newValue } } }
   
   internal var _calFreq: Int {
-    get { return _objectQ.sync { __calFreq } }
-    set { _objectQ.sync(flags: .barrier) { __calFreq = newValue } } }
+    get { return _q.sync { __calFreq } }
+    set { _q.sync(flags: .barrier) { __calFreq = newValue } } }
   
   internal var _callsign: String {
-    get { return _objectQ.sync { __callsign } }
-    set { _objectQ.sync(flags: .barrier) { __callsign = newValue } } }
+    get { return _q.sync { __callsign } }
+    set { _q.sync(flags: .barrier) { __callsign = newValue } } }
   
   internal var _chassisSerial: String {
-    get { return _objectQ.sync { __chassisSerial } }
-    set { _objectQ.sync(flags: .barrier) { __chassisSerial = newValue } } }
+    get { return _q.sync { __chassisSerial } }
+    set { _q.sync(flags: .barrier) { __chassisSerial = newValue } } }
   
   internal var _clientIp: String {
-    get { return _objectQ.sync { __clientIp } }
-    set { _objectQ.sync(flags: .barrier) { __clientIp = newValue } } }
+    get { return _q.sync { __clientIp } }
+    set { _q.sync(flags: .barrier) { __clientIp = newValue } } }
   
   internal var _daxIqAvailable: Int {
-    get { return _objectQ.sync { __daxIqAvailable } }
-    set { _objectQ.sync(flags: .barrier) { __daxIqAvailable = newValue } } }
+    get { return _q.sync { __daxIqAvailable } }
+    set { _q.sync(flags: .barrier) { __daxIqAvailable = newValue } } }
   
   internal var _daxIqCapacity: Int {
-    get { return _objectQ.sync { __daxIqCapacity } }
-    set { _objectQ.sync(flags: .barrier) { __daxIqCapacity = newValue } } }
+    get { return _q.sync { __daxIqCapacity } }
+    set { _q.sync(flags: .barrier) { __daxIqCapacity = newValue } } }
   
   internal var _enforcePrivateIpEnabled: Bool {
-    get { return _objectQ.sync { __enforcePrivateIpEnabled } }
-    set { _objectQ.sync(flags: .barrier) { __enforcePrivateIpEnabled = newValue } } }
+    get { return _q.sync { __enforcePrivateIpEnabled } }
+    set { _q.sync(flags: .barrier) { __enforcePrivateIpEnabled = newValue } } }
   
   internal var _extPresent: Bool {
-    get { return _objectQ.sync { __extPresent } }
-    set { _objectQ.sync(flags: .barrier) { __extPresent = newValue } } }
+    get { return _q.sync { __extPresent } }
+    set { _q.sync(flags: .barrier) { __extPresent = newValue } } }
   
   internal var _filterCwAutoLevel: Int {
-    get { return _objectQ.sync { __filterCwAutoLevel } }
-    set { _objectQ.sync(flags: .barrier) { __filterCwAutoLevel = newValue } } }
+    get { return _q.sync { __filterCwAutoLevel } }
+    set { _q.sync(flags: .barrier) { __filterCwAutoLevel = newValue } } }
   
   internal var _filterDigitalAutoLevel: Int {
-    get { return _objectQ.sync { __filterDigitalAutoLevel } }
-    set { _objectQ.sync(flags: .barrier) { __filterDigitalAutoLevel = newValue } } }
+    get { return _q.sync { __filterDigitalAutoLevel } }
+    set { _q.sync(flags: .barrier) { __filterDigitalAutoLevel = newValue } } }
   
   internal var _filterVoiceAutoLevel: Int {
-    get { return _objectQ.sync { __filterVoiceAutoLevel } }
-    set { _objectQ.sync(flags: .barrier) { __filterVoiceAutoLevel = newValue } } }
+    get { return _q.sync { __filterVoiceAutoLevel } }
+    set { _q.sync(flags: .barrier) { __filterVoiceAutoLevel = newValue } } }
   
   internal var _filterCwLevel: Int {
-    get { return _objectQ.sync { __filterCwLevel } }
-    set { _objectQ.sync(flags: .barrier) { __filterCwLevel = newValue } } }
+    get { return _q.sync { __filterCwLevel } }
+    set { _q.sync(flags: .barrier) { __filterCwLevel = newValue } } }
   
   internal var _filterDigitalLevel: Int {
-    get { return _objectQ.sync { __filterDigitalLevel } }
-    set { _objectQ.sync(flags: .barrier) { __filterDigitalLevel = newValue } } }
+    get { return _q.sync { __filterDigitalLevel } }
+    set { _q.sync(flags: .barrier) { __filterDigitalLevel = newValue } } }
   
   internal var _filterVoiceLevel: Int {
-    get { return _objectQ.sync { __filterVoiceLevel } }
-    set { _objectQ.sync(flags: .barrier) { __filterVoiceLevel = newValue } } }
+    get { return _q.sync { __filterVoiceLevel } }
+    set { _q.sync(flags: .barrier) { __filterVoiceLevel = newValue } } }
   
   internal var _fpgaMbVersion: String {
-    get { return _objectQ.sync { __fpgaMbVersion } }
-    set { _objectQ.sync(flags: .barrier) { __fpgaMbVersion = newValue } } }
+    get { return _q.sync { __fpgaMbVersion } }
+    set { _q.sync(flags: .barrier) { __fpgaMbVersion = newValue } } }
   
   internal var _freqErrorPpb: Int {
-    get { return _objectQ.sync { __freqErrorPpb } }
-    set { _objectQ.sync(flags: .barrier) { __freqErrorPpb = newValue } } }
+    get { return _q.sync { __freqErrorPpb } }
+    set { _q.sync(flags: .barrier) { __freqErrorPpb = newValue } } }
   
   internal var _frontSpeakerMute: Bool {
-    get { return _objectQ.sync { __frontSpeakerMute } }
-    set { _objectQ.sync(flags: .barrier) { __frontSpeakerMute = newValue } } }
+    get { return _q.sync { __frontSpeakerMute } }
+    set { _q.sync(flags: .barrier) { __frontSpeakerMute = newValue } } }
   
   internal var _fullDuplexEnabled: Bool {
-    get { return _objectQ.sync { __fullDuplexEnabled } }
-    set { _objectQ.sync(flags: .barrier) { __fullDuplexEnabled = newValue } } }
+    get { return _q.sync { __fullDuplexEnabled } }
+    set { _q.sync(flags: .barrier) { __fullDuplexEnabled = newValue } } }
   
   internal var _gateway: String {
-    get { return _objectQ.sync { __gateway } }
-    set { _objectQ.sync(flags: .barrier) { __gateway = newValue } } }
+    get { return _q.sync { __gateway } }
+    set { _q.sync(flags: .barrier) { __gateway = newValue } } }
   
   internal var _gpsdoPresent: Bool {
-    get { return _objectQ.sync { __gpsdoPresent } }
-    set { _objectQ.sync(flags: .barrier) { __gpsdoPresent = newValue } } }
+    get { return _q.sync { __gpsdoPresent } }
+    set { _q.sync(flags: .barrier) { __gpsdoPresent = newValue } } }
   
   internal var _headphoneGain: Int {
-    get { return _objectQ.sync { __headphoneGain } }
-    set { _objectQ.sync(flags: .barrier) { __headphoneGain = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
+    get { return _q.sync { __headphoneGain } }
+    set { _q.sync(flags: .barrier) { __headphoneGain = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _headphoneMute: Bool {
-    get { return _objectQ.sync { __headphoneMute } }
-    set { _objectQ.sync(flags: .barrier) { __headphoneMute = newValue } } }
+    get { return _q.sync { __headphoneMute } }
+    set { _q.sync(flags: .barrier) { __headphoneMute = newValue } } }
   
   internal var _ipAddress: String {
-    get { return _objectQ.sync { __ipAddress } }
-    set { _objectQ.sync(flags: .barrier) { __ipAddress = newValue } } }
+    get { return _q.sync { __ipAddress } }
+    set { _q.sync(flags: .barrier) { __ipAddress = newValue } } }
   
   internal var _location: String {
-    get { return _objectQ.sync { __location } }
-    set { _objectQ.sync(flags: .barrier) { __location = newValue } } }
+    get { return _q.sync { __location } }
+    set { _q.sync(flags: .barrier) { __location = newValue } } }
   
   internal var _macAddress: String {
-    get { return _objectQ.sync { __macAddress } }
-    set { _objectQ.sync(flags: .barrier) { __macAddress = newValue } } }
+    get { return _q.sync { __macAddress } }
+    set { _q.sync(flags: .barrier) { __macAddress = newValue } } }
   
   internal var _lineoutGain: Int {
-    get { return _objectQ.sync { __lineoutGain } }
-    set { _objectQ.sync(flags: .barrier) { __lineoutGain = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
+    get { return _q.sync { __lineoutGain } }
+    set { _q.sync(flags: .barrier) { __lineoutGain = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   internal var _lineoutMute: Bool {
-    get { return _objectQ.sync { __lineoutMute } }
-    set { _objectQ.sync(flags: .barrier) { __lineoutMute = newValue } } }
+    get { return _q.sync { __lineoutMute } }
+    set { _q.sync(flags: .barrier) { __lineoutMute = newValue } } }
   
   internal var _locked: Bool {
-    get { return _objectQ.sync { __locked } }
-    set { _objectQ.sync(flags: .barrier) { __locked = newValue } } }
+    get { return _q.sync { __locked } }
+    set { _q.sync(flags: .barrier) { __locked = newValue } } }
+  
+  internal var _mox: Bool {
+    get { return _q.sync { __mox } }
+    set { _q.sync(flags: .barrier) { __mox = newValue } } }
   
   internal var _netmask: String {
-    get { return _objectQ.sync { __netmask } }
-    set { _objectQ.sync(flags: .barrier) { __netmask = newValue } } }
+    get { return _q.sync { __netmask } }
+    set { _q.sync(flags: .barrier) { __netmask = newValue } } }
   
   internal var _nickname: String {
-    get { return _objectQ.sync { __nickname } }
-    set { _objectQ.sync(flags: .barrier) { __nickname = newValue } } }
+    get { return _q.sync { __nickname } }
+    set { _q.sync(flags: .barrier) { __nickname = newValue } } }
   
   internal var _numberOfScus: Int {
-    get { return _objectQ.sync { __numberOfScus } }
-    set { _objectQ.sync(flags: .barrier) { __numberOfScus = newValue } } }
+    get { return _q.sync { __numberOfScus } }
+    set { _q.sync(flags: .barrier) { __numberOfScus = newValue } } }
   
   internal var _numberOfSlices: Int {
-    get { return _objectQ.sync { __numberOfSlices } }
-    set { _objectQ.sync(flags: .barrier) { __numberOfSlices = newValue } } }
+    get { return _q.sync { __numberOfSlices } }
+    set { _q.sync(flags: .barrier) { __numberOfSlices = newValue } } }
   
   internal var _numberOfTx: Int {
-    get { return _objectQ.sync { __numberOfTx } }
-    set { _objectQ.sync(flags: .barrier) { __numberOfTx = newValue } } }
+    get { return _q.sync { __numberOfTx } }
+    set { _q.sync(flags: .barrier) { __numberOfTx = newValue } } }
   
   internal var _oscillator: String {
-    get { return _objectQ.sync { __oscillator } }
-    set { _objectQ.sync(flags: .barrier) { __oscillator = newValue } } }
+    get { return _q.sync { __oscillator } }
+    set { _q.sync(flags: .barrier) { __oscillator = newValue } } }
   
   internal var _picDecpuVersion: String {
-    get { return _objectQ.sync { __picDecpuVersion } }
-    set { _objectQ.sync(flags: .barrier) { __picDecpuVersion = newValue } } }
+    get { return _q.sync { __picDecpuVersion } }
+    set { _q.sync(flags: .barrier) { __picDecpuVersion = newValue } } }
   
   internal var _psocMbPa100Version: String {
-    get { return _objectQ.sync { __psocMbPa100Version } }
-    set { _objectQ.sync(flags: .barrier) { __psocMbPa100Version = newValue } } }
+    get { return _q.sync { __psocMbPa100Version } }
+    set { _q.sync(flags: .barrier) { __psocMbPa100Version = newValue } } }
   
   internal var _psocMbtrxVersion: String {
-    get { return _objectQ.sync { __psocMbtrxVersion } }
-    set { _objectQ.sync(flags: .barrier) { __psocMbtrxVersion = newValue } } }
+    get { return _q.sync { __psocMbtrxVersion } }
+    set { _q.sync(flags: .barrier) { __psocMbtrxVersion = newValue } } }
   
   internal var _radioModel: String {
-    get { return _objectQ.sync { __radioModel } }
-    set { _objectQ.sync(flags: .barrier) { __radioModel = newValue } } }
+    get { return _q.sync { __radioModel } }
+    set { _q.sync(flags: .barrier) { __radioModel = newValue } } }
   
   internal var _radioOptions: String {
-    get { return _objectQ.sync { __radioOptions } }
-    set { _objectQ.sync(flags: .barrier) { __radioOptions = newValue } } }
+    get { return _q.sync { __radioOptions } }
+    set { _q.sync(flags: .barrier) { __radioOptions = newValue } } }
   
   internal var _radioScreenSaver: String {
-    get { return _objectQ.sync { __radioScreenSaver } }
-    set { _objectQ.sync(flags: .barrier) { __radioScreenSaver = newValue } } }
+    get { return _q.sync { __radioScreenSaver } }
+    set { _q.sync(flags: .barrier) { __radioScreenSaver = newValue } } }
   
   internal var _region: String {
-    get { return _objectQ.sync { __region } }
-    set { _objectQ.sync(flags: .barrier) { __region = newValue } } }
+    get { return _q.sync { __region } }
+    set { _q.sync(flags: .barrier) { __region = newValue } } }
   
   internal var _remoteOnEnabled: Bool {
-    get { return _objectQ.sync { __remoteOnEnabled } }
-    set { _objectQ.sync(flags: .barrier) { __remoteOnEnabled = newValue } } }
+    get { return _q.sync { __remoteOnEnabled } }
+    set { _q.sync(flags: .barrier) { __remoteOnEnabled = newValue } } }
   
   internal var _rttyMark: Int {
-    get { return _objectQ.sync { __rttyMark } }
-    set { _objectQ.sync(flags: .barrier) { __rttyMark = newValue } } }
+    get { return _q.sync { __rttyMark } }
+    set { _q.sync(flags: .barrier) { __rttyMark = newValue } } }
   
   internal var _setting: String {
-    get { return _objectQ.sync { __setting } }
-    set { _objectQ.sync(flags: .barrier) { __setting = newValue } } }
+    get { return _q.sync { __setting } }
+    set { _q.sync(flags: .barrier) { __setting = newValue } } }
   
   internal var _smartSdrMB: String {
-    get { return _objectQ.sync { __smartSdrMB } }
-    set { _objectQ.sync(flags: .barrier) { __smartSdrMB = newValue } } }
+    get { return _q.sync { __smartSdrMB } }
+    set { _q.sync(flags: .barrier) { __smartSdrMB = newValue } } }
   
   internal var _snapTuneEnabled: Bool {
-    get { return _objectQ.sync { __snapTuneEnabled } }
-    set { _objectQ.sync(flags: .barrier) { __snapTuneEnabled = newValue } } }
+    get { return _q.sync { __snapTuneEnabled } }
+    set { _q.sync(flags: .barrier) { __snapTuneEnabled = newValue } } }
   
   internal var _softwareVersion: String {
-    get { return _objectQ.sync { __softwareVersion } }
-    set { _objectQ.sync(flags: .barrier) { __softwareVersion = newValue } } }
+    get { return _q.sync { __softwareVersion } }
+    set { _q.sync(flags: .barrier) { __softwareVersion = newValue } } }
   
   internal var _startOffset: Bool {
-    get { return _objectQ.sync { __startOffset } }
-    set { _objectQ.sync(flags: .barrier) { __startOffset = newValue } } }
+    get { return _q.sync { __startOffset } }
+    set { _q.sync(flags: .barrier) { __startOffset = newValue } } }
   
   internal var _state: String {
-    get { return _objectQ.sync { __state } }
-    set { _objectQ.sync(flags: .barrier) { __state = newValue } } }
+    get { return _q.sync { __state } }
+    set { _q.sync(flags: .barrier) { __state = newValue } } }
   
   internal var _staticGateway: String {
-    get { return _objectQ.sync { __staticGateway } }
-    set { _objectQ.sync(flags: .barrier) { __staticGateway = newValue } } }
+    get { return _q.sync { __staticGateway } }
+    set { _q.sync(flags: .barrier) { __staticGateway = newValue } } }
   
   internal var _staticIp: String {
-    get { return _objectQ.sync { __staticIp } }
-    set { _objectQ.sync(flags: .barrier) { __staticIp = newValue } } }
+    get { return _q.sync { __staticIp } }
+    set { _q.sync(flags: .barrier) { __staticIp = newValue } } }
   
   internal var _staticNetmask: String {
-    get { return _objectQ.sync { __staticNetmask } }
-    set { _objectQ.sync(flags: .barrier) { __staticNetmask = newValue } } }
+    get { return _q.sync { __staticNetmask } }
+    set { _q.sync(flags: .barrier) { __staticNetmask = newValue } } }
   
   internal var _tcxoPresent: Bool {
-    get { return _objectQ.sync { __tcxoPresent } }
-    set { _objectQ.sync(flags: .barrier) { __tcxoPresent = newValue } } }
+    get { return _q.sync { __tcxoPresent } }
+    set { _q.sync(flags: .barrier) { __tcxoPresent = newValue } } }
   
   internal var _tnfEnabled: Bool {
-    get { return _objectQ.sync { __tnfEnabled } }
-    set { _objectQ.sync(flags: .barrier) { __tnfEnabled = newValue } } }
+    get { return _q.sync { __tnfEnabled } }
+    set { _q.sync(flags: .barrier) { __tnfEnabled = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -1733,68 +1738,68 @@ extension Radio {
   
   // collections
   public var amplifiers: [AmplifierId: Amplifier] {
-    get { return _objectQ.sync { _amplifiers } }
-    set { _objectQ.sync(flags: .barrier) { _amplifiers = newValue } } }
+    get { return _q.sync { _amplifiers } }
+    set { _q.sync(flags: .barrier) { _amplifiers = newValue } } }
   
   public var audioStreams: [DaxStreamId: AudioStream] {
-    get { return _objectQ.sync { _audioStreams } }
-    set { _objectQ.sync(flags: .barrier) { _audioStreams = newValue } } }
+    get { return _q.sync { _audioStreams } }
+    set { _q.sync(flags: .barrier) { _audioStreams = newValue } } }
   
   public var equalizers: [Equalizer.EqType: Equalizer] {
-    get { return _objectQ.sync { _equalizers } }
-    set { _objectQ.sync(flags: .barrier) { _equalizers = newValue } } }
+    get { return _q.sync { _equalizers } }
+    set { _q.sync(flags: .barrier) { _equalizers = newValue } } }
   
   public var iqStreams: [DaxStreamId: IqStream] {
-    get { return _objectQ.sync { _iqStreams } }
-    set { _objectQ.sync(flags: .barrier) { _iqStreams = newValue } } }
+    get { return _q.sync { _iqStreams } }
+    set { _q.sync(flags: .barrier) { _iqStreams = newValue } } }
   
   public var memories: [MemoryId: Memory] {
-    get { return _objectQ.sync { _memories } }
-    set { _objectQ.sync(flags: .barrier) { _memories = newValue } } }
+    get { return _q.sync { _memories } }
+    set { _q.sync(flags: .barrier) { _memories = newValue } } }
   
   public var meters: [MeterId: Meter] {
-    get { return _objectQ.sync { _meters } }
-    set { _objectQ.sync(flags: .barrier) { _meters = newValue } } }
+    get { return _q.sync { _meters } }
+    set { _q.sync(flags: .barrier) { _meters = newValue } } }
   
   public var micAudioStreams: [DaxStreamId: MicAudioStream] {
-    get { return _objectQ.sync { _micAudioStreams } }
-    set { _objectQ.sync(flags: .barrier) { _micAudioStreams = newValue } } }
+    get { return _q.sync { _micAudioStreams } }
+    set { _q.sync(flags: .barrier) { _micAudioStreams = newValue } } }
   
   public var opusStreams: [OpusId: Opus] {
-    get { return _objectQ.sync { _opusStreams } }
-    set { _objectQ.sync(flags: .barrier) { _opusStreams = newValue } } }
+    get { return _q.sync { _opusStreams } }
+    set { _q.sync(flags: .barrier) { _opusStreams = newValue } } }
   
   public var panadapters: [PanadapterId: Panadapter] {
-    get { return _objectQ.sync { _panadapters } }
-    set { _objectQ.sync(flags: .barrier) { _panadapters = newValue } } }
+    get { return _q.sync { _panadapters } }
+    set { _q.sync(flags: .barrier) { _panadapters = newValue } } }
   
   public var replyHandlers: [SequenceId: ReplyTuple] {
-    get { return _objectQ.sync { _replyHandlers } }
-    set { _objectQ.sync(flags: .barrier) { _replyHandlers = newValue } } }
+    get { return _q.sync { _replyHandlers } }
+    set { _q.sync(flags: .barrier) { _replyHandlers = newValue } } }
   
   public var slices: [SliceId: Slice] {
-    get { return _objectQ.sync { _slices } }
-    set { _objectQ.sync(flags: .barrier) { _slices = newValue } } }
+    get { return _q.sync { _slices } }
+    set { _q.sync(flags: .barrier) { _slices = newValue } } }
   
   public var tnfs: [TnfId: Tnf] {
-    get { return _objectQ.sync { _tnfs } }
-    set { _objectQ.sync(flags: .barrier) { _tnfs = newValue } } }
+    get { return _q.sync { _tnfs } }
+    set { _q.sync(flags: .barrier) { _tnfs = newValue } } }
   
   public var txAudioStreams: [DaxStreamId: TxAudioStream] {
-    get { return _objectQ.sync { _txAudioStreams } }
-    set { _objectQ.sync(flags: .barrier) { _txAudioStreams = newValue } } }
+    get { return _q.sync { _txAudioStreams } }
+    set { _q.sync(flags: .barrier) { _txAudioStreams = newValue } } }
   
   public var waterfalls: [WaterfallId: Waterfall] {
-    get { return _objectQ.sync { _waterfalls } }
-    set { _objectQ.sync(flags: .barrier) { _waterfalls = newValue } } }
+    get { return _q.sync { _waterfalls } }
+    set { _q.sync(flags: .barrier) { _waterfalls = newValue } } }
   
   public var usbCables: [UsbCableId: UsbCable] {
-    get { return _objectQ.sync { _usbCables } }
-    set { _objectQ.sync(flags: .barrier) { _usbCables = newValue } } }
+    get { return _q.sync { _usbCables } }
+    set { _q.sync(flags: .barrier) { _usbCables = newValue } } }
   
   public var xvtrs: [XvtrId: Xvtr] {
-    get { return _objectQ.sync { _xvtrs } }
-    set { _objectQ.sync(flags: .barrier) { _xvtrs = newValue } } }
+    get { return _q.sync { _xvtrs } }
+    set { _q.sync(flags: .barrier) { _xvtrs = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Token enums in alphabetical order.
