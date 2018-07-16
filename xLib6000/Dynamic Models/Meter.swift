@@ -348,8 +348,9 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
     }
     // did it change?
     if adjNewValue != previousValue {
-      //      // notify all observers
-      //      NC.post(.meterUpdated, object: self as Any?)
+      // notify all observers
+      NC.post(.meterUpdated, object: self as Any?)
+      
       value = adjNewValue
     }
   }

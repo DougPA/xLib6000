@@ -1,5 +1,11 @@
 xLib6000 Change Log
 
+v1.2.7
+
+Meter.swift - uncommented the Notification line in streamHandler(_:)
+Transmit.swift - changed moxEnabled to mox
+TransmitCommands.swift - made mox property send the "xmit 1/0" command
+
 v1.2.6
 
 Atu.swift - corrected "status"

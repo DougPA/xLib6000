@@ -53,7 +53,7 @@ public final class Transmit                 : NSObject, StaticModel {
   private var __micBoostEnabled             = false                         //
   private var __micLevel                    = 0                             //
   private var __micSelection                = ""                            //
-  private var __moxEnabled                  = false                         // MOX enabled
+  private var __mox                         = false                         // manual Transmit
   private var __rawIqEnabled                = false                         //
   private var __rfPower                     = 0                             // Power level (0 - 100)
   private var __speechProcessorEnabled      = false                         //
@@ -456,9 +456,9 @@ extension Transmit {
     get { return _q.sync { __micSelection } }
     set { _q.sync(flags: .barrier) { __micSelection = newValue } } }
   
-  internal var _moxEnabled: Bool {
-    get { return _q.sync { __moxEnabled } }
-    set { _q.sync(flags: .barrier) { __moxEnabled = newValue } } }
+  internal var _mox: Bool {
+    get { return _q.sync { __mox } }
+    set { _q.sync(flags: .barrier) { __mox = newValue } } }
   
   internal var _rawIqEnabled: Bool {
     get { return _q.sync { __rawIqEnabled } }

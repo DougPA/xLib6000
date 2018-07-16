@@ -17,6 +17,7 @@ import Foundation
 extension Transmit {
   
   static let kTuneCmd                       = "transmit "                   // command prefixes
+  static let kXmitCmd                       = "xmit "
   static let kSetCmd                        = "transmit set "
   static let kCwCmd                         = "cw "
   static let kMicCmd                        = "mic "
@@ -49,6 +50,16 @@ extension Transmit {
   private func transmitCmd(_ token: Token, _ value: Any) {
     
     Api.sharedInstance.send(Transmit.kSetCmd + token.rawValue + "=\(value)")
+  }
+  /// Set Xmit on the Radio
+  ///
+  /// - Parameters:
+  ///   - token:      the parse token
+  ///   - value:      the new value
+  ///
+  private func xmitCmd(_ value: Any) {
+    
+    Api.sharedInstance.send(Transmit.kXmitCmd + "\(value)")
   }
   /// Set a Transmit property on the Radio
   ///
@@ -201,9 +212,9 @@ extension Transmit {
     get {  return _micLevel }
     set { if _micLevel != newValue { _micLevel = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( "miclevel", newValue) } } }
   
-  @objc dynamic public var moxEnabled: Bool {
-    get { return _moxEnabled }
-    set { if _moxEnabled != newValue { _moxEnabled = newValue ; transmitCmd( "mox", newValue.asNumber()) } } }
+  @objc dynamic public var mox: Bool {
+    get { return _mox }
+    set { if _mox != newValue { _mox = newValue ; xmitCmd( newValue.asNumber()) } } }
   
   @objc dynamic public var rfPower: Int {
     get {  return _rfPower }
