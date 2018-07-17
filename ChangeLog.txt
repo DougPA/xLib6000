@@ -1,5 +1,10 @@
 xLib6000 Change Log
 
+v1.2.11
+
+Interlock.swift - moved stateChange(_:) to Radio
+Radio.swift - added stateChange(_:) & made all accesses to "mox" use "_mox" with KVO signaling
+
 v1.2.10
 
 Intelock.swift - added PttSource and Reason enums (not currently used)

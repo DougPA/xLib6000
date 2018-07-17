@@ -289,6 +289,39 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   }
   
   // ----------------------------------------------------------------------------
+  // MARK: - Internal methods
+  
+  /// Change the MOX property when an Interloack state change occurs
+  ///
+  /// - Parameter state:            a new Interloack state
+  ///
+  internal func stateChange(_ state: String) {
+    
+    let currentMox = _mox
+    
+    // if TRANSMITTING
+    if state == Interlock.State.transmitting.rawValue {
+      
+      // if mox not on, turn it on
+      if currentMox == false {
+        willChangeValue(for: \.mox)
+        _mox = true
+        didChangeValue(for: \.mox)
+      }
+      
+      // if not TRANSMITTING and not PTT and not UNKEY
+    } else if state != Interlock.State.pttRequested.rawValue && state != Interlock.State.unKeyRequested.rawValue {
+      
+      // if mox is on, turn it off
+      if currentMox == true {
+        willChangeValue(for: \.mox)
+        _mox = false
+        didChangeValue(for: \.mox)
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
   // --------------------------------------------------------------------------------

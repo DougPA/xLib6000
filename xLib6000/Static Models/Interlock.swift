@@ -140,8 +140,9 @@ public final class Interlock                : NSObject, StaticModel {
         willChangeValue(for: \.state)
         _state = property.value
         didChangeValue(for: \.state)
+        
         // determine if a Mox change is needed
-        stateChange(_state)
+        _api.radio!.stateChange(_state)
 
       case .timeout:
         willChangeValue(for: \.timeout)
@@ -190,32 +191,10 @@ public final class Interlock                : NSObject, StaticModel {
       }
     }
   }
-  
+}
   // ------------------------------------------------------------------------------
   // MARK: - Private methods
   
-  /// Change the MOX property (on Radio) when an Interloack state change occurs
-  ///
-  /// - Parameter state:            a new Interloack state
-  ///
-  private func stateChange(_ state: String) {
-    
-    let currentMox = _api.radio!._mox
-    
-    // if TRANSMITTING
-    if state == State.transmitting.rawValue {
-      
-      // if mox not on, turn it on
-      if currentMox == false { _api.radio!.mox = true }
-    
-    // if not TRANSMITTING and not PTT and not UNKEY
-    } else if state != State.pttRequested.rawValue && state != State.unKeyRequested.rawValue {
-      
-      // if mox is on, turn it off
-      if currentMox { _api.radio!.mox = false }
-    }
-  }
-}
 
 // --------------------------------------------------------------------------------
 // MARK: - Interlock Class extensions
