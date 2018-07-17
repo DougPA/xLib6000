@@ -189,6 +189,28 @@ public final class Interlock                : NSObject, StaticModel {
     }
   }
   
+  // ------------------------------------------------------------------------------
+  // MARK: - Private methods
+  
+  /// Change the MOX property (on Radio) when an Interloack state change occurs
+  ///
+  /// - Parameter state:            a new Interloack state
+  ///
+  private func stateChange(_ state: String) {
+    
+    // if TRANSMITTING
+    if state == State.transmitting.rawValue {
+      
+      // if mox not on, turn it on
+      if !_api.radio!._mox { _api.radio!.mox = true }
+    
+    // if not TRANSMITTING and not PTT and not UNKEY
+    } else if state != State.pttRequested.rawValue && state != State.unKeyRequested.rawValue {
+      
+      // if mox is on, turn it off
+      if _api.radio!._mox { _api.radio!.mox = false }
+    }
+  }
 }
 
 // --------------------------------------------------------------------------------
@@ -242,7 +264,7 @@ extension Interlock {
   
   internal var _state: String {
     get { return _q.sync { __state } }
-    set { _q.sync(flags: .barrier) { __state = newValue } } }
+    set { _q.sync(flags: .barrier) { __state = newValue ; stateChange(newValue) } } }
   
   internal var _timeout: Int {
     get { return _q.sync { __timeout } }
@@ -324,5 +346,17 @@ extension Interlock {
     case tx2Delay           = "tx2_delay"
     case tx3Enabled         = "tx3_enabled"
     case tx3Delay           = "tx3_delay"
+  }
+  
+  internal enum State: String {
+    case receive            = "RECEIVE"
+    case ready              = "READY"
+    case notReady           = "NOT_READY"
+    case pttRequested       = "PTT_REQUESTED"
+    case transmitting       = "TRANSMITTING"
+    case txFault            = "TX_FAULT"
+    case timeout            = "TIMEOUT"
+    case stuckInput         = "STUCK_INPUT"
+    case unKeyRequested     = "UNKEY_REQUESTED"
   }
 }

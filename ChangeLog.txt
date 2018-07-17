@@ -1,5 +1,9 @@
 xLib6000 Change Log
 
+v1.2.9
+
+Interlock.swift - added stateChange(_:)
+
 v1.2.8
 
 Transmit.swift, TransmitCommands.swift - moved "mox" property to Radio.swift, RadioCommands.swift
