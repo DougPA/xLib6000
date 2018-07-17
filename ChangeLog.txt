@@ -1,7 +1,14 @@
 xLib6000 Change Log
 
+v1.2.10
+
+Intelock.swift - added PttSource and Reason enums (not currently used)
+Atu.swift - added Status enum (not currently used)
+Interlock.swift - corrected usage of stateChange(_:)
+
 v1.2.9
 
+Interlock.swift - added State enum
 Interlock.swift - added stateChange(_:)
 
 v1.2.8

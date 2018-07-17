@@ -143,4 +143,17 @@ extension Atu {
     case memoriesEnabled  = "memories_enabled"
     case usingMemories    = "using_mem"
   }
+  
+  internal enum Status: String {
+    case none             = "NONE"
+    case tuneNotStarted   = "TUNE_NOT_STARTED"
+    case tuneInProgress   = "TUNE_IN_PROGRESS"
+    case tuneBypass       = "TUNE_BYPASS"
+    case tuneSuccessful   = "TUNE_SUCCESSFUL"
+    case tuneOK           = "TUNE_OK"
+    case tuneFailBypass   = "TUNE_FAIL_BYPASS"
+    case tuneFail         = "TUNE_FAIL"
+    case tuneAborted      = "TUNE_ABORTED"
+    case tuneManualBypass = "TUNE_MANUAL_BYPASS"
+  }
 }

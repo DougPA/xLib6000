@@ -140,6 +140,8 @@ public final class Interlock                : NSObject, StaticModel {
         willChangeValue(for: \.state)
         _state = property.value
         didChangeValue(for: \.state)
+        // determine if a Mox change is needed
+        stateChange(_state)
 
       case .timeout:
         willChangeValue(for: \.timeout)
@@ -198,17 +200,19 @@ public final class Interlock                : NSObject, StaticModel {
   ///
   private func stateChange(_ state: String) {
     
+    let currentMox = _api.radio!._mox
+    
     // if TRANSMITTING
     if state == State.transmitting.rawValue {
       
       // if mox not on, turn it on
-      if !_api.radio!._mox { _api.radio!.mox = true }
+      if currentMox == false { _api.radio!.mox = true }
     
     // if not TRANSMITTING and not PTT and not UNKEY
     } else if state != State.pttRequested.rawValue && state != State.unKeyRequested.rawValue {
       
       // if mox is on, turn it off
-      if _api.radio!._mox { _api.radio!.mox = false }
+      if currentMox { _api.radio!.mox = false }
     }
   }
 }
@@ -264,7 +268,7 @@ extension Interlock {
   
   internal var _state: String {
     get { return _q.sync { __state } }
-    set { _q.sync(flags: .barrier) { __state = newValue ; stateChange(newValue) } } }
+    set { _q.sync(flags: .barrier) { __state = newValue } } }
   
   internal var _timeout: Int {
     get { return _q.sync { __timeout } }
@@ -358,5 +362,23 @@ extension Interlock {
     case timeout            = "TIMEOUT"
     case stuckInput         = "STUCK_INPUT"
     case unKeyRequested     = "UNKEY_REQUESTED"
+  }
+  
+  internal enum PttSource: String {
+    case software           = "SW"
+    case mic                = "MIC"
+    case acc                = "ACC"
+    case rca                = "RCA"
+  }
+
+  internal enum Reasons: String {
+    case rcaTxRequest       = "RCA_TXREQ"
+    case accTxRequest       = "ACC_TXREQ"
+    case badMode            = "BAD_MODE"
+    case tooFar             = "TOO_FAR"
+    case outOfBand          = "OUT_OF_BAND"
+    case paRange            = "PA_RANGE"
+    case clientTxInhibit    = "CLIENT_TX_INHIBIT"
+    case xvtrRxOnly         = "XVTR_RX_OLY"
   }
 }
