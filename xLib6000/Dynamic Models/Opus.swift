@@ -49,9 +49,8 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   private var __txEnabled                   = false                         // Opus for transmit
   private var __rxStopped                   = false                         // Rx stream stopped
   //
-  private weak var _delegate                : StreamHandler? {              // Delegate for Opus Data Stream
-    didSet { if _delegate == nil { _initialized = false ; _rxSeq = nil } } }
-  //                                                                                                  
+  private weak var _delegate                : StreamHandler?                // Delegate for Opus Data Stream
+  //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
   // ------------------------------------------------------------------------------
