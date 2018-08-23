@@ -17,7 +17,7 @@ protocol UdpManagerDelegate                 : class {
   
   // if any of theses are not needed, implement a stub in the delegate that does nothing
   
-  func udpError(_ message: String)                                          // report a UDP error
+  func udpMessage(_ message: String, level: MessageLevel)                     // report a UDP error
   func udpState(bound: Bool, port: UInt16, error: String)                   // report a UDP state change
   func udpStreamHandler(_ vita: Vita)                                       // process a Vita stream
 }
@@ -145,7 +145,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       } catch let error {
         
         // We didn't get the port we wanted
-        _delegate?.udpError("Unable to bind to UDP port \(tmpPort) - \(error.localizedDescription)")
+        _delegate?.udpMessage("Unable to bind to UDP port \(tmpPort) - \(error.localizedDescription)", level: .info)
         
         // try the next Port Number
         tmpPort += 1
@@ -176,7 +176,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       
     } catch let error {
       // read error
-      _delegate?.udpError("beginReceiving error - \(error.localizedDescription)")
+      _delegate?.udpMessage("beginReceiving error - \(error.localizedDescription)", level: .error)
     }
   }
   /// Unbind from the UDP port
@@ -200,7 +200,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
     
     guard clientHandle != "" else {
       // should not happen
-      _delegate?.udpError("No client handle in register UDP")
+      _delegate?.udpMessage("No client handle in register UDP", level: .error)
       return
     }
     // register & keep open the router (on a background queue)
@@ -266,13 +266,13 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       case .ifData, .extData, .ifContext, .extContext:
         
         // error, pass it to the delegate
-        _delegate?.udpError("Unexpected packetType - \(vita.packetType.rawValue)")
+        _delegate?.udpMessage("Unexpected packetType - \(vita.packetType.rawValue)", level: .warning)
       }
       
     } else {
       
       // pass the error to the delegate
-      _delegate?.udpError("Unable to decode received packet")
+      _delegate?.udpMessage("Unable to decode received packet", level: .warning)
     }
   }
 }

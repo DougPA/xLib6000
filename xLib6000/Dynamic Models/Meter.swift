@@ -116,6 +116,11 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
           meter.streamHandler( Int16(bitPattern: meterValue) )
         }
       }
+//      else {
+//
+//        // duplicate meter in packet, log it and ignore it
+//        Log.sharedInstance.msg("Duplicate meter in packet, number = \(meterNumber)", level: .warning, function: #function, file: #file, line: #line)
+//      }
     }
   }
   /// Find Meters by a Slice Id
@@ -257,7 +262,7 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       guard let token = Token(rawValue: key) else {
         
         // unknown Key, log it and ignore the Key
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       
@@ -330,7 +335,7 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
     guard let token = Units(rawValue: units) else {
       
       // unknown Units, log it and ignore it
-      Log.sharedInstance.msg("Meter \(id).\(desc), Unknown units - \(units)", level: .debug, function: #function, file: #file, line: #line)
+      Log.sharedInstance.msg("Meter \(id).\(desc), Unknown units - \(units)", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     

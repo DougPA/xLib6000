@@ -350,7 +350,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       guard let token = ApplicationInfoToken(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-        _api.log.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _api.log.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -388,7 +388,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       guard let token = ApplicationUserSettingsToken(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-        _api.log.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _api.log.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -426,7 +426,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       guard let token = RadioConnectReadyToken(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-        _api.log.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _api.log.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -478,7 +478,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
         // Check for Unknown token
         guard let token = RadioListToken(rawValue: property.key)  else {
           // unknown Token, log it and ignore this token
-          _api.log.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+          _api.log.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }
         
@@ -579,7 +579,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       guard let token = RadioTestConnectionResultsToken(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-        _api.log.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _api.log.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       
@@ -663,7 +663,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // Disconnected
     let msg = "WAN Server: \(_currentHost) on port: \(_currentPort) disconnected \((err == nil) ? "" : "with error = " + err!.localizedDescription)"
     
-    _api.log.msg(msg, level: .info, function: #function, file: #file, line: #line)
+    _api.log.msg(msg, level: err != nil ? .warning : .info, function: #function, file: #file, line: #line)
     
     stopPinging()
     

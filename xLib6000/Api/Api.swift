@@ -203,7 +203,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // if pinger active, stop pinging
     if _pinger != nil {
       _pinger = nil
-      log.msg("Pinger stopped", level: .error, function: #function, file: #file, line: #line)
+      log.msg("Pinger stopped", level: .info, function: #function, file: #file, line: #line)
     }
     // the radio class will be removed, inform observers
     NC.post(.radioWillBeRemoved, object: radio as Any?)
@@ -362,14 +362,14 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         // start pinging
         if pingerEnabled {
           
-          log.msg("Pinger started", level: .error, function: #function, file: #file, line: #line)
+          log.msg("Pinger started", level: .info, function: #function, file: #file, line: #line)
           _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ)
         }
         // TCP & UDP connections established, inform observers
         NC.post(.clientDidConnect, object: activeRadio as Any?)
       }
       
-      log.msg("Client connection established", level: .info, function: #function, file: #file, line: #line)
+//      log.msg("Client connection established", level: .info, function: #function, file: #file, line: #line)
       
       // could this be a remote connection?
       if apiVersionMajor >= 2 {
@@ -403,7 +403,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case .disconnected(let reason):
       
       // TCP connection disconnected
-      log.msg("Disconnected, reason = \(reason)", level: .error, function: #function, file: #file, line: #line)
+      log.msg("Disconnected, reason = \(reason)", level: .info, function: #function, file: #file, line: #line)
       
       // TCP connection was disconnected, inform observers
       NC.post(.tcpDidDisconnect, object: reason)
@@ -576,7 +576,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   @objc private func tcpPingStarted(_ note: Notification) {
     
-    log.msg("Pinging started", level: .verbose, function: #function, file: #file, line: #line)
+    log.msg("Pinging started", level: .info, function: #function, file: #file, line: #line)
   }
   /// Process .tcpPingTimeout Notification
   ///
@@ -676,10 +676,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameters:
   ///   - message:    error message
   ///
-  func udpError(_ message: String) {
+  func udpMessage(_ message: String, level: MessageLevel) {
     
     // UDP port encountered an error
-    log.msg("UDP error:  \(message)", level: .error, function: #function, file: #file, line: #line)
+    log.msg("\(message)", level: level, function: #function, file: #file, line: #line)
   }
   /// Respond to a UDP Connection/Disconnection event
   ///

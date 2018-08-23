@@ -90,7 +90,7 @@ public final class Equalizer                : NSObject, DynamicModel {
       
     default:
       // unknown type, log & ignore it
-      Log.sharedInstance.msg("Unknown EQ - \(type)", level: .debug, function: #function, file: #file, line: #line)
+      Log.sharedInstance.msg("Unknown EQ - \(type)", level: .warning, function: #function, file: #file, line: #line)
     }
     // if an equalizer was found
     if let equalizer = equalizer {
@@ -134,7 +134,7 @@ public final class Equalizer                : NSObject, DynamicModel {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known Keys, in alphabetical order

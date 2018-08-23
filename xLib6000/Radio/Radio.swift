@@ -342,7 +342,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // ignore incorrectly formatted messages
     if components.count < 2 {
       
-      Log.sharedInstance.msg("Incomplete message, c\(commandSuffix)", level: .debug, function: #function, file: #file, line: #line)
+      Log.sharedInstance.msg("Incomplete message, c\(commandSuffix)", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // bits 24-25 are the errorCode???
@@ -482,7 +482,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
       default:
         // unknown Display Type, log it and ignore the message
-        Log.sharedInstance.msg("Unknown Display - \(keyValues[0].key)", level: .debug, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Unknown Display - \(keyValues[0].key)", level: .warning, function: #function, file: #file, line: #line)
       }
       
     case .eq:
@@ -601,7 +601,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
       // FIXME: Handle the disconnect?
       // Disconnected
-      Log.sharedInstance.msg("Disconnect, forced=\(keyValues[2].value)", level: .verbose, function: #function, file: #file, line: #line)
+      Log.sharedInstance.msg("Disconnect, forced=\(keyValues[2].value)", level: .info, function: #function, file: #file, line: #line)
       
     } else {
       // Unrecognized
@@ -621,7 +621,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Keys
       guard let token = InfoToken(rawValue: property.key) else {
         // unknown Key, log it and ignore this Key
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -795,7 +795,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Tokens
       guard let token = VersionToken(rawValue: property.key) else {
         // Unknown Token, log it and ignore this Token
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -869,7 +869,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         guard let token = RadioToken(rawValue: property.key)  else {
           
           // unknown Display Type, log it and ignore this token
-          Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+          Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }
         // Known tokens, in alphabetical order
@@ -1009,7 +1009,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       guard let token = RadioFilterSharpness(rawValue: property.key)  else {
         
         // unknown Display Type, log it and ignore this token
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1080,7 +1080,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       guard let token = RadioStaticNet(rawValue: property.key)  else {
         
         // unknown Display Type, log it and ignore this token
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1117,7 +1117,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         guard let token = RadioOscillator(rawValue: property.key)  else {
           
           // unknown Display Type, log it and ignore this token
-          Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+          Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }
         // Known tokens, in alphabetical order
@@ -1189,7 +1189,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       _hardwareVersion = suffix
       
     default:    // Unknown Type
-      Log.sharedInstance.msg("Unexpected message - " + msg, level: .debug, function: #function, file: #file, line: #line)
+      Log.sharedInstance.msg("Unexpected message - " + msg, level: .warning, function: #function, file: #file, line: #line)
     }
   }
   /// Process outbound Tcp messages

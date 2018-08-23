@@ -213,7 +213,7 @@ public final class Memory                   : NSObject, DynamicModel {
       // Check for Unknown token
       guard let token = Token(rawValue: property.key) else {
         // unknown token, log it and ignore the token
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order

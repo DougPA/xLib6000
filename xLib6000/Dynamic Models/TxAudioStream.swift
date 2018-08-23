@@ -122,10 +122,8 @@ public final class TxAudioStream            : NSObject, DynamicModel {
     // skip this if we are not the DAX TX Client
     if !_transmit { return false }
     
-    if _vita == nil {
-      // get a new Vita struct (w/defaults & IfDataWithStream, daxAudio, StreamId, tsi.other)
-      _vita = Vita(packetType: .ifDataWithStream, classCode: .daxAudio, streamId: id, tsi: .other)
-    }
+    // get a TxAudio Vita
+    if _vita == nil { _vita = Vita(type: .txAudio, streamId: id) }
     
     let kMaxSamplesToSend = 128     // maximum packet samples (per channel)
     let kNumberOfChannels = 2       // 2 channels
@@ -166,8 +164,8 @@ public final class TxAudioStream            : NSObject, DynamicModel {
       _vita!.payloadData = payloadData
 
       // set the length of the packet
-      _vita!.payloadSize = numFloatsToSend * MemoryLayout<UInt32>.size        // 32-Bit L/R samples
-      _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size     // payload size + header size
+      _vita!.payloadSize = numFloatsToSend * MemoryLayout<UInt32>.size            // 32-Bit L/R samples
+      _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size      // payload size + header size
       
       // set the sequence number
       _vita!.sequence = _txSeq
@@ -203,7 +201,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known keys, in alphabetical order

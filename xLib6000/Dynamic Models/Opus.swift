@@ -22,8 +22,14 @@ public typealias OpusId = UInt32
 
 public final class Opus                     : NSObject, DynamicModelWithStream {
 
-  public static let kTxPacketSize           = 240                           // Tx packet size (bytes)
-
+  public static let sampleRate              = 24_000
+  public static let frameCount              = 240
+  public static let channelCount            = 2
+  public static let isInterleaved           = true
+  public static let application             = 2049
+  public static let rxStreamId              : UInt32 = 0x4a000000
+  public static let txStreamId              : UInt32 = 0x4b000000
+  
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
@@ -42,6 +48,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   private var _rxLostPacketCount            = 0                             // Rx lost packet count
   private var _rxSeq                        : Int?                          // Rx sequence number
   private var _txSeq                        = 0                             // Tx sequence number
+  private var _txSampleCount                = 0                             // Tx sample count
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
@@ -110,33 +117,43 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   ///
   /// - Parameters:
   ///   - buffer:             array of encoded audio samples
-  ///   - samples:            number of samples to be sent
   /// - Returns:              success / failure
   ///
   public func sendTxAudio(buffer: [UInt8], samples: Int) {
     
-    if _vita == nil {
-      // get a new Vita class (w/defaults & IfDataWithStream, daxAudio, StreamId, tsi.other)
-      _vita = Vita(packetType: .ifDataWithStream, classCode: .daxAudio, streamId: id, tsi: .other)
-    }
-    // create new array for payload (interleaved L/R samples)
-    _vita!.payloadData = [UInt8](repeating: 0, count: Opus.kTxPacketSize)
+    assert(buffer.count == Opus.frameCount, "Opus Tx frame count != 240" )
     
-    // set the length of the packet
-    _vita!.payloadSize = Opus.kTxPacketSize                                      // 8-Bit encoded samples
-    _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size     // payload size + header size
+    if _api.radio?.interlock.state == "TRANSMITTING" {
     
-    // set the sequence number
-    _vita!.sequence = _txSeq
+      // get an OpusTx Vita
+      if _vita == nil { _vita = Vita(type: .opusTx, streamId: Opus.txStreamId) }
     
-    // encode the Vita class as data and send to radio
-    if let data = Vita.encodeAsData(_vita!) {
+      // create new array for payload (interleaved L/R samples)
+      _vita!.payloadData = buffer
       
-      // send packet to radio
-      _api.sendVitaData(data)
+      // set the length of the packet
+      _vita!.payloadSize = samples                                              // 8-Bit encoded samples
+      _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size    // payload size + header size
+      
+      // set the sequence number
+      _vita!.sequence = _txSeq
+      
+      
+      
+//      Swift.print( _vita!.desc() )
+      
+    
+    
+
+      // encode the Vita class as data and send to radio
+      if let data = Vita.encodeAsData(_vita!) {
+        
+        // send packet to radio
+        _api.sendVitaData(data)
+      }
+      // increment the sequence number (mod 16)
+      _txSeq = (_txSeq + 1) % 16
     }
-    // increment the sequence number (mod 16)
-    _txSeq = (_txSeq + 1) % 16
   }
   
   // ------------------------------------------------------------------------------
@@ -157,7 +174,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known Keys, in alphabetical order

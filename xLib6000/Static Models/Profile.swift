@@ -107,7 +107,7 @@ public final class Profile                  : NSObject, StaticModel {
       }
     } else {
       // unknown type
-      Log.sharedInstance.msg("Unknown profile - \(properties[0].key), \(properties[1].key)", level: .debug, function: #function, file: #file, line: #line)
+      Log.sharedInstance.msg("Unknown profile - \(properties[0].key), \(properties[1].key)", level: .warning, function: #function, file: #file, line: #line)
     }
   }
 }
