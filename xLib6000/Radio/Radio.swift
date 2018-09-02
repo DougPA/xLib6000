@@ -225,7 +225,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     for (_, opusStream) in _opusStreams {
       // notify all observers
-      NC.post(.opusWillBeRemoved, object: opusStream as Any?)
+      NC.post(.opusRxWillBeRemoved, object: opusStream as Any?)
     }
     opusStreams.removeAll()
     
@@ -387,7 +387,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       } else {
         
         // send it to the default reply handler
-        defaultReplyHandler(replyTuple.command, seqNum: "", responseValue: components[1], reply: replySuffix)
+        defaultReplyHandler(replyTuple.command, seqNum: components[0], responseValue: components[1], reply: replySuffix)
       }
       // Remove the object from the notification list
       replyHandlers[components[0]] = nil
@@ -1241,7 +1241,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       if !command.hasPrefix(Api.Command.clientProgram.rawValue) {
         
         // Anything other than 0 is an error, log it and ignore the Reply
-        Log.sharedInstance.msg(command + ", non-zero reply - \(reply)", level: .error, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("c\(seqNum)|" + command + ", non-zero reply - \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .error, function: #function, file: #file, line: #line)
       }
       return
     }

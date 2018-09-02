@@ -207,7 +207,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     
     guard responseValue == Api.kNoError else {
       // Anything other than 0 is an error, log it and ignore the Reply
-      Log.sharedInstance.msg(command + ", non-zero reply - \(responseValue)", level: .error, function: #function, file: #file, line: #line)
+      Log.sharedInstance.msg(command + ", non-zero reply - \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .error, function: #function, file: #file, line: #line)
       return
     }
     // parse out the values

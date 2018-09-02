@@ -63,7 +63,6 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   ///
   /// - Parameters:
   ///   - udpReceiveQ:        a serial Q for Udp receive activity
-  ///   - udpSendQ:           a serial Q for Udp send activity
   ///   - delegate:           a delegate for Udp activity
   ///   - udpPort:            a port number
   ///   - enableBroadcast:    whether to allow Broadcasts
@@ -77,7 +76,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
     
     super.init()
     
-    // get a socket
+    // get an IPV4 socket
     _udpSocket = GCDAsyncUdpSocket(delegate: self, delegateQueue: _udpReceiveQ)
     _udpSocket.setIPv4Enabled(true)
     _udpSocket.setIPv6Enabled(false)

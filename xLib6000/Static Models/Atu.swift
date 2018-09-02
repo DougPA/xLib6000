@@ -29,7 +29,7 @@ public final class Atu                      : NSObject, StaticModel {
   //
   private var __enabled                     = false                         //
   private var __memoriesEnabled             = false                         //
-  private var __status                      = false                         //
+  private var __status                      = Status.none.rawValue          //
   private var __usingMemories               = false                         //
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -84,7 +84,7 @@ public final class Atu                      : NSObject, StaticModel {
 
       case .status:
         willChangeValue(for: \.status)
-        _status = property.value.bValue()
+        _status = property.value
         didChangeValue(for: \.status)
 
       case .usingMemories:
@@ -117,7 +117,7 @@ extension Atu {
     get { return _q.sync { __memoriesEnabled } }
     set { _q.sync(flags: .barrier) { __memoriesEnabled = newValue } } }
   
-  internal var _status: Bool {
+  internal var _status: String {
     get { return _q.sync { __status } }
     set { _q.sync(flags: .barrier) { __status = newValue } } }
   
@@ -128,8 +128,30 @@ extension Atu {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant (no message to Radio)
   
-  @objc dynamic public var status: Bool {
-    return _status }
+  @objc dynamic public var status: String {
+    var value = ""
+    guard let token = Status(rawValue: _status) else { return "Unknown" }
+    switch token {
+    case .none, .tuneNotStarted:
+      break
+    case .tuneInProgress:
+      value = "Tuning"
+    case .tuneBypass:
+      value = "Success Byp"
+    case .tuneSuccessful:
+      value = "Success"
+    case .tuneOK:
+      value = "OK"
+    case .tuneFailBypass:
+      value = "Fail Byp"
+    case .tuneFail:
+      value = "Fail"
+    case .tuneAborted:
+      value = "Aborted"
+    case .tuneManualBypass:
+      value = "Manual Byp"
+    }
+    return value }
   
   @objc dynamic public var usingMemories: Bool {
     return _usingMemories }

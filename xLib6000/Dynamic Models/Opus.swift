@@ -22,7 +22,7 @@ public typealias OpusId = UInt32
 
 public final class Opus                     : NSObject, DynamicModelWithStream {
 
-  public static let sampleRate              = 24_000
+  public static let sampleRate              : Double = 24_000
   public static let frameCount              = 240
   public static let channelCount            = 2
   public static let isInterleaved           = true
@@ -121,8 +121,6 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   ///
   public func sendTxAudio(buffer: [UInt8], samples: Int) {
     
-    assert(buffer.count == Opus.frameCount, "Opus Tx frame count != 240" )
-    
     if _api.radio?.interlock.state == "TRANSMITTING" {
     
       // get an OpusTx Vita
@@ -137,13 +135,6 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       
       // set the sequence number
       _vita!.sequence = _txSeq
-      
-      
-      
-//      Swift.print( _vita!.desc() )
-      
-    
-    
 
       // encode the Vita class as data and send to radio
       if let data = Vita.encodeAsData(_vita!) {
@@ -213,7 +204,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       _initialized = true
       
       // notify all observers
-      NC.post(.opusHasBeenAdded, object: self as Any?)
+      NC.post(.opusRxHasBeenAdded, object: self as Any?)
     }
   }
 

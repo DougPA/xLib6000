@@ -20,7 +20,7 @@ extension Atu {
   static let kClearCmd                      = "atu clear"                   // Command prefixes
   static let kStartCmd                      = "atu start"
   static let kBypassCmd                     = "atu bypass"
-  static let kSetCmd                        = "atu set "
+  static let kCmd                           = "atu "
   
   // ----------------------------------------------------------------------------
   // MARK: - Public Instance methods that send Commands to the Radio (hardware)
@@ -64,7 +64,7 @@ extension Atu {
   ///
   private func atuCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Atu.kSetCmd + token.rawValue + "=\(value)")
+    Api.sharedInstance.send(Atu.kCmd + token.rawValue + "=\(value)")
   }
   
   // ----------------------------------------------------------------------------
@@ -74,8 +74,10 @@ extension Atu {
     get {  return _memoriesEnabled }
     set { if _memoriesEnabled != newValue { _memoriesEnabled = newValue ; atuCmd( .memoriesEnabled, newValue.asNumber()) } } }
   
+//  @objc dynamic public var enabled: Bool {
+//    get {  return _enabled }
+//    set { if _enabled != newValue { _enabled = newValue ; atuCmd( .enabled, newValue.asNumber()) } } }
   @objc dynamic public var enabled: Bool {
-    get {  return _enabled }
-    set { if _enabled != newValue { _enabled = newValue ; atuCmd( .enabled, newValue.asNumber()) } } }
+      return _enabled }
 }
 
