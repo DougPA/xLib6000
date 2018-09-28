@@ -48,8 +48,8 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
 
   private var _voltsAmpsDenom               : Float = 256.0                 // denominator for voltage/amperage depends on API version
 
-  private let kSwrDbmDbfsDenom              : Float = 128.0                 // denominator for Swr, Dbm, Dbfs
-  private let kDegcDenom                    : Float = 64.0                  // denominator for Degc
+  private let kDbDbmDbfsSwrDenom            : Float = 128.0                 // denominator for Db, Dbm, Dbfs, Swr
+  private let kDegDenom                     : Float = 64.0                  // denominator for Degc, Degf
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
@@ -338,18 +338,20 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       Log.sharedInstance.msg("Meter \(id).\(desc), Unknown units - \(units)", level: .warning, function: #function, file: #file, line: #line)
       return
     }
-    
     var adjNewValue: Float = 0.0
     switch token {
+      
+    case .db, .dbm, .dbfs, .swr:
+      adjNewValue = Float(newValue) / kDbDbmDbfsSwrDenom
       
     case .volts, .amps:
       adjNewValue = Float(newValue) / _voltsAmpsDenom
       
-    case .swr, .dbm, .dbfs:
-      adjNewValue = Float(newValue) / kSwrDbmDbfsDenom
-      
-    case .degc:
-      adjNewValue = Float(newValue) / kDegcDenom
+    case .degc, .degf:
+      adjNewValue = Float(newValue) / kDegDenom
+    
+    case .rpm, .watts, .percent, .none:
+      adjNewValue = Float(newValue)
     }
     // did it change?
     if adjNewValue != previousValue {
@@ -442,12 +444,18 @@ extension Meter {
   }
   
   public enum Units : String {
-    case dbm
+    case none
+    case amps
+    case db
     case dbfs
+    case dbm
+    case degc
+    case degf
+    case percent
+    case rpm
     case swr
     case volts
-    case amps
-    case degc
+    case watts
   }
   
 }

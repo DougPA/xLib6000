@@ -299,8 +299,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     let currentMox = _mox
     
-    // if TRANSMITTING
-    if state == Interlock.State.transmitting.rawValue {
+    // if PTT_REQUESTED or TRANSMITTING
+    if state == Interlock.State.pttRequested.rawValue || state == Interlock.State.transmitting.rawValue {
       
       // if mox not on, turn it on
       if currentMox == false {
@@ -309,8 +309,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         didChangeValue(for: \.mox)
       }
       
-      // if not TRANSMITTING and not PTT and not UNKEY
-    } else if state != Interlock.State.pttRequested.rawValue && state != Interlock.State.unKeyRequested.rawValue {
+      // if READY or UNKEY_REQUESTED
+    } else if state == Interlock.State.ready.rawValue || state == Interlock.State.unKeyRequested.rawValue {
       
       // if mox is on, turn it off
       if currentMox == true {

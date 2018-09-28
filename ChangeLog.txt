@@ -1,5 +1,17 @@
 xLib6000 Change Log
 
+v2.0.0
+
+Converted to Unified Logging
+
+
+
+v1.2.13
+
+Meter.swift - added new units to Unit enum, adjusted usage of units
+
+
+
 v1.2.12
 
 Opus.swift - removed "didSet..." from _delegate
