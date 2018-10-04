@@ -1,5 +1,10 @@
 xLib6000 Change Log
 
+v1.2.13
+
+Meter.swift - 
+
+
 v1.2.12
 
 Opus.swift - removed "didSet..." from _delegate

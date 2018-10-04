@@ -442,12 +442,18 @@ extension Meter {
   }
   
   public enum Units : String {
-    case dbm
+    case none
+    case amps
+    case db
     case dbfs
+    case dbm
+    case degc
+    case degf
+    case percent
+    case rpm
     case swr
     case volts
-    case amps
-    case degc
+    case watts
   }
   
 }
