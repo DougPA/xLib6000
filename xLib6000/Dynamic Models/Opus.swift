@@ -42,6 +42,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
+  private var _clientHandle                 : UInt32 = 0                    //
   private var _ip                           = ""                            // IP Address of ???
   private var _port                         = 0                             // port number used by Opus
   private var _vita                         : Vita?                         // a Vita class
@@ -171,6 +172,11 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       // known Keys, in alphabetical order
       switch token {
         
+      case .clientHandle:
+        willChangeValue(for: \.clientHandle)
+        _clientHandle = UInt32(String(property.value.dropFirst(2)), radix: 16) ?? 0
+        didChangeValue(for: \.clientHandle)
+
       case .ipAddress:
         willChangeValue(for: \.ip)
         _ip = property.value.trimmingCharacters(in: CharacterSet.whitespaces)
@@ -344,6 +350,10 @@ extension Opus {
   //          If yes, implement it, if not should they be "get" only?
   
   // listed in alphabetical order
+  @objc dynamic public var clientHandle: UInt32 {
+    get { return _clientHandle }
+    set { if _clientHandle != newValue { _clientHandle = newValue } } }
+
   @objc dynamic public var ip: String {
     get { return _ip }
     set { if _ip != newValue { _ip = newValue } } }
@@ -367,6 +377,7 @@ extension Opus {
   // MARK: - Opus tokens
   
   internal enum Token : String {
+    case clientHandle         = "client_handle"
     case ipAddress            = "ip"
     case port
     case rxEnabled            = "rx_on"
