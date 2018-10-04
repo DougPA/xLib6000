@@ -14,7 +14,7 @@ UdpManager.swift - eliminated udpMessage(_ msg: String, level: OSLogType) in Udp
 
 
 
-Changed major version number from 1 to 2 due to conversion to Unified Logging in place of XCGLogger
+Changed major version number from 1 to 2 due to conversion to Unified Logging in place of Log Delegate
 
 ============================================================
 
