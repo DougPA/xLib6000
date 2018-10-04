@@ -15,6 +15,8 @@
 //
 // --------------------------------------------------------------------------------
 
+import os
+
 public final class Api                      : NSObject, TcpManagerDelegate, UdpManagerDelegate {
   
   public static let kId                     = "xLib6000"                    // API Name
@@ -39,7 +41,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   public var availableRadios                : [RadioParameters] {           // Radios discovered
     return _radioFactory.availableRadios }
-  public let log                            = Log.sharedInstance
+//  public let log                            = Log.sharedInstance
   public var delegate                       : ApiDelegate?                  // API delegate
   public var testerModeEnabled              = false                         // Library being used by xAPITester
   public var testerDelegate                 : ApiDelegate?                  // API delegate for xAPITester
@@ -59,6 +61,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _log                          = OSLog(subsystem: kBundleIdentifier, category: "Api")
   private var _apiState                     : ApiState = .started           // state of the API
   private var _tcp                          : TcpManager!                   // TCP connection class (commands)
   private var _udp                          : UdpManager!                   // UDP connection class (streams)
@@ -203,7 +206,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // if pinger active, stop pinging
     if _pinger != nil {
       _pinger = nil
-      log.msg("Pinger stopped", level: .info, function: #function, file: #file, line: #line)
+//      log.msg("Pinger stopped", level: .info, function: #function, file: #file, line: #line)
+      
+      os_log("Pinger stopped", log: _log, type: .info)
+    
     }
     // the radio class will be removed, inform observers
     NC.post(.radioWillBeRemoved, object: radio as Any?)
@@ -307,7 +313,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case .tcpConnected(let host, let port):
       
       // log it
-      log.msg("TCP connected to \(isWan ? "REMOTE" : "LOCAL") Radio @ \(host), Port \(port)", level: .info, function: #function, file: #file, line: #line)
+//      log.msg("TCP connected to \(isWan ? "REMOTE" : "LOCAL") Radio @ \(host), Port \(port)", level: .info, function: #function, file: #file, line: #line)
+      let wanStatus = isWan ? "REMOTE" : "LOCAL"
+      
+      os_log("TCP connected to %{public}@ Radio @ %{public}@, Port %{public}d", log: _log, type: .info, wanStatus, host, port)
 
       // a tcp connection has been established, inform observers
       NC.post(.tcpDidConnect, object: nil)
@@ -326,8 +335,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case .udpBound(let port):
       
       // UDP (streams) connection established, initialize the radio
-      log.msg("UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
+//      log.msg("UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
       
+      os_log("UDP bound to Port %{public}d", log: _log, type: .info, port)
+
       localUDPPort = port
 
       // a UDP port has been bound, inform observers
@@ -362,7 +373,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         // start pinging
         if pingerEnabled {
           
-          log.msg("Pinger started", level: .info, function: #function, file: #file, line: #line)
+//          log.msg("Pinger started", level: .info, function: #function, file: #file, line: #line)
+          
+          os_log("Pinger started", log: _log, type: .info)
+          
           _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ)
         }
         // TCP & UDP connections established, inform observers
@@ -403,8 +417,17 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case .disconnected(let reason):
       
       // TCP connection disconnected
-      log.msg("Disconnected, reason = \(reason)", level: .info, function: #function, file: #file, line: #line)
+//      log.msg("Disconnected, reason = \(reason)", level: .info, function: #function, file: #file, line: #line)
+      var explanation: String = ""
+      switch reason {
+      case .normal:
+        explanation = "normal"
+      case .error(let errorMessage):
+        explanation = errorMessage
+      }
       
+      os_log("Disconnected, reason = %{public}@", log: _log, type: .info, explanation)
+
       // TCP connection was disconnected, inform observers
       NC.post(.tcpDidDisconnect, object: reason)
       
@@ -414,7 +437,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case .update( _, _):
       
       // FIXME: need to handle Update State ???
-      log.msg("Update in process", level: .info, function: #function, file: #file, line: #line)
+//      log.msg("Update in process", level: .info, function: #function, file: #file, line: #line)
+      
+      os_log("Update in process", log: _log, type: .info)
+    
     }
   }
 
@@ -434,7 +460,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     // compare the versions
     if apiVersionParts[0] != radioVersionParts[0] || apiVersionParts[1] != radioVersionParts[1] || apiVersionParts[2] != radioVersionParts[2] {
-      log.msg("Update needed, Radio version = \(activeRadio!.firmwareVersion!), API supports version = \(kApiFirmwareSupport)", level: .warning, function: #function, file: #file, line: #line)
+//      log.msg("Update needed, Radio version = \(activeRadio!.firmwareVersion!), API supports version = \(kApiFirmwareSupport)", level: .warning, function: #function, file: #file, line: #line)
+    
+      os_log("Update needed, Radio version = %{public}@, API supports version = %{public}@", log: _log, type: .default, activeRadio!.firmwareVersion!, kApiFirmwareSupport)
+      
     }
     // set integer numbers for major and minor for fast comparision
     apiVersionMajor = Int(apiVersionParts[0]) ?? 0
@@ -576,7 +605,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   @objc private func tcpPingStarted(_ note: Notification) {
     
-    log.msg("Pinging started", level: .info, function: #function, file: #file, line: #line)
+//    log.msg("Pinging started", level: .info, function: #function, file: #file, line: #line)
+    
+    os_log("Pinger started", log: _log, type: .info)
+  
   }
   /// Process .tcpPingTimeout Notification
   ///
@@ -585,8 +617,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   @objc private func tcpPingTimeout(_ note: Notification) {
     
-    log.msg("Ping timeout", level: .error, function: #function, file: #file, line: #line)
+//    log.msg("Ping timeout", level: .error, function: #function, file: #file, line: #line)
     
+    os_log("Pinger timeout", log: _log, type: .error)
+
     // FIXME: Disconnect?
   }
   
@@ -629,7 +663,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   func tcpError(_ msg: String) {
     
-    log.msg("TCP error:  \(msg)", level: .error, function: #function, file: #file, line: #line)
+//    log.msg("TCP error:  \(msg)", level: .error, function: #function, file: #file, line: #line)
+
+    os_log("TCP error: %{public}@?", log: _log, type: .error, msg)
+    
   }
   /// Respond to a TCP Connection/Disconnection event
   ///
@@ -676,10 +713,13 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameters:
   ///   - message:    error message
   ///
-  func udpMessage(_ message: String, level: MessageLevel) {
+  func udpMessage(_ msg: String, level: OSLogType) {
     
     // UDP port encountered an error
-    log.msg("\(message)", level: level, function: #function, file: #file, line: #line)
+//    log.msg("\(message)", level: level, function: #function, file: #file, line: #line)
+
+    os_log("%{public}@", log: _log, type: .error, msg)
+  
   }
   /// Respond to a UDP Connection/Disconnection event
   ///

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os
 
 // --------------------------------------------------------------------------------
 // MARK: - UdpManager delegate protocol
@@ -17,7 +18,7 @@ protocol UdpManagerDelegate                 : class {
   
   // if any of theses are not needed, implement a stub in the delegate that does nothing
   
-  func udpMessage(_ message: String, level: MessageLevel)                     // report a UDP error
+  func udpMessage(_ message: String, level: OSLogType)                      // report a UDP error
   func udpState(bound: Bool, port: UInt16, error: String)                   // report a UDP state change
   func udpStreamHandler(_ vita: Vita)                                       // process a Vita stream
 }
@@ -265,13 +266,13 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       case .ifData, .extData, .ifContext, .extContext:
         
         // error, pass it to the delegate
-        _delegate?.udpMessage("Unexpected packetType - \(vita.packetType.rawValue)", level: .warning)
+        _delegate?.udpMessage("Unexpected packetType - \(vita.packetType.rawValue)", level: .default)
       }
       
     } else {
       
       // pass the error to the delegate
-      _delegate?.udpMessage("Unable to decode received packet", level: .warning)
+      _delegate?.udpMessage("Unable to decode received packet", level: .default)
     }
   }
 }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os
 
 // --------------------------------------------------------------------------------
 // MARK: - Profile Class implementation
@@ -25,6 +26,7 @@ public final class Profile                  : NSObject, StaticModel {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "Profile")
   private let _q                            : DispatchQueue                 // Q for object synchronization
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -107,7 +109,9 @@ public final class Profile                  : NSObject, StaticModel {
       }
     } else {
       // unknown type
-      Log.sharedInstance.msg("Unknown profile - \(properties[0].key), \(properties[1].key)", level: .warning, function: #function, file: #file, line: #line)
+//      Log.sharedInstance.msg("Unknown profile - \(properties[0].key), \(properties[1].key)", level: .warning, function: #function, file: #file, line: #line)
+      
+      os_log("Unknown profile = %{public}@, %{public}@", log: _log, type: .default, properties[0].key, properties[1].key)
     }
   }
 }

@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import os
 
 // ------------------------------------------------------------------------------
 // MARK: - TxAudioStream Class implementation
@@ -28,6 +29,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Tnf")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -201,7 +203,10 @@ public final class TxAudioStream            : NSObject, DynamicModel {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
+//        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
+
+        os_log("Unknown token - %{public}@", log: _log, type: .default, property.key)
+        
         continue
       }
       // known keys, in alphabetical order

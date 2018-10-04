@@ -3,7 +3,9 @@ xLib6000 Change Log
 v2.0.0
 
 Converted to Unified Logging
-
+Opus.swift - added client_handle token
+Radio.swift - added mute_local_audio_when_remote token
+Api.swift - changed kApiFirmwareSupport to 2.4.9.x
 
 
 v1.2.13

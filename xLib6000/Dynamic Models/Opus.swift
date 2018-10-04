@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os
 
 public typealias OpusId = UInt32
 
@@ -38,10 +39,12 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Opus")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
+  private var _clientHandle                 : UInt32 = 0                    //
   private var _ip                           = ""                            // IP Address of ???
   private var _port                         = 0                             // port number used by Opus
   private var _vita                         : Vita?                         // a Vita class
@@ -165,12 +168,20 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
+//        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
+
+        os_log("Unknown token - %{public}@", log: _log, type: .default, property.key)
+        
         continue
       }
       // known Keys, in alphabetical order
       switch token {
         
+      case .clientHandle:        
+        willChangeValue(for: \.clientHandle)
+        _clientHandle = UInt32(String(property.value.dropFirst(2)), radix: 16) ?? 0
+        didChangeValue(for: \.clientHandle)
+
       case .ipAddress:
         willChangeValue(for: \.ip)
         _ip = property.value.trimmingCharacters(in: CharacterSet.whitespaces)
@@ -230,7 +241,9 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
     if vita.sequence != _rxSeq {
       
       // NO, log the issue
-      Log.sharedInstance.msg("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(_rxSeq!)", level: .warning, function: #function, file: #file, line: #line)
+//      Log.sharedInstance.msg("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(_rxSeq!)", level: .warning, function: #function, file: #file, line: #line)
+
+      os_log("Missing packet(s), rcvdSeq: %d,  != expectedSeq: %d", log: _log, type: .default, vita.sequence, _rxSeq!)
       
       if vita.sequence < _rxSeq! {
         
@@ -344,6 +357,10 @@ extension Opus {
   //          If yes, implement it, if not should they be "get" only?
   
   // listed in alphabetical order
+  @objc dynamic public var clientHandle: UInt32 {
+    get { return _clientHandle }
+    set { if _clientHandle != newValue { _clientHandle = newValue } } }
+  
   @objc dynamic public var ip: String {
     get { return _ip }
     set { if _ip != newValue { _ip = newValue } } }
@@ -367,6 +384,7 @@ extension Opus {
   // MARK: - Opus tokens
   
   internal enum Token : String {
+    case clientHandle         = "client_handle"
     case ipAddress            = "ip"
     case port
     case rxEnabled            = "rx_on"

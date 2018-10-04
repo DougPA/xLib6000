@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os
 
 // ------------------------------------------------------------------------------
 // MARK: - VITA header struct implementation
@@ -322,7 +323,11 @@ public class Vita {
         guard let token = DiscoveryToken(rawValue: kv.key) else {
           
           // unknown Key, log it and ignore the Key
-          Api.sharedInstance.log.msg("Unknown token - \(kv.key)", level: .warning, function: #function, file: #file, line: #line)
+//          Api.sharedInstance.log.msg("Unknown token - \(kv.key)", level: .warning, function: #function, file: #file, line: #line)
+          
+          let log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "Vita")
+          os_log("Unknown Discovery token - %{public}@", log: log, type: .default, kv.key)
+
           continue
         }
         

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os
 import simd
 
 public typealias PanadapterId = UInt32
@@ -39,6 +40,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Panadapter")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
@@ -207,7 +209,10 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     
     guard responseValue == Api.kNoError else {
       // Anything other than 0 is an error, log it and ignore the Reply
-      Log.sharedInstance.msg(command + ", non-zero reply - \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .error, function: #function, file: #file, line: #line)
+//      Log.sharedInstance.msg(command + ", non-zero reply - \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .error, function: #function, file: #file, line: #line)
+
+      os_log("%{public}@,  non-zero reply - %{public}@, %{public}@", log: _log, type: .default, command, responseValue, flexErrorString(errorCode: responseValue))
+      
       return
     }
     // parse out the values
@@ -233,7 +238,10 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
+//        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
+
+        os_log("Unknown token - %{public}@", log: _log, type: .default, property.key)
+        
         continue
       }
       // Known keys, in alphabetical order
