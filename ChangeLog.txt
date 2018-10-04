@@ -2,7 +2,7 @@ xLib6000 Change Log
 
 v1.2.13
 
-Meter.swift - 
+Meter.swift - added new Meter units to enum, updated parsing
 
 
 v1.2.12
