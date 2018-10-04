@@ -661,13 +661,13 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   /// - Parameter msg:          the error message
   ///
-  func tcpError(_ msg: String) {
-    
+//  func tcpError(_ msg: String) {
+  
 //    log.msg("TCP error:  \(msg)", level: .error, function: #function, file: #file, line: #line)
 
-    os_log("TCP error: %{public}@?", log: _log, type: .error, msg)
-    
-  }
+//    os_log("TCP error: %{public}@?", log: _log, type: .error, msg)
+//
+//  }
   /// Respond to a TCP Connection/Disconnection event
   ///
   /// - Parameters:
@@ -713,14 +713,14 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Parameters:
   ///   - message:    error message
   ///
-  func udpMessage(_ msg: String, level: OSLogType) {
-    
+//  func udpMessage(_ msg: String, level: OSLogType) {
+  
     // UDP port encountered an error
 //    log.msg("\(message)", level: level, function: #function, file: #file, line: #line)
 
-    os_log("%{public}@", log: _log, type: .error, msg)
-  
-  }
+//    os_log("%{public}@", log: _log, type: .error, msg)
+//  
+//  }
   /// Respond to a UDP Connection/Disconnection event
   ///
   /// - Parameters:

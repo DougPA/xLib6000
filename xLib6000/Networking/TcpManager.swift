@@ -20,7 +20,7 @@ protocol TcpManagerDelegate: class {
 //  func addReplyHandler(_ sequenceId: SequenceId, replyTuple: ReplyTuple)
   func receivedMessage(_ text: String)
   func sentMessage(_ text: String)
-  func tcpError(_ message: String)
+//  func tcpError(_ message: String)
   func tcpState(connected: Bool, host: String, port: UInt16, error: String)
 }
 

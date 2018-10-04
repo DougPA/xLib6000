@@ -1274,13 +1274,13 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - file:           file originating the message
   ///   - line:           line originating the message
   ///
-  public func apiMessage(_ msg: String, level: OSLogType, function: StaticString, file: StaticString, line: Int) {
-    
+//  public func apiMessage(_ msg: String, level: OSLogType, function: StaticString, file: StaticString, line: Int) {
+  
     // log the message
 //    Log.sharedInstance.msg(text, level: level, function: function, file: file, line: line)
 
-    os_log("Api message -  %{public}@", log: _log, type: .default, msg)
-  }
+//    os_log("Api message -  %{public}@", log: _log, type: .default, msg)
+//  }
   
   /// Add a Reply Handler for a specific Sequence/Command
   ///

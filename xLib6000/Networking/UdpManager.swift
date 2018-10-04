@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import os
+import os.log
 
 // --------------------------------------------------------------------------------
 // MARK: - UdpManager delegate protocol
@@ -18,7 +18,7 @@ protocol UdpManagerDelegate                 : class {
   
   // if any of theses are not needed, implement a stub in the delegate that does nothing
   
-  func udpMessage(_ message: String, level: OSLogType)                      // report a UDP error
+//  func udpMessage(_ message: String, level: OSLogType)                      // report a UDP error
   func udpState(bound: Bool, port: UInt16, error: String)                   // report a UDP state change
   func udpStreamHandler(_ vita: Vita)                                       // process a Vita stream
 }
@@ -41,6 +41,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   // MARK: - Private properties
   
   private weak var _delegate                : UdpManagerDelegate?           // class to receive UDP data
+  private let _log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "UdpManager")
   private var _parameters                   : RadioParameters?              // Struct of Radio parameters
   private var _udpReceiveQ                  : DispatchQueue!                // serial GCD Queue for inbound UDP traffic
   private var _udpRegisterQ                 : DispatchQueue!                // serial GCD Queue for registration
@@ -142,10 +143,12 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
         
         success = true
         
-      } catch let error {
+      } catch {
         
         // We didn't get the port we wanted
-        _delegate?.udpMessage("Unable to bind to UDP port \(tmpPort) - \(error.localizedDescription)", level: .info)
+//        _delegate?.udpMessage("Unable to bind to UDP port \(tmpPort) - \(error.localizedDescription)", level: .info)
+
+        os_log("Unable to bind to UDP port %{public}@", log: _log, type: .info, tmpPort)
         
         // try the next Port Number
         tmpPort += 1
@@ -176,7 +179,10 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       
     } catch let error {
       // read error
-      _delegate?.udpMessage("beginReceiving error - \(error.localizedDescription)", level: .error)
+//      _delegate?.udpMessage("beginReceiving error - \(error.localizedDescription)", level: .error)
+
+      os_log("beginReceiving error - %{public}@", log: _log, type: .error, error.localizedDescription)
+      
     }
   }
   /// Unbind from the UDP port
@@ -200,7 +206,10 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
     
     guard clientHandle != "" else {
       // should not happen
-      _delegate?.udpMessage("No client handle in register UDP", level: .error)
+//      _delegate?.udpMessage("No client handle in register UDP", level: .error)
+
+      os_log("No client handle in register UDP", log: _log, type: .error)
+      
       return
     }
     // register & keep open the router (on a background queue)
@@ -266,13 +275,19 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       case .ifData, .extData, .ifContext, .extContext:
         
         // error, pass it to the delegate
-        _delegate?.udpMessage("Unexpected packetType - \(vita.packetType.rawValue)", level: .default)
+//        _delegate?.udpMessage("Unexpected packetType - \(vita.packetType.rawValue)", level: .default)
+
+        os_log("Unexpected packetType - %{public}@", log: _log, type: .default, vita.packetType.rawValue)
+        
       }
       
     } else {
       
       // pass the error to the delegate
-      _delegate?.udpMessage("Unable to decode received packet", level: .default)
+//      _delegate?.udpMessage("Unable to decode received packet", level: .default)
+
+      os_log("Unable to decode received packet", log: _log, type: .default)
+      
     }
   }
 }
