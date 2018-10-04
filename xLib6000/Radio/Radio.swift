@@ -124,6 +124,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // M
   private var __macAddress                  = ""                            // Radio Mac Address (read only)
   private var __mox                         = false                         // manual Transmit
+  private var __muteLocalAudio              = false                         // mute local audio when remote
   // N
   private var __netmask                     = ""                            //
   private var __nickname                    = ""                            // User assigned name
@@ -940,6 +941,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           _lineoutMute = property.value.bValue()
           didChangeValue(for: \.lineoutMute)
 
+        case .muteLocalAudio:
+          willChangeValue(for: \.muteLocalAudio)
+          _muteLocalAudio = property.value.bValue()
+          didChangeValue(for: \.muteLocalAudio)
+          
         case .nickname:
           willChangeValue(for: \.nickname)
           _nickname = property.value
@@ -1562,6 +1568,10 @@ extension Radio {
     get { return _q.sync { __mox } }
     set { _q.sync(flags: .barrier) { __mox = newValue } } }
   
+  internal var _muteLocalAudio: Bool {
+    get { return _q.sync { __muteLocalAudio } }
+    set { _q.sync(flags: .barrier) { __muteLocalAudio = newValue } } }
+  
   internal var _netmask: String {
     get { return _q.sync { __netmask } }
     set { _q.sync(flags: .barrier) { __netmask = newValue } } }
@@ -1893,6 +1903,7 @@ extension Radio {
     case headphoneMute                      = "headphone_mute"
     case lineoutGain                        = "lineout_gain"
     case lineoutMute                        = "lineout_mute"
+    case muteLocalAudio                     = "mute_local_audio_when_remote"
     case nickname
     case panadapters
     case pllDone                            = "pll_done"

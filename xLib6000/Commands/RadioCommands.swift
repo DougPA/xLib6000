@@ -285,6 +285,10 @@ extension Radio {
     get {  return _callsign }
     set { if _callsign != newValue { _callsign = newValue ; radioCmd( .callsign, newValue) } } }
   
+  @objc dynamic public var muteLocalAudio: Bool {
+    get { return _muteLocalAudio }
+    set { if _muteLocalAudio != newValue { _muteLocalAudio = newValue } } }
+
   @objc dynamic public var nickname: String {
     get {  return _nickname }
     set { if _nickname != newValue { _nickname = newValue ; radioCmd("name", newValue) } } }
