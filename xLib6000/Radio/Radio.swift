@@ -158,7 +158,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __staticNetmask               = ""                            // Static Netmask
   // T
   private var __tcxoPresent                 = false                         //
-  private var __tnfEnabled                  = false                         // TNF's enable
+  private var __tnfsEnabled                 = false                         // TNF's enable
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   
@@ -1029,10 +1029,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           _snapTuneEnabled = property.value.bValue()
           didChangeValue(for: \.snapTuneEnabled)
 
-        case .tnfEnabled:
-          willChangeValue(for: \.tnfEnabled)
-          _tnfEnabled = property.value.bValue()
-          didChangeValue(for: \.tnfEnabled)
+        case .tnfsEnabled:
+          willChangeValue(for: \.tnfsEnabled)
+          _tnfsEnabled = property.value.bValue()
+          didChangeValue(for: \.tnfsEnabled)
         }
       }
     }
@@ -1740,9 +1740,9 @@ extension Radio {
     get { return _q.sync { __tcxoPresent } }
     set { _q.sync(flags: .barrier) { __tcxoPresent = newValue } } }
   
-  internal var _tnfEnabled: Bool {
-    get { return _q.sync { __tnfEnabled } }
-    set { _q.sync(flags: .barrier) { __tnfEnabled = newValue } } }
+  internal var _tnfsEnabled: Bool {
+    get { return _q.sync { __tnfsEnabled } }
+    set { _q.sync(flags: .barrier) { __tnfsEnabled = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -1979,7 +1979,7 @@ extension Radio {
     case rttyMark                           = "rtty_mark_default"
     case slices
     case snapTuneEnabled                    = "snap_tune_enabled"
-    case tnfEnabled                         = "tnf_enabled"
+    case tnfsEnabled                        = "tnf_enabled"
   }
   
   internal enum RadioTokenCategory: String {

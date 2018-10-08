@@ -270,9 +270,9 @@ extension Radio {
     get {  return _rttyMark }
     set { if _rttyMark != newValue { _rttyMark = newValue ; radioSetCmd( .rttyMark, newValue) } } }
   
-  @objc dynamic public var tnfEnabled: Bool {
-    get {  return _tnfEnabled }
-    set { if _tnfEnabled != newValue { _tnfEnabled = newValue ; radioSetCmd( .tnfEnabled, newValue.asString()) } } }
+  @objc dynamic public var tnfsEnabled: Bool {
+    get {  return _tnfsEnabled }
+    set { if _tnfsEnabled != newValue { _tnfsEnabled = newValue ; radioSetCmd( .tnfsEnabled, newValue.asString()) } } }
   
   // ***** RADIO COMMANDS *****  
   

@@ -56,7 +56,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public private(set) var radioVersionMajor = 0                             // numeric versions of Radio firmware version
   public private(set) var radioVersionMinor = 0
 
-  public let kApiFirmwareSupport            = "2.3.9.x"                     // The Radio Firmware version supported by this API
+  public let kApiFirmwareSupport            = "2.4.9.x"                     // The Radio Firmware version supported by this API
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
