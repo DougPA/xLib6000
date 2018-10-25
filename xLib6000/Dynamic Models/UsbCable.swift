@@ -98,8 +98,6 @@ public final class UsbCable                 : NSObject, DynamicModel {
       } else {
         
         // NO, log the error and ignore it
-//        Log.sharedInstance.msg("Invalid UsbCable Type, \(keyValues[1].value)", level: .error, function: #function, file: #file, line: #line)
-
         let log = OSLog(subsystem:Api.kBundleIdentifier, category: "UsbCable")
         os_log("Invalid UsbCable Type, %{public}@", log: log, type: .default, keyValues[1].value)
         
@@ -159,9 +157,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
         guard let token = Token(rawValue: property.key) else {
           
           // unknown Key, log it and ignore the Key
-//          Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-
-          os_log("Unknown token - %{public}@", log: _log, type: .default, property.key)
+          os_log("Unknown UsbCable token - %{public}@", log: _log, type: .default, property.key)
           
           continue
         }
@@ -268,8 +264,6 @@ public final class UsbCable                 : NSObject, DynamicModel {
     } else {
       
       // NO, log the error
-//      Log.sharedInstance.msg("Status type (\(properties[0])) != Cable type (\(cableType)))", level: .error, function: #function, file: #file, line: #line)
-
       os_log("Status type (%{public}@) != Cable type (%{public}@)", log: _log, type: .default, properties[0].key, cableType.rawValue)
       
     }

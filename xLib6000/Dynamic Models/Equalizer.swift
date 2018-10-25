@@ -92,8 +92,6 @@ public final class Equalizer                : NSObject, DynamicModel {
       
     default:
       // unknown type, log & ignore it
-//      Log.sharedInstance.msg("Unknown EQ - \(type)", level: .warning, function: #function, file: #file, line: #line)
-
       let log = OSLog(subsystem:Api.kBundleIdentifier, category: "Equalizer")
       os_log("Unknown EQ - %{public}@", log: log, type: .default, type)
       
@@ -140,9 +138,7 @@ public final class Equalizer                : NSObject, DynamicModel {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-//        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-
-        os_log("Unknown token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Equalizer token - %{public}@", log: _log, type: .default, property.key)
         
         continue
       }

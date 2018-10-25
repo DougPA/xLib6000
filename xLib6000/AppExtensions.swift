@@ -61,7 +61,7 @@ public extension NotificationCenter {
   ///   - type:           Notification name
   ///   - object:         associated object (if any)
   ///
-  public class func makeObserver(_ observer: Any, with selector: Selector, of name: String, object: Any?) {
+  public class func makeObserver(_ observer: Any, with selector: Selector, of name: String, object: Any? = nil) {
     
     NotificationCenter.default.addObserver(observer, selector: selector, name: NSNotification.Name(rawValue: name), object: object)
   }
@@ -73,7 +73,7 @@ public extension NotificationCenter {
   ///   - type:           Notification type
   ///   - object:         associated object (if any)
   ///
-  public class func makeObserver(_ observer: Any, with selector: Selector, of type: NotificationType, object: Any?) {
+  public class func makeObserver(_ observer: Any, with selector: Selector, of type: NotificationType, object: Any? = nil) {
     
     NotificationCenter.default.addObserver(observer, selector: selector, name: NSNotification.Name(rawValue: type.rawValue), object: object)
   }

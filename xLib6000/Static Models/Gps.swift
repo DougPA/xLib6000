@@ -102,8 +102,6 @@ public final class Gps                      : NSObject, StaticModel {
       guard let token = Token(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-//        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-        
         os_log("Unknown Gps token = %{public}@", log: _log, type: .default, property.key)
         
         continue

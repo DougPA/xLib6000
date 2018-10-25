@@ -161,9 +161,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-//        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-
-        os_log("Unknown token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Waterfall token - %{public}@", log: _log, type: .default, property.key)
         
         continue
       }

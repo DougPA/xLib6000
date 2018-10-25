@@ -264,9 +264,7 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       guard let token = Token(rawValue: key) else {
         
         // unknown Key, log it and ignore the Key
-//        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-
-        os_log("Unknown token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Meter token - %{public}@", log: _log, type: .default, property.key)
         
         continue
       }
@@ -340,8 +338,6 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
     guard let token = Units(rawValue: units) else {
       
       // unknown Units, log it and ignore it
-//      Log.sharedInstance.msg("Meter \(id).\(desc), Unknown units - \(units)", level: .warning, function: #function, file: #file, line: #line)
-
       os_log("Meter %{public}@.%{public}@, Unknown units - %{public}@", log: _log, type: .default, id, desc, units)
       
       return

@@ -112,10 +112,7 @@ public final class Cwx                      : NSObject, StaticModel {
     
     // zero or anything greater than 2 is an error, log it and ignore the Reply
     guard components == 1 || components == 2 else {
-      
-//      Log.sharedInstance.msg(command + ", Invalid reply", level: .warning, function: #function, file: #file, line: #line)
-
-      os_log("%{public}@,  Invalid reply", log: _log, type: .default, command)
+      os_log("%{public}@,  Invalid Cwx reply", log: _log, type: .default, command)
       
       return
     }
@@ -125,9 +122,7 @@ public final class Cwx                      : NSObject, StaticModel {
     // not an integer, log it and ignore the Reply
     guard charPos != nil else {
       
-//      Log.sharedInstance.msg(command + ", Invalid character position", level: .warning, function: #function, file: #file, line: #line)
-
-      os_log("%{public}@,  Invalid character position", log: _log, type: .default, command)
+      os_log("%{public}@,  Invalid Cwx character position", log: _log, type: .default, command)
       
       return
     }
@@ -147,9 +142,7 @@ public final class Cwx                      : NSObject, StaticModel {
       // not an integer, log it and ignore the Reply
       guard block != nil else {
         
-//        Log.sharedInstance.msg(command + ", Invalid block", level: .warning, function: #function, file: #file, line: #line)
-
-        os_log("%{public}@,  Invalid block", log: _log, type: .default, command)
+        os_log("%{public}@,  Invalid Cwx block", log: _log, type: .default, command)
         
         return
       }
@@ -191,8 +184,6 @@ public final class Cwx                      : NSObject, StaticModel {
         guard let token = Token(rawValue: property.key) else {
           
           // unknown token, log it and ignore the token
-//          Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-          
           os_log("Unknown Cwx token = %{public}@", log: _log, type: .default, property.key)
           
           continue

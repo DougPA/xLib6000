@@ -168,9 +168,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-//        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-
-        os_log("Unknown token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Opus token - %{public}@", log: _log, type: .default, property.key)
         
         continue
       }
@@ -241,9 +239,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
     if vita.sequence != _rxSeq {
       
       // NO, log the issue
-//      Log.sharedInstance.msg("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(_rxSeq!)", level: .warning, function: #function, file: #file, line: #line)
-
-      os_log("Missing packet(s), rcvdSeq: %d,  != expectedSeq: %d", log: _log, type: .default, vita.sequence, _rxSeq!)
+      os_log("Missing Opus packet(s), rcvdSeq: %d,  != expectedSeq: %d", log: _log, type: .default, vita.sequence, _rxSeq!)
       
       if vita.sequence < _rxSeq! {
         

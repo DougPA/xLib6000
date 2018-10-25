@@ -360,8 +360,6 @@ public final class Slice                    : NSObject, DynamicModel {
       switch modeType {
         
       case .FM, .NFM:
-//        Log.sharedInstance.msg("Cannot change Filter width in FM mode", level: .warning, function: #function, file: #file, line: #line)
-
         os_log("Cannot change Filter width in FM mode", log: _log, type: .info)
         
         newValue = value
@@ -400,8 +398,6 @@ public final class Slice                    : NSObject, DynamicModel {
       switch modeType {
         
       case .FM, .NFM:
-//        Log.sharedInstance.msg("Cannot change Filter width in FM mode", level: .warning, function: #function, file: #file, line: #line)
-
         os_log("Cannot change Filter width in FM mode", log: _log, type: .info)
         
         newValue = value
@@ -443,9 +439,7 @@ public final class Slice                    : NSObject, DynamicModel {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-//        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-
-        os_log("Unknown token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Slice token - %{public}@", log: _log, type: .default, property.key)
         
         continue
       }
@@ -606,9 +600,7 @@ public final class Slice                    : NSObject, DynamicModel {
 
       case .ghost:
         // FIXME: Is this needed?
-//        Log.sharedInstance.msg("Unknown token - \(property.key),\(property.value)", level: .warning, function: #function, file: #file, line: #line)
-
-        os_log("Unknown token - %{public}@.%{public}@", log: _log, type: .default, property.key, property.value)
+        os_log("Unprocessed Slice property - %{public}@.%{public}@", log: _log, type: .default, property.key, property.value)
         
       case .inUse:
         willChangeValue(for: \.inUse)

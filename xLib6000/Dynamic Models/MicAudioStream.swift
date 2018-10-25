@@ -134,9 +134,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-//        Log.sharedInstance.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-
-        os_log("Unknown token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown MicAudioStream token - %{public}@", log: _log, type: .default, property.key)
         
         continue
       }
@@ -238,9 +236,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-//      Log.sharedInstance.msg("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
-
-      os_log("Missing packet(s), rcvdSeq: %d,  != expectedSeq: %d", log: _log, type: .default, vita.sequence, expectedSequenceNumber)
+      os_log("Missing MicAudioStream packet(s), rcvdSeq: %d,  != expectedSeq: %d", log: _log, type: .default, vita.sequence, expectedSequenceNumber)
       
       _rxSeq = nil
       rxLostPacketCount += 1
