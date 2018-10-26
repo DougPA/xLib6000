@@ -206,7 +206,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // if pinger active, stop pinging
     if _pinger != nil {
       _pinger = nil
-//      log.msg("Pinger stopped", level: .info, function: #function, file: #file, line: #line)
       
       os_log("Pinger stopped", log: _log, type: .info)
     
@@ -313,11 +312,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case .tcpConnected(let host, let port):
       
       // log it
-//      log.msg("TCP connected to \(isWan ? "REMOTE" : "LOCAL") Radio @ \(host), Port \(port)", level: .info, function: #function, file: #file, line: #line)
       let wanStatus = isWan ? "REMOTE" : "LOCAL"
       
       os_log("TCP connected to %{public}@ Radio @ %{public}@, Port %{public}d", log: _log, type: .info, wanStatus, host, port)
-
+      
       // a tcp connection has been established, inform observers
       NC.post(.tcpDidConnect, object: nil)
       
@@ -335,7 +333,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case .udpBound(let port):
       
       // UDP (streams) connection established, initialize the radio
-//      log.msg("UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
       
       os_log("UDP bound to Port %{public}d", log: _log, type: .info, port)
 
@@ -373,8 +370,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         // start pinging
         if pingerEnabled {
           
-//          log.msg("Pinger started", level: .info, function: #function, file: #file, line: #line)
-          
           os_log("Pinger started", log: _log, type: .info)
           
           _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ)
@@ -382,8 +377,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         // TCP & UDP connections established, inform observers
         NC.post(.clientDidConnect, object: activeRadio as Any?)
       }
-      
-//      log.msg("Client connection established", level: .info, function: #function, file: #file, line: #line)
       
       // could this be a remote connection?
       if apiVersionMajor >= 2 {
@@ -417,7 +410,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case .disconnected(let reason):
       
       // TCP connection disconnected
-//      log.msg("Disconnected, reason = \(reason)", level: .info, function: #function, file: #file, line: #line)
       var explanation: String = ""
       switch reason {
       case .normal:
@@ -437,7 +429,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     case .update( _, _):
       
       // FIXME: need to handle Update State ???
-//      log.msg("Update in process", level: .info, function: #function, file: #file, line: #line)
       
       os_log("Update in process", log: _log, type: .info)
     
@@ -447,6 +438,40 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
     
+//  public func mModelDetected(_ selectedRadio: RadioParameters) {
+//
+//    let alert = NSAlert()
+//    alert.messageText = "Close the existing connection?"
+//    alert.informativeText = ""
+//    alert.alertStyle = .warning
+//    let yesButton = alert.addButton(withTitle: "Yes")
+//    yesButton.tag = 0
+//    let noButton = alert.addButton(withTitle: "No")
+//    noButton.tag = 1
+//
+//    if alert.runModal().rawValue == yesButton.tag{
+//
+//      os_log("YES, Close the existing connection", log: self._log, type: .info)
+//
+//      // save the Command types
+//      self._primaryCmdTypes = [.clientDisconnect]
+//      self._secondaryCmdTypes = []
+//      self._subscriptionCmdTypes = []
+//
+//      // disconnect the front panel (if connected)
+//      disconnectFrontPanel(selectedRadio)
+//
+//      sleep(1)
+//    } else {
+//
+//      os_log("NO, do not Close the existing connection", log:self._log, type: .info)
+//    }
+//  }
+
+//  private func disconnectFrontPanel(_ selectedRadio: RadioParameters) {
+//    
+//  }
+  
   /// Determine if the Radio (hardware) Firmware version is compatable with the API version
   ///
   /// - Parameters:
@@ -460,7 +485,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     // compare the versions
     if apiVersionParts[0] != radioVersionParts[0] || apiVersionParts[1] != radioVersionParts[1] || apiVersionParts[2] != radioVersionParts[2] {
-//      log.msg("Update needed, Radio version = \(activeRadio!.firmwareVersion!), API supports version = \(kApiFirmwareSupport)", level: .warning, function: #function, file: #file, line: #line)
     
       os_log("Update needed, Radio version = %{public}@, API supports version = %{public}@", log: _log, type: .default, activeRadio!.firmwareVersion!, kApiFirmwareSupport)
       
@@ -479,10 +503,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private func sendCommandList(_ commands: [CommandTuple]) {
     
     // send the commands to the Radio (hardware)
-    for cmd in commands {
-      
-      send(cmd.command, diagnostic: cmd.diagnostic, replyTo: cmd.replyHandler)
-    }
+    commands.forEach { send($0.command, diagnostic: $0.diagnostic, replyTo: $0.replyHandler) }
   }
   ///
   ///     Note: commands will be in default order if one of the .all... values is passed
@@ -605,8 +626,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   @objc private func tcpPingStarted(_ note: Notification) {
     
-//    log.msg("Pinging started", level: .info, function: #function, file: #file, line: #line)
-    
     os_log("Pinger started", log: _log, type: .info)
   
   }
@@ -616,8 +635,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///   - note:       a Notification instance
   ///
   @objc private func tcpPingTimeout(_ note: Notification) {
-    
-//    log.msg("Ping timeout", level: .error, function: #function, file: #file, line: #line)
     
     os_log("Pinger timeout", log: _log, type: .error)
 
@@ -663,8 +680,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
 //  func tcpError(_ msg: String) {
   
-//    log.msg("TCP error:  \(msg)", level: .error, function: #function, file: #file, line: #line)
-
 //    os_log("TCP error: %{public}@?", log: _log, type: .error, msg)
 //
 //  }
@@ -716,8 +731,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 //  func udpMessage(_ msg: String, level: OSLogType) {
   
     // UDP port encountered an error
-//    log.msg("\(message)", level: level, function: #function, file: #file, line: #line)
-
 //    os_log("%{public}@", log: _log, type: .error, msg)
 //  
 //  }
@@ -793,7 +806,7 @@ extension Api {
   ///     Note: The "clientUdpPort" command must be sent AFTER the actual Udp port number has been determined.
   ///           The default port number may already be in use by another application.
   ///
-  public enum Command: String {
+  public enum Command: String, Equatable {
     
     // GROUP A: none of this group should be included in one of the command sets
     case none
@@ -806,6 +819,7 @@ extension Api {
     // GROUP B: members of this group can be included in the command sets
     case antList                            = "ant list"
     case clientProgram                      = "client program "
+    case clientDisconnect                   = "client disconnect"
     case clientGui                          = "client gui"
     case clientLowBW                        = "client low_bw_connect"
     case eqRx                               = "eq rxsc info"

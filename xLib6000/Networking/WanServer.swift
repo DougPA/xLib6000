@@ -182,8 +182,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     
     guard _isConnected else {
       
-//      _api.log.msg("Not connected", level: .warning, function: #function, file: #file, line: #line)
-      
       os_log("Not connected", log: _log, type: .default)
       
       return;
@@ -200,8 +198,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     
     guard _isConnected else {
       
-//      _api.log.msg("Not connected", level: .warning, function: #function, file: #file, line: #line)
-      
       os_log("Not connected", log: _log, type: .default)
       
       return;
@@ -216,8 +212,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   public func sendTestConnection(radioSerial: String) {
     
     guard _isConnected else {
-      
-//      _api.log.msg("Not connected", level: .warning, function: #function, file: #file, line: #line)
       
       os_log("Not connected", log: _log, type: .default)
       
@@ -254,8 +248,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     guard let token = Token(rawValue: msgType)  else {
       
       // unknown Message Type, log it and ignore the message
-//      _api.log.msg("Unknown message:" + msg, level: .warning, function: #function, file: #file, line: #line)
-      
       os_log("Unknown message: %{public}@", log: _log, type: .default, msg)
       
       return
@@ -292,8 +284,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     guard let token = ApplicationToken(rawValue: msgType)  else {
       
       // unknown Message Type, log it and ignore the message
-//      _api.log.msg("Unknown message:" + msg, level: .warning, function: #function, file: #file, line: #line)
-      
       os_log("Unknown WanServer Application token: %{public}@", log: _log, type: .default, msg)
       
       return
@@ -334,8 +324,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     guard let token = RadioToken(rawValue: msgType)  else {
       
       // unknown Message Type, log it and ignore the message
-//      _api.log.msg("Unknown message:" + msg, level: .warning, function: #function, file: #file, line: #line)
-      
       os_log("Unknown WanServer Radio token: %{public}@", log: _log, type: .default, msg)
       
       return
@@ -370,8 +358,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       guard let token = ApplicationInfoToken(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-//        _api.log.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-        
         os_log("Unknown WanServer Info token - %{public}@", log: _log, type: .default, property.key)
         
         continue
@@ -391,8 +377,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   /// - Parameter msg:                the message text
   ///
   private func parseRegistrationInvalid(_ msg: String) {
-    
-//    _api.log.msg("\(msg)", level: .warning, function: #function, file: #file, line: #line)
     
     os_log("%{public}@", log: _log, type: .default, msg)
     
@@ -455,8 +439,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       guard let token = RadioConnectReadyToken(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-//        _api.log.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-        
         os_log("Unknown Radio Connect token - %{public}@", log: _log, type: .default, property.key)
         
         continue
@@ -510,8 +492,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
         // Check for Unknown token
         guard let token = RadioListToken(rawValue: property.key)  else {
           // unknown Token, log it and ignore this token
-//          _api.log.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-          
           os_log("Unknown Radio List token - %{public}@", log: _log, type: .default, property.key)
           
           continue
@@ -531,8 +511,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
           dateFormatter.dateFormat = "M/d/yyy_H:mm:ss_a"
           
           guard let date = dateFormatter.date(from: property.value.lowercased()) else {
-//            _api.log.msg("LastSeen date mismatched format: \(property.value)", level: .error, function: #function, file: #file, line: #line)
-            
             os_log("LastSeen date mismatched format: %{public}@", log: _log, type: .error, property.value)
             
             break
@@ -617,8 +595,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       guard let token = RadioTestConnectionResultsToken(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-//        _api.log.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-        
         os_log("Unknown WanServer TestConnection token - %{public}@", log: _log, type: .default, property.key)
         
         continue
@@ -702,10 +678,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   @objc public func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
     
     // Disconnected
-//    let msg = "WAN Server: \(_currentHost) on port: \(_currentPort) disconnected \((err == nil) ? "" : "with error = " + err!.localizedDescription)"
-    
-//    _api.log.msg(msg, level: err != nil ? .warning : .info, function: #function, file: #file, line: #line)
-    
     let error = (err == nil ? "" : "with error = " + err!.localizedDescription)
     os_log("WAN Server: %{public}@ on port: %{public}@ disconnected %{public}@", log: _log, type: err != nil ? .default : .info, _currentHost, _currentPort, error)
     
@@ -728,9 +700,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // Connected, save the ip & port
     _currentHost = sock.connectedHost ?? ""
     _currentPort = sock.connectedPort
-    
-//    let msg = "WAN Server: \(_currentHost) on port: \(_currentPort) connected"
-//    _api.log.msg(msg, level: .info, function: #function, file: #file, line: #line)
     
     os_log("WAN Server: %{public}@ on port: %{public}d", log: _log, type: .info, _currentHost, _currentPort)
     
@@ -777,8 +746,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     
     // starting the communication with the server over TLS
     let command = kAppRegisterCmd + "=\(_appName) " + kPlatform + "=\(_platform) " + kToken + "=\(_token)"
-    
-//    _api.log.msg("Start TLS dialogue with WAN Server", level: .info, function: #function, file: #file, line: #line)
     
     os_log("Start TLS dialogue with WAN Server", log: _log, type: .info)
     

@@ -322,9 +322,7 @@ public class Vita {
         // check for unknown keys
         guard let token = DiscoveryToken(rawValue: kv.key) else {
           
-          // unknown Key, log it and ignore the Key
-//          Api.sharedInstance.log.msg("Unknown token - \(kv.key)", level: .warning, function: #function, file: #file, line: #line)
-          
+          // unknown Key, log it and ignore the Key          
           let log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "Vita")
           os_log("Unknown Discovery token - %{public}@", log: log, type: .default, kv.key)
 
@@ -335,6 +333,9 @@ public class Vita {
           
         case .callsign:
           radio.callsign = kv.value
+          
+        case .firmwareVersion:
+          radio.firmwareVersion = kv.value
           
         case .fpcMac:
           radio.fpcMac = kv.value
@@ -378,8 +379,8 @@ public class Vita {
         case .status:
           radio.status = kv.value
           
-        case .firmwareVersion:
-          radio.firmwareVersion = kv.value
+        case .wanConnected:
+          radio.wanConnected = kv.value.bValue()
           
         // satisfy the switch statement, not a real token
         case .lastSeen:
@@ -520,6 +521,7 @@ extension Vita {
   
   enum DiscoveryToken : String {            // Discovery Tokens
     case callsign
+    case firmwareVersion                    = "version"
     case fpcMac                             = "fpc_mac"
     case inUseHost                          = "inuse_host"
     case inUseIp                            = "inuse_ip"
@@ -534,7 +536,7 @@ extension Vita {
     case requiresAdditionalLicense          = "requires_additional_license"
     case serialNumber                       = "serial"
     case status
-    case firmwareVersion                    = "version"
+    case wanConnected                       = "wan_connected"
     
     case lastSeen   // not a real token
   }

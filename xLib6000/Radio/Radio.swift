@@ -1255,17 +1255,15 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         // Anything other than 0 is an error, log it and ignore the Reply
         os_log("c%{public}@, %{public}@, non-zero reply %{public}@, %{public}@", log: _log, type: .default, seqNum, command, responseValue, flexErrorString(errorCode: responseValue))
         
-//        if command == Api.Command.clientGui.rawValue {
-        
-          DispatchQueue.main.sync {
-            let alert = NSAlert()
-            alert.messageText = "FATAL ERROR on \"\(command)\" command"
-            alert.informativeText = "RESPONSE - \(responseValue) \n\(flexErrorString(errorCode: responseValue)) \n\nAPPLICATION WILL BE TERMINATED"
-            alert.alertStyle = .critical
-            alert.addButton(withTitle: "Close")
-            alert.beginSheetModal(for: NSApp.mainWindow!, completionHandler: {(response) in NSApp.terminate(self) } )
-          }
-//        }
+        DispatchQueue.main.sync{
+          let alert = NSAlert()
+          alert.messageText = "FATAL ERROR on \"\(command)\" command"
+          alert.informativeText = "RESPONSE - \(responseValue) \n\(flexErrorString(errorCode: responseValue)) \n\nAPPLICATION WILL BE TERMINATED"
+          alert.alertStyle = .critical
+          alert.addButton(withTitle: "Close")
+          alert.runModal()
+          NSApp.terminate(self)
+        }
       }
       return
     }

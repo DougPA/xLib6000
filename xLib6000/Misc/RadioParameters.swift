@@ -44,7 +44,8 @@ public final class RadioParameters          : Equatable {
   public var requiresHolePunch              : Bool
   public var serialNumber                   : String                        // serial number
   public var status                         : String?                       // available, in_use, connected, update, etc.
-  public var upnpSupported: Bool
+  public var upnpSupported                  : Bool
+  public var wanConnected                   : Bool
 
 
   // ----------------------------------------------------------------------------
@@ -74,6 +75,7 @@ public final class RadioParameters          : Equatable {
   private let kSerialNumber                 = "serialNumber"
   private let kStatus                       = "status"
   private let kUpnpSupported                = "upnpSupported"
+  private let kWanConnected                 = "wanConnected"
 
 
   // ----------------------------------------------------------------------------
@@ -99,6 +101,7 @@ public final class RadioParameters          : Equatable {
     self.requiresHolePunch            = false
     self.serialNumber                 = serialNumber
     self.upnpSupported                = false
+    self.wanConnected                 = false
   }
   /// Initialize a RadioParameters instance from a dictionary
   ///
@@ -134,8 +137,8 @@ public final class RadioParameters          : Equatable {
     self.serialNumber                 = dict[kSerialNumber] as? String ?? ""
     self.status                       = dict[kStatus] as? String ?? ""
     self.upnpSupported                = dict[kUpnpSupported] as? Bool ?? false
-
-}
+    self.wanConnected                 = dict[kWanConnected] as? Bool ?? false
+  }
   
   // ----------------------------------------------------------------------------
   // MARK: - Static methods
@@ -181,6 +184,7 @@ public final class RadioParameters          : Equatable {
     dict[kSerialNumber]               = self.serialNumber
     dict[kStatus]                     = self.status
     dict[kUpnpSupported]              = self.upnpSupported
+    dict[kWanConnected]               = self.wanConnected
 
     return dict
   }
@@ -266,6 +270,9 @@ public final class RadioParameters          : Equatable {
     case kUpnpSupported:
       return upnpSupported.description
 
+    case kWanConnected:
+      return wanConnected.description
+      
     default:
       return "Unknown"
     }
