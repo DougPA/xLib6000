@@ -51,32 +51,33 @@ public final class RadioParameters          : Equatable {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private let kLastSeen                     = "lastSeen"
-  private let kCallsign                     = "callsign"
-  private let kFpcMac                       = "fpcMac"
-  private let kFirmwareVersion              = "firmwareVersion"
-  private let kInUseHost                    = "inUseHost"
-  private let kIpAddress                    = "ipAddress"
-  private let kIsPortForwardOn              = "isPortForwardOn"
-  private let kLocalInterfaceIP             = "localInterfaceIP"
-  private let kLowBandwidthConnect          = "lowBandwidthConnect"
-  private let kMaxLicensedVersion           = "maxLicensedVersion"
-  private let kModel                        = "model"
-  private let kName                         = "name"
-  private let kNegotiatedHolePunchPort      = "negotiatedHolePunchPort"
-  private let kNickname                     = "nickname"
-  private let kPort                         = "port"
-  private let kProtocolVersion              = "protocolVersion"
-  private let kPublicTlsPort                = "publicTlsPort"
-  private let kPublicUdpPort                = "publicUdpPort"
-  private let kRadioLicenseId               = "radioLicenseId"
-  private let kRequiresAdditionalLicense    = "requiresAdditionalLicense"
-  private let kRequiresHolePunch            = "requiresHolePunch"
-  private let kSerialNumber                 = "serialNumber"
-  private let kStatus                       = "status"
-  private let kUpnpSupported                = "upnpSupported"
-  private let kWanConnected                 = "wanConnected"
-
+  enum RadioProperties : String {
+    case lastSeen
+    case callsign
+    case fpcMac
+    case firmwareVersion
+    case inUseHost
+    case ipAddress
+    case isPortForwardOn
+    case localInterfaceIP
+    case lowBandwidthConnect
+    case maxLicensedVersion
+    case model
+    case name
+    case negotiatedHolePunchPort
+    case nickname
+    case port
+    case protocolVersion
+    case publicTlsPort
+    case publicUdpPort
+    case radioLicenseId
+    case requiresAdditionalLicense
+    case requiresHolePunch
+    case serialNumber
+    case status
+    case upnpSupported
+    case wanConnected                       
+  }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -113,31 +114,31 @@ public final class RadioParameters          : Equatable {
     // lastSeen will be "Now"
     self.lastSeen                     = Date()
     
-    self.callsign                     = dict[kCallsign] as? String ?? ""
-    self.fpcMac                       = dict[kFpcMac] as? String ?? ""
-    self.firmwareVersion              = dict[kFirmwareVersion] as? String ?? ""
-    self.inUseHost                    = dict[kInUseHost] as? String ?? ""
-    self.inUseIp                      = dict[kInUseHost] as? String ?? ""
-    self.ipAddress                    = dict[kIpAddress] as? String ?? ""
-    self.isPortForwardOn              = dict[kIsPortForwardOn] as? Bool ?? false
-    self.localInterfaceIP             = dict[kLocalInterfaceIP] as? String ?? "0.0.0.0"
-    self.lowBandwidthConnect          = dict[kLowBandwidthConnect] as? Bool ?? false
-    self.maxLicensedVersion           = dict[kMaxLicensedVersion] as? String ?? ""
-    self.model                        = dict[kModel] as? String ?? ""
-    self.name                         = dict[kName] as? String ?? ""
-    self.negotiatedHolePunchPort      = dict[kNegotiatedHolePunchPort] as? Int ?? -1
-    self.nickname                     = dict[kNickname] as? String ?? ""
-    self.port                         = dict[kPort] as? Int ?? 0
-    self.protocolVersion              = dict[kProtocolVersion] as? String ?? ""
-    self.publicTlsPort                = dict[kPublicTlsPort] as? Int ?? 0
-    self.publicUdpPort                = dict[kPublicUdpPort] as? Int ?? 0
-    self.radioLicenseId               = dict[kRadioLicenseId] as? String ?? ""
-    self.requiresAdditionalLicense    = dict[kRequiresAdditionalLicense] as? String ?? ""
-    self.requiresHolePunch            = dict[kRequiresHolePunch] as? Bool ?? false
-    self.serialNumber                 = dict[kSerialNumber] as? String ?? ""
-    self.status                       = dict[kStatus] as? String ?? ""
-    self.upnpSupported                = dict[kUpnpSupported] as? Bool ?? false
-    self.wanConnected                 = dict[kWanConnected] as? Bool ?? false
+    self.callsign                     = dict[RadioProperties.callsign.rawValue] as? String ?? ""
+    self.fpcMac                       = dict[RadioProperties.fpcMac.rawValue] as? String ?? ""
+    self.firmwareVersion              = dict[RadioProperties.firmwareVersion.rawValue] as? String ?? ""
+    self.inUseHost                    = dict[RadioProperties.inUseHost.rawValue] as? String ?? ""
+    self.inUseIp                      = dict[RadioProperties.inUseHost.rawValue] as? String ?? ""
+    self.ipAddress                    = dict[RadioProperties.ipAddress.rawValue] as? String ?? ""
+    self.isPortForwardOn              = dict[RadioProperties.isPortForwardOn.rawValue] as? Bool ?? false
+    self.localInterfaceIP             = dict[RadioProperties.localInterfaceIP.rawValue] as? String ?? "0.0.0.0"
+    self.lowBandwidthConnect          = dict[RadioProperties.lowBandwidthConnect.rawValue] as? Bool ?? false
+    self.maxLicensedVersion           = dict[RadioProperties.maxLicensedVersion.rawValue] as? String ?? ""
+    self.model                        = dict[RadioProperties.model.rawValue] as? String ?? ""
+    self.name                         = dict[RadioProperties.name.rawValue] as? String ?? ""
+    self.negotiatedHolePunchPort      = dict[RadioProperties.negotiatedHolePunchPort.rawValue] as? Int ?? -1
+    self.nickname                     = dict[RadioProperties.nickname.rawValue] as? String ?? ""
+    self.port                         = dict[RadioProperties.port.rawValue] as? Int ?? 0
+    self.protocolVersion              = dict[RadioProperties.protocolVersion.rawValue] as? String ?? ""
+    self.publicTlsPort                = dict[RadioProperties.publicTlsPort.rawValue] as? Int ?? 0
+    self.publicUdpPort                = dict[RadioProperties.publicUdpPort.rawValue] as? Int ?? 0
+    self.radioLicenseId               = dict[RadioProperties.radioLicenseId.rawValue] as? String ?? ""
+    self.requiresAdditionalLicense    = dict[RadioProperties.requiresAdditionalLicense.rawValue] as? String ?? ""
+    self.requiresHolePunch            = dict[RadioProperties.requiresHolePunch.rawValue] as? Bool ?? false
+    self.serialNumber                 = dict[RadioProperties.serialNumber.rawValue] as? String ?? ""
+    self.status                       = dict[RadioProperties.status.rawValue] as? String ?? ""
+    self.upnpSupported                = dict[RadioProperties.upnpSupported.rawValue] as? Bool ?? false
+    self.wanConnected                 = dict[RadioProperties.wanConnected.rawValue] as? Bool ?? false
   }
   
   // ----------------------------------------------------------------------------
@@ -160,31 +161,31 @@ public final class RadioParameters          : Equatable {
     
     var dict = [String : Any]()
     
-    dict[kCallsign]                   = self.callsign
-    dict[kFpcMac]                     = self.fpcMac
-    dict[kFirmwareVersion]            = self.firmwareVersion
-    dict[kInUseHost]                  = self.inUseHost
-    dict[kInUseHost]                  = self.inUseIp
-    dict[kIpAddress]                  = self.ipAddress
-    dict[kIsPortForwardOn]            = self.isPortForwardOn
-    dict[kLocalInterfaceIP]           = self.localInterfaceIP
-    dict[kLowBandwidthConnect]        = self.lowBandwidthConnect
-    dict[kMaxLicensedVersion]         = self.maxLicensedVersion
-    dict[kModel]                      = self.model
-    dict[kName]                       = self.name
-    dict[kNegotiatedHolePunchPort]    = self.negotiatedHolePunchPort
-    dict[kNickname]                   = self.nickname
-    dict[kPort]                       = self.port
-    dict[kProtocolVersion]            = self.protocolVersion
-    dict[kPublicTlsPort]              = self.publicTlsPort
-    dict[kPublicUdpPort]              = self.publicUdpPort
-    dict[kRadioLicenseId]             = self.radioLicenseId
-    dict[kRequiresAdditionalLicense]  = self.requiresAdditionalLicense
-    dict[kRequiresHolePunch]          = self.requiresHolePunch
-    dict[kSerialNumber]               = self.serialNumber
-    dict[kStatus]                     = self.status
-    dict[kUpnpSupported]              = self.upnpSupported
-    dict[kWanConnected]               = self.wanConnected
+    dict[RadioProperties.callsign.rawValue]                   = self.callsign
+    dict[RadioProperties.fpcMac.rawValue]                     = self.fpcMac
+    dict[RadioProperties.firmwareVersion.rawValue]            = self.firmwareVersion
+    dict[RadioProperties.inUseHost.rawValue]                  = self.inUseHost
+    dict[RadioProperties.inUseHost.rawValue]                  = self.inUseIp
+    dict[RadioProperties.ipAddress.rawValue]                  = self.ipAddress
+    dict[RadioProperties.isPortForwardOn.rawValue]            = self.isPortForwardOn
+    dict[RadioProperties.localInterfaceIP.rawValue]           = self.localInterfaceIP
+    dict[RadioProperties.lowBandwidthConnect.rawValue]        = self.lowBandwidthConnect
+    dict[RadioProperties.maxLicensedVersion.rawValue]         = self.maxLicensedVersion
+    dict[RadioProperties.model.rawValue]                      = self.model
+    dict[RadioProperties.name.rawValue]                       = self.name
+    dict[RadioProperties.negotiatedHolePunchPort.rawValue]    = self.negotiatedHolePunchPort
+    dict[RadioProperties.nickname.rawValue]                   = self.nickname
+    dict[RadioProperties.port.rawValue]                       = self.port
+    dict[RadioProperties.protocolVersion.rawValue]            = self.protocolVersion
+    dict[RadioProperties.publicTlsPort.rawValue]              = self.publicTlsPort
+    dict[RadioProperties.publicUdpPort.rawValue]              = self.publicUdpPort
+    dict[RadioProperties.radioLicenseId.rawValue]             = self.radioLicenseId
+    dict[RadioProperties.requiresAdditionalLicense.rawValue]  = self.requiresAdditionalLicense
+    dict[RadioProperties.requiresHolePunch.rawValue]          = self.requiresHolePunch
+    dict[RadioProperties.serialNumber.rawValue]               = self.serialNumber
+    dict[RadioProperties.status.rawValue]                     = self.status
+    dict[RadioProperties.upnpSupported.rawValue]              = self.upnpSupported
+    dict[RadioProperties.wanConnected.rawValue]               = self.wanConnected
 
     return dict
   }
@@ -198,83 +199,102 @@ public final class RadioParameters          : Equatable {
     
     switch propertyName {
       
-    case kCallsign:
+    case RadioProperties.callsign.rawValue:
       return callsign
       
-    case kFpcMac:
+    case RadioProperties.fpcMac.rawValue:
       return fpcMac
       
-    case kFirmwareVersion:
+    case RadioProperties.firmwareVersion.rawValue:
       return firmwareVersion
       
-    case kInUseHost:
+    case RadioProperties.inUseHost.rawValue:
       return inUseHost
       
-    case kInUseHost:
+    case RadioProperties.inUseHost.rawValue:
       return inUseIp
       
-    case kIpAddress:
+    case RadioProperties.ipAddress.rawValue:
       return ipAddress
       
-    case kIsPortForwardOn:
+    case RadioProperties.isPortForwardOn.rawValue:
       return isPortForwardOn.description
-
-    case kLastSeen:
+      
+    case RadioProperties.lastSeen.rawValue:
       return lastSeen.description
       
-    case kLocalInterfaceIP:
+    case RadioProperties.localInterfaceIP.rawValue:
       return localInterfaceIP
-
-    case kLowBandwidthConnect:
+      
+    case RadioProperties.lowBandwidthConnect.rawValue:
       return lowBandwidthConnect.description
-
-    case kMaxLicensedVersion:
+      
+    case RadioProperties.maxLicensedVersion.rawValue:
       return maxLicensedVersion
       
-    case kModel:
+    case RadioProperties.model.rawValue:
       return model
       
-    case kName:
+    case RadioProperties.name.rawValue:
       return name
       
-    case kNickname:
+    case RadioProperties.nickname.rawValue:
       return nickname
       
-    case kPort:
+    case RadioProperties.port.rawValue:
       return port.description
       
-    case kProtocolVersion:
+    case RadioProperties.protocolVersion.rawValue:
       return protocolVersion
       
-    case kPublicTlsPort:
+    case RadioProperties.publicTlsPort.rawValue:
       return publicTlsPort.description
-
-    case kPublicUdpPort:
+      
+    case RadioProperties.publicUdpPort.rawValue:
       return publicUdpPort.description
-
-    case kRadioLicenseId:
+      
+    case RadioProperties.radioLicenseId.rawValue:
       return radioLicenseId
       
-    case kRequiresAdditionalLicense:
+    case RadioProperties.requiresAdditionalLicense.rawValue:
       return requiresAdditionalLicense
       
-    case kRequiresHolePunch:
+    case RadioProperties.requiresHolePunch.rawValue:
       return requiresHolePunch.description
-
-    case kSerialNumber:
+      
+    case RadioProperties.serialNumber.rawValue:
       return serialNumber
       
-    case kStatus:
+    case RadioProperties.status.rawValue:
       return status
-
-    case kUpnpSupported:
+      
+    case RadioProperties.upnpSupported.rawValue:
       return upnpSupported.description
-
-    case kWanConnected:
+      
+    case RadioProperties.wanConnected.rawValue:
       return wanConnected.description
       
     default:
       return "Unknown"
     }
+  }
+
+  /// Provide a sorted list of the Radio Parameters in a String
+  ///
+  /// - Returns:          a String
+  ///
+  public func description() -> String {
+  
+    // get the parameters dictionary
+    let dict = dictFromParams()
+    
+    // get the keys sorted
+    let sortedKeys = Array(dict.keys).sorted(by:<)
+    
+    // add each key and value into the string
+    var string = "Radio Parameters\n\n"
+    sortedKeys.forEach( { key in string += "\(key) = \(dict[key]!)\n" } )
+
+    return string
   }
 }
