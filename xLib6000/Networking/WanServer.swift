@@ -521,8 +521,10 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
           radio.maxLicensedVersion = property.value
         case .model:
           radio.model = property.value
+        case .nickName:
+          radio.nickname = property.value
         case .publicIp:
-          radio.ipAddress = property.value
+          radio.publicIp = property.value
         case .publicTlsPort:
           publicTlsPort = property.value.iValue()
         case .publicUdpPort:
@@ -535,15 +537,13 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
           radio.requiresAdditionalLicense = property.value
         case .radioLicenseId:
           radio.radioLicenseId = property.value
-        case .radioName:
-          radio.name = property.value
-        case .serial:
+        case .serialNumber:
           radio.serialNumber = property.value
         case .status:
           radio.status = property.value
         case .upnpSupported:
           radio.upnpSupported = property.value.bValue()
-        case .version:
+        case .firmwareVersion:
           radio.firmwareVersion = property.value
         }
       }
@@ -679,9 +679,10 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     
     // Disconnected
     let error = (err == nil ? "" : "with error = " + err!.localizedDescription)
-    os_log("WAN Server: %{public}@ on port: %{public}@ disconnected %{public}@", log: _log, type: err != nil ? .default : .info, _currentHost, _currentPort, error)
-    
+    os_log("WAN Server: %{public}@ disconnected %{public}@", log: _log, type: .info, _currentHost)
 
+    Swift.print("port = \(_currentPort)")
+    
     stopPinging()
     
     _isConnected = false
@@ -837,12 +838,15 @@ extension WanServer {
   }
   
   private enum RadioListToken: String {
-    case callsign
-    case inUseIp                    = "inuseip"
-    case inUseHost                  = "inusehost"
     case lastSeen                   = "last_seen"
+
+    case callsign
+    case firmwareVersion            = "version"
+    case inUseHost                  = "inusehost"
+    case inUseIp                    = "inuseip"
     case maxLicensedVersion         = "max_licensed_version"
     case model
+    case nickName                   = "radio_name"
     case publicIp                   = "public_ip"
     case publicTlsPort              = "public_tls_port"
     case publicUdpPort              = "public_udp_port"
@@ -850,11 +854,10 @@ extension WanServer {
     case publicUpnpUdpPort          = "public_upnp_udp_port"
     case requiresAdditionalLicense  = "requires_additional_license"
     case radioLicenseId             = "radio_license_id"
-    case radioName                  = "radio_name"
-    case serial
+//    case radioName                  = "radio_name"
+    case serialNumber               = "serial"
     case status
     case upnpSupported              = "upnp_supported"
-    case version
   }
   
   private enum RadioTestConnectionResultsToken: String {

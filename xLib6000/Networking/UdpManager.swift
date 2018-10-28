@@ -157,7 +157,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
     _udpRcvPort = tmpPort
     
     // save the ip address
-    _udpSendIP = radioParameters.ipAddress
+    _udpSendIP = radioParameters.publicIp
     
     // change the state
     _delegate?.udpState(bound: success, port: _udpRcvPort, error: success ? "" : "Unable to bind")

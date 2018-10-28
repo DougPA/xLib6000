@@ -193,22 +193,31 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
     guard let vita = Vita.decodeFrom(data: data) else { return }
     
     // parse the packet to obtain a RadioParameters (updates the timestamp)
-    guard let radio = Vita.parseDiscovery(vita) else { return }
+    guard let discoveredRadio = Vita.parseDiscovery(vita) else { return }
     
     // is it already in the availableRadios array? ( == compares serialNumbers )
-    for (i, existingRadio) in availableRadios.enumerated() where existingRadio == radio {
+    for (i, radio) in availableRadios.enumerated() where radio == discoveredRadio {
+
+      let previousStatus = availableRadios[i].status
       
       // YES, update the existing entry
-      availableRadios[i] = radio
+      availableRadios[i] = discoveredRadio
       
       // indicate it was a known radio
       knownRadio = true
+      
+      // has a known Radio's Status changed?
+      if knownRadio && previousStatus != discoveredRadio.status {
+
+        // YES, send the updated array of radio dictionaries to all observers
+        NC.post(.radiosAvailable, object: availableRadios as Any?)
+      }
     }
     // Is it a known radio?
     if knownRadio == false {
       
       // NO, add it to the array
-      availableRadios.append(radio)
+      availableRadios.append(discoveredRadio)
       
       // send the updated array of radio dictionaries to all observers
       NC.post(.radiosAvailable, object: availableRadios as Any?)

@@ -41,7 +41,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   public var availableRadios                : [RadioParameters] {           // Radios discovered
     return _radioFactory.availableRadios }
-//  public let log                            = Log.sharedInstance
   public var delegate                       : ApiDelegate?                  // API delegate
   public var testerModeEnabled              = false                         // Library being used by xAPITester
   public var testerDelegate                 : ApiDelegate?                  // API delegate for xAPITester
@@ -153,15 +152,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         
       case .active:                           // active with a different radio
         
-        // Disconnect the active Radio
-        disconnect(reason: .normal)
-        
-        activeRadio = nil
-        
-        self.radio = nil
-        
         // if enabled, resume listening for Discovery broadcasts
-        _radioFactory.resume()
+//        _radioFactory.resume()
         
         fallthrough
         
@@ -181,7 +173,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         if _tcp.connect(radioParameters: selectedRadio, isWan: isWan) {
           
           // if enabled, pause listening for Discovery broadcasts
-          _radioFactory.pause()
+//          _radioFactory.pause()
           
           // check the versions
           checkFirmware()
@@ -237,8 +229,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   public func send(_ command: String, diagnostic flag: Bool = false, replyTo callback: ReplyHandler? = nil) {
     
-    // tell the TcpManager to send the command (and optionally setup a callback)
-//    let seqNumber = _tcp.send(command, diagnostic: flag, replyTo: callback)
+    // tell the TcpManager to send the command
     let seqNumber = _tcp.send(command, diagnostic: flag)
 
     // register to be notified when reply received
@@ -318,6 +309,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // a tcp connection has been established, inform observers
       NC.post(.tcpDidConnect, object: nil)
+      
+      if activeRadio!.status == "In_Use" {
+        
+        send("client disconnect")
+        sleep(1)
+      }
       
       _tcp.readNext()
       
@@ -425,53 +422,20 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // remove the currently active radio
       activeRadio = nil
+      
+      _apiState = .active
 
     case .update( _, _):
       
       // FIXME: need to handle Update State ???
       
       os_log("Update in process", log: _log, type: .info)
-    
     }
   }
 
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
     
-//  public func mModelDetected(_ selectedRadio: RadioParameters) {
-//
-//    let alert = NSAlert()
-//    alert.messageText = "Close the existing connection?"
-//    alert.informativeText = ""
-//    alert.alertStyle = .warning
-//    let yesButton = alert.addButton(withTitle: "Yes")
-//    yesButton.tag = 0
-//    let noButton = alert.addButton(withTitle: "No")
-//    noButton.tag = 1
-//
-//    if alert.runModal().rawValue == yesButton.tag{
-//
-//      os_log("YES, Close the existing connection", log: self._log, type: .info)
-//
-//      // save the Command types
-//      self._primaryCmdTypes = [.clientDisconnect]
-//      self._secondaryCmdTypes = []
-//      self._subscriptionCmdTypes = []
-//
-//      // disconnect the front panel (if connected)
-//      disconnectFrontPanel(selectedRadio)
-//
-//      sleep(1)
-//    } else {
-//
-//      os_log("NO, do not Close the existing connection", log:self._log, type: .info)
-//    }
-//  }
-
-//  private func disconnectFrontPanel(_ selectedRadio: RadioParameters) {
-//    
-//  }
-  
   /// Determine if the Radio (hardware) Firmware version is compatable with the API version
   ///
   /// - Parameters:
@@ -481,12 +445,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     // separate the parts of each version
     let apiVersionParts = kApiFirmwareSupport.components(separatedBy: ".")
-    let radioVersionParts = activeRadio!.firmwareVersion!.components(separatedBy: ".")
+    let radioVersionParts = activeRadio!.firmwareVersion.components(separatedBy: ".")
     
     // compare the versions
     if apiVersionParts[0] != radioVersionParts[0] || apiVersionParts[1] != radioVersionParts[1] || apiVersionParts[2] != radioVersionParts[2] {
     
-      os_log("Update needed, Radio version = %{public}@, API supports version = %{public}@", log: _log, type: .default, activeRadio!.firmwareVersion!, kApiFirmwareSupport)
+      os_log("Update needed, Radio version = %{public}@, API supports version = %{public}@", log: _log, type: .default, activeRadio!.firmwareVersion, kApiFirmwareSupport)
       
     }
     // set integer numbers for major and minor for fast comparision

@@ -120,9 +120,9 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
     do {
       // attempt to connect to the Radio (with timeout)
       if let ifa = interface {
-        try _tcpSocket.connect(toHost: radioParameters.ipAddress, onPort: UInt16(port), viaInterface: ifa, withTimeout: _timeout)
+        try _tcpSocket.connect(toHost: radioParameters.publicIp, onPort: UInt16(port), viaInterface: ifa, withTimeout: _timeout)
       } else {
-        try _tcpSocket.connect(toHost: radioParameters.ipAddress, onPort: UInt16(port), withTimeout: _timeout)
+        try _tcpSocket.connect(toHost: radioParameters.publicIp, onPort: UInt16(port), withTimeout: _timeout)
       }
       
     } catch _ {

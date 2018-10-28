@@ -308,7 +308,7 @@ public class Vita {
     if vita.classIdPresent && vita.classCode == .discovery {
       
       // YES, create a minimal RadioParameters with now as "lastSeen"
-      let radio = RadioParameters()
+      let discoveredRadio = RadioParameters()
       
       // Payload is a series of strings of the form <key=value> separated by ' ' (space)
       let payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
@@ -332,55 +332,52 @@ public class Vita {
         switch token {
           
         case .callsign:
-          radio.callsign = kv.value
+          discoveredRadio.callsign = kv.value
+          
+        case .discoveryVersion:
+          discoveredRadio.discoveryVersion = kv.value
           
         case .firmwareVersion:
-          radio.firmwareVersion = kv.value
+          discoveredRadio.firmwareVersion = kv.value
           
         case .fpcMac:
-          radio.fpcMac = kv.value
+          discoveredRadio.fpcMac = kv.value
           
         case .inUseHost:
-          radio.inUseHost = kv.value
+          discoveredRadio.inUseHost = kv.value
           
         case .inUseIp:
-          radio.inUseIp = kv.value
-          
-        case .ipAddress:
-          radio.ipAddress = kv.value
+          discoveredRadio.inUseIp = kv.value
           
         case .maxLicensedVersion:
-          radio.maxLicensedVersion = kv.value
+          discoveredRadio.maxLicensedVersion = kv.value
           
         case .model:
-          radio.model = kv.value
-          
-        case .name:
-          radio.name = kv.value
+          discoveredRadio.model = kv.value
           
         case .nickname:
-          radio.nickname = kv.value
+          discoveredRadio.nickname = kv.value
           
         case .port:
-          radio.port = kv.value.iValue()
+          discoveredRadio.port = kv.value.iValue()
           
-        case .protocolVersion:
-          radio.protocolVersion = kv.value
+        case .publicIp:
+          discoveredRadio.publicIp = kv.value
           
         case .radioLicenseId:
-          radio.radioLicenseId = kv.value
+          discoveredRadio.radioLicenseId = kv.value
           
         case .requiresAdditionalLicense:
-          radio.requiresAdditionalLicense = kv.value
+          discoveredRadio.requiresAdditionalLicense = kv.value
           
         case .serialNumber:
-          radio.serialNumber = kv.value
+          discoveredRadio.serialNumber = kv.value
           
         case .status:
-          radio.status = kv.value
+          discoveredRadio.status = kv.value
           
         case .wanConnected:
-          radio.wanConnected = kv.value.bValue()
+          discoveredRadio.wanConnected = kv.value.bValue()
           
         // satisfy the switch statement, not a real token
         case .lastSeen:
@@ -388,9 +385,9 @@ public class Vita {
         }
       }
       // is it a valid Discovery packet?
-      if radio.ipAddress != "" && radio.port != 0 && radio.model != "" && radio.serialNumber != "" {
+      if discoveredRadio.publicIp != "" && discoveredRadio.port != 0 && discoveredRadio.model != "" && discoveredRadio.serialNumber != "" {
         // YES
-        return radio
+        return discoveredRadio
       }
     }
     // Not a Discovery packet
@@ -521,17 +518,16 @@ extension Vita {
   
   enum DiscoveryToken : String {            // Discovery Tokens
     case callsign
+    case discoveryVersion                   = "discovery_protocol_version"
     case firmwareVersion                    = "version"
     case fpcMac                             = "fpc_mac"
     case inUseHost                          = "inuse_host"
     case inUseIp                            = "inuse_ip"
-    case ipAddress                          = "ip"
     case maxLicensedVersion                 = "max_licensed_version"
     case model
-    case name
-    case nickname
+    case nickname                           = "nickname"
     case port
-    case protocolVersion                    = "discovery_protocol_version"
+    case publicIp                           = "ip"
     case radioLicenseId                     = "radio_license_id"
     case requiresAdditionalLicense          = "requires_additional_license"
     case serialNumber                       = "serial"
