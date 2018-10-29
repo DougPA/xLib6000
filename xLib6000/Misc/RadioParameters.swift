@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os.log
 
 // --------------------------------------------------------------------------------
 // MARK: - RadioParameters implementation
@@ -20,34 +21,34 @@ public final class RadioParameters          : Equatable {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public var lastSeen                       : Date                          // data/time last broadcast from Radio
+  public var lastSeen                       = Date()                        // data/time last broadcast from Radio
 
-  public var callsign                       : String                        // user assigned call sign
-  public var discoveryVersion               : String                        // e.g. 2.0.0.1
-  public var fpcMac                         : String                        // ??
-  public var firmwareVersion                : String                        // Radio firmware version (e.g. 2.0.1.17)
-  public var inUseHost                      : String                        // ??
-  public var inUseIp                        : String                        // ??
-  public var isPortForwardOn                : Bool
-  public var localInterfaceIP               : String
-  public var lowBandwidthConnect            : Bool
-  public var maxLicensedVersion             : String                        // Highest licensed version
-  public var model                          : String                        // Radio model (e.g. FLEX-6500)
-  public var negotiatedHolePunchPort        : Int
-  public var nickname                       : String                        // user assigned Radio name
-  public var port                           : Int                           // port # broadcast received on
-  public var publicIp                       : String                        // IP Address (dotted decimal)
-  public var publicTlsPort                  : Int
-  public var publicUdpPort                  : Int
-  public var radioLicenseId                 : String                        // The current License of the Radio
-  public var requiresAdditionalLicense      : String                        // License needed?
-  public var requiresHolePunch              : Bool
-  public var serialNumber                   : String                        // serial number
-  public var status                         : String                        // available, in_use, connected, update, etc.
-  public var upnpSupported                  : Bool
-  public var wanConnected                   : Bool
+  public var callsign                       = ""                            // user assigned call sign
+  public var discoveryVersion               = ""                            // e.g. 2.0.0.1
+  public var fpcMac                         = ""                            // ??
+  public var firmwareVersion                = ""                            // Radio firmware version (e.g. 2.0.1.17)
+  public var inUseHost                      = ""                            // ??
+  public var inUseIp                        = ""                            // ??
+  public var isPortForwardOn                = false
+  public var localInterfaceIP               = ""
+  public var lowBandwidthConnect            = false
+  public var maxLicensedVersion             = ""                            // Highest licensed version
+  public var model                          = ""                            // Radio model (e.g. FLEX-6500)
+  public var negotiatedHolePunchPort        = -1
+  public var nickname                       = ""                            // user assigned Radio name
+  public var port                           = -1                            // port # broadcast received on
+  public var publicIp                       = ""                            // IP Address (dotted decimal)
+  public var publicTlsPort                  = -1
+  public var publicUdpPort                  = -1
+  public var radioLicenseId                 = ""                            // The current License of the Radio
+  public var requiresAdditionalLicense      = ""                            // License needed?
+  public var requiresHolePunch              = false
+  public var serialNumber                   = ""                            // serial number
+  public var status                         = ""                            // available, in_use, connected, update, etc.
+  public var upnpSupported                  = false
+  public var wanConnected                   = false
   
-  public var dict                           : [String : Any ] {              // computed dict
+  public var dict                           : [String : Any ] {             // computed dict
     get {
       
       var dict = [String : Any]()
@@ -93,7 +94,12 @@ public final class RadioParameters          : Equatable {
     return string
   }
   
-  public enum Param : String {
+  // ----------------------------------------------------------------------------
+  // MARK: - Private properties
+  
+  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "RadioParameters")
+
+  private enum Param : String {
     case lastSeen
     
     case callsign
@@ -119,7 +125,7 @@ public final class RadioParameters          : Equatable {
     case serialNumber
     case status
     case upnpSupported
-    case wanConnected                       
+    case wanConnected
   }
 
   // ----------------------------------------------------------------------------
@@ -127,37 +133,8 @@ public final class RadioParameters          : Equatable {
   
   /// Initialize an empty RadioParameters struct
   ///
-  /// - Parameters:
-  ///   - lastSeen:       the DateTime
-  ///
-  public init(lastSeen: Date = Date(), ipAddress: String = "", port: Int = 0, model: String = "", serialNumber: String = "") {
+  public init() {
     
-    self.lastSeen                     = lastSeen
-
-    self.callsign                     = ""
-    self.discoveryVersion             = ""
-    self.fpcMac                       = ""
-    self.firmwareVersion              = ""
-    self.inUseHost                    = ""
-    self.inUseIp                      = ""
-    self.isPortForwardOn              = false
-    self.localInterfaceIP             = "0.0.0.0"
-    self.lowBandwidthConnect          = false
-    self.maxLicensedVersion           = ""
-    self.model                        = model
-    self.negotiatedHolePunchPort      = -1 // This is invalid until negotiated
-    self.nickname                     = ""
-    self.port                         = port
-    self.publicIp                     = ipAddress
-    self.publicTlsPort                = 0
-    self.publicUdpPort                = 0
-    self.radioLicenseId               = ""
-    self.requiresAdditionalLicense    = ""
-    self.requiresHolePunch            = false
-    self.serialNumber                 = serialNumber
-    self.status                       = ""
-    self.upnpSupported                = false
-    self.wanConnected                 = false
   }
   /// Initialize a RadioParameters instance from a dictionary
   ///
@@ -167,32 +144,32 @@ public final class RadioParameters          : Equatable {
   public init(_ dict: [String : Any]) {
     
     // lastSeen will be "Now"
-    self.lastSeen                           = Date()
+    lastSeen                                 = Date()
     
-    self.callsign                           = dict[Param.callsign.rawValue] as? String ?? ""
-    self.discoveryVersion                   = dict[Param.discoveryVersion.rawValue] as? String ?? ""
-    self.fpcMac                             = dict[Param.fpcMac.rawValue] as? String ?? ""
-    self.firmwareVersion                    = dict[Param.firmwareVersion.rawValue] as? String ?? ""
-    self.inUseHost                          = dict[Param.inUseHost.rawValue] as? String ?? ""
-    self.inUseIp                            = dict[Param.inUseHost.rawValue] as? String ?? ""
-    self.isPortForwardOn                    = dict[Param.isPortForwardOn.rawValue] as? Bool ?? false
-    self.localInterfaceIP                   = dict[Param.localInterfaceIP.rawValue] as? String ?? "0.0.0.0"
-    self.lowBandwidthConnect                = dict[Param.lowBandwidthConnect.rawValue] as? Bool ?? false
-    self.maxLicensedVersion                 = dict[Param.maxLicensedVersion.rawValue] as? String ?? ""
-    self.model                              = dict[Param.model.rawValue] as? String ?? ""
-    self.negotiatedHolePunchPort            = dict[Param.negotiatedHolePunchPort.rawValue] as? Int ?? -1
-    self.nickname                           = dict[Param.nickname.rawValue] as? String ?? ""
-    self.port                               = dict[Param.port.rawValue] as? Int ?? 0
-    self.publicIp                           = dict[Param.publicIp.rawValue] as? String ?? ""
-    self.publicTlsPort                      = dict[Param.publicTlsPort.rawValue] as? Int ?? 0
-    self.publicUdpPort                      = dict[Param.publicUdpPort.rawValue] as? Int ?? 0
-    self.radioLicenseId                     = dict[Param.radioLicenseId.rawValue] as? String ?? ""
-    self.requiresAdditionalLicense          = dict[Param.requiresAdditionalLicense.rawValue] as? String ?? ""
-    self.requiresHolePunch                  = dict[Param.requiresHolePunch.rawValue] as? Bool ?? false
-    self.serialNumber                       = dict[Param.serialNumber.rawValue] as? String ?? ""
-    self.status                             = dict[Param.status.rawValue] as? String ?? ""
-    self.upnpSupported                      = dict[Param.upnpSupported.rawValue] as? Bool ?? false
-    self.wanConnected                       = dict[Param.wanConnected.rawValue] as? Bool ?? false
+    callsign                                = dict[Param.callsign.rawValue] as? String ?? ""
+    discoveryVersion                        = dict[Param.discoveryVersion.rawValue] as? String ?? ""
+    fpcMac                                  = dict[Param.fpcMac.rawValue] as? String ?? ""
+    firmwareVersion                         = dict[Param.firmwareVersion.rawValue] as? String ?? ""
+    inUseHost                               = dict[Param.inUseHost.rawValue] as? String ?? ""
+    inUseIp                                 = dict[Param.inUseHost.rawValue] as? String ?? ""
+    isPortForwardOn                         = dict[Param.isPortForwardOn.rawValue] as? Bool ?? false
+    localInterfaceIP                        = dict[Param.localInterfaceIP.rawValue] as? String ?? "0.0.0.0"
+    lowBandwidthConnect                     = dict[Param.lowBandwidthConnect.rawValue] as? Bool ?? false
+    maxLicensedVersion                      = dict[Param.maxLicensedVersion.rawValue] as? String ?? ""
+    model                                   = dict[Param.model.rawValue] as? String ?? ""
+    negotiatedHolePunchPort                 = dict[Param.negotiatedHolePunchPort.rawValue] as? Int ?? -1
+    nickname                                = dict[Param.nickname.rawValue] as? String ?? ""
+    port                                    = dict[Param.port.rawValue] as? Int ?? 0
+    publicIp                                = dict[Param.publicIp.rawValue] as? String ?? ""
+    publicTlsPort                           = dict[Param.publicTlsPort.rawValue] as? Int ?? 0
+    publicUdpPort                           = dict[Param.publicUdpPort.rawValue] as? Int ?? 0
+    radioLicenseId                          = dict[Param.radioLicenseId.rawValue] as? String ?? ""
+    requiresAdditionalLicense               = dict[Param.requiresAdditionalLicense.rawValue] as? String ?? ""
+    requiresHolePunch                       = dict[Param.requiresHolePunch.rawValue] as? Bool ?? false
+    serialNumber                            = dict[Param.serialNumber.rawValue] as? String ?? ""
+    status                                  = dict[Param.status.rawValue] as? String ?? ""
+    upnpSupported                           = dict[Param.upnpSupported.rawValue] as? Bool ?? false
+    wanConnected                            = dict[Param.wanConnected.rawValue] as? Bool ?? false
   }
   
   // ----------------------------------------------------------------------------
@@ -217,87 +194,17 @@ public final class RadioParameters          : Equatable {
   ///   - id:         a Property Name
   /// - Returns:      String value of the Property
   ///
-  public func valueForName(_ propertyName: String) -> String? {
+  public func valueForName(_ propertyName: String) -> String {
     
-    switch propertyName {
+    // check for unknown keys
+    guard let token = Param(rawValue: propertyName) else {
       
-    case Param.callsign.rawValue:
-      return callsign
+      // log it and ignore the Key
+      os_log("Unknown Radio Param token - %{public}@", log: _log, type: .default, propertyName)
       
-    case Param.discoveryVersion.rawValue:
-      return discoveryVersion
-      
-    case Param.fpcMac.rawValue:
-      return fpcMac
-      
-    case Param.firmwareVersion.rawValue:
-      return firmwareVersion
-      
-    case Param.inUseHost.rawValue:
-      return inUseHost
-      
-    case Param.inUseHost.rawValue:
-      return inUseIp
-      
-    case Param.isPortForwardOn.rawValue:
-      return isPortForwardOn.description
-      
-    case Param.lastSeen.rawValue:
-      return lastSeen.description
-      
-    case Param.localInterfaceIP.rawValue:
-      return localInterfaceIP
-      
-    case Param.lowBandwidthConnect.rawValue:
-      return lowBandwidthConnect.description
-      
-    case Param.maxLicensedVersion.rawValue:
-      return maxLicensedVersion
-      
-    case Param.model.rawValue:
-      return model
-      
-    case Param.nickname.rawValue:
-      return nickname
-      
-    case Param.port.rawValue:
-      return port.description
-      
-    case Param.publicIp.rawValue:
-      return publicIp
-
-    case Param.publicTlsPort.rawValue:
-      return publicTlsPort.description
-      
-    case Param.publicUdpPort.rawValue:
-      return publicUdpPort.description
-      
-    case Param.radioLicenseId.rawValue:
-      return radioLicenseId
-      
-//    case Param.radioName.rawValue:
-//      return radioName
-      
-    case Param.requiresAdditionalLicense.rawValue:
-      return requiresAdditionalLicense
-      
-    case Param.requiresHolePunch.rawValue:
-      return requiresHolePunch.description
-      
-    case Param.serialNumber.rawValue:
-      return serialNumber
-      
-    case Param.status.rawValue:
-      return status
-      
-    case Param.upnpSupported.rawValue:
-      return upnpSupported.description
-      
-    case Param.wanConnected.rawValue:
-      return wanConnected.description
-      
-    default:
-      return "Unknown"
+      return ""
     }
+
+    return dict[token.rawValue] as? String ?? ""
   }
 }

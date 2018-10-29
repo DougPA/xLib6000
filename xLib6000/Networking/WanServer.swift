@@ -677,6 +677,9 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   ///
   @objc public func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
     
+    // FIXME: Something wrong here ???
+    
+    
     // Disconnected
     let error = (err == nil ? "" : "with error = " + err!.localizedDescription)
     os_log("WAN Server: %{public}@ disconnected %{public}@", log: _log, type: .info, _currentHost)
