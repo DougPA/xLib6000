@@ -311,7 +311,7 @@ public class Vita {
       let discoveredRadio = RadioParameters()
       
       // Payload is a series of strings of the form <key=value> separated by ' ' (space)
-      let payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
+      let payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize - 1, encoding: String.Encoding.ascii.rawValue)! as String
 
       // parse into a KeyValuesArray
       let keyValues = payloadData.keyValuesArray()

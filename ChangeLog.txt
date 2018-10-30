@@ -4,6 +4,7 @@ v2.0.4
 
 RadioParameters.swift - refactored (simplification)
 WanServer.swift - added a "FIXME:" in socketDidDisconnect(_:withError:)
+Vita.swift - corrected an error in class parseDiscovery(_:) (payloadSize)
 
 
 v2.0.3
