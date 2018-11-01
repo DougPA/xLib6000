@@ -1254,7 +1254,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
         // Anything other than 0 is an error, log it and ignore the Reply
         let errorLevel = flexErrorLevel(errorCode: responseValue)
-        os_log("c%{public}@, %{public}@, non-zero reply %{public}@, %{public}@ (%{public}@)", log: _log, type: .default, seqNum, command, responseValue, flexErrorString(errorCode: responseValue), errorLevel)
+        let errorType = (errorLevel == "Error" || errorLevel == "Fatal" || errorLevel == "Unknown error" ? OSLogType.default : OSLogType.info)
+        os_log("c%{public}@, %{public}@, non-zero reply %{public}@, %{public}@ (%{public}@)", log: _log, type: errorType, seqNum, command, responseValue, flexErrorString(errorCode: responseValue), errorLevel)
 
         switch errorLevel {
           
