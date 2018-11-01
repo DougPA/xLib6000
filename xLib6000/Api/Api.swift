@@ -310,7 +310,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // a tcp connection has been established, inform observers
       NC.post(.tcpDidConnect, object: nil)
       
-      if activeRadio!.status == "In_Use" {
+      if activeRadio!.status == "In_Use" && _isGui {
         
         send("client disconnect")
         sleep(1)

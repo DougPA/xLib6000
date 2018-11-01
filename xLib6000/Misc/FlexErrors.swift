@@ -16,6 +16,31 @@ import Foundation
 //
 // ----------------------------------------------------------------------------
 
+public func flexErrorLevel(errorCode: String) -> String {
+  var errorLevel = ""
+  
+  let number = UInt32(errorCode, radix: 16) ?? 0
+  
+  switch number {
+  case 0x10000001...0x10000003:
+    errorLevel = "Info"
+  case 0x31000001...0x31000009:
+    errorLevel = "Warning"
+  case 0x50000001...0x500000A3:
+    errorLevel = "Error"
+  case 0x50001000...0x50001017:
+    errorLevel = "Error"
+  case 0xE2000000:
+    errorLevel = "Error"
+  case 0xF3000001...0xF3000004:
+    errorLevel = "Fatal"
+  default:
+    errorLevel = "Unknown error"
+  }
+  return errorLevel
+}
+
+
 public func flexErrorString(errorCode: String) -> String {
   var errorString = ""
   
@@ -488,7 +513,7 @@ enum FlexErrors: UInt32 {
     // Info
     case .SLM_I_CLIENT_CONNECTED: return "Client connected"                             // 0x10000001
     case .SLM_I_UNKNOWN_CLIENT: return "Unknown client"                                 // 0x10000002
-    case .SL_I_CWX_NOTHING_TO_ERASE: return "Nothing to erase"                          // 0x10000003
+    case .SL_I_CWX_NOTHING_TO_ERASE: return "CWX Nothing to erase"                      // 0x10000003
     }
   }
 }

@@ -1253,16 +1253,27 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       if !command.hasPrefix(Api.Command.clientProgram.rawValue) {
         
         // Anything other than 0 is an error, log it and ignore the Reply
-        os_log("c%{public}@, %{public}@, non-zero reply %{public}@, %{public}@", log: _log, type: .default, seqNum, command, responseValue, flexErrorString(errorCode: responseValue))
-        
-        DispatchQueue.main.sync{
-          let alert = NSAlert()
-          alert.messageText = "FATAL ERROR on \"\(command)\" command"
-          alert.informativeText = "RESPONSE - \(responseValue) \n\(flexErrorString(errorCode: responseValue)) \n\nAPPLICATION WILL BE TERMINATED"
-          alert.alertStyle = .critical
-          alert.addButton(withTitle: "Close")
-          alert.runModal()
-          NSApp.terminate(self)
+        let errorLevel = flexErrorLevel(errorCode: responseValue)
+        os_log("c%{public}@, %{public}@, non-zero reply %{public}@, %{public}@ (%{public}@)", log: _log, type: .default, seqNum, command, responseValue, flexErrorString(errorCode: responseValue), errorLevel)
+
+        switch errorLevel {
+          
+        case "Error", "Fatal", "Unknown error":
+          DispatchQueue.main.sync {
+            let alert = NSAlert()
+            alert.messageText = "\(errorLevel) on \"\(command)\" command"
+            alert.informativeText = "RESPONSE - \(responseValue) \n\(flexErrorString(errorCode: responseValue)) \n\nAPPLICATION WILL BE TERMINATED"
+            alert.alertStyle = .critical
+            alert.addButton(withTitle: "Ok")
+            
+            let _ = alert.runModal()
+            
+            // terminate App
+            NSApp.terminate(self)
+          }
+
+        default:
+          break
         }
       }
       return
