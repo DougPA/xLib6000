@@ -1,5 +1,16 @@
 xLib6000 Change Log
 
+v2.0.6
+
+WanServer.swift - changed hostName & hostPort to constants
+WanServer.swift - reworked log messages and comments
+Radio.swift - commented out code in defaultReplyHandler(_:seqNum:responseValue:reply:) until v2.4.9 bugs fixed
+
+
+
+
+
+
 v2.0.5
 
 Radio.swift - corrections to defaultReplyHandler(_:seqNum:responseValue:reply:)
