@@ -25,8 +25,8 @@ public final class RadioParameters          : Equatable {
 
   public var callsign                       = ""                            // user assigned call sign
   public var discoveryVersion               = ""                            // e.g. 2.0.0.1
-  public var fpcMac                         = ""                            // ??
   public var firmwareVersion                = ""                            // Radio firmware version (e.g. 2.0.1.17)
+  public var fpcMac                         = ""                            // ??
   public var inUseHost                      = ""                            // ??
   public var inUseIp                        = ""                            // ??
   public var isPortForwardOn                = false
