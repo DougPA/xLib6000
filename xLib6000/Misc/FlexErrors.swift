@@ -33,7 +33,7 @@ public func flexErrorLevel(errorCode: String) -> String {
   case 0xE2000000:
     errorLevel = "Error"
   case 0xF3000001...0xF3000004:
-    errorLevel = "Fatal"
+    errorLevel = "Fatal error"
   default:
     errorLevel = "Unknown error"
   }
