@@ -643,7 +643,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // start the timer
     _pingTimer?.resume()
 
-    os_log("Started pinging SmartLink Server: %{public}@ on port %{public}d", log: _log, type: .info, _currentHost, _currentPort)
+    os_log("Started pinging SmartLink Server: %{public}@, port %{public}d", log: _log, type: .info, _currentHost, _currentPort)
   }
   /// Stop pinging the server
   ///
@@ -652,7 +652,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // stop the Timer (if any)
     _pingTimer?.cancel();
 
-    os_log("Stopped pinging SmartLink Server: %{public}@ on port %{public}d", log: _log, type: .info, _currentHost, _currentPort)
+    os_log("Stopped pinging SmartLink Server: %{public}@, port %{public}d", log: _log, type: .info, _currentHost, _currentPort)
   }
   /// Send a command to the server
   ///
@@ -681,7 +681,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
 
     // Disconnected from the SmartLInk server
     let error = (err == nil ? "" : " with error = " + err!.localizedDescription)
-    os_log("Disconnected from SmartLink server: %{public}@ on port %{public}@%{public}@", log: _log, type: .info, _currentHost, _currentPort, error)
+    os_log("Disconnected from SmartLink server: %{public}@, port %{public}@%{public}@", log: _log, type: .info, _currentHost, _currentPort, error)
     
     _isConnected = false
     _currentHost = ""
@@ -700,7 +700,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     _currentHost = sock.connectedHost ?? ""
     _currentPort = sock.connectedPort
     
-    os_log("Connected to SmartLink server: %{public}@ on port %{public}d", log: _log, type: .info, _currentHost, _currentPort)
+    os_log("Connected to SmartLink server: %{public}@, port %{public}d", log: _log, type: .info, _currentHost, _currentPort)
     
     // start a secure (TLS) connection to the SmartLink server
     var tlsSettings = [String : NSObject]()
