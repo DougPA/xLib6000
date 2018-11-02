@@ -18,12 +18,12 @@ public struct WanUserSettings {
   public var firstName  : String
   public var lastName   : String
 
-  init(callsign: String, firstName: String, lastName: String) {
-
-    self.callsign       = callsign
-    self.firstName      = firstName
-    self.lastName       = lastName
-  }
+//  init(callsign: String, firstName: String, lastName: String) {
+//
+//    self.callsign       = callsign
+//    self.firstName      = firstName
+//    self.lastName       = lastName
+//  }
 }
 
 public struct WanTestConnectionResults {
@@ -111,11 +111,11 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   private let kPlatform                     = "platform"
   private let kTestCmd                      = "application test_connection serial"
   private let kToken                        = "token"
+  private let kHostName                     = WanServer.kAddress            // SmartLink server address
+  private let kHostPort                     = WanServer.kPort               // SmartLink server SSL port
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
-  private var __hostName                    = WanServer.kAddress            // SmartLink server address
-  private var __hostPort                    = WanServer.kPort               // SmartLink server SSL port
   private var __isConnected                 = false
   private var __sslClientPublicIp           = ""                            // public IP of the radio
   //
@@ -160,7 +160,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     
     // try to connect
     do {
-      try _tlsSocket.connect(toHost: _hostName, onPort: UInt16(_hostPort), withTimeout: _timeout)
+      try _tlsSocket.connect(toHost: kHostName, onPort: UInt16(kHostPort), withTimeout: _timeout)
     } catch _ {
       success = false
     }
@@ -180,13 +180,12 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   ///
   public func sendConnectMessageForRadio(radioSerial: String, holePunchPort: Int = 0) {
     
+    // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
-      
-      os_log("Not connected", log: _log, type: .default)
-      
-      return;
+      os_log("sendConnectMessageForRadio, Not connected", log: _log, type: .default)
+      return
     }
-    
+    // send a command to SmartLink to request a connection to the specified Radio
     let command = kAppConnectCmd + "=\(radioSerial) " + kHolePunchPort + "=\(String(holePunchPort))"
     sendCommand(command)
   }
@@ -196,13 +195,12 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   ///
   public func sendDisconnectUsersMessageToServer(radioSerial: String) {
     
+    // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
-      
-      os_log("Not connected", log: _log, type: .default)
-      
-      return;
+      os_log("sendDisconnectUsersMessageToServer, Not connected", log: _log, type: .default)
+      return
     }
-    // send the command
+    // send a command to SmartLink to request disconnection from the specified Radio
     sendCommand(kDisconnectUsersCmd + "=\(radioSerial)" )
   }
   /// Test connection
@@ -211,13 +209,12 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   ///
   public func sendTestConnection(radioSerial: String) {
     
+    // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
-      
-      os_log("Not connected", log: _log, type: .default)
-      
-      return;
+      os_log("sendTestConnection, Not connected", log: _log, type: .default)
+      return
     }
-    // send the command
+    // send a command to SmartLink to test the connection for the specified Radio
     sendCommand(kTestCmd + "=\(radioSerial)" )
   }
 
@@ -248,7 +245,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     guard let token = Token(rawValue: msgType)  else {
       
       // unknown Message Type, log it and ignore the message
-      os_log("Unknown message: %{public}@", log: _log, type: .default, msg)
+      os_log("Unknown message token: %{public}@", log: _log, type: .default, msg)
       
       return
     }
@@ -284,7 +281,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     guard let token = ApplicationToken(rawValue: msgType)  else {
       
       // unknown Message Type, log it and ignore the message
-      os_log("Unknown WanServer Application token: %{public}@", log: _log, type: .default, msg)
+      os_log("Unknown Application token: %{public}@", log: _log, type: .default, msg)
       
       return
     }
@@ -324,7 +321,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     guard let token = RadioToken(rawValue: msgType)  else {
       
       // unknown Message Type, log it and ignore the message
-      os_log("Unknown WanServer Radio token: %{public}@", log: _log, type: .default, msg)
+      os_log("Unknown Radio token: %{public}@", log: _log, type: .default, msg)
       
       return
     }
@@ -358,7 +355,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       guard let token = ApplicationInfoToken(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-        os_log("Unknown WanServer Info token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Info token - %{public}@", log: _log, type: .default, property.key)
         
         continue
       }
@@ -398,9 +395,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       guard let token = ApplicationUserSettingsToken(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-//        _api.log.msg("Unknown token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-        
-        os_log("Unknown WanServer UserSettings token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown UserSettings token - %{public}@", log: _log, type: .default, property.key)
         
         continue
       }
@@ -595,7 +590,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       guard let token = RadioTestConnectionResultsToken(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-        os_log("Unknown WanServer TestConnection token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown TestConnection token - %{public}@", log: _log, type: .default, property.key)
         
         continue
       }
@@ -629,7 +624,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     
     _tlsSocket.readData(to: GCDAsyncSocket.lfData(), withTimeout: -1, tag: 0)
   }
-  /// Begin pinging the server
+  /// Begin pinging the SmartLink server
   ///
   private func startPinging() {
     
@@ -647,6 +642,8 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     }
     // start the timer
     _pingTimer?.resume()
+
+    os_log("Started pinging SmartLink Server: %{public}@ on port %{public}d", log: _log, type: .info, _currentHost, _currentPort)
   }
   /// Stop pinging the server
   ///
@@ -654,6 +651,8 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     
     // stop the Timer (if any)
     _pingTimer?.cancel();
+
+    os_log("Stopped pinging SmartLink Server: %{public}@ on port %{public}d", log: _log, type: .info, _currentHost, _currentPort)
   }
   /// Send a command to the server
   ///
@@ -661,6 +660,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   ///
   private func sendCommand(_ cmd: String) {
     
+    // send the specified command to the SmartLink server using TLS
     let command = cmd + "\n"
     _tlsSocket.write(command.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withTimeout: -1, tag: 0)
   }
@@ -677,16 +677,11 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   ///
   @objc public func socketDidDisconnect(_ sock: GCDAsyncSocket, withError err: Error?) {
     
-    // FIXME: Something wrong here ???
-    
-    
-    // Disconnected
-    let error = (err == nil ? "" : "with error = " + err!.localizedDescription)
-    os_log("WAN Server: %{public}@ disconnected %{public}@", log: _log, type: .info, _currentHost)
-
-    Swift.print("port = \(_currentPort)")
-    
     stopPinging()
+
+    // Disconnected from the SmartLInk server
+    let error = (err == nil ? "" : " with error = " + err!.localizedDescription)
+    os_log("Disconnected from SmartLink server: %{public}@ on port %{public}@%{public}@", log: _log, type: .info, _currentHost, _currentPort, error)
     
     _isConnected = false
     _currentHost = ""
@@ -701,18 +696,18 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   ///
   @objc public func socket(_ sock: GCDAsyncSocket, didConnectToHost host: String, port: UInt16) {
     
-    // Connected, save the ip & port
+    // Connected to the SmartLink server, save the ip & port
     _currentHost = sock.connectedHost ?? ""
     _currentPort = sock.connectedPort
     
-    os_log("WAN Server: %{public}@ on port: %{public}d", log: _log, type: .info, _currentHost, _currentPort)
+    os_log("Connected to SmartLink server: %{public}@ on port %{public}d", log: _log, type: .info, _currentHost, _currentPort)
     
-    // start server TLS connection
+    // start a secure (TLS) connection to the SmartLink server
     var tlsSettings = [String : NSObject]()
-    tlsSettings[kCFStreamSSLPeerName as String] = _hostName as NSObject
+    tlsSettings[kCFStreamSSLPeerName as String] = kHostName as NSObject
     _tlsSocket.startTLS(tlsSettings)
     
-    // start pinging
+    // start pinging (if needed)
     if _ping { startPinging() }
     
     _isConnected = true
@@ -751,8 +746,9 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // starting the communication with the server over TLS
     let command = kAppRegisterCmd + "=\(_appName) " + kPlatform + "=\(_platform) " + kToken + "=\(_token)"
     
-    os_log("Start TLS dialogue with WAN Server", log: _log, type: .info)
+    os_log("TLS connection to SmartLink server \"Did Secure\"", log: _log, type: .info)
     
+    // register the Application / token pair with the SmartLink server
     sendCommand(command)
     
     // start reading
@@ -770,17 +766,9 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
 extension WanServer {
 
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Private properties - with synchronization
   
   // listed in alphabetical order
-  
-  private var _hostName: String {
-    get { return _objectQ.sync { __hostName } }
-    set { _objectQ.sync(flags: .barrier) { __hostName = newValue } } }
-  
-  private var _hostPort: Int {
-    get { return _objectQ.sync { __hostPort } }
-    set { _objectQ.sync(flags: .barrier) { __hostPort = newValue } } }
   
   private var _isConnected: Bool {
     get { return _objectQ.sync { __isConnected } }
@@ -792,12 +780,6 @@ extension WanServer {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant
-  
-  @objc dynamic public var hostName: String {
-    return _hostName }
-  
-  @objc dynamic public var hostPort: Int {
-    return _hostPort }
   
   @objc dynamic public var isConnected: Bool {
     return _isConnected }
@@ -857,7 +839,6 @@ extension WanServer {
     case publicUpnpUdpPort          = "public_upnp_udp_port"
     case requiresAdditionalLicense  = "requires_additional_license"
     case radioLicenseId             = "radio_license_id"
-//    case radioName                  = "radio_name"
     case serialNumber               = "serial"
     case status
     case upnpSupported              = "upnp_supported"
