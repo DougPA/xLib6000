@@ -305,7 +305,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // log it
       let wanStatus = isWan ? "REMOTE" : "LOCAL"
       
-      os_log("TCP connected to %{public}@ Radio @ %{public}@, Port %{public}d", log: _log, type: .info, wanStatus, host, port)
+      os_log("TCP connected to %{public}@ @ %{public}@, port %{public}d (%{public}@)", log: _log, type: .info, activeRadio!.nickname, host, port, wanStatus)
       
       // a tcp connection has been established, inform observers
       NC.post(.tcpDidConnect, object: nil)
@@ -367,7 +367,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         // start pinging
         if pingerEnabled {
           
-          os_log("Pinger started", log: _log, type: .info)
+          let wanStatus = isWan ? "REMOTE" : "LOCAL"
+          let p = (isWan ? activeRadio!.publicTlsPort : activeRadio!.port)
+          os_log("Started pinging: %{public}@ @ %{public}@, port %{public}d (%{public}@)", log: _log, type: .info, activeRadio!.nickname, activeRadio!.publicIp, p, wanStatus)
           
           _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ)
         }
