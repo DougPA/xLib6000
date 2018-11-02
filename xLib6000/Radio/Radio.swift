@@ -358,7 +358,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // log it
     os_log("%{public}@", log: _log, type: .default, msgText)
-
+    
     // FIXME: Take action on some/all errors?
   }
   /// Parse a Reply. format: <sequenceNumber>|<hexResponse>|<message>[|<debugOutput>]
@@ -373,9 +373,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // ignore incorrectly formatted replies
     if components.count < 2 {
-      
       os_log("Incomplete reply, r%{public}@", log: _log, type: .default, replySuffix)
-      
       return
     }
     
@@ -1257,25 +1255,27 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         let errorType = (errorLevel == "Error" || errorLevel == "Fatal" || errorLevel == "Unknown error" ? OSLogType.default : OSLogType.info)
         os_log("c%{public}@, %{public}@, non-zero reply %{public}@, %{public}@ (%{public}@)", log: _log, type: errorType, seqNum, command, responseValue, flexErrorString(errorCode: responseValue), errorLevel)
 
-        switch errorLevel {
-          
-        case "Error", "Fatal", "Unknown error":
-          DispatchQueue.main.sync {
-            let alert = NSAlert()
-            alert.messageText = "\(errorLevel) on \"\(command)\" command"
-            alert.informativeText = "RESPONSE - \(responseValue) \n\(flexErrorString(errorCode: responseValue)) \n\nAPPLICATION WILL BE TERMINATED"
-            alert.alertStyle = .critical
-            alert.addButton(withTitle: "Ok")
-            
-            let _ = alert.runModal()
-            
-            // terminate App
-            NSApp.terminate(self)
-          }
-
-        default:
-          break
-        }
+        // FIXME: Temporarily commented out until bugs in v2.4.9 are fixed
+        
+//        switch errorLevel {
+//
+//        case "Error", "Fatal error", "Unknown error":
+//          DispatchQueue.main.sync {
+//            let alert = NSAlert()
+//            alert.messageText = "\(errorLevel) on command\nc\(seqNum)|\(command)"
+//            alert.informativeText = "\(responseValue) \n\(flexErrorString(errorCode: responseValue)) \n\nAPPLICATION WILL BE TERMINATED"
+//            alert.alertStyle = .critical
+//            alert.addButton(withTitle: "Ok")
+//
+//            let _ = alert.runModal()
+//
+//            // terminate App
+//            NSApp.terminate(self)
+//          }
+//
+//        default:
+//          break
+//        }
       }
       return
     }
