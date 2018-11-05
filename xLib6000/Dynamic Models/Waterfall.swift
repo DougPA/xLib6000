@@ -37,8 +37,9 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
+  public var streamActive                   = false
+  
   public private(set) var id                : WaterfallId   = 0             // Waterfall Id (StreamId)
-
   public private(set) var lastTimecode      = 0                             // Time code of last frame received
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
 
@@ -142,6 +143,8 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
     _dataframes.append(WaterfallFrame(frameSize: 4096))
 
     super.init()
+    
+    streamActive = false
   }
   
   // ------------------------------------------------------------------------------

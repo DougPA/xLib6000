@@ -30,8 +30,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
+  public var streamActive                   = false
+
   public private(set) var id                : PanadapterId = 0              // Panadapter Id (StreamId)
-  
   public private(set) var lastFrameIndex    = 0                             // Frame index of previous Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
   
@@ -193,6 +194,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     _dataframes.append(PanadapterFrame(frameSize: Panadapter.kMaxBins))
 
     super.init()
+    
+    streamActive = false
   }
   
   // ----------------------------------------------------------------------------
