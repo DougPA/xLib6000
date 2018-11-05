@@ -206,8 +206,12 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       
       return
     }
+//    Swift.print("Register entered: udpRegisterQ = \(_udpRegisterQ)")
+    
     // register & keep open the router (on a background queue)
     _udpRegisterQ.async { [unowned self] in
+      
+//      Swift.print("Register Q entered, udpSocket = \(self._udpSocket.debugDescription), udpBound = \(self._udpBound)")
       
       // until successful Registration
       while self._udpSocket != nil && !self._udpSuccessfulRegistration && self._udpBound {
@@ -215,23 +219,31 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
         // send a Registration command
         let cmd = self.kRegisterCmd + "=0x" + clientHandle
         self.sendData(cmd.data(using: String.Encoding.ascii, allowLossyConversion: false)!)
+
+//        Swift.print("Register command sent: \(cmd)")
         
         // pause
         usleep(self.kRegistrationDelay)
       }
-      // as long as connected after Registration
-      while self._udpSocket != nil && self._udpBound {
-        
-        // We must maintain the NAT rule in the local router
-        // so we have to send traffic every once in a while
-        
-        // send a Ping command
-        let cmd = self.kPingCmd + "=0x" + clientHandle
-        self.sendData(cmd.data(using: String.Encoding.ascii, allowLossyConversion: false)!)
-        
-        // pause
-        sleep(self.kPingDelay)
-      }
+
+      os_log("SmartLink - register UDP successful", log: self._log, type: .info)
+
+//      // as long as connected after Registration
+//      while self._udpSocket != nil && self._udpBound {
+//
+//        // We must maintain the NAT rule in the local router
+//        // so we have to send traffic every once in a while
+//
+//        // send a Ping command
+//        let cmd = self.kPingCmd + "=0x" + clientHandle
+//        self.sendData(cmd.data(using: String.Encoding.ascii, allowLossyConversion: false)!)
+//
+//        // pause
+//        sleep(self.kPingDelay)
+//      }
+//
+//      os_log("SmartLink - pinging stopped", log: self._log, type: .info)
+      
     }
   }
 
