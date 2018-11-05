@@ -198,62 +198,40 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   public func removeAll() {
     
     // ----- remove all objects -----
-    
-    // clear all collections
     //      NOTE: order is important
     
-    for (_, audioStream) in _audioStreams {
-      // notify all observers
-      NC.post(.audioStreamWillBeRemoved, object: audioStream as Any?)
-    }
+    // notify all observers, then remove
+    audioStreams.forEach( { NC.post(.audioStreamWillBeRemoved, object: $0.value as Any?) } )
     audioStreams.removeAll()
     
-//    for (_, iqStream) in _iqStreams {
-//      // notify all observers
-//      NC.post(.iqStreamWillBeRemoved, object: iqStream as Any?)
-//    }
-//    iqStreams.removeAll()
+    iqStreams.forEach( { NC.post(.iqStreamWillBeRemoved, object: $0.value as Any?) } )
+    iqStreams.removeAll()
     
-    for (_, micAudioStream) in _micAudioStreams {
-      // notify all observers
-      NC.post(.micAudioStreamWillBeRemoved, object: micAudioStream as Any?)
-    }
+    micAudioStreams.forEach( {NC.post(.micAudioStreamWillBeRemoved, object: $0.value as Any?)} )
     micAudioStreams.removeAll()
     
-    for (_, txAudioStream) in _txAudioStreams {
-      // notify all observers
-      NC.post(.txAudioStreamWillBeRemoved, object: txAudioStream as Any?)
-    }
+    txAudioStreams.forEach( { NC.post(.txAudioStreamWillBeRemoved, object: $0.value as Any?) } )
     txAudioStreams.removeAll()
     
-    for (_, opusStream) in _opusStreams {
-      // notify all observers
-      NC.post(.opusRxWillBeRemoved, object: opusStream as Any?)
-    }
+    opusStreams.forEach( { NC.post(.opusRxWillBeRemoved, object: $0.value as Any?) } )
     opusStreams.removeAll()
     
-    for (_, tnf) in _tnfs {
-      // notify all observers
-      NC.post(.tnfWillBeRemoved, object: tnf as Any?)
-    }
+    tnfs.forEach( { NC.post(.tnfWillBeRemoved, object: $0.value as Any?) } )
     tnfs.removeAll()
     
-    for (_, slice) in _slices {
-      // notify all observers
-      NC.post(.sliceWillBeRemoved, object: slice as Any?)
-    }
+    slices.forEach( { NC.post(.sliceWillBeRemoved, object: $0.value as Any?) } )
     slices.removeAll()
     
-    for (_, panadapter) in _panadapters {
+    panadapters.forEach( {
       
-      let waterfallId = panadapter.waterfallId
+      let waterfallId = $0.value.waterfallId
       let waterfall = waterfalls[waterfallId]
       
       // notify all observers
-      NC.post(.panadapterWillBeRemoved, object: panadapter as Any?)
+      NC.post(.panadapterWillBeRemoved, object: $0.value as Any?)
       
       NC.post(.waterfallWillBeRemoved, object: waterfall as Any?)
-    }
+    })
     panadapters.removeAll()
     waterfalls.removeAll()
     
@@ -294,7 +272,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----------------------------------------------------------------------------
   // MARK: - Internal methods
   
-  /// Change the MOX property when an Interloack state change occurs
+  /// Change the MOX property when an Interlock state change occurs
   ///
   /// - Parameter state:            a new Interloack state
   ///
@@ -608,7 +586,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // what is the message?
     if keyValues[1].key == "connected" {
       // Connected
-      _api.setConnectionState(.clientConnected)
+//      _api.setConnectionState(.clientConnected)
+      _api.clientConnected()
       
     } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
       // FIXME: Handle the disconnect?
@@ -1414,10 +1393,20 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
       case .panadapter where self.panadapters[vitaPacket.streamId] != nil:
         // Panadapter
+        if !self.panadapters[vitaPacket.streamId]!.streamActive {
+          self.panadapters[vitaPacket.streamId]!.streamActive = true
+          // log the start of the stream
+          os_log("Panadapter UDP Stream started - %{public}@", log: self._log, type: .info, vitaPacket.streamId.hex)
+        }
         self.panadapters[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         
       case .waterfall where self.waterfalls[vitaPacket.streamId] != nil:
         // Waterfall
+        if !self.waterfalls[vitaPacket.streamId]!.streamActive {
+          self.waterfalls[vitaPacket.streamId]!.streamActive = true
+          // log the start of the stream
+          os_log("Waterfall UDP Stream started - %{public}@", log: self._log, type: .info, vitaPacket.streamId.hex)
+        }
         self.waterfalls[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         
       default:
