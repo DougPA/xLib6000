@@ -93,11 +93,8 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
     var localInterface: String?
     var success = true
     
-    _isWan = isWan
-    _seqNum = 0
-    
     // Local or Remote connection?
-    if _isWan {
+    if isWan {
       
       // Remote (WAN)
       if radioParameters.requiresHolePunch {
@@ -140,6 +137,12 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
       // connection attemp failed
       success = false
     }
+    
+    if success {
+      _isWan = isWan
+      _seqNum = 0
+    }
+    
     return success
   }
   /// Disconnect from the Radio (hardware)
