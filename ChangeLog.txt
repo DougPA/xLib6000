@@ -4,6 +4,13 @@ v2.1.0
 
 refactored the Api state machine, eliminated setConnectionState()
 UdpManager.swift - commented out "ping" code in register(clientHandle:)
+Panadapter.swift - renamed streamActive to isStreaming
+Waterfall.swift - renamed streamActive to isStreaming
+Opus.swift - added public var isStreaming
+Panadapter.swift - added detection of out-of-sequence packets
+Waterfall.swift - added detection of out-of-sequence packets
+Meter.swift - in parseProperties(_:) added '&& number != "" && units != ""' to if !_initialized
+TcpManager.swift - correction to connect(radioParameters:isWan:)
 
 v2.0.6
 

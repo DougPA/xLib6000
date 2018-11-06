@@ -1389,23 +1389,28 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
       case .opus where self.opusStreams[vitaPacket.streamId] != nil:
         // Opus
+        if self.opusStreams[vitaPacket.streamId]!.isStreaming == false {
+          self.opusStreams[vitaPacket.streamId]!.isStreaming = true
+          // log the start of the stream
+          os_log("Opus %{public}@ Stream started", log: self._log, type: .info, vitaPacket.streamId.hex)
+        }
         self.opusStreams[vitaPacket.streamId]!.vitaProcessor( vitaPacket )
         
       case .panadapter where self.panadapters[vitaPacket.streamId] != nil:
         // Panadapter
-        if !self.panadapters[vitaPacket.streamId]!.streamActive {
-          self.panadapters[vitaPacket.streamId]!.streamActive = true
+        if self.panadapters[vitaPacket.streamId]!.isStreaming == false {
+          self.panadapters[vitaPacket.streamId]!.isStreaming = true
           // log the start of the stream
-          os_log("Panadapter UDP Stream started - %{public}@", log: self._log, type: .info, vitaPacket.streamId.hex)
+          os_log("Panadapter %{public}@ Stream started", log: self._log, type: .info, vitaPacket.streamId.hex)
         }
         self.panadapters[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         
       case .waterfall where self.waterfalls[vitaPacket.streamId] != nil:
         // Waterfall
-        if !self.waterfalls[vitaPacket.streamId]!.streamActive {
-          self.waterfalls[vitaPacket.streamId]!.streamActive = true
+        if self.waterfalls[vitaPacket.streamId]!.isStreaming == false {
+          self.waterfalls[vitaPacket.streamId]!.isStreaming = true
           // log the start of the stream
-          os_log("Waterfall UDP Stream started - %{public}@", log: self._log, type: .info, vitaPacket.streamId.hex)
+          os_log("Waterfall %{public}@ Stream started", log: self._log, type: .info, vitaPacket.streamId.hex)
         }
         self.waterfalls[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         

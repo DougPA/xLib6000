@@ -61,9 +61,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // MARK: - Private properties
   
   private var _log                          = OSLog(subsystem: kBundleIdentifier, category: "Api")
-  private var _newState                     : Api.NewState! {
-    didSet { os_log("Api state changed to %{public}@", log: _log, type: .info, _newState.rawValue)
-}
+  private var _apiState                     : Api.NewState! {
+    didSet { os_log("Api state changed to %{public}@", log: _log, type: .info, _apiState.rawValue) }
   }
   private var _tcp                          : TcpManager!                   // TCP connection class (commands)
   private var _udp                          : UdpManager!                   // UDP connection class (streams)
@@ -119,8 +118,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // initialize a Manager for the UDP Data Streams
     _udp = UdpManager(udpReceiveQ: _udpReceiveQ, udpRegisterQ: _udpRegisterQ, delegate: self)
     
-    // update the State
-    _newState = .disconnected
+    // set the initial State
+    _apiState = .disconnected
   }
   
   // ----------------------------------------------------------------------------
@@ -142,7 +141,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) -> Bool {
 
     // must be in the Ready state to connect
-    guard _newState == .disconnected else { return false }
+    guard _apiState == .disconnected else { return false }
     
     _clientName = clientName
     _isGui = isGui
@@ -178,7 +177,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public func disconnect(reason: DisconnectReason = .normal) {
     
     // must be in the Client Connected state to connect
-    guard _newState == .clientConnected else { return }
+    guard _apiState == .clientConnected else { return }
     
     // if pinger active, stop pinging
     if _pinger != nil {
@@ -303,7 +302,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // TCP & UDP connections established, inform observers
       NC.post(.clientDidConnect, object: activeRadio as Any?)
       
-      _newState = .clientConnected
+      _apiState = .clientConnected
     }
 
     // could this be a remote connection?
@@ -554,12 +553,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // connected?
     if connected {
       
-      // YES, set state
-      _newState = .tcpConnected
-
       // log it
       let wanStatus = isWan ? "REMOTE" : "LOCAL"
       os_log("TCP connected to %{public}@ @ %{public}@, port %{public}d (%{public}@)", log: _log, type: .info, activeRadio!.nickname, host, port, wanStatus)
+      
+      // YES, set state
+      _apiState = .tcpConnected
       
       // a tcp connection has been established, inform observers
       NC.post(.tcpDidConnect, object: nil)
@@ -599,7 +598,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         
         os_log("Tcp Disconnected with error = %{public}@", log: _log, type: .info, error)
       }
-      _newState = .disconnected
+      _apiState = .disconnected
     }
   }
 
@@ -621,9 +620,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // YES, UDP (streams) connection established
       
-      _newState = .udpBound
-      
       os_log("UDP bound to Port %{public}d", log: _log, type: .info, port)
+      
+      _apiState = .udpBound
       
       localUDPPort = port
       
@@ -636,7 +635,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // if WAN connection reset the state to .clientConnected as the true connection state
       if isWan {
         
-        _newState = .clientConnected
+        _apiState = .clientConnected
       }
     } else {
     
