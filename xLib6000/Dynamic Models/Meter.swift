@@ -297,7 +297,7 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
         units = property.value.lowercased()
       }
     }
-    if !_initialized {
+    if !_initialized && number != "" && units != "" {
       
       // the Radio (hardware) has acknowledged this Meter
       _initialized = true
