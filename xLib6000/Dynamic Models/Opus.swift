@@ -34,6 +34,8 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
+  public var isStreaming                    = false
+  
   public private(set) var id                : OpusId                        // The Opus stream id
 
   // ----------------------------------------------------------------------------
@@ -111,6 +113,8 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
     _q = queue
     
     super.init()
+    
+    isStreaming = false
   }
   
   // ------------------------------------------------------------------------------
