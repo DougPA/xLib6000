@@ -160,7 +160,6 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
   ///   - replyTo:        ReplyHandler (if any)
   /// - Returns:          the Sequence Number of the Command
   ///
-//  func send(_ cmd: String, diagnostic: Bool = false, replyTo callback: ReplyHandler? = nil) -> Int {
   func send(_ cmd: String, diagnostic: Bool = false) -> Int {
     var lastSeqNum = 0
     var command = ""
@@ -169,9 +168,6 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
       
       // assemble the command
       command =  "C" + "\(diagnostic ? "D" : "")" + "\(self._seqNum)|" + cmd + "\n"
-      
-//      // register to be notified when reply received
-//      _delegate?.addReplyHandler( String(self._seqNum), replyTuple: (replyTo: callback, command: cmd) )
       
       // send it, no timeout, tag = segNum
       self._tcpSocket.write(command.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withTimeout: -1, tag: self._seqNum)
