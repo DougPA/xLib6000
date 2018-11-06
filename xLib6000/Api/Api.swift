@@ -62,7 +62,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   
   private var _log                          = OSLog(subsystem: kBundleIdentifier, category: "Api")
   private var _apiState                     : Api.NewState! {
-    didSet { os_log("Api state changed to %{public}@", log: _log, type: .info, _apiState.rawValue) }
+    didSet { os_log("Api state == %{public}@", log: _log, type: .info, _apiState.rawValue) }
   }
   private var _tcp                          : TcpManager!                   // TCP connection class (commands)
   private var _udp                          : UdpManager!                   // UDP connection class (streams)
@@ -176,7 +176,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   public func disconnect(reason: DisconnectReason = .normal) {
     
-    // must be in the Client Connected state to connect
+    // must be in the Client Connected state to disconnect
     guard _apiState == .clientConnected else { return }
     
     // if pinger active, stop pinging
@@ -572,8 +572,14 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         os_log("\"wan validate handle=%{public}@\" sent", log: _log, type: .info, wanConnectionHandle)
         
       } else {
-        // establish a UDP port for the Data Streams
-        _udp.bind(radioParameters: activeRadio!, isWan: isWan)
+        // insure that a UDP port was bound (for the Data Streams)
+        guard _udp.bind(radioParameters: activeRadio!, isWan: isWan) else {
+          
+          // Bind failed, disconnect
+          _tcp.disconnect()
+          
+          return
+        }
       }
       // if another Gui client connected, disconnect it
       if activeRadio!.status == "In_Use" && _isGui {
