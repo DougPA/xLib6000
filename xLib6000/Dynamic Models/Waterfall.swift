@@ -37,10 +37,10 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public var streamActive                   = false
+  public var isStreaming                    = false
   
   public private(set) var id                : WaterfallId   = 0             // Waterfall Id (StreamId)
-  public private(set) var lastTimecode      = 0                             // Time code of last frame received
+  public private(set) var lastTimecode      = -1                            // Time code of last frame received
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
 
   // ----------------------------------------------------------------------------
@@ -67,6 +67,8 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   private weak var _delegate                : StreamHandler?                // Delegate for Waterfall stream
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
+  
+  private let _numberOfDataFrames           = 10
   
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -139,12 +141,13 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
     _q = queue
     
     // allocate two dataframes
-    _dataframes.append(WaterfallFrame(frameSize: 4096))
-    _dataframes.append(WaterfallFrame(frameSize: 4096))
+    for _ in 0..<_numberOfDataFrames {
+      _dataframes.append(WaterfallFrame(frameSize: 4096))
+    }
 
     super.init()
     
-    streamActive = false
+    isStreaming = false
   }
   
   // ------------------------------------------------------------------------------
@@ -233,26 +236,30 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   ///
   func vitaProcessor(_ vita: Vita) {
     
-//    // If the time code is out-of-sequence, ignore the packet
-//    if _dataframes[_dataframeIndex].timeCode < lastTimecode {
-//      droppedPackets += 1
-//      Log.sharedInstance.msg("Missing packet(s), timecode: \(_dataframes[_dataframeIndex].timeCode) < last timecode: \(lastTimecode)", level: .warning, function: #function, file: #file, line: #line)
-//      // out of sequence, ignore this packet
-//      return
-//    }
-//    lastTimecode = _dataframes[_dataframeIndex].timeCode;
-    
     // convert the Vita struct and accumulate a WaterfallFrame
     if _dataframes[_dataframeIndex].accumulate(vita: vita) {
       
+      if lastTimecode >= 0 && _dataframes[_dataframeIndex].timeCode > lastTimecode + 1 {
+        
+        // a frame has been skipped, ignore the skipped frame
+        os_log("Missing Frame: previous = %{public}d, current = %{public}d", log: _log, type: .default, lastTimecode, _dataframes[_dataframeIndex].timeCode)
+        
+      } else if lastTimecode >= 0 && _dataframes[_dataframeIndex].timeCode < lastTimecode {
+        
+        // a frame is either duplicated or out of order, ignore it
+        os_log("Out of sequence Frame: previous = %{public}d, current = %{public}d", log: _log, type: .default, lastTimecode, _dataframes[_dataframeIndex].timeCode)
+        return
+      }
       // save the auto black level
       _autoBlackLevel = _dataframes[_dataframeIndex].autoBlackLevel
       
       // Pass the data frame to this Waterfall's delegate
       delegate?.streamHandler(_dataframes[_dataframeIndex])
 
+      lastTimecode = _dataframes[_dataframeIndex].timeCode;
+
       // use the next dataframe
-      _dataframeIndex = (_dataframeIndex + 1) % 2
+      _dataframeIndex = (_dataframeIndex + 1) % _numberOfDataFrames
     }
   }
 }

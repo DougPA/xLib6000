@@ -30,10 +30,10 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public var streamActive                   = false
+  public var isStreaming                    = false
 
   public private(set) var id                : PanadapterId = 0              // Panadapter Id (StreamId)
-  public private(set) var lastFrameIndex    = 0                             // Frame index of previous Vita payload
+  public private(set) var lastFrameIndex    = -1                            // Frame index of previous Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
   
   @objc dynamic public let daxIqChoices     = Api.daxIqChannels
@@ -91,6 +91,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private weak var _delegate                : StreamHandler?                // Delegate for Panadapter stream
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
+  
+  private let _numberOfPanadapterFrames     = 6
 
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
@@ -189,13 +191,14 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     self.id = id
     _q = queue
 
-    // allocate two dataframes
-    _dataframes.append(PanadapterFrame(frameSize: Panadapter.kMaxBins))
-    _dataframes.append(PanadapterFrame(frameSize: Panadapter.kMaxBins))
+    // allocate three dataframes
+    for _ in 0..<_numberOfPanadapterFrames {
+      _dataframes.append(PanadapterFrame(frameSize: Panadapter.kMaxBins))
+    }
 
     super.init()
     
-    streamActive = false
+    isStreaming = false
   }
   
   // ----------------------------------------------------------------------------
@@ -416,23 +419,27 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///
   func vitaProcessor(_ vita: Vita) {
     
-    
-//    // If the frame index is out-of-sequence, ignore the packet
-//    if _dataframes[_dataframeIndex].frameIndex < lastFrameIndex {
-//      droppedPackets += 1
-//      Log.sharedInstance.msg("Missing packet(s), frameIndex: \(_dataframes[_dataframeIndex].frameIndex) < last frameIndex: \(lastFrameIndex)", level: .warning, function: #function, file: #file, line: #line)
-//      return
-//    }
-//    lastFrameIndex = _dataframes[_dataframeIndex].frameIndex
-    
     // convert the Vita struct to a PanadapterFrame
     if _dataframes[_dataframeIndex].accumulate(vita: vita) {
       
+      if lastFrameIndex >= 0 && _dataframes[_dataframeIndex].frameIndex > lastFrameIndex + 1 {
+        
+        // a frame has been skipped, ignore the skipped frame
+        os_log("Missing Frame: previous = %{public}d, current = %{public}d", log: _log, type: .default, lastFrameIndex, _dataframes[_dataframeIndex].frameIndex)
+      
+      } else if lastFrameIndex >= 0 && _dataframes[_dataframeIndex].frameIndex < lastFrameIndex {
+        
+        // a frame is either duplicated or out of order, ignore it
+        os_log("Out of sequence Frame: previous = %{public}d, current = %{public}d", log: _log, type: .default, lastFrameIndex, _dataframes[_dataframeIndex].frameIndex)
+        return
+      }
       // Pass the data frame to this Panadapter's delegate
       delegate?.streamHandler(_dataframes[_dataframeIndex])
+      
+      lastFrameIndex = _dataframes[_dataframeIndex].frameIndex
 
       // use the next dataframe
-      _dataframeIndex = (_dataframeIndex + 1) % 2
+      _dataframeIndex = (_dataframeIndex + 1) % _numberOfPanadapterFrames
     }
   }
 }
@@ -508,7 +515,7 @@ public class PanadapterFrame {
       binSize = Int(CFSwapInt16BigToHost(p.pointee.binSize))
       totalBinsInFrame = Int(CFSwapInt16BigToHost(p.pointee.totalBinsInFrame))
       frameIndex = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
-    
+      
     } else {
       // pre 2.3.x
       // Bins are just beyond the payload
