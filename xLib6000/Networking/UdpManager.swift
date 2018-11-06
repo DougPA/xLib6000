@@ -104,7 +104,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   ///   - isWan:              Wan enabled
   ///   - clientHandle:       handle
   ///
-  func bind(radioParameters: RadioParameters, isWan: Bool, clientHandle: String = "") {
+  func bind(radioParameters: RadioParameters, isWan: Bool, clientHandle: String = "") -> Bool {
     
     var success               = false
     var tmpPort               : UInt16 = 0
@@ -153,19 +153,25 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       }
       if success { break }
     }
-    // capture the number of the actual port in use
-    _udpRcvPort = tmpPort
     
-    // save the ip address
-    _udpSendIP = radioParameters.publicIp
-    
-    // change the state
-    _delegate?.udpState(bound: success, port: _udpRcvPort, error: success ? "" : "Unable to bind")
-    
-    _udpBound = true
-    
-    // if a Wan connection, register
-    if isWan { register(clientHandle: clientHandle) }
+    // was a port bound?
+    if success {
+      
+      // YES, capture the number of the actual port in use
+      _udpRcvPort = tmpPort
+      
+      // save the ip address
+      _udpSendIP = radioParameters.publicIp
+      
+      // change the state
+      _delegate?.udpState(bound: success, port: _udpRcvPort, error: success ? "" : "Unable to bind")
+      
+      _udpBound = true
+      
+      // if a Wan connection, register
+      if isWan { register(clientHandle: clientHandle) }
+    }
+    return success
   }
   /// Begin receiving UDP data
   ///
