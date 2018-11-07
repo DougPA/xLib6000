@@ -170,37 +170,35 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // returns sucess if active
     return false
   }
-  /// Disconnect from the active Radio
+  /// Shutdown the active Radio
   ///
   /// - Parameter reason:         a reason code
   ///
-  public func disconnect(reason: DisconnectReason = .normal) {
+  public func shutdown(reason: DisconnectReason = .normal) {
     
-    // must be in the Client Connected state to disconnect
-    guard _apiState == .clientConnected else { return }
-    
-    // if pinger active, stop pinging
+    // stop pinging (if active)
     if _pinger != nil {
       _pinger = nil
       
       os_log("Pinger stopped", log: _log, type: .info)
-    
     }
-    // the radio class will be removed, inform observers
-    NC.post(.radioWillBeRemoved, object: radio as Any?)
+    // the radio (if any) will be removed, inform observers
+    if activeRadio != nil { NC.post(.radioWillBeRemoved, object: radio as Any?) }
     
-    // disconnect TCP
-    _tcp.disconnect()
+    if _apiState != .disconnected {
+      // disconnect TCP
+      _tcp.disconnect()
+      
+      // unbind and close udp
+      _udp.unbind()
+    }
     
-    // unbind and close udp
-    _udp.unbind()
-    
+    // the radio (if any)) has been removed, inform observers
+    if activeRadio != nil { NC.post(.radioHasBeenRemoved, object: nil) }
+
     // remove the Radio
     activeRadio = nil
     radio = nil
-    
-    // the radio class has been removed, inform observers
-    NC.post(.radioHasBeenRemoved, object: nil)
   }
   /// Send a command to the Radio (hardware)
   ///
@@ -493,7 +491,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   @objc private func tcpPingStarted(_ note: Notification) {
     
     os_log("Pinger started", log: _log, type: .info)
-  
   }
   /// Process .tcpPingTimeout Notification
   ///
@@ -503,8 +500,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   @objc private func tcpPingTimeout(_ note: Notification) {
     
     os_log("Pinger timeout", log: _log, type: .error)
-
-    // FIXME: Disconnect?
   }
   
   // ----------------------------------------------------------------------------
@@ -577,7 +572,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
           
           // Bind failed, disconnect
           _tcp.disconnect()
-          
+
+          // the tcp connection was disconnected, inform observers
+          NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: "Udp bind failure"))
+
           return
         }
       }
@@ -594,6 +592,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // NO, error?
       if error == "" {
         
+        // the tcp connection was disconnected, inform observers
+        NC.post(.tcpDidDisconnect, object: DisconnectReason.normal)
+
         os_log("Tcp Disconnected", log: _log, type: .info)
         
       } else {
@@ -602,8 +603,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         
         _udp.unbind()
         
-        os_log("Tcp Disconnected with error = %{public}@", log: _log, type: .info, error)
+        // the tcp connection was disconnected, inform observers
+        NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: error))
+
+        os_log("Tcp Disconnected with message = %{public}@", log: _log, type: .info, error)
       }
+
       _apiState = .disconnected
     }
   }
