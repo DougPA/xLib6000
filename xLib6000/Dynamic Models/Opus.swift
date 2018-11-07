@@ -238,25 +238,22 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
     
     // is this the first packet?
     if _rxSeq == nil { _rxSeq = vita.sequence ; _rxLostPacketCount = 0}
-    
+
     // is the received Sequence Number correct?
     if vita.sequence != _rxSeq {
       
-      // NO, log the issue
-      os_log("Missing Opus packet(s), rcvdSeq: %d,  != expectedSeq: %d", log: _log, type: .default, vita.sequence, _rxSeq!)
-      
-      if vita.sequence < _rxSeq! {
+      // NO, missing or out-of-sequence?
+      if vita.sequence > _rxSeq! {
         
-        // less than expected, packet is old, ignore it
-        _rxSeq = nil
-        _rxLostPacketCount += 1
-        return
+        // MISSING, frame(s) has been skipped, ignore the skipped frame(s)
+        os_log("Missing Frame(s): expected = %{public}d, received = %{public}d", log: _log, type: .default, _rxSeq!, vita.sequence)
+        _rxSeq = vita.sequence
         
       } else {
         
-        // greater than expected, one or more packets were lost, resync & process it
-        _rxSeq = vita.sequence
-        _rxLostPacketCount += 1
+        // OUT-OF-SEQUENCE, a frame is either duplicated or out of order, ignore it
+        os_log("Out of sequence Frame(s) were ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, _rxSeq!, vita.sequence)
+        return
       }
     }
     // calculate the next Sequence Number
