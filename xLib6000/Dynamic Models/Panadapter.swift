@@ -425,12 +425,12 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       if lastFrameIndex >= 0 && _dataframes[_dataframeIndex].frameIndex > lastFrameIndex + 1 {
         
         // a frame has been skipped, ignore the skipped frame
-        os_log("Missing Frame: previous = %{public}d, current = %{public}d", log: _log, type: .default, lastFrameIndex, _dataframes[_dataframeIndex].frameIndex)
+        os_log("Missing Frame(s): expected = %{public}d, received = %{public}d", log: _log, type: .default, lastFrameIndex + 1, _dataframes[_dataframeIndex].frameIndex)
       
       } else if lastFrameIndex >= 0 && _dataframes[_dataframeIndex].frameIndex < lastFrameIndex {
         
         // a frame is either duplicated or out of order, ignore it
-        os_log("Out of sequence Frame: previous = %{public}d, current = %{public}d", log: _log, type: .default, lastFrameIndex, _dataframes[_dataframeIndex].frameIndex)
+        os_log("Out of sequence Frame(s) were ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, lastFrameIndex + 1, _dataframes[_dataframeIndex].frameIndex)
         return
       }
       // Pass the data frame to this Panadapter's delegate

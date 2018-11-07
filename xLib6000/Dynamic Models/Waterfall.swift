@@ -242,12 +242,12 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       if lastTimecode >= 0 && _dataframes[_dataframeIndex].timeCode > lastTimecode + 1 {
         
         // a frame has been skipped, ignore the skipped frame
-        os_log("Missing Frame: previous = %{public}d, current = %{public}d", log: _log, type: .default, lastTimecode, _dataframes[_dataframeIndex].timeCode)
+        os_log("Missing Frame(s): expected = %{public}d, received = %{public}d", log: _log, type: .default, lastTimecode + 1, _dataframes[_dataframeIndex].timeCode)
         
       } else if lastTimecode >= 0 && _dataframes[_dataframeIndex].timeCode < lastTimecode {
         
         // a frame is either duplicated or out of order, ignore it
-        os_log("Out of sequence Frame: previous = %{public}d, current = %{public}d", log: _log, type: .default, lastTimecode, _dataframes[_dataframeIndex].timeCode)
+        os_log("Out of sequence Frame(s) were ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, lastTimecode + 1, _dataframes[_dataframeIndex].timeCode)
         return
       }
       // save the auto black level
