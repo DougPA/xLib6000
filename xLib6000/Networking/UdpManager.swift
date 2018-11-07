@@ -18,7 +18,6 @@ protocol UdpManagerDelegate                 : class {
   
   // if any of theses are not needed, implement a stub in the delegate that does nothing
   
-//  func udpMessage(_ message: String, level: OSLogType)                      // report a UDP error
   func udpState(bound: Bool, port: UInt16, error: String)                   // report a UDP state change
   func udpStreamHandler(_ vita: Vita)                                       // process a Vita stream
 }
@@ -164,7 +163,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       _udpSendIP = radioParameters.publicIp
       
       // change the state
-      _delegate?.udpState(bound: success, port: _udpRcvPort, error: success ? "" : "Unable to bind")
+      _delegate?.udpState(bound: success, port: _udpRcvPort, error: "")
       
       _udpBound = true
       
