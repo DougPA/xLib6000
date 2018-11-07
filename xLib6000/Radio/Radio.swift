@@ -1392,7 +1392,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if self.opusStreams[vitaPacket.streamId]!.isStreaming == false {
           self.opusStreams[vitaPacket.streamId]!.isStreaming = true
           // log the start of the stream
-          os_log("Opus %{public}@ Stream started", log: self._log, type: .info, vitaPacket.streamId.hex)
+          os_log("Opus Stream started: ID = %{public}@ ", log: self._log, type: .info, vitaPacket.streamId.hex)
         }
         self.opusStreams[vitaPacket.streamId]!.vitaProcessor( vitaPacket )
         
@@ -1401,7 +1401,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if self.panadapters[vitaPacket.streamId]!.isStreaming == false {
           self.panadapters[vitaPacket.streamId]!.isStreaming = true
           // log the start of the stream
-          os_log("Panadapter %{public}@ Stream started", log: self._log, type: .info, vitaPacket.streamId.hex)
+          os_log("Panadapter Stream started: ID = %{public}@ ", log: self._log, type: .info, vitaPacket.streamId.hex)
         }
         self.panadapters[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         
@@ -1410,13 +1410,13 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if self.waterfalls[vitaPacket.streamId]!.isStreaming == false {
           self.waterfalls[vitaPacket.streamId]!.isStreaming = true
           // log the start of the stream
-          os_log("Waterfall %{public}@ Stream started", log: self._log, type: .info, vitaPacket.streamId.hex)
+          os_log("Waterfall Stream started: ID = %{public}@ ", log: self._log, type: .info, vitaPacket.streamId.hex)
         }
         self.waterfalls[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         
       default:
         // log the error
-        os_log("UDP Stream error, no object for - %{public}@ %{public}@", log: self._log, type: .default, vitaPacket.classCode.description(), vitaPacket.streamId.hex)
+        os_log("UDP Stream error, no object: %{public}@ ID = %{public}@", log: self._log, type: .default, vitaPacket.classCode.description(), vitaPacket.streamId.hex)
         
       }
     }
