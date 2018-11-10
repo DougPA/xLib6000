@@ -550,7 +550,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // log it
       let wanStatus = isWan ? "REMOTE" : "LOCAL"
-      os_log("TCP connected to %{public}@ @ %{public}@, port %{public}d (%{public}@)", log: _log, type: .info, activeRadio!.nickname, host, port, wanStatus)
+      let guiStatus = _isGui ? "(GUI) " : ""
+      os_log("TCP connected to %{public}@ @ %{public}@, port %{public}d %{public}@(%{public}@)", log: _log, type: .info, activeRadio!.nickname, host, port, guiStatus, wanStatus)
       
       // YES, set state
       _apiState = .tcpConnected
@@ -564,7 +565,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         let cmd = "wan validate handle=" + wanConnectionHandle // TODO: + "\n"
         send(cmd, replyTo: nil)
         
-        os_log("\"wan validate handle=%{public}@\" sent", log: _log, type: .info, wanConnectionHandle)
+        os_log("Wan validate handle: %{public}@", log: _log, type: .info, wanConnectionHandle)
         
       } else {
         // insure that a UDP port was bound (for the Data Streams)
