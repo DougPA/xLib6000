@@ -37,6 +37,9 @@ public final class Slice                    : NSObject, DynamicModel {
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
 
+  private var _firstFrequency               = true
+  
+
   private let kTuneStepList                 =                               // tuning steps
     [1, 10, 50, 100, 500, 1_000, 2_000, 3_000]
   private var _diversityIsAllowed          : Bool
@@ -433,6 +436,8 @@ public final class Slice                    : NSObject, DynamicModel {
   ///
   func parseProperties(_ properties: KeyValuesArray) {
     
+    Swift.print("properties = \(properties)")
+
     // process each key/value pair, <key=value>
     for property in properties {
       
@@ -594,6 +599,9 @@ public final class Slice                    : NSObject, DynamicModel {
         didChangeValue(for: \.fmToneFreq)
 
       case .frequency:
+        // fixes a bug caused by the radio sending the wrong freq the first time
+        if _firstFrequency { _firstFrequency = false ; break }
+        
         willChangeValue(for: \.frequency)
         _frequency = property.value.mhzToHz()
         didChangeValue(for: \.frequency)
@@ -807,9 +815,8 @@ public final class Slice                    : NSObject, DynamicModel {
         break
       }
     }
-    // if this is not yet initialized and inUse becomes true and panadapterId & frequency are set
     if _initialized == false && inUse == true && panadapterId != 0 && frequency != 0 && mode != "" {
-      
+
       // mark it as initialized
       _initialized = true
       
