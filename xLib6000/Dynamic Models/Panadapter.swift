@@ -370,9 +370,11 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
         didChangeValue(for: \.wnbUpdating)
 
       case .xPixels:
-        willChangeValue(for: \.xPixels)
-        _xPixels = CGFloat(property.value.fValue())
-        didChangeValue(for: \.xPixels)
+//        willChangeValue(for: \.xPixels)
+//        _xPixels = CGFloat(property.value.fValue())
+//        didChangeValue(for: \.xPixels)
+        
+        break
 
       case .xvtrLabel:
         willChangeValue(for: \.xvtrLabel)
@@ -380,9 +382,11 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
         didChangeValue(for: \.xvtrLabel)
 
       case .yPixels:
-        willChangeValue(for: \.yPixels)
-        _yPixels = CGFloat(property.value.fValue())
-        didChangeValue(for: \.yPixels)
+//        willChangeValue(for: \.yPixels)
+//        _yPixels = CGFloat(property.value.fValue())
+//        didChangeValue(for: \.yPixels)
+        
+        break
 
       case .available, .capacity, .daxIqRate:
         // ignored by Panadapter

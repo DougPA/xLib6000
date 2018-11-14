@@ -2,7 +2,7 @@ xLib6000 Change Log
 
 v2.1.1
 
-Slice.swift - in parseProperties(_:) added code to ignore the first frequency sent by the Radio
+Panadapter.swift - commented out xPixel & yPixel code in parseProperties(_:)
 
 v2.1.0
 
