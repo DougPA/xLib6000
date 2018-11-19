@@ -169,7 +169,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var audioPan: Int {
     get { return _audioPan }
-    set { if _audioPan != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioGain = newValue ; audioCmd("pan", value: newValue) } } } }
+    set { if _audioPan != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioPan = newValue ; audioCmd("pan", value: newValue) } } } }
   
   // ***** FILTER COMMANDS *****
 
