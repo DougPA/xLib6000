@@ -3,6 +3,9 @@ xLib6000 Change Log
 v2.1.1
 
 Panadapter.swift - commented out xPixel & yPixel code in parseProperties(_:)
+Meter.swift - corrected log message in streamHandler(_:)
+SliceCOmmands.swift - corrected error in "@objc dynamic public var audioPan: Int"
+
 
 v2.1.0
 
