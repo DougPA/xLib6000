@@ -338,7 +338,7 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
     guard let token = Units(rawValue: units) else {
       
       // unknown Units, log it and ignore it
-      os_log("Meter %{public}@.%{public}@, Unknown units - %{public}@", log: _log, type: .default, id, desc, units)
+      os_log("Meter, Unknown units - %{public}@", log: _log, type: .default, units)
       
       return
     }
