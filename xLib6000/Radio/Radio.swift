@@ -1367,57 +1367,67 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Pass the stream to the appropriate object (checking for existence of the object first)
       switch (vitaPacket.classCode) {
         
-      case .daxAudio where self.audioStreams[vitaPacket.streamId] != nil:
-        // Dax Slice Audio
-        self.audioStreams[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
-        
-      case .daxAudio where self.micAudioStreams[vitaPacket.streamId] != nil:
+      case .daxAudio:
         // Dax Microphone Audio
-        self.micAudioStreams[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
-        
-      case .daxIq24 where self.iqStreams[vitaPacket.streamId] != nil,
-           .daxIq48 where self.iqStreams[vitaPacket.streamId] != nil,
-           .daxIq96 where self.iqStreams[vitaPacket.streamId] != nil,
-           .daxIq192 where self.iqStreams[vitaPacket.streamId] != nil:
+        if let daxAudio = self.audioStreams[vitaPacket.streamId] {
+          daxAudio.vitaProcessor(vitaPacket)
+        }
+        // Dax Slice Audio
+        if let daxMicAudio = self.micAudioStreams[vitaPacket.streamId] {
+          daxMicAudio.vitaProcessor(vitaPacket)
+        }
+
+      case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
         // Dax IQ
-        self.iqStreams[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
+        if let daxIq = self.iqStreams[vitaPacket.streamId] {
+
+          daxIq.vitaProcessor(vitaPacket)
+        }
         
       case .meter:
         // Meter - unlike other streams, the Meter stream contains multiple Meters
         //         and must be processed by a class method on the Meter object
         Meter.vitaProcessor(vitaPacket)
         
-      case .opus where self.opusStreams[vitaPacket.streamId] != nil:
+      case .opus:
         // Opus
-        if self.opusStreams[vitaPacket.streamId]!.isStreaming == false {
-          self.opusStreams[vitaPacket.streamId]!.isStreaming = true
-          // log the start of the stream
-          os_log("Opus Stream started: ID = %{public}@ ", log: self._log, type: .info, vitaPacket.streamId.hex)
+        if let opus = self.opusStreams[vitaPacket.streamId] {
+
+          if opus.isStreaming == false {
+            opus.isStreaming = true
+            // log the start of the stream
+            os_log("Opus Stream started: ID = %{public}@ ", log: self._log, type: .info, vitaPacket.streamId.hex)
+          }
+          opus.vitaProcessor( vitaPacket )
         }
-        self.opusStreams[vitaPacket.streamId]!.vitaProcessor( vitaPacket )
         
-      case .panadapter where self.panadapters[vitaPacket.streamId] != nil:
+      case .panadapter:
         // Panadapter
-        if self.panadapters[vitaPacket.streamId]!.isStreaming == false {
-          self.panadapters[vitaPacket.streamId]!.isStreaming = true
-          // log the start of the stream
-          os_log("Panadapter Stream started: ID = %{public}@ ", log: self._log, type: .info, vitaPacket.streamId.hex)
+        if let panadapter = self.panadapters[vitaPacket.streamId] {
+          
+          if panadapter.isStreaming == false {
+            panadapter.isStreaming = true
+            // log the start of the stream
+            os_log("Panadapter Stream started: ID = %{public}@ ", log: self._log, type: .info, vitaPacket.streamId.hex)
+          }
+          panadapter.vitaProcessor(vitaPacket)
         }
-        self.panadapters[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         
-      case .waterfall where self.waterfalls[vitaPacket.streamId] != nil:
+      case .waterfall:
         // Waterfall
-        if self.waterfalls[vitaPacket.streamId]!.isStreaming == false {
-          self.waterfalls[vitaPacket.streamId]!.isStreaming = true
-          // log the start of the stream
-          os_log("Waterfall Stream started: ID = %{public}@ ", log: self._log, type: .info, vitaPacket.streamId.hex)
+        if let waterfall = self.waterfalls[vitaPacket.streamId] {
+          
+          if waterfall.isStreaming == false {
+            waterfall.isStreaming = true
+            // log the start of the stream
+            os_log("Waterfall Stream started: ID = %{public}@ ", log: self._log, type: .info, vitaPacket.streamId.hex)
+          }
+          waterfall.vitaProcessor(vitaPacket)
         }
-        self.waterfalls[vitaPacket.streamId]!.vitaProcessor(vitaPacket)
         
       default:
         // log the error
         os_log("UDP Stream error, no object: %{public}@ ID = %{public}@", log: self._log, type: .default, vitaPacket.classCode.description(), vitaPacket.streamId.hex)
-        
       }
     }
   }
