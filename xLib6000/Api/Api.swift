@@ -198,6 +198,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
     // remove the Radio
     activeRadio = nil
+    
+    // FIXME: possible race on setting / reading radio
+    
     radio = nil
   }
   /// Send a command to the Radio (hardware)

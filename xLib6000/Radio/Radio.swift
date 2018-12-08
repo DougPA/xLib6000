@@ -354,7 +354,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       os_log("Incomplete reply, r%{public}@", log: _log, type: .default, replySuffix)
       return
     }
-    
     // is there an Object expecting to be notified?
     if let replyTuple = replyHandlers[ components[0] ] {
       
@@ -375,14 +374,12 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // Remove the object from the notification list
       replyHandlers[components[0]] = nil
       
-      
     } else {
       
       // no Object is waiting for this reply, log it if it is a non-zero Reply (i.e a possible error)
       if components[1] != Api.kNoError {
 
         os_log("Unhandled non-zero reply, c%{public}@, r%{public}@, %{public}@", log: _log, type: .default, components[0], replySuffix, flexErrorString(errorCode: components[1]))
-
       }
     }
   }
@@ -400,7 +397,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     guard components.count > 1 else {
       
       os_log("Incomplete status, c%{public}@", log: _log, type: .default, commandSuffix)
-
       return
     }
     // find the space & get the msgType
@@ -421,7 +417,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
     
     
-    // FIXME: file, mixer & turf Not currently implemented
+    // FIXME: ***** file, mixer & turf Not currently implemented *****
     
     
     // Known Message Types, in alphabetical order
@@ -470,7 +466,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       default:
         // unknown Display Type, log it and ignore the message
         os_log("Unknown Display - %{public}@", log: _log, type: .default, keyValues[0].key)
-        
       }
       
     case .eq:
@@ -479,7 +474,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       Equalizer.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q )
       
     case .file:
-      
       os_log("Unprocessed %{public}@, %{public}@", log: _log, type: .default, msgType, remainder)
 
     case .gps:
@@ -503,9 +497,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       MicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
       
     case .mixer:
-      
       os_log("Unprocessed %{public}@, %{public}@", log: _log, type: .default, msgType, remainder)
-      
 
     case .opusStream:
       //     format: <opusId> <key=value> <key=value> ...<key=value>
@@ -541,7 +533,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       transmit.parseProperties( remainder.keyValuesArray())
       
     case .turf:
-      
       os_log("Unprocessed %{public}@, %{public}@", log: _log, type: .default, msgType, remainder)
       
     case .txAudioStream:
@@ -577,7 +568,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     guard keyValues.count >= 2 else {
       
       os_log("Invalid client status", log: _log, type: .default)
-      
       return
     }
     // guard that the message has my API Handle
@@ -586,7 +576,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // what is the message?
     if keyValues[1].key == "connected" {
       // Connected
-//      _api.setConnectionState(.clientConnected)
       _api.clientConnected()
       
     } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
@@ -597,7 +586,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     } else {
       // Unrecognized
       os_log("Unprocessed Client message, %{public}@", log: _log, type: .default, keyValues[0].key)
-      
     }
   }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
@@ -614,7 +602,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       guard let token = InfoToken(rawValue: property.key) else {
         // log it and ignore this Key
         os_log("Unknown Info token - %{public}@", log: _log, type: .default, property.key)
-
         continue
       }
       // Known keys, in alphabetical order
@@ -789,7 +776,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       guard let token = VersionToken(rawValue: property.key) else {
         // log it and ignore this Token
         os_log("Unknown Version token - %{public}@", log: _log, type: .default, property.key)
-        
         continue
       }
       // Known tokens, in alphabetical order
@@ -864,7 +850,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           
           // log it and ignore this token
           os_log("Unknown Radio token - %{public}@", log: _log, type: .default, property.key)
-          
           continue
         }
         // Known tokens, in alphabetical order
@@ -1010,7 +995,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
         // log it and ignore this token
         os_log("Unknown Filter token - %{public}@", log: _log, type: .default, property.key)
-        
         continue
       }
       // Known tokens, in alphabetical order
@@ -1082,7 +1066,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
         // log it and ignore this token
         os_log("Unknown Static token - %{public}@", log: _log, type: .default, property.key)
-        
         continue
       }
       // Known tokens, in alphabetical order
@@ -1193,7 +1176,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     default:    // Unknown Type
       os_log("Unexpected message -  %{public}@", log: _log, type: .default, msg)
-      
     }
   }
   /// Process outbound Tcp messages
@@ -1234,7 +1216,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         let errorType = (errorLevel == "Error" || errorLevel == "Fatal" || errorLevel == "Unknown error" ? OSLogType.default : OSLogType.info)
         os_log("c%{public}@, %{public}@, non-zero reply %{public}@, %{public}@ (%{public}@)", log: _log, type: errorType, seqNum, command, responseValue, flexErrorString(errorCode: responseValue), errorLevel)
 
-        // FIXME: Temporarily commented out until bugs in v2.4.9 are fixed
+        // FIXME: ***** Temporarily commented out until bugs in v2.4.9 are fixed *****
         
 //        switch errorLevel {
 //
@@ -1306,7 +1288,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 //      // save the list
 //      profile.profiles[.tx] = reply.valuesArray(  delimiter: "^" )
       
-
     default:
       
       if command.hasPrefix(Panadapter.kCmd + "create") {

@@ -484,11 +484,11 @@ extension Transmit {
   
   internal var _txFilterHigh: Int {
     get { return _q.sync { __txFilterHigh } }
-    set { let value = txFilterHighLimits(txFilterLow, newValue) ; _q.sync(flags: .barrier) { __txFilterHigh = value } } }
+    set { _q.sync(flags: .barrier) { __txFilterHigh = newValue } } }
   
   internal var _txFilterLow: Int {
     get { return _q.sync { __txFilterLow } }
-    set { let value = txFilterLowLimits(newValue, txFilterHigh) ; _q.sync(flags: .barrier) { __txFilterLow = value } } }
+    set { _q.sync(flags: .barrier) { __txFilterLow = newValue } } }
   
   internal var _txInWaterfallEnabled: Bool {
     get { return _q.sync { __txInWaterfallEnabled } }
