@@ -57,14 +57,8 @@ public enum NotificationType : String {
   case panadapterHasBeenAdded
   case panadapterWillBeRemoved
   
-  case globalProfileHasBeenAdded
-  case globalProfileWillBeRemoved
-  
-  case micProfileHasBeenAdded
-  case micProfileWillBeRemoved
-  
-  case txProfileHasBeenAdded
-  case txProfileWillBeRemoved
+  case profileHasBeenAdded
+  case profileWillBeRemoved
   
   case radioHasBeenAdded
   case radioWillBeRemoved
@@ -88,11 +82,6 @@ public enum NotificationType : String {
   
   case txAudioStreamHasBeenAdded
   case txAudioStreamWillBeRemoved
-  
-  case txProfileChanged
-  case txProfileCreated
-  case txProfileRemoved
-  case txProfileUpdated
   
   case udpDidBind
   

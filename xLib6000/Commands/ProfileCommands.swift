@@ -11,7 +11,7 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Profile Class extensions
 //              - Static command prefix properties
-//              - Public instance methods that send Commands to the Radio (hardware)
+//              - Public class methods that send Commands to the Radio (hardware)
 //              - Dynamic public properties that send Commands to the Radio
 // --------------------------------------------------------------------------------
 
@@ -20,29 +20,31 @@ extension Profile {
   static let kCmd                           = "profile "                    // Command prefixes
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Public Class methods that send Commands to the Radio (hardware)
 
-  /// Delete a Global profile
+  /// Delete a Profile entry
   ///
   /// - Parameters:
+  ///   - token:              profile type
   ///   - name:               profile name
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func delete(_ token: Profile.Token, name: String, callback: ReplyHandler? = nil) {
+  public class func delete(_ type: String, name: String, callback: ReplyHandler? = nil) {
     
     // tell the Radio to delete the named Global Profile
-    Api.sharedInstance.send(Profile.kCmd + token.rawValue + " delete \"" + name + "\"", replyTo: callback)
+    Api.sharedInstance.send(Profile.kCmd + type + " delete \"" + name + "\"", replyTo: callback)
   }
-  /// Save a Global profile
+  /// Save a Profile entry
   ///
   /// - Parameters:
+  ///   - token:              profile type
   ///   - name:               profile name
   ///   - callback:           ReplyHandler (optional)
   ///
-  public func save(_ token: Profile.Token, name: String, callback: ReplyHandler? = nil) {
+  public class func save(_ type: String, name: String, callback: ReplyHandler? = nil) {
     
     // tell the Radio to save the named Global Profile
-    Api.sharedInstance.send(Profile.kCmd + token.rawValue + " save \"" + name + "\"", replyTo: callback)
+    Api.sharedInstance.send(Profile.kCmd + type + " save \"" + name + "\"", replyTo: callback)
   }
 
   // ----------------------------------------------------------------------------
@@ -63,16 +65,8 @@ extension Profile {
   // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
   
   // listed in alphabetical order
-  @objc dynamic public var globalProfileSelection: String {
-    get {  return _globalProfileSelection }
-    set { if _globalProfileSelection != newValue { _globalProfileSelection = newValue ; profileCmd( "global", newValue) } } }
-  
-  @objc dynamic public var micProfileSelection: String {
-    get {  return _micProfileSelection }
-    set { if _micProfileSelection != newValue { _micProfileSelection = newValue ; profileCmd( "mic", newValue) } } }
-  
-  @objc dynamic public var txProfileSelection: String {
-    get {  return _txProfileSelection }
-    set { if _txProfileSelection != newValue { _txProfileSelection = newValue  ; profileCmd( "tx", newValue) } } }
+  @objc dynamic public var selection: ProfileId {
+    get {  return _selection }
+    set { if _selection != newValue { _selection = newValue ; profileCmd( "global", newValue) } } }
   
 }

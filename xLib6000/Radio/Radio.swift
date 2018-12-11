@@ -66,6 +66,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var _micAudioStreams              = [DaxStreamId: MicAudioStream]() // Dictionary of MicAudio streams
   private var _opusStreams                  = [OpusId: Opus]()              // Dictionary of Opus Streams
   private var _panadapters                  = [PanadapterId: Panadapter]()  // Dictionary of Panadapters
+  private var _profiles                     = [ProfileId: Profile]()        // Dictionary of Profiles
   private var _replyHandlers                = [SequenceId: ReplyTuple]()    // Dictionary of pending replies
   private var _slices                       = [SliceId: Slice]()            // Dictionary of Slices
   private var _tnfs                         = [TnfId: Tnf]()                // Dictionary of Tnfs
@@ -184,7 +185,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     cwx = Cwx(queue: _q)
     gps = Gps(queue: _q)
     interlock = Interlock(queue: _q)
-    profile = Profile(queue: _q)
+//    profile = Profile(queue: _q)
     transmit = Transmit(queue: _q)
     wan = Wan(queue: _q)
     waveform = Waveform(queue: _q)
@@ -235,14 +236,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     panadapters.removeAll()
     waterfalls.removeAll()
     
-    NC.post(.globalProfileWillBeRemoved, object: profile.globalProfileList as Any?)
-    profile.globalProfileList.removeAll()
-
-    NC.post(.micProfileWillBeRemoved, object: profile.micProfileList as Any?)
-    profile.micProfileList.removeAll()
-
-    NC.post(.txProfileWillBeRemoved, object: profile.txProfileList as Any?)
-    profile.txProfileList.removeAll()
+    profiles.forEach( {
+      NC.post(.profileWillBeRemoved, object: $0.value.list as Any?)
+      $0.value.list.removeAll()
+    } )
 
     equalizers.removeAll()
     
@@ -510,7 +507,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       //     format: tx current=<value>
       //     format: mic list=<value>^<value>^...<value>^
       //     format: mic current=<value>
-      profile.parseProperties( remainder.keyValuesArray(delimiter: "="))
+      Profile.parseStatus( remainder.keyValuesArray(delimiter: "="), radio: self, queue: _q)
       
     case .radio:
       //     format: <key=value> <key=value> ...<key=value>
@@ -1829,6 +1826,10 @@ extension Radio {
   public var panadapters: [PanadapterId: Panadapter] {
     get { return _q.sync { _panadapters } }
     set { _q.sync(flags: .barrier) { _panadapters = newValue } } }
+  
+  public var profiles: [ProfileId: Profile] {
+    get { return _q.sync { _profiles } }
+    set { _q.sync(flags: .barrier) { _profiles = newValue } } }
   
   public var replyHandlers: [SequenceId: ReplyTuple] {
     get { return _q.sync { _replyHandlers } }
