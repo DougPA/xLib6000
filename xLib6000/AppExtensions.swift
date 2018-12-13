@@ -289,6 +289,13 @@ public extension String {
 
 public extension Bool {
   
+  /// Return 1 / 0 for true / false Booleans
+  ///
+  /// - Returns:      a String
+  ///
+  func asInt() -> Int {
+    return (self ? 1 : 0)
+  }
   /// Return "1" / "0" for true / false Booleans
   ///
   /// - Returns:      a String

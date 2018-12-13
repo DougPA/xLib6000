@@ -136,7 +136,7 @@ public final class Profile                  : NSObject, StaticModel {
     if token  == Profile.Token.selection {
       
       willChangeValue(for: \.selection)
-      _selection = properties[1].key
+      _selection = (properties.count > 1 ? properties[1].key : "")
       didChangeValue(for: \.selection)
     }
     // is the Profile initialized?
@@ -175,9 +175,11 @@ extension Profile {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant (no message to Radio)
   
+  // FIXME: Should any of these send a message to the Radio?
+  //          If yes, implement it, if not should they be "get" only?
+  
   @objc dynamic public var list: [ProfileString] {
-    get { return _q.sync { _list } }
-    set { _q.sync(flags: .barrier) { _list = newValue } } }
+    return _list }
   
   // ----------------------------------------------------------------------------
   // MARK: - Profile Tokens

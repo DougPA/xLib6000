@@ -171,6 +171,8 @@ extension Radio {
   private func radioFilterCmd( _ token1: RadioFilterSharpness,  _ token2: RadioFilterSharpness, _ value: Any) {
     
    Api.sharedInstance.send(Radio.kCmd + "filter_sharpness" + " " + token1.rawValue + " " + token2.rawValue + "=\(value)")
+    
+    Swift.print(Radio.kCmd + "filter_sharpness" + " " + token1.rawValue + " " + token2.rawValue + "=\(value)")
   }
   /// Set Static Network properties on the Radio
   ///
@@ -309,17 +311,17 @@ extension Radio {
   
   // ***** RADIO FILTER COMMANDS *****
   
-  @objc dynamic public var filterCwAutoLevel: Int {
-    get {  return _filterCwAutoLevel }
-    set { if _filterCwAutoLevel != newValue { _filterCwAutoLevel = newValue ; radioFilterCmd( .cw, .autoLevel, newValue) } } }
+  @objc dynamic public var filterCwAutoEnabled: Bool { 
+    get {  return _filterCwAutoEnabled }
+    set { if _filterCwAutoEnabled != newValue { _filterCwAutoEnabled = newValue ; radioFilterCmd( .cw, .autoLevel, newValue.asNumber()) } } }
   
-  @objc dynamic public var filterDigitalAutoLevel: Int {
-    get {  return _filterDigitalAutoLevel }
-    set { if _filterDigitalAutoLevel != newValue { _filterDigitalAutoLevel = newValue ; radioFilterCmd( .digital, .autoLevel, newValue) } } }
+  @objc dynamic public var filterDigitalAutoEnabled: Bool {
+    get {  return _filterDigitalAutoEnabled }
+    set { if _filterDigitalAutoEnabled != newValue { _filterDigitalAutoEnabled = newValue ; radioFilterCmd( .digital, .autoLevel, newValue.asNumber()) } } }
   
-  @objc dynamic public var filterVoiceAutoLevel: Int {
-    get {  return _filterVoiceAutoLevel }
-    set { if _filterVoiceAutoLevel != newValue { _filterVoiceAutoLevel = newValue ; radioFilterCmd( .voice, .autoLevel, newValue) } } }
+  @objc dynamic public var filterVoiceAutoEnabled: Bool {
+    get {  return _filterVoiceAutoEnabled }
+    set { if _filterVoiceAutoEnabled != newValue { _filterVoiceAutoEnabled = newValue ; radioFilterCmd( .voice, .autoLevel, newValue.asNumber()) } } }
   
   @objc dynamic public var filterCwLevel: Int {
     get {  return _filterCwLevel }

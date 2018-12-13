@@ -101,11 +101,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __enforcePrivateIpEnabled     = false                         //
   private var __extPresent                  = false                         //
   // F
-  private var __filterCwAutoLevel           = 0                             //
+  private var __filterCwAutoLevel           = false                         //
   private var __filterCwLevel               = 0                             //
-  private var __filterDigitalAutoLevel      = 0                             //
+  private var __filterDigitalAutoLevel      = false                         //
   private var __filterDigitalLevel          = 0                             //
-  private var __filterVoiceAutoLevel        = 0                             //
+  private var __filterVoiceAutoLevel        = false                         //
   private var __filterVoiceLevel            = 0                             //
   private var __fpgaMbVersion               = ""                            // FPGA version (read only)
   private var __freqErrorPpb                = 0                             // Calibration error (Hz)
@@ -238,7 +238,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     profiles.forEach( {
       NC.post(.profileWillBeRemoved, object: $0.value.list as Any?)
-      $0.value.list.removeAll()
+      $0.value._list.removeAll()
     } )
 
     equalizers.removeAll()
@@ -999,21 +999,21 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
       case .autoLevel:
         if cw {
-          willChangeValue(for: \.filterCwAutoLevel)
-          _filterCwAutoLevel = property.value.iValue()
-          didChangeValue(for: \.filterCwAutoLevel)
+          willChangeValue(for: \.filterCwAutoEnabled)
+          _filterCwAutoEnabled = property.value.bValue()
+          didChangeValue(for: \.filterCwAutoEnabled)
           cw = false
         }
         if digital {
-          willChangeValue(for: \.filterDigitalAutoLevel)
-          _filterDigitalAutoLevel = property.value.iValue()
-          didChangeValue(for: \.filterDigitalAutoLevel)
+          willChangeValue(for: \.filterDigitalAutoEnabled)
+          _filterDigitalAutoEnabled = property.value.bValue()
+          didChangeValue(for: \.filterDigitalAutoEnabled)
           digital = false
         }
         if voice {
-          willChangeValue(for: \.filterVoiceAutoLevel)
-          _filterVoiceAutoLevel = property.value.iValue()
-          didChangeValue(for: \.filterVoiceAutoLevel)
+          willChangeValue(for: \.filterVoiceAutoEnabled)
+          _filterVoiceAutoEnabled = property.value.bValue()
+          didChangeValue(for: \.filterVoiceAutoEnabled)
           voice = false
         }
         
@@ -1028,19 +1028,16 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           willChangeValue(for: \.filterCwLevel)
           _filterCwLevel = property.value.iValue()
           didChangeValue(for: \.filterCwLevel)
-          cw = false
         }
         if digital {
           willChangeValue(for: \.filterDigitalLevel)
           _filterDigitalLevel = property.value.iValue()
           didChangeValue(for: \.filterDigitalLevel)
-          digital = false
         }
         if voice {
           willChangeValue(for: \.filterVoiceLevel)
           _filterVoiceLevel = property.value.iValue()
           didChangeValue(for: \.filterVoiceLevel)
-          voice = false
         }
         
       case .voice, .VOICE:
@@ -1495,15 +1492,15 @@ extension Radio {
     get { return _q.sync { __extPresent } }
     set { _q.sync(flags: .barrier) { __extPresent = newValue } } }
   
-  internal var _filterCwAutoLevel: Int {
+  internal var _filterCwAutoEnabled: Bool {
     get { return _q.sync { __filterCwAutoLevel } }
     set { _q.sync(flags: .barrier) { __filterCwAutoLevel = newValue } } }
   
-  internal var _filterDigitalAutoLevel: Int {
+  internal var _filterDigitalAutoEnabled: Bool {
     get { return _q.sync { __filterDigitalAutoLevel } }
     set { _q.sync(flags: .barrier) { __filterDigitalAutoLevel = newValue } } }
   
-  internal var _filterVoiceAutoLevel: Int {
+  internal var _filterVoiceAutoEnabled: Bool {
     get { return _q.sync { __filterVoiceAutoLevel } }
     set { _q.sync(flags: .barrier) { __filterVoiceAutoLevel = newValue } } }
   
