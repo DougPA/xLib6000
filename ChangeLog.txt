@@ -14,7 +14,7 @@ RadioCommands.swift - changed filter--AutoLevel to filter--AutoEnabled
 Radio.swift - corrected parseFilterProperties(_:), removed -- = false from .level case
 RadioCommands.swift - added class calibrate(callback:)
 Radio.swift - changed _startOffset to _startCalibration
-RadioCommands.swift - changed startOffset to startCalibration
+RadioCommands.swift - changed startOffset to startCalibration, corrected setter
 Radio.swift - changed _calFreq to be in Hz (not MHz)
 
 v2.1.1

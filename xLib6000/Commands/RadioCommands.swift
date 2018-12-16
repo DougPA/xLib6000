@@ -25,7 +25,6 @@ extension Radio {
   static let kUptimeCmd                     = "radio uptime"
   static let kLicenseCmd                    = "license "
   static let kXmitCmd                       = "xmit "
-  static let kCalibrateCmd                  = "pll_start"
 
   // ----------------------------------------------------------------------------
   // MARK: - Public Class methods that send Commands to the Radio (hardware)
@@ -288,7 +287,7 @@ extension Radio {
   
   @objc dynamic public var startCalibration: Bool {
     get { return _startCalibration }
-    set { if _startCalibration != newValue { _startCalibration = newValue ; if _startCalibration { radioCmd("pll_start", "") } } } }
+    set { if _startCalibration != newValue { _startCalibration = newValue ; if newValue { Swift.print("startCalibration") ; radioCmd("pll_start", "") } } } }
   
   @objc dynamic public var callsign: String {
     get {  return _callsign }

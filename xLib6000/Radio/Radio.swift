@@ -23,8 +23,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // MARK: - Public properties (Read Only)
   
   public private(set) var uptime            = 0
-  @objc dynamic public var radioVersion     : String { return _api.activeRadio?.firmwareVersion ?? "" }
-  
+  @objc dynamic public var version          : String { return _api.activeRadio?.firmwareVersion ?? "" }
+  @objc dynamic public var serialNumber     : String { return _api.activeRadio?.serialNumber ?? "" }
+
   // Static models
   @objc dynamic public private(set) var atu         : Atu!                  // Atu model
   @objc dynamic public private(set) var cwx         : Cwx!                  // Cwx model
