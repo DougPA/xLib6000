@@ -152,7 +152,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __smartSdrMB                  = ""                            // Microburst main CPU software version
   private var __snapTuneEnabled             = false                         // Snap tune enable
   private var __softwareVersion             = ""                            // (read only)
-  private var __startOffset                 = true                          //
+  private var __startCalibration            = false                         // true if a Calibration is in progress
   private var __state                       = ""                            //
   private var __staticGateway               = ""                            // Static Gateway address
   private var __staticIp                    = ""                            // Static IpAddress
@@ -869,7 +869,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
         case .calFreq:
           willChangeValue(for: \.calFreq)
-          _calFreq = property.value.iValue()
+          _calFreq = property.value.mhzToHz()
           didChangeValue(for: \.calFreq)
 
         case .callsign:
@@ -933,9 +933,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           didChangeValue(for: \.availablePanadapters)
 
         case .pllDone:
-          willChangeValue(for: \.startOffset)
-          _startOffset = property.value.bValue()
-          didChangeValue(for: \.startOffset)
+          willChangeValue(for: \.startCalibration)
+          _startCalibration = !(property.value.bValue())
+          didChangeValue(for: \.startCalibration)
 
         case .remoteOnEnabled:
           willChangeValue(for: \.remoteOnEnabled)
@@ -1656,9 +1656,9 @@ extension Radio {
     get { return _q.sync { __softwareVersion } }
     set { _q.sync(flags: .barrier) { __softwareVersion = newValue } } }
   
-  internal var _startOffset: Bool {
-    get { return _q.sync { __startOffset } }
-    set { _q.sync(flags: .barrier) { __startOffset = newValue } } }
+  internal var _startCalibration: Bool {
+    get { return _q.sync { __startCalibration } }
+    set { _q.sync(flags: .barrier) { __startCalibration = newValue } } }
   
   internal var _state: String {
     get { return _q.sync { __state } }

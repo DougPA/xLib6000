@@ -25,7 +25,8 @@ extension Radio {
   static let kUptimeCmd                     = "radio uptime"
   static let kLicenseCmd                    = "license "
   static let kXmitCmd                       = "xmit "
-  
+  static let kCalibrateCmd                  = "pll_start"
+
   // ----------------------------------------------------------------------------
   // MARK: - Public Class methods that send Commands to the Radio (hardware)
 
@@ -38,10 +39,6 @@ extension Radio {
     // ask the Radio to send a list of antennas
     Api.sharedInstance.send(Api.Command.antList.rawValue, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
   }
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
-
   /// Identify a low Bandwidth connection
   ///
   /// - Parameter callback:   ReplyHandler (optional)
@@ -128,7 +125,9 @@ extension Radio {
   ///   - value:      the new value
   ///
   private func mixerCmd( _ token: String, _ value: Any) {
-    
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
+
    Api.sharedInstance.send(Radio.kMixerCmd + token + " \(value)")
   }
   /// Set a Radio property on the Radio
@@ -141,6 +140,12 @@ extension Radio {
     
    Api.sharedInstance.send(Radio.kSetCmd + token.rawValue + "=\(value)")
   }
+  private func radioSetCmd( _ token: String, _ value: Any) {
+    // NOTE: commands use this format when the Token received does not match the Token sent
+    //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
+
+    Api.sharedInstance.send(Radio.kSetCmd + token + "=\(value)")
+  }
   /// Set a Radio property on the Radio
   ///
   /// - Parameters:
@@ -151,12 +156,6 @@ extension Radio {
     
    Api.sharedInstance.send(Radio.kCmd + token.rawValue + " \(value)")
   }
-  /// Set a Radio property on the Radio
-  ///
-  /// - Parameters:
-  ///   - token:      a String
-  ///   - value:      the new value
-  ///
   private func radioCmd( _ token: String, _ value: Any) {
     // NOTE: commands use this format when the Token received does not match the Token sent
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
@@ -272,6 +271,10 @@ extension Radio {
     get {  return _rttyMark }
     set { if _rttyMark != newValue { _rttyMark = newValue ; radioSetCmd( .rttyMark, newValue) } } }
   
+  @objc dynamic public var snapTuneEnabled: Bool {
+    get {  return _snapTuneEnabled }
+    set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; radioSetCmd( .snapTuneEnabled, newValue.asNumber()) } } }
+  
   @objc dynamic public var tnfsEnabled: Bool {
     get {  return _tnfsEnabled }
     set { if _tnfsEnabled != newValue { _tnfsEnabled = newValue ; radioSetCmd( .tnfsEnabled, newValue.asString()) } } }
@@ -283,15 +286,17 @@ extension Radio {
     get {  return _backlight }
     set { if _backlight != newValue { _backlight = newValue  } } }
   
+  @objc dynamic public var startCalibration: Bool {
+    get { return _startCalibration }
+    set { if _startCalibration != newValue { _startCalibration = newValue ; if _startCalibration { radioCmd("pll_start", "") } } } }
+  
   @objc dynamic public var callsign: String {
     get {  return _callsign }
     set { if _callsign != newValue { _callsign = newValue ; radioCmd( .callsign, newValue) } } }
   
-  // FIXME: need radioCmd for muteLocalAudio (if any)
-  
   @objc dynamic public var muteLocalAudio: Bool {
     get { return _muteLocalAudio }
-    set { if _muteLocalAudio != newValue { _muteLocalAudio = newValue } } }
+    set { if _muteLocalAudio != newValue { _muteLocalAudio = newValue ; radioSetCmd( "mute_local_audio", newValue.asNumber()) } } }
   
   @objc dynamic public var nickname: String {
     get {  return _nickname }
@@ -300,14 +305,6 @@ extension Radio {
   @objc dynamic public var radioScreenSaver: String {
     get {  return _radioScreenSaver }
     set { if _radioScreenSaver != newValue { _radioScreenSaver = newValue ; radioCmd("screensaver", newValue) } } }
-  
-  @objc dynamic public var snapTuneEnabled: Bool {
-    get {  return _snapTuneEnabled }
-    set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; radioCmd( .snapTuneEnabled, newValue.asNumber()) } } }
-  
-  @objc dynamic public var startOffset: Bool {
-    get { return _startOffset }
-    set { if _startOffset != newValue { _startOffset = newValue ; if !_startOffset { radioCmd("pll_start", "") } } } }
   
   // ***** RADIO FILTER COMMANDS *****
   
