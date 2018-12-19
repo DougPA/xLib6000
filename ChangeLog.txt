@@ -16,6 +16,8 @@ RadioCommands.swift - added class calibrate(callback:)
 Radio.swift - changed _startOffset to _startCalibration
 RadioCommands.swift - changed startOffset to startCalibration, corrected setter
 Radio.swift - changed _calFreq to be in Hz (not MHz)
+ProfileCommands.swift - corrected profileCmd(_:) and var selection
+RadioCommands.swift - renamed radioStaticCmd(_:_:_:) to staticNetParamsSet(callback:)
 
 v2.1.1
 

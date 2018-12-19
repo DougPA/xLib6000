@@ -78,6 +78,14 @@ extension Radio {
     // ask the Radio for its license info
     return Api.sharedInstance.send(Radio.kLicenseCmd + "refresh", replyTo: callback)
   }
+  /// Set Static Network properties on the Radio
+  ///
+  /// - Parameter callback:   ReplyHandler (optional)
+  ///
+  public func staticNetParamsSet(callback: ReplyHandler? = nil) {
+    
+    Api.sharedInstance.send(Radio.kCmd + "static_net_params" + " " + RadioStaticNet.ip.rawValue + "=\(staticIp) " + RadioStaticNet.gateway.rawValue + "=\(staticGateway) " + RadioStaticNet.netmask.rawValue + "=\(staticNetmask)")
+  }
   /// Reset the Static Net Params
   ///
   /// - Parameter callback:   ReplyHandler (optional)
@@ -171,16 +179,6 @@ extension Radio {
    Api.sharedInstance.send(Radio.kCmd + "filter_sharpness" + " " + token1.rawValue + " " + token2.rawValue + "=\(value)")
     
     Swift.print(Radio.kCmd + "filter_sharpness" + " " + token1.rawValue + " " + token2.rawValue + "=\(value)")
-  }
-  /// Set Static Network properties on the Radio
-  ///
-  /// - Parameters:
-  ///   - token:      the parse token
-  ///   - value:      the new value
-  ///
-  private func radioStaticCmd(_ value1: Any,_ value2: Any,_ value3: Any) {
-    
-    Api.sharedInstance.send(Radio.kCmd + "static_net_params" + " " + RadioStaticNet.ip.rawValue + "=\(value1) " + RadioStaticNet.gateway.rawValue + "=\(value2) " + RadioStaticNet.netmask.rawValue + "=\(value3)")
   }
   /// Set Xmit on the Radio
   ///
@@ -335,15 +333,15 @@ extension Radio {
   
   @objc dynamic public var staticGateway: String {
     get {  return _staticGateway }
-    set { if _staticGateway != newValue { _staticGateway = newValue ; radioStaticCmd(_staticIp,  newValue , _staticNetmask) } } }
+    set { if _staticGateway != newValue { _staticGateway = newValue } } }
   
   @objc dynamic public var staticIp: String {
     get {  return _staticIp }
-    set { if _staticIp != newValue { _staticIp = newValue ; radioStaticCmd(newValue,  _staticGateway , _staticNetmask) } } }
+    set { if _staticIp != newValue { _staticIp = newValue } } }
   
   @objc dynamic public var staticNetmask: String {
     get {  return _staticNetmask }
-    set { if _staticNetmask != newValue { _staticNetmask = newValue ; radioStaticCmd(_staticIp,  _staticGateway , newValue) } } }
+    set { if _staticNetmask != newValue { _staticNetmask = newValue } } }
   
   // ***** XMIT COMMANDS *****
   

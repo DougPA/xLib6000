@@ -56,10 +56,10 @@ extension Profile {
   ///   - token:      a String
   ///   - value:      the new value
   ///
-  private func profileCmd(_ token: String, _ value: Any) {
+  private func profileCmd(_ value: Any) {
     // NOTE: commands use this format when the Token received does not match the Token sent
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    Api.sharedInstance.send(Profile.kCmd + token + " load \"\(value)\"")
+    Api.sharedInstance.send(Profile.kCmd + id + " load \"\(value)\"")
   }
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
@@ -67,6 +67,6 @@ extension Profile {
   // listed in alphabetical order
   @objc dynamic public var selection: ProfileId {
     get {  return _selection }
-    set { if _selection != newValue { _selection = newValue ; profileCmd( "global", newValue) } } }
+    set { if _selection != newValue { _selection = newValue ; profileCmd(newValue) } } }
   
 }
