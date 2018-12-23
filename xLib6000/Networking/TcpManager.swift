@@ -50,7 +50,17 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
   private var _tcpSocket                    : GCDAsyncSocket!               // GCDAsync TCP socket object
   private var _seqNum                       = 0                             // Sequence number
   private var _timeout                      = 0.0                           // timeout in seconds
-  private var _isWan                        = false                         // is a TLS connection needed
+
+  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
+  //
+  private var __isWan                        = false                         // is a TLS connection needed
+  //
+  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
+
+  private var _isWan: Bool {
+    get { return _tcpSendQ.sync { __isWan } }
+    set { _tcpSendQ.sync( flags: .barrier){ __isWan = newValue } } }
+  
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
@@ -60,7 +70,7 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
   /// - Parameters:
   ///   - tcpReceiveQ:    a serial Queue for Tcp receive activity
   ///   - tcpSendQ:       a serial Queue for Tcp send activity
-  ///   - delegate:       a delegate fro Tcp activity
+  ///   - delegate:       a delegate for Tcp activity
   ///   - timeout:        connection timeout (seconds)
   ///
   init(tcpReceiveQ: DispatchQueue, tcpSendQ: DispatchQueue, delegate: TcpManagerDelegate, timeout: Double = 0.5) {
