@@ -41,11 +41,9 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   
   private weak var _delegate                : UdpManagerDelegate?           // class to receive UDP data
   private let _log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "UdpManager")
-  private var _parameters                   : RadioParameters?              // Struct of Radio parameters
   private var _udpReceiveQ                  : DispatchQueue!                // serial GCD Queue for inbound UDP traffic
   private var _udpRegisterQ                 : DispatchQueue!                // serial GCD Queue for registration
   private var _udpSocket                    : GCDAsyncUdpSocket!            // socket for Vita UDP data
-  private var _udpSuccessfulRegistration    = false
   private var _udpBound                     = false
   private var _udpRcvPort                   : UInt16 = 0                    // actual Vita port number
   private var _udpSendIP                    = ""                            // radio IP address (destination for send)
@@ -56,6 +54,18 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   private let kMaxBindAttempts              = 20
   private let kRegisterCmd                  = "client udp_register handle"
   private let kRegistrationDelay            : UInt32 = 50_000
+
+  private let _objectQ                      = DispatchQueue(label: Api.kId + ".udpObjects")
+  
+  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
+  //
+  private var __udpSuccessfulRegistration   = false
+  //
+  // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
+  
+  private var _udpSuccessfulRegistration: Bool {
+    get { return _objectQ.sync { __udpSuccessfulRegistration } }
+    set { _objectQ.sync( flags: .barrier){ __udpSuccessfulRegistration = newValue } } }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization

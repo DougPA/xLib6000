@@ -48,20 +48,25 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
   private var _tcpReceiveQ                  : DispatchQueue                 // serial GCD Queue for receiving Radio Commands
   private var _tcpSendQ                     : DispatchQueue                 // serial GCD Queue for sending Radio Commands
   private var _tcpSocket                    : GCDAsyncSocket!               // GCDAsync TCP socket object
-  private var _seqNum                       = 0                             // Sequence number
   private var _timeout                      = 0.0                           // timeout in seconds
+
+  private let _objectQ                      = DispatchQueue(label: Api.kId + ".tcpObjects")
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
   //
-  private var __isWan                        = false                         // is a TLS connection needed
+  private var __isWan                       = false                         // is a TLS connection needed
+  private var __seqNum                      = 0                             // Sequence number
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
 
   private var _isWan: Bool {
-    get { return _tcpSendQ.sync { __isWan } }
-    set { _tcpSendQ.sync( flags: .barrier){ __isWan = newValue } } }
-  
+    get { return _objectQ.sync { __isWan } }
+    set { _objectQ.sync( flags: .barrier){ __isWan = newValue } } }
 
+  private var _seqNum: Int {
+    get { return _objectQ.sync { __seqNum } }
+    set { _objectQ.sync( flags: .barrier){ __seqNum = newValue } } }
+  
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   

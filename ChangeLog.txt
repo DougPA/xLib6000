@@ -1,5 +1,10 @@
 xLib6000 Change Log
 
+v2.2.2
+
+TcpManager.swift - refactored _isWan & _seqNum vars to eliminate race issue
+UdpManager.swift - refactored _udpSuccessfulRegistration var to eliminate race issue
+
 v2.2.1
 
 Profile.swift - refactored profiles to be a dynamic model rather than a static one
