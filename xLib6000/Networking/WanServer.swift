@@ -36,11 +36,12 @@ public struct WanTestConnectionResults {
   public var radioSerial                = ""
 
   public func string() -> String {
-    return "UPNP TCP Working: \(upnpTcpPortWorking.description)" +
-      "\nUPNP UDP Working: \(upnpUdpPortWorking.description)" +
-      "\nForwarded TCP Working: \(forwardTcpPortWorking.description)" +
-      "\nForwarded UDP Working: \(forwardUdpPortWorking.description)" +
-    "\nNAT Preserves Ports: \(natSupportsHolePunch.description)"
+    return
+      "UPNP TCP Working:\t\t\(upnpTcpPortWorking.description)\n" +
+      "UPNP UDP Working:\t\t\(upnpUdpPortWorking.description)\n" +
+      "Forwarded TCP Working:\t\(forwardTcpPortWorking.description)\n" +
+      "Forwarded UDP Working:\t\(forwardUdpPortWorking.description)\n" +
+      "NAT Preserves Ports:\t\t\(natSupportsHolePunch.description)"
   }
 }
 
@@ -529,7 +530,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
         case .publicUpnpUdpPort:
           publicUpnpUdpPort = property.value.iValue()
         case .requiresAdditionalLicense:
-          radio.requiresAdditionalLicense = property.value
+          radio.requiresAdditionalLicense = property.value.bValue()
         case .radioLicenseId:
           radio.radioLicenseId = property.value
         case .serialNumber:
@@ -580,7 +581,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   /// - Parameter properties:         a KeyValuesArray
   ///
   private func parseTestConnectionResults(_ properties: KeyValuesArray) {
-    
     var results = WanTestConnectionResults()
     
     // process each key/value pair, <key=value>
@@ -598,17 +598,17 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       // Known tokens, in alphabetical order
       switch token {
       case .forwardTcpPortWorking:
-        results.forwardTcpPortWorking = property.value.bValue()
+        results.forwardTcpPortWorking = property.value.tValue()
       case .forwardUdpPortWorking:
-        results.forwardUdpPortWorking = property.value.bValue()
+        results.forwardUdpPortWorking = property.value.tValue()
       case .natSupportsHolePunch:
-        results.natSupportsHolePunch = property.value.bValue()
+        results.natSupportsHolePunch = property.value.tValue()
       case .radioSerial:
         results.radioSerial = property.value
       case .upnpTcpPortWorking:
-        results.upnpTcpPortWorking = property.value.bValue()
+        results.upnpTcpPortWorking = property.value.tValue()
       case .upnpUdpPortWorking:
-        results.upnpUdpPortWorking = property.value.bValue()
+        results.upnpUdpPortWorking = property.value.tValue()
       }
     }
     // call delegate
@@ -848,7 +848,7 @@ extension WanServer {
     case forwardTcpPortWorking      = "forward_tcp_port_working"
     case forwardUdpPortWorking      = "forward_udp_port_working"
     case natSupportsHolePunch       = "nat_supports_hole_punch"
-    case radioSerial                = "radio_serial"
+    case radioSerial                = "serial"
     case upnpTcpPortWorking         = "upnp_tcp_port_working"
     case upnpUdpPortWorking         = "upnp_udp_port_working"
   }

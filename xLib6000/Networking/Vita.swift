@@ -368,7 +368,7 @@ public class Vita {
           discoveredRadio.radioLicenseId = kv.value
           
         case .requiresAdditionalLicense:
-          discoveredRadio.requiresAdditionalLicense = kv.value
+          discoveredRadio.requiresAdditionalLicense = kv.value.bValue()
           
         case .serialNumber:
           discoveredRadio.serialNumber = kv.value

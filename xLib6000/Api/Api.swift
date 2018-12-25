@@ -135,7 +135,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///     - metersToSubscribe:    array of meter short type (defaults to .all)
   /// - Returns:                  Success / Failure
   ///
-  public func connect(_ selectedRadio: RadioParameters, clientName: String, isGui: Bool = true,
+  public func connect(_ selectedRadio: RadioParameters,
+                      clientName: String,
+                      isGui: Bool = true,
+                      isWan: Bool = false,
+                      wanHandle: String = "",
                       primaryCmdTypes: [Api.Command] = [.allPrimary],
                       secondaryCmdTypes: [Api.Command] = [.allSecondary],
                       subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) -> Bool {
@@ -145,6 +149,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     _clientName = clientName
     _isGui = isGui
+    self.isWan = isWan
+    wanConnectionHandle = wanHandle
     
     // Create a Radio class
     radio = Radio(api: self, queue: _objectQ)

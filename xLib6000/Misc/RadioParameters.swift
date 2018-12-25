@@ -41,7 +41,7 @@ public final class RadioParameters          : Equatable {
   public var publicTlsPort                  = -1
   public var publicUdpPort                  = -1
   public var radioLicenseId                 = ""                            // The current License of the Radio
-  public var requiresAdditionalLicense      = ""                            // License needed?
+  public var requiresAdditionalLicense      = false                         // License needed?
   public var requiresHolePunch              = false
   public var serialNumber                   = ""                            // serial number
   public var status                         = ""                            // available, in_use, connected, update, etc.
@@ -164,7 +164,7 @@ public final class RadioParameters          : Equatable {
     publicTlsPort                           = dict[Param.publicTlsPort.rawValue] as? Int ?? 0
     publicUdpPort                           = dict[Param.publicUdpPort.rawValue] as? Int ?? 0
     radioLicenseId                          = dict[Param.radioLicenseId.rawValue] as? String ?? ""
-    requiresAdditionalLicense               = dict[Param.requiresAdditionalLicense.rawValue] as? String ?? ""
+    requiresAdditionalLicense               = dict[Param.requiresAdditionalLicense.rawValue] as? Bool ?? false
     requiresHolePunch                       = dict[Param.requiresHolePunch.rawValue] as? Bool ?? false
     serialNumber                            = dict[Param.serialNumber.rawValue] as? String ?? ""
     status                                  = dict[Param.status.rawValue] as? String ?? ""

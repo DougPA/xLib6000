@@ -139,6 +139,13 @@ public extension String {
   func bValue() -> Bool {
     return (Int(self) ?? 0) == 1 ? true : false
   }
+  /// Return the Bool value (or false if invalid)
+  ///
+  /// - Returns:      a Bool equivalent
+  ///
+  func tValue() -> Bool {
+    return self.lowercased() == "true" ? true : false
+  }
   /// Return the Float value (or 0 if invalid)
   ///
   /// - Returns:      a Float equivalent
