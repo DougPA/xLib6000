@@ -33,7 +33,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   public var isStreaming                    = false
 
   public private(set) var id                : PanadapterId = 0              // Panadapter Id (StreamId)
-  public private(set) var lastFrameIndex    = -1                            // Frame index of previous Vita payload
+  public private(set) var expectedIndex     = -1                            // Frame index of next Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
   
   @objc dynamic public let daxIqChoices     = Api.daxIqChannels
@@ -46,8 +46,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
 
-  private var _dataframes                   = [PanadapterFrame]()
-  private var _dataframeIndex               = 0
+  private var _panadapterframes             = [PanadapterFrame]()
+  private var _index                   = 0
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
@@ -191,9 +191,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     self.id = id
     _q = queue
 
-    // allocate three dataframes
+    // allocate dataframes
     for _ in 0..<_numberOfPanadapterFrames {
-      _dataframes.append(PanadapterFrame(frameSize: Panadapter.kMaxBins))
+      _panadapterframes.append(PanadapterFrame(frameSize: Panadapter.kMaxBins))
     }
 
     super.init()
@@ -424,26 +424,15 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   func vitaProcessor(_ vita: Vita) {
     
     // convert the Vita struct to a PanadapterFrame
-    if _dataframes[_dataframeIndex].accumulate(vita: vita) {
+    if _panadapterframes[_index].accumulate(vita: vita, expectedIndex: &expectedIndex) {
       
-      if lastFrameIndex >= 0 && _dataframes[_dataframeIndex].frameIndex > lastFrameIndex + 1 {
-        
-        // a frame has been skipped, ignore the skipped frame
-        os_log("Missing Frame(s): expected = %{public}d, received = %{public}d", log: _log, type: .default, lastFrameIndex + 1, _dataframes[_dataframeIndex].frameIndex)
-      
-      } else if lastFrameIndex >= 0 && _dataframes[_dataframeIndex].frameIndex < lastFrameIndex {
-        
-        // a frame is either duplicated or out of order, ignore it
-        os_log("Out of sequence Frame(s) were ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, lastFrameIndex + 1, _dataframes[_dataframeIndex].frameIndex)
-        return
-      }
-      // Pass the data frame to this Panadapter's delegate
-      delegate?.streamHandler(_dataframes[_dataframeIndex])
-      
-      lastFrameIndex = _dataframes[_dataframeIndex].frameIndex
+      expectedIndex += 1
 
+      // Pass the data frame to this Panadapter's delegate
+      delegate?.streamHandler(_panadapterframes[_index])
+      
       // use the next dataframe
-      _dataframeIndex = (_dataframeIndex + 1) % _numberOfPanadapterFrames
+      _index = (_index + 1) % _numberOfPanadapterFrames
     }
   }
 }
@@ -483,7 +472,7 @@ public class PanadapterFrame {
     var totalBinsInFrame                    : UInt16
     var frameIndex                          : UInt32
   }
-
+  private var _expectedIndex                = 0
   private var _binsProcessed                = 0
   private var _byteOffsetToBins             = 0
   
@@ -501,7 +490,7 @@ public class PanadapterFrame {
   /// - Parameter vita:         incoming Vita object
   /// - Returns:                true if entire frame processed
   ///
-  public func accumulate(vita: Vita) -> Bool {
+  public func accumulate(vita: Vita, expectedIndex: inout Int) -> Bool {
   
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
@@ -535,19 +524,37 @@ public class PanadapterFrame {
       totalBinsInFrame = numberOfBins
       frameIndex = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
     }
+    // is this the first frame?
+    if expectedIndex == -1 { expectedIndex = frameIndex }
     
-    // update the count of bins processed
-    _binsProcessed += numberOfBins
-    
-    // get a pointer to the Bins in the payload
-    let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
-    
-    // Swap the byte ordering of the data & place it in the bins
-    for i in 0..<numberOfBins {
-      bins[i+startingBinIndex] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
+    if frameIndex < expectedIndex {
+      
+      Swift.print("Panadapter: Out of sequence Frame ignored: expected = \(expectedIndex), received = \(frameIndex)")
+      return false
     }
-    // reset the count if the entire frame has been accumulated
-    if _binsProcessed == totalBinsInFrame { _binsProcessed = 0 }
+    
+    if frameIndex > expectedIndex {
+      Swift.print("Panadapter: \(frameIndex - expectedIndex) Frame(s) skipped: expected = \(expectedIndex), received = \(frameIndex)")
+      expectedIndex = frameIndex
+    }
+
+    if frameIndex == expectedIndex {
+
+      // get a pointer to the Bins in the payload
+      let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
+      
+      // Swap the byte ordering of the data & place it in the bins
+      for i in 0..<numberOfBins {
+        bins[i+startingBinIndex] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
+      }
+      // update the count of bins processed
+      _binsProcessed += numberOfBins
+      
+      // reset the count if the entire frame has been accumulated
+      if _binsProcessed == totalBinsInFrame { _binsProcessed = 0 }
+    }
+    
+//    Swift.print("result = \(_binsProcessed == 0), frameIndex = \(frameIndex)")
     
     // return true if the entire frame has been accumulated
     return _binsProcessed == 0

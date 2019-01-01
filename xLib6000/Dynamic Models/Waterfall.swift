@@ -40,7 +40,8 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   public var isStreaming                    = false
   
   public private(set) var id                : WaterfallId   = 0             // Waterfall Id (StreamId)
-  public private(set) var lastTimecode      = -1                            // Time code of last frame received
+//  public private(set) var lastTimecode      = -1                            // Time code of last frame received
+  public private(set) var expectedIndex     = -1                            // Frame index of next Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
 
   // ----------------------------------------------------------------------------
@@ -51,8 +52,8 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
-  private var _dataframes                   = [WaterfallFrame]()
-  private var _dataframeIndex               = 0
+  private var _waterfallframes                   = [WaterfallFrame]()
+  private var _index               = 0
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
@@ -142,7 +143,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
     
     // allocate two dataframes
     for _ in 0..<_numberOfDataFrames {
-      _dataframes.append(WaterfallFrame(frameSize: 4096))
+      _waterfallframes.append(WaterfallFrame(frameSize: 4096))
     }
 
     super.init()
@@ -237,29 +238,18 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   func vitaProcessor(_ vita: Vita) {
     
     // convert the Vita struct and accumulate a WaterfallFrame
-    if _dataframes[_dataframeIndex].accumulate(vita: vita) {
+    if _waterfallframes[_index].accumulate(vita: vita, expectedIndex: &expectedIndex) {
       
-      if lastTimecode >= 0 && _dataframes[_dataframeIndex].timeCode > lastTimecode + 1 {
-        
-        // a frame has been skipped, ignore the skipped frame
-        os_log("Missing Frame(s): expected = %{public}d, received = %{public}d", log: _log, type: .default, lastTimecode + 1, _dataframes[_dataframeIndex].timeCode)
-        
-      } else if lastTimecode >= 0 && _dataframes[_dataframeIndex].timeCode < lastTimecode {
-        
-        // a frame is either duplicated or out of order, ignore it
-        os_log("Out of sequence Frame(s) were ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, lastTimecode + 1, _dataframes[_dataframeIndex].timeCode)
-        return
-      }
+      expectedIndex += 1
+
       // save the auto black level
-      _autoBlackLevel = _dataframes[_dataframeIndex].autoBlackLevel
+      _autoBlackLevel = _waterfallframes[_index].autoBlackLevel
       
       // Pass the data frame to this Waterfall's delegate
-      delegate?.streamHandler(_dataframes[_dataframeIndex])
-
-      lastTimecode = _dataframes[_dataframeIndex].timeCode;
+      delegate?.streamHandler(_waterfallframes[_index])
 
       // use the next dataframe
-      _dataframeIndex = (_dataframeIndex + 1) % _numberOfDataFrames
+      _index = (_index + 1) % _numberOfDataFrames
     }
   }
 }
@@ -291,7 +281,8 @@ public class WaterfallFrame {
   // MARK: - Private properties
   
   private var _binsProcessed                = 0
-  
+  private var _byteOffsetToBins             = 0
+
   private struct PayloadHeaderOld {                                         // struct to mimic payload layout
     var firstBinFreq                        : UInt64                        // 8 bytes
     var binBandwidth                        : UInt64                        // 8 bytes
@@ -313,10 +304,7 @@ public class WaterfallFrame {
     var totalBinsInFrame                    : UInt16                        // 2 bytes
     var firstBinIndex                       : UInt16                        // 2 bytes
   }
-  
-  private let kByteOffsetToBins = MemoryLayout<PayloadHeader>.size          // Bins are just beyond the payload
-  
-  
+    
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -334,7 +322,7 @@ public class WaterfallFrame {
   /// - Parameter vita:         incoming Vita object
   /// - Returns:                true if entire frame processed
   ///
-  public func accumulate(vita: Vita) -> Bool {
+  public func accumulate(vita: Vita, expectedIndex: inout Int) -> Bool {
     
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
 
@@ -343,6 +331,10 @@ public class WaterfallFrame {
       // map the payload to the New Payload struct
       let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
       
+      // 2.3.x or greater
+      // Bins are just beyond the payload
+      _byteOffsetToBins = MemoryLayout<PayloadHeader>.size
+
       // byte swap and convert each payload component
       firstBinFreq = CGFloat(CFSwapInt64BigToHost(p.pointee.firstBinFreq)) / 1.048576E6
       binBandwidth = CGFloat(CFSwapInt64BigToHost(p.pointee.binBandwidth)) / 1.048576E6
@@ -359,6 +351,10 @@ public class WaterfallFrame {
       // map the payload to the Old Payload struct
       let p = payloadPtr.bindMemory(to: PayloadHeaderOld.self, capacity: 1)
       
+      // pre 2.3.x
+      // Bins are just beyond the payload
+      _byteOffsetToBins = MemoryLayout<PayloadHeaderOld>.size
+
       // byte swap and convert each payload component
       firstBinFreq = CGFloat(CFSwapInt64BigToHost(p.pointee.firstBinFreq)) / 1.048576E6
       binBandwidth = CGFloat(CFSwapInt64BigToHost(p.pointee.binBandwidth)) / 1.048576E6
@@ -370,19 +366,36 @@ public class WaterfallFrame {
       totalBinsInFrame = numberOfBins
       startingBinIndex = 0
     }
-    // update the count of bins processed
-    _binsProcessed += numberOfBins * height
-
-    // get a pointer to the data in the payload
-    let binsPtr = payloadPtr.advanced(by: kByteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
+    // is this the first frame?
+    if expectedIndex == -1 { expectedIndex = timeCode }
     
-    // Swap the byte ordering of the data & place it in the bins
-    for i in 0..<numberOfBins * height {
-      bins[i + startingBinIndex] = CFSwapInt16BigToHost(binsPtr.advanced(by: i).pointee)
+    if timeCode < expectedIndex {
+      
+      Swift.print("Waterfall: Out of sequence Frame ignored: expected = \(expectedIndex), received = \(timeCode)")
+      return false
     }
-    // reset the count if the entire frame has been accumulated
-    if _binsProcessed == totalBinsInFrame { _binsProcessed = 0 }
     
+    if timeCode > expectedIndex {
+      Swift.print("Waterfall: \(timeCode - expectedIndex) Frame(s) skipped: expected = \(expectedIndex), received = \(timeCode)")
+      expectedIndex = timeCode
+    }
+    
+    if timeCode == expectedIndex {
+      
+      // get a pointer to the Bins in the payload
+      let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
+      
+      // Swap the byte ordering of the data & place it in the bins
+      for i in 0..<numberOfBins {
+        bins[i+startingBinIndex] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
+      }
+      // update the count of bins processed
+      _binsProcessed += numberOfBins
+      
+      // reset the count if the entire frame has been accumulated
+      if _binsProcessed == totalBinsInFrame { _binsProcessed = 0 }
+    }
+
     // return true if the entire frame has been accumulated
     return _binsProcessed == 0
   }
