@@ -122,42 +122,42 @@ public extension String {
   ///
   /// - Returns:      the Int equivalent
   ///
-  func mhzToHz() -> Int {
+  var mhzToHz : Int {
     return Int( (Double(self) ?? 0) * 1_000_000 )
   }
   /// Return the Integer value (or 0 if invalid)
   ///
   /// - Returns:      the Int equivalent
   ///
-  func iValue() -> Int {
+  var iValue : Int {
     return Int(self) ?? 0
   }
   /// Return the Bool value (or false if invalid)
   ///
   /// - Returns:      a Bool equivalent
   ///
-  func bValue() -> Bool {
+  var bValue : Bool {
     return (Int(self) ?? 0) == 1 ? true : false
   }
   /// Return the Bool value (or false if invalid)
   ///
   /// - Returns:      a Bool equivalent
   ///
-  func tValue() -> Bool {
+  var tValue : Bool {
     return self.lowercased() == "true" ? true : false
   }
   /// Return the Float value (or 0 if invalid)
   ///
   /// - Returns:      a Float equivalent
   ///
-  func fValue() -> Float {
+  var fValue : Float {
     return Float(self) ?? 0
   }
   /// Return the Double value (or 0 if invalid)
   ///
   /// - Returns:      a Double equivalent
   ///
-  func dValue() -> Double {
+  var dValue : Double {
     return Double(self) ?? 0
   }
   /// Replace spaces with a specified value
@@ -300,36 +300,50 @@ public extension Bool {
   ///
   /// - Returns:      a String
   ///
-  func asInt() -> Int {
+  var asInt : Int {
     return (self ? 1 : 0)
   }
   /// Return "1" / "0" for true / false Booleans
   ///
   /// - Returns:      a String
   ///
-  func asNumber() -> String {
+  var asNumber : String {
     return (self ? "1" : "0")
   }
   /// Return "True" / "False" Strings for true / false Booleans
   ///
   /// - Returns:      a String
   ///
-  func asString() -> String {
+  var asString : String {
     return (self ? "True" : "False")
   }
   /// Return "T" / "F" Strings for true / false Booleans
   ///
   /// - Returns:      a String
   ///
-  func asLetter() -> String {
+  var asLetter : String {
     return (self ? "T" : "F")
   }
   /// Return "on" / "off" Strings for true / false Booleans
   ///
   /// - Returns:      a String
   ///
-  func asOnOff() -> String {
+  var asOnOff : String {
     return (self ? "on" : "off")
+  }
+  /// Return "PASS" / "FAIL" Strings for true / false Booleans
+  ///
+  /// - Returns:      a String
+  ///
+  var asPassFail : String  {
+    return self == true ? "PASS" : "FAIL"
+  }
+  /// Return "YES" / "NO" Strings for true / false Booleans
+  ///
+  /// - Returns:      a String
+  ///
+  var asYesNo : String {
+    return self == true ? "YES" : "NO"
   }
 }
 
@@ -342,7 +356,7 @@ public extension Int {
   ///
   /// - Returns:      the String equivalent
   ///
-  func hzToMhz() -> String {
+  var hzToMhz : String {
     
     // convert to a String with up to 2 leading & with 6 trailing places
     return String(format: "%02.6f", Float(self) / 1_000_000.0)

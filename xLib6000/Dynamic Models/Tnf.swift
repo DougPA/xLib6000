@@ -234,22 +234,22 @@ public final class Tnf                      : NSObject, DynamicModel {
         
       case .depth:
         willChangeValue(for: \.depth)
-        _depth = property.value.iValue()
+        _depth = property.value.iValue
         didChangeValue(for: \.depth)
 
       case .frequency:
         willChangeValue(for: \.frequency)
-        _frequency = property.value.mhzToHz()
+        _frequency = property.value.mhzToHz
         didChangeValue(for: \.frequency)
 
       case .permanent:
         willChangeValue(for: \.permanent)
-        _permanent = property.value.bValue()
+        _permanent = property.value.bValue
         didChangeValue(for: \.permanent)
 
       case .width:
          willChangeValue(for: \.width)
-         _width = property.value.mhzToHz()
+         _width = property.value.mhzToHz
          didChangeValue(for: \.width)
       }
     }

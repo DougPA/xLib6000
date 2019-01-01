@@ -448,7 +448,7 @@ public final class Slice                    : NSObject, DynamicModel {
         
       case .active:
         willChangeValue(for: \.active)
-        _active = property.value.bValue()
+        _active = property.value.bValue
         didChangeValue(for: \.active)
 
       case .agcMode:
@@ -458,129 +458,129 @@ public final class Slice                    : NSObject, DynamicModel {
 
       case .agcOffLevel:
         willChangeValue(for: \.agcOffLevel)
-        _agcOffLevel = property.value.iValue()
+        _agcOffLevel = property.value.iValue
         didChangeValue(for: \.agcOffLevel)
 
       case .agcThreshold:
         willChangeValue(for: \.agcThreshold)
-        _agcThreshold = property.value.iValue()
+        _agcThreshold = property.value.iValue
         didChangeValue(for: \.agcThreshold)
 
       case .anfEnabled:
         willChangeValue(for: \.anfEnabled)
-        _anfEnabled = property.value.bValue()
+        _anfEnabled = property.value.bValue
         didChangeValue(for: \.anfEnabled)
 
       case .anfLevel:
         willChangeValue(for: \.anfLevel)
-        _anfLevel = property.value.iValue()
+        _anfLevel = property.value.iValue
         didChangeValue(for: \.anfLevel)
 
       case .apfEnabled:
         willChangeValue(for: \.apfEnabled)
-        _apfEnabled = property.value.bValue()
+        _apfEnabled = property.value.bValue
         didChangeValue(for: \.apfEnabled)
 
       case .apfLevel:
         willChangeValue(for: \.apfLevel)
-        _apfLevel = property.value.iValue()
+        _apfLevel = property.value.iValue
         didChangeValue(for: \.apfLevel)
 
       case .audioGain:
         willChangeValue(for: \.audioGain)
-        _audioGain = property.value.iValue()
+        _audioGain = property.value.iValue
         didChangeValue(for: \.audioGain)
 
       case .audioMute:
         willChangeValue(for: \.audioMute)
-        _audioMute = property.value.bValue()
+        _audioMute = property.value.bValue
         didChangeValue(for: \.audioMute)
 
       case .audioPan:
         willChangeValue(for: \.audioPan)
-        _audioPan = property.value.iValue()
+        _audioPan = property.value.iValue
         didChangeValue(for: \.audioPan)
 
       case .daxChannel:
-        if _daxChannel != 0 && property.value.iValue() == 0 {
+        if _daxChannel != 0 && property.value.iValue == 0 {
           // remove this slice from the AudioStream it was using
           if let audioStream = AudioStream.find(with: _daxChannel) {
             audioStream.slice = nil
           }
         }
         willChangeValue(for: \.daxChannel)
-        _daxChannel = property.value.iValue()
+        _daxChannel = property.value.iValue
         didChangeValue(for: \.daxChannel)
 
       case .daxTxEnabled:
         willChangeValue(for: \.daxTxEnabled)
-        _daxTxEnabled = property.value.bValue()
+        _daxTxEnabled = property.value.bValue
         didChangeValue(for: \.daxTxEnabled)
 
       case .detached:
         willChangeValue(for: \.detached)
-        _detached = property.value.bValue()
+        _detached = property.value.bValue
         didChangeValue(for: \.detached)
 
      case .dfmPreDeEmphasisEnabled:
         willChangeValue(for: \.dfmPreDeEmphasisEnabled)
-        _dfmPreDeEmphasisEnabled = property.value.bValue()
+        _dfmPreDeEmphasisEnabled = property.value.bValue
         didChangeValue(for: \.dfmPreDeEmphasisEnabled)
 
       case .digitalLowerOffset:
         willChangeValue(for: \.digitalLowerOffset)
-        _digitalLowerOffset = property.value.iValue()
+        _digitalLowerOffset = property.value.iValue
         didChangeValue(for: \.digitalLowerOffset)
 
       case .digitalUpperOffset:
         willChangeValue(for: \.digitalUpperOffset)
-        _digitalUpperOffset = property.value.iValue()
+        _digitalUpperOffset = property.value.iValue
         didChangeValue(for: \.digitalUpperOffset)
 
       case .diversityEnabled:
         if _diversityIsAllowed {
           willChangeValue(for: \.diversityEnabled)
-          _diversityEnabled = property.value.bValue()
+          _diversityEnabled = property.value.bValue
           didChangeValue(for: \.diversityEnabled)
         }
         
       case .diversityChild:
         if _diversityIsAllowed {
           willChangeValue(for: \.diversityChild)
-          _diversityChild = property.value.bValue()
+          _diversityChild = property.value.bValue
           didChangeValue(for: \.diversityChild)
         }
         
       case .diversityIndex:
         if _diversityIsAllowed {
           willChangeValue(for: \.diversityIndex)
-          _diversityIndex = property.value.iValue()
+          _diversityIndex = property.value.iValue
           didChangeValue(for: \.diversityIndex)
         }
         
       case .filterHigh:
         willChangeValue(for: \.filterHigh)
-        _filterHigh = property.value.iValue()
+        _filterHigh = property.value.iValue
         didChangeValue(for: \.filterHigh)
 
       case .filterLow:
         willChangeValue(for: \.filterLow)
-        _filterLow = property.value.iValue()
+        _filterLow = property.value.iValue
         didChangeValue(for: \.filterLow)
 
       case .fmDeviation:
         willChangeValue(for: \.fmDeviation)
-        _fmDeviation = property.value.iValue()
+        _fmDeviation = property.value.iValue
         didChangeValue(for: \.fmDeviation)
 
       case .fmRepeaterOffset:
         willChangeValue(for: \.fmRepeaterOffset)
-        _fmRepeaterOffset = property.value.fValue()
+        _fmRepeaterOffset = property.value.fValue
         didChangeValue(for: \.fmRepeaterOffset)
 
       case .fmToneBurstEnabled:
          willChangeValue(for: \.fmToneBurstEnabled)
-        _fmToneBurstEnabled = property.value.bValue()
+        _fmToneBurstEnabled = property.value.bValue
         didChangeValue(for: \.fmToneBurstEnabled)
 
       case .fmToneMode:
@@ -590,12 +590,12 @@ public final class Slice                    : NSObject, DynamicModel {
 
       case .fmToneFreq:
         willChangeValue(for: \.fmToneFreq)
-        _fmToneFreq = property.value.fValue()
+        _fmToneFreq = property.value.fValue
         didChangeValue(for: \.fmToneFreq)
 
       case .frequency:
         willChangeValue(for: \.frequency)
-        _frequency = property.value.mhzToHz()
+        _frequency = property.value.mhzToHz
         didChangeValue(for: \.frequency)
 
       case .ghost:
@@ -604,22 +604,22 @@ public final class Slice                    : NSObject, DynamicModel {
         
       case .inUse:
         willChangeValue(for: \.inUse)
-        _inUse = property.value.bValue()
+        _inUse = property.value.bValue
         didChangeValue(for: \.inUse)
 
       case .locked:
         willChangeValue(for: \.locked)
-        _locked = property.value.bValue()
+        _locked = property.value.bValue
         didChangeValue(for: \.locked)
 
       case .loopAEnabled:
         willChangeValue(for: \.loopAEnabled)
-        _loopAEnabled = property.value.bValue()
+        _loopAEnabled = property.value.bValue
         didChangeValue(for: \.loopAEnabled)
 
       case .loopBEnabled:
         willChangeValue(for: \.loopBEnabled)
-        _loopBEnabled = property.value.bValue()
+        _loopBEnabled = property.value.bValue
         didChangeValue(for: \.loopBEnabled)
 
       case .mode:
@@ -634,32 +634,32 @@ public final class Slice                    : NSObject, DynamicModel {
 
       case .nbEnabled:
         willChangeValue(for: \.nbEnabled)
-        _nbEnabled = property.value.bValue()
+        _nbEnabled = property.value.bValue
         didChangeValue(for: \.nbEnabled)
 
       case .nbLevel:
         willChangeValue(for: \.nbLevel)
-        _nbLevel = property.value.iValue()
+        _nbLevel = property.value.iValue
         didChangeValue(for: \.nbLevel)
 
       case .nrEnabled:
          willChangeValue(for: \.nrEnabled)
-        _nrEnabled = property.value.bValue()
+        _nrEnabled = property.value.bValue
         didChangeValue(for: \.nrEnabled)
 
       case .nrLevel:
         willChangeValue(for: \.nrLevel)
-        _nrLevel = property.value.iValue()
+        _nrLevel = property.value.iValue
         didChangeValue(for: \.nrLevel)
 
       case .nr2:
         willChangeValue(for: \.nr2)
-        _nr2 = property.value.iValue()
+        _nr2 = property.value.iValue
         didChangeValue(for: \.nr2)
 
       case .owner:
         willChangeValue(for: \.owner)
-        _owner = property.value.iValue()
+        _owner = property.value.iValue
         didChangeValue(for: \.owner)
 
       case .panadapterId:     // does have leading "0x"
@@ -674,27 +674,27 @@ public final class Slice                    : NSObject, DynamicModel {
 
       case .postDemodBypassEnabled:
         willChangeValue(for: \.postDemodBypassEnabled)
-        _postDemodBypassEnabled = property.value.bValue()
+        _postDemodBypassEnabled = property.value.bValue
         didChangeValue(for: \.postDemodBypassEnabled)
 
       case .postDemodLow:
          willChangeValue(for: \.postDemodLow)
-         _postDemodLow = property.value.iValue()
+         _postDemodLow = property.value.iValue
          didChangeValue(for: \.postDemodLow)
 
       case .postDemodHigh:
         willChangeValue(for: \.postDemodHigh)
-        _postDemodHigh = property.value.iValue()
+        _postDemodHigh = property.value.iValue
         didChangeValue(for: \.postDemodHigh)
 
       case .qskEnabled:
         willChangeValue(for: \.qskEnabled)
-        _qskEnabled = property.value.bValue()
+        _qskEnabled = property.value.bValue
         didChangeValue(for: \.qskEnabled)
 
       case .recordEnabled:
          willChangeValue(for: \.recordEnabled)
-        _recordEnabled = property.value.bValue()
+        _recordEnabled = property.value.bValue
         didChangeValue(for: \.recordEnabled)
 
       case .repeaterOffsetDirection:
@@ -704,27 +704,27 @@ public final class Slice                    : NSObject, DynamicModel {
 
       case .rfGain:
         willChangeValue(for: \.rfGain)
-        _rfGain = property.value.iValue()
+        _rfGain = property.value.iValue
         didChangeValue(for: \.rfGain)
 
       case .ritOffset:
         willChangeValue(for: \.ritOffset)
-        _ritOffset = property.value.iValue()
+        _ritOffset = property.value.iValue
         didChangeValue(for: \.ritOffset)
 
       case .ritEnabled:
         willChangeValue(for: \.ritEnabled)
-        _ritEnabled = property.value.bValue()
+        _ritEnabled = property.value.bValue
         didChangeValue(for: \.ritEnabled)
 
       case .rttyMark:
          willChangeValue(for: \.rttyMark)
-         _rttyMark = property.value.iValue()
+         _rttyMark = property.value.iValue
          didChangeValue(for: \.rttyMark)
 
       case .rttyShift:
         willChangeValue(for: \.rttyShift)
-        _rttyShift = property.value.iValue()
+        _rttyShift = property.value.iValue
         didChangeValue(for: \.rttyShift)
 
       case .rxAnt:
@@ -739,17 +739,17 @@ public final class Slice                    : NSObject, DynamicModel {
 
       case .squelchEnabled:
          willChangeValue(for: \.squelchEnabled)
-        _squelchEnabled = property.value.bValue()
+        _squelchEnabled = property.value.bValue
         didChangeValue(for: \.squelchEnabled)
 
       case .squelchLevel:
         willChangeValue(for: \.squelchLevel)
-        _squelchLevel = property.value.iValue()
+        _squelchLevel = property.value.iValue
         didChangeValue(for: \.squelchLevel)
 
       case .step:
         willChangeValue(for: \.step)
-        _step = property.value.iValue()
+        _step = property.value.iValue
         didChangeValue(for: \.step)
 
       case .stepList:
@@ -759,7 +759,7 @@ public final class Slice                    : NSObject, DynamicModel {
 
       case .txEnabled:
         willChangeValue(for: \.txEnabled)
-        _txEnabled = property.value.bValue()
+        _txEnabled = property.value.bValue
         didChangeValue(for: \.txEnabled)
 
       case .txAnt:
@@ -774,32 +774,32 @@ public final class Slice                    : NSObject, DynamicModel {
 
       case .txOffsetFreq:
         willChangeValue(for: \.txOffsetFreq)
-        _txOffsetFreq = property.value.fValue()
+        _txOffsetFreq = property.value.fValue
         didChangeValue(for: \.txOffsetFreq)
 
       case .wide:
         willChangeValue(for: \.wide)
-        _wide = property.value.bValue()
+        _wide = property.value.bValue
         didChangeValue(for: \.wide)
 
       case .wnbEnabled:
          willChangeValue(for: \.wnbEnabled)
-        _wnbEnabled = property.value.bValue()
+        _wnbEnabled = property.value.bValue
         didChangeValue(for: \.wnbEnabled)
 
       case .wnbLevel:
         willChangeValue(for: \.wnbLevel)
-        _wnbLevel = property.value.iValue()
+        _wnbLevel = property.value.iValue
         didChangeValue(for: \.wnbLevel)
 
       case .xitOffset:
         willChangeValue(for: \.xitOffset)
-        _xitOffset = property.value.iValue()
+        _xitOffset = property.value.iValue
         didChangeValue(for: \.xitOffset)
 
       case .xitEnabled:
         willChangeValue(for: \.xitEnabled)
-        _xitEnabled = property.value.bValue()
+        _xitEnabled = property.value.bValue
         didChangeValue(for: \.xitEnabled)
 
       case .daxClients, .diversityParent, .recordTime:

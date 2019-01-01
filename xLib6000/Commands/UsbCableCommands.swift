@@ -58,7 +58,7 @@ extension UsbCable {
   // listed in alphabetical order
   @objc dynamic public var autoReport: Bool {
     get { return _autoReport }
-    set { if _autoReport != newValue { _autoReport = newValue ; usbCableCmd( .autoReport, newValue.asNumber()) } } }
+    set { if _autoReport != newValue { _autoReport = newValue ; usbCableCmd( .autoReport, newValue.asNumber) } } }
   
   @objc dynamic public var band: String {
     get { return _band }
@@ -70,7 +70,7 @@ extension UsbCable {
   
   @objc dynamic public var enable: Bool {
     get { return _enable }
-    set { if _enable != newValue { _enable = newValue ; usbCableCmd( .enable, newValue.asNumber()) } } }
+    set { if _enable != newValue { _enable = newValue ; usbCableCmd( .enable, newValue.asNumber) } } }
   
   @objc dynamic public var flowControl: String {
     get { return _flowControl }
@@ -86,7 +86,7 @@ extension UsbCable {
   
   @objc dynamic public var pluggedIn: Bool {
     get { return _pluggedIn }
-    set { if _pluggedIn != newValue { _pluggedIn = newValue ; usbCableCmd( .pluggedIn, newValue.asNumber()) } } }
+    set { if _pluggedIn != newValue { _pluggedIn = newValue ; usbCableCmd( .pluggedIn, newValue.asNumber) } } }
   
   @objc dynamic public var polarity: String {
     get { return _polarity }
@@ -122,5 +122,5 @@ extension UsbCable {
   
   @objc dynamic public var usbLog: Bool {
     get { return _usbLog }
-    set { if _usbLog != newValue { _usbLog = newValue ; usbCableCmd( .usbLog, newValue.asNumber()) } } }
+    set { if _usbLog != newValue { _usbLog = newValue ; usbCableCmd( .usbLog, newValue.asNumber) } } }
 }

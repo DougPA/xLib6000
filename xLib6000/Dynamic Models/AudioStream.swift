@@ -216,17 +216,17 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
         
       case .daxChannel:
         willChangeValue(for: \.daxChannel)
-        _daxChannel = property.value.iValue()
+        _daxChannel = property.value.iValue
         didChangeValue(for: \.daxChannel)
 
       case .daxClients:
         willChangeValue(for: \.daxClients)
-        _daxClients = property.value.iValue()
+        _daxClients = property.value.iValue
         didChangeValue(for: \.daxClients)
 
       case .inUse:
         willChangeValue(for: \.inUse)
-        _inUse = property.value.bValue()
+        _inUse = property.value.bValue
         didChangeValue(for: \.inUse)
 
       case .ip:
@@ -236,7 +236,7 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
 
       case .port:
         willChangeValue(for: \.port)
-        _port = property.value.iValue()
+        _port = property.value.iValue
         didChangeValue(for: \.port)
 
       case .slice:

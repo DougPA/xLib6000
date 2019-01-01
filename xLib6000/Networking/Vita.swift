@@ -359,7 +359,7 @@ public class Vita {
           discoveredRadio.nickname = kv.value
           
         case .port:
-          discoveredRadio.port = kv.value.iValue()
+          discoveredRadio.port = kv.value.iValue
           
         case .publicIp:
           discoveredRadio.publicIp = kv.value
@@ -368,7 +368,7 @@ public class Vita {
           discoveredRadio.radioLicenseId = kv.value
           
         case .requiresAdditionalLicense:
-          discoveredRadio.requiresAdditionalLicense = kv.value.bValue()
+          discoveredRadio.requiresAdditionalLicense = kv.value.bValue
           
         case .serialNumber:
           discoveredRadio.serialNumber = kv.value
@@ -377,7 +377,7 @@ public class Vita {
           discoveredRadio.status = kv.value
           
         case .wanConnected:
-          discoveredRadio.wanConnected = kv.value.bValue()
+          discoveredRadio.wanConnected = kv.value.bValue
           
         // satisfy the switch statement, not a real token
         case .lastSeen:

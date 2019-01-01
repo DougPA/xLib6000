@@ -191,22 +191,22 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
 
       case .port:
         willChangeValue(for: \.port)
-        _port = property.value.iValue()
+        _port = property.value.iValue
         didChangeValue(for: \.port)
 
       case .rxEnabled:
         willChangeValue(for: \.rxEnabled)
-        _rxEnabled = property.value.bValue()
+        _rxEnabled = property.value.bValue
         didChangeValue(for: \.rxEnabled)
 
       case .txEnabled:
         willChangeValue(for: \.txEnabled)
-        _txEnabled = property.value.bValue()
+        _txEnabled = property.value.bValue
         didChangeValue(for: \.txEnabled)
 
       case .rxStopped:
         willChangeValue(for: \.rxStopped)
-        _rxStopped = property.value.bValue()
+        _rxStopped = property.value.bValue
         didChangeValue(for: \.rxStopped)
      }
     }

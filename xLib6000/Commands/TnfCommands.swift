@@ -83,13 +83,13 @@ extension Tnf {
   
   @objc dynamic public var frequency: Int {
     get { return _frequency }
-    set { if _frequency != newValue { _frequency = newValue ; tnfCmd( .frequency, newValue.hzToMhz()) } } }
+    set { if _frequency != newValue { _frequency = newValue ; tnfCmd( .frequency, newValue.hzToMhz) } } }
   
   @objc dynamic public var permanent: Bool {
     get { return _permanent }
-    set { if _permanent != newValue { _permanent = newValue ; tnfCmd( .permanent, newValue.asNumber()) } } }
+    set { if _permanent != newValue { _permanent = newValue ; tnfCmd( .permanent, newValue.asNumber) } } }
   
   @objc dynamic public var width: Int {
     get { return _width  }
-    set { if _width != newValue { if newValue.within(minWidth, maxWidth) { _width = newValue ; tnfCmd( .width, newValue.hzToMhz()) } } } }
+    set { if _width != newValue { if newValue.within(minWidth, maxWidth) { _width = newValue ; tnfCmd( .width, newValue.hzToMhz) } } } }
 }

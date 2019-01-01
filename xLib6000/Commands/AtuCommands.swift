@@ -72,11 +72,11 @@ extension Atu {
   
   @objc dynamic public var memoriesEnabled: Bool {
     get {  return _memoriesEnabled }
-    set { if _memoriesEnabled != newValue { _memoriesEnabled = newValue ; atuCmd( .memoriesEnabled, newValue.asNumber()) } } }
+    set { if _memoriesEnabled != newValue { _memoriesEnabled = newValue ; atuCmd( .memoriesEnabled, newValue.asNumber) } } }
   
 //  @objc dynamic public var enabled: Bool {
 //    get {  return _enabled }
-//    set { if _enabled != newValue { _enabled = newValue ; atuCmd( .enabled, newValue.asNumber()) } } }
+//    set { if _enabled != newValue { _enabled = newValue ; atuCmd( .enabled, newValue.asNumber) } } }
   @objc dynamic public var enabled: Bool {
       return _enabled }
 }

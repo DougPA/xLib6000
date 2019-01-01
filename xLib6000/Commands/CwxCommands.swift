@@ -170,7 +170,7 @@ extension Cwx {
   
   @objc dynamic public var qskEnabled: Bool {
     get { return _qskEnabled }
-    set { if _qskEnabled != newValue { _qskEnabled = newValue ; cwxCmd( .qskEnabled, newValue.asNumber()) } } }
+    set { if _qskEnabled != newValue { _qskEnabled = newValue ; cwxCmd( .qskEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var wpm: Int {
     get { return _wpm }

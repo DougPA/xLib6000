@@ -147,57 +147,57 @@ public final class Xvtr                     : NSObject, DynamicModel {
 
       case .ifFrequency:
         willChangeValue(for: \.ifFrequency)
-        _ifFrequency = property.value.iValue()
+        _ifFrequency = property.value.iValue
         didChangeValue(for: \.ifFrequency)
 
       case .inUse:
         willChangeValue(for: \.inUse)
-        _inUse = property.value.bValue()
+        _inUse = property.value.bValue
         didChangeValue(for: \.inUse)
 
       case .isValid:
         willChangeValue(for: \.isValid)
-        _isValid = property.value.bValue()
+        _isValid = property.value.bValue
         didChangeValue(for: \.isValid)
 
       case .loError:
         willChangeValue(for: \.loError)
-        _loError = property.value.iValue()
+        _loError = property.value.iValue
         didChangeValue(for: \.loError)
 
       case .maxPower:
         willChangeValue(for: \.maxPower)
-        _maxPower = property.value.iValue()
+        _maxPower = property.value.iValue
         didChangeValue(for: \.maxPower)
 
       case .order:
         willChangeValue(for: \.order)
-        _order = property.value.iValue()
+        _order = property.value.iValue
         didChangeValue(for: \.order)
 
       case .preferred:
         willChangeValue(for: \.preferred)
-        _preferred = property.value.bValue()
+        _preferred = property.value.bValue
         didChangeValue(for: \.preferred)
 
       case .rfFrequency:
         willChangeValue(for: \.rfFrequency)
-        _rfFrequency = property.value.iValue()
+        _rfFrequency = property.value.iValue
         didChangeValue(for: \.rfFrequency)
 
       case .rxGain:
         willChangeValue(for: \.rxGain)
-        _rxGain = property.value.iValue()
+        _rxGain = property.value.iValue
         didChangeValue(for: \.rxGain)
 
       case .rxOnly:
         willChangeValue(for: \.rxOnly)
-        _rxOnly = property.value.bValue()
+        _rxOnly = property.value.bValue
         didChangeValue(for: \.rxOnly)
 
       case .twoMeterInt:
         willChangeValue(for: \.twoMeterInt)
-        _twoMeterInt = property.value.iValue()
+        _twoMeterInt = property.value.iValue
         didChangeValue(for: \.twoMeterInt)
       }
     }

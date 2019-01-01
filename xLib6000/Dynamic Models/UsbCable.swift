@@ -166,7 +166,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
           
         case .autoReport:
           willChangeValue(for: \.autoReport)
-          _autoReport = property.value.bValue()
+          _autoReport = property.value.bValue
           didChangeValue(for: \.autoReport)
 
         case .band:
@@ -180,12 +180,12 @@ public final class UsbCable                 : NSObject, DynamicModel {
           
         case .dataBits:
           willChangeValue(for: \.dataBits)
-          _dataBits = property.value.iValue()
+          _dataBits = property.value.iValue
           didChangeValue(for: \.dataBits)
 
         case .enable:
           willChangeValue(for: \.enable)
-          _enable = property.value.bValue()
+          _enable = property.value.bValue
           didChangeValue(for: \.enable)
 
         case .flowControl:
@@ -205,7 +205,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
 
         case .pluggedIn:
           willChangeValue(for: \.pluggedIn)
-          _pluggedIn = property.value.bValue()
+          _pluggedIn = property.value.bValue
           didChangeValue(for: \.pluggedIn)
 
         case .polarity:
@@ -230,7 +230,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
 
         case .sourceSlice:
          willChangeValue(for: \.sourceSlice)
-          _sourceSlice = property.value.iValue()
+          _sourceSlice = property.value.iValue
           didChangeValue(for: \.sourceSlice)
 
         case .sourceTxAnt:
@@ -240,17 +240,17 @@ public final class UsbCable                 : NSObject, DynamicModel {
 
         case .speed:
           willChangeValue(for: \.speed)
-          _speed = property.value.iValue()
+          _speed = property.value.iValue
           didChangeValue(for: \.speed)
 
         case .stopBits:
           willChangeValue(for: \.stopBits)
-          _stopBits = property.value.iValue()
+          _stopBits = property.value.iValue
           didChangeValue(for: \.stopBits)
 
         case .usbLog:
           willChangeValue(for: \.usbLog)
-          _usbLog = property.value.bValue()
+          _usbLog = property.value.bValue
           didChangeValue(for: \.usbLog)
 
           //                case .usbLogLine:

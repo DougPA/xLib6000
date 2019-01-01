@@ -176,27 +176,27 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
         
       case .autoBlackEnabled:
         willChangeValue(for: \.autoBlackEnabled)
-        _autoBlackEnabled = property.value.bValue()
+        _autoBlackEnabled = property.value.bValue
         didChangeValue(for: \.autoBlackEnabled)
 
       case .blackLevel:
         willChangeValue(for: \.blackLevel)
-        _blackLevel = property.value.iValue()
+        _blackLevel = property.value.iValue
         didChangeValue(for: \.blackLevel)
 
       case .colorGain:
         willChangeValue(for: \.colorGain)
-        _colorGain = property.value.iValue()
+        _colorGain = property.value.iValue
         didChangeValue(for: \.colorGain)
 
       case .gradientIndex:
          willChangeValue(for: \.gradientIndex)
-        _gradientIndex = property.value.iValue()
+        _gradientIndex = property.value.iValue
         didChangeValue(for: \.gradientIndex)
 
       case .lineDuration:
         willChangeValue(for: \.lineDuration)
-        _lineDuration = property.value.iValue()
+        _lineDuration = property.value.iValue
         didChangeValue(for: \.lineDuration)
 
       case .panadapterId:     // does not have leading "0x"

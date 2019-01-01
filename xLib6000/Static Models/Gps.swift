@@ -116,7 +116,7 @@ public final class Gps                      : NSObject, StaticModel {
 
       case .frequencyError:
         willChangeValue(for: \.frequencyError)
-        _frequencyError = property.value.dValue()
+        _frequencyError = property.value.dValue
         didChangeValue(for: \.frequencyError)
 
       case .grid:
@@ -151,17 +151,17 @@ public final class Gps                      : NSObject, StaticModel {
 
       case .track:
         willChangeValue(for: \.track)
-        _track = property.value.dValue()
+        _track = property.value.dValue
         didChangeValue(for: \.track)
 
       case .tracked:
         willChangeValue(for: \.tracked)
-        _tracked = property.value.bValue()
+        _tracked = property.value.bValue
         didChangeValue(for: \.tracked)
 
       case .visible:
         willChangeValue(for: \.visible)
-        _visible = property.value.bValue()
+        _visible = property.value.bValue
         didChangeValue(for: \.visible)
       }
     }

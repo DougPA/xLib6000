@@ -72,7 +72,7 @@ extension Equalizer {
   // listed in alphabetical order
   @objc dynamic public var eqEnabled: Bool {
     get { return  _eqEnabled }
-    set { if _eqEnabled != newValue { _eqEnabled = newValue ; eqCmd( .enabled, newValue.asNumber()) } } }
+    set { if _eqEnabled != newValue { _eqEnabled = newValue ; eqCmd( .enabled, newValue.asNumber) } } }
   
   @objc dynamic public var level63Hz: Int {
     get { return _level63Hz }

@@ -276,13 +276,13 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
         desc = property.value
         
       case .fps:
-        fps = property.value.iValue()
+        fps = property.value.iValue
         
       case .high:
-        high = property.value.fValue()
+        high = property.value.fValue
         
       case .low:
-        low = property.value.fValue()
+        low = property.value.fValue
         
       case .name:
         name = property.value.lowercased()

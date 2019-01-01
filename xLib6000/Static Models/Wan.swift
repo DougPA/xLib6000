@@ -74,12 +74,12 @@ public final class Wan                      : NSObject, StaticModel {
         
       case .serverConnected:
         willChangeValue(for: \.serverConnected)
-        _serverConnected = property.value.bValue()
+        _serverConnected = property.value.bValue
         didChangeValue(for: \.serverConnected)
 
       case .radioAuthenticated:
         willChangeValue(for: \.radioAuthenticated)
-        _radioAuthenticated = property.value.bValue()
+        _radioAuthenticated = property.value.bValue
         didChangeValue(for: \.radioAuthenticated)
       }
     }

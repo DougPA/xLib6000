@@ -52,7 +52,7 @@ extension Panadapter {
     // tell the Radio to create a Panafall (if any available)
     if Api.sharedInstance.radio!.availablePanadapters > 0 {
       
-      var cmd = Panadapter.kCreateCmd + "freq" + "=\(frequency.hzToMhz())"
+      var cmd = Panadapter.kCreateCmd + "freq" + "=\(frequency.hzToMhz)"
       if antenna != nil { cmd += " ant=" + "\(antenna!)" }
       if dimensions != nil { cmd += " x" + "=\(dimensions!.width)" + " y" + "=\(dimensions!.height)" }
       Api.sharedInstance.send(cmd, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
@@ -81,7 +81,7 @@ extension Panadapter {
   public func clickTune(_ frequency: Int, callback: ReplyHandler? = nil) {
     
     // FIXME: ???
-    Api.sharedInstance.send(xLib6000.Slice.kCmd + "m " + "\(frequency.hzToMhz())" + " pan=\(id.hex)", replyTo: callback)
+    Api.sharedInstance.send(xLib6000.Slice.kCmd + "m " + "\(frequency.hzToMhz)" + " pan=\(id.hex)", replyTo: callback)
   }
 
   // ----------------------------------------------------------------------------
@@ -128,17 +128,17 @@ extension Panadapter {
   
   @objc dynamic public var bandwidth: Int {
     get { return _bandwidth }
-    set { if _bandwidth != newValue { _bandwidth = newValue ; panadapterSet( .bandwidth, newValue.hzToMhz() + " autocenter=1") } } }
+    set { if _bandwidth != newValue { _bandwidth = newValue ; panadapterSet( .bandwidth, newValue.hzToMhz + " autocenter=1") } } }
   
   @objc dynamic public var bandZoomEnabled: Bool {
     get { return _bandZoomEnabled }
-    set { if _bandZoomEnabled != newValue { _bandZoomEnabled = newValue ; panadapterSet( .bandZoomEnabled, newValue.asNumber()) } } }
+    set { if _bandZoomEnabled != newValue { _bandZoomEnabled = newValue ; panadapterSet( .bandZoomEnabled, newValue.asNumber) } } }
   
   // FIXME: Where does autoCenter come from?
   
   @objc dynamic public var center: Int {
     get { return _center }
-    set { if _center != newValue { _center = newValue ; panadapterSet( .center, newValue.hzToMhz()) } } }
+    set { if _center != newValue { _center = newValue ; panadapterSet( .center, newValue.hzToMhz) } } }
   
   @objc dynamic public var daxIqChannel: Int {
     get { return _daxIqChannel }
@@ -150,7 +150,7 @@ extension Panadapter {
   
   @objc dynamic public var loggerDisplayEnabled: Bool {
     get { return _loggerDisplayEnabled }
-    set { if _loggerDisplayEnabled != newValue { _loggerDisplayEnabled = newValue ; panadapterSet( .n1mmSpectrumEnable, newValue.asNumber()) } } }
+    set { if _loggerDisplayEnabled != newValue { _loggerDisplayEnabled = newValue ; panadapterSet( .n1mmSpectrumEnable, newValue.asNumber) } } }
   
   @objc dynamic public var loggerDisplayIpAddress: String {
     get { return _loggerDisplayIpAddress }
@@ -166,11 +166,11 @@ extension Panadapter {
   
   @objc dynamic public var loopAEnabled: Bool {
     get { return _loopAEnabled }
-    set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; panadapterSet( .loopAEnabled, newValue.asNumber()) } } }
+    set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; panadapterSet( .loopAEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var loopBEnabled: Bool {
     get { return _loopBEnabled }
-    set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; panadapterSet( .loopBEnabled, newValue.asNumber()) } } }
+    set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; panadapterSet( .loopBEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var maxDbm: CGFloat {
     get { return _maxDbm }
@@ -190,15 +190,15 @@ extension Panadapter {
   
   @objc dynamic public var segmentZoomEnabled: Bool {
     get { return _segmentZoomEnabled }
-    set { if _segmentZoomEnabled != newValue { _segmentZoomEnabled = newValue ; panadapterSet( .segmentZoomEnabled, newValue.asNumber()) } } }
+    set { if _segmentZoomEnabled != newValue { _segmentZoomEnabled = newValue ; panadapterSet( .segmentZoomEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var weightedAverageEnabled: Bool {
     get { return _weightedAverageEnabled }
-    set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; panadapterSet( .weightedAverageEnabled, newValue.asNumber()) } } }
+    set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; panadapterSet( .weightedAverageEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var wnbEnabled: Bool {
     get { return _wnbEnabled }
-    set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; panadapterSet( .wnbEnabled, newValue.asNumber()) } } }
+    set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; panadapterSet( .wnbEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var wnbLevel: Int {
     get { return _wnbLevel }

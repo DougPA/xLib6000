@@ -147,47 +147,47 @@ public final class Equalizer                : NSObject, DynamicModel {
         
       case .level63Hz:
         willChangeValue(for: \.level63Hz)
-        _level63Hz = property.value.iValue()
+        _level63Hz = property.value.iValue
         didChangeValue(for: \.level63Hz)
 
       case .level125Hz:
         willChangeValue(for: \.level125Hz)
-        _level125Hz = property.value.iValue()
+        _level125Hz = property.value.iValue
         didChangeValue(for: \.level125Hz)
 
       case .level250Hz:
         willChangeValue(for: \.level250Hz)
-        _level250Hz = property.value.iValue()
+        _level250Hz = property.value.iValue
         didChangeValue(for: \.level250Hz)
 
       case .level500Hz:
         willChangeValue(for: \.level500Hz)
-        _level500Hz = property.value.iValue()
+        _level500Hz = property.value.iValue
         didChangeValue(for: \.level500Hz)
 
       case .level1000Hz:
         willChangeValue(for: \.level1000Hz)
-        _level1000Hz = property.value.iValue()
+        _level1000Hz = property.value.iValue
         didChangeValue(for: \.level1000Hz)
 
       case .level2000Hz:
         willChangeValue(for: \.level2000Hz)
-        _level2000Hz = property.value.iValue()
+        _level2000Hz = property.value.iValue
         didChangeValue(for: \.level2000Hz)
 
       case .level4000Hz:
         willChangeValue(for: \.level4000Hz)
-        _level4000Hz = property.value.iValue()
+        _level4000Hz = property.value.iValue
         didChangeValue(for: \.level4000Hz)
 
       case .level8000Hz:
         willChangeValue(for: \.level8000Hz)
-        _level8000Hz = property.value.iValue()
+        _level8000Hz = property.value.iValue
         didChangeValue(for: \.level8000Hz)
 
       case .enabled:
         willChangeValue(for: \.eqEnabled)
-        _eqEnabled = property.value.bValue()
+        _eqEnabled = property.value.bValue
         didChangeValue(for: \.eqEnabled)
       }
     }

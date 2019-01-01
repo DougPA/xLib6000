@@ -607,7 +607,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
       case .atuPresent:
         willChangeValue(for: \.atuPresent)
-        _atuPresent = property.value.bValue()
+        _atuPresent = property.value.bValue
         didChangeValue(for: \.atuPresent)
 
       case .callsign:
@@ -662,17 +662,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
       case .numberOfScus:
         willChangeValue(for: \.numberOfScus)
-        _numberOfScus = property.value.iValue()
+        _numberOfScus = property.value.iValue
         didChangeValue(for: \.numberOfScus)
 
       case .numberOfSlices:
         willChangeValue(for: \.numberOfSlices)
-        _numberOfSlices = property.value.iValue()
+        _numberOfSlices = property.value.iValue
         didChangeValue(for: \.numberOfSlices)
 
       case .numberOfTx:
         willChangeValue(for: \.numberOfTx)
-        _numberOfTx = property.value.iValue()
+        _numberOfTx = property.value.iValue
         didChangeValue(for: \.numberOfTx)
 
       case .options:
@@ -855,22 +855,22 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           
         case .backlight:
           willChangeValue(for: \.backlight)
-          _backlight = property.value.iValue()
+          _backlight = property.value.iValue
           didChangeValue(for: \.backlight)
 
         case .bandPersistenceEnabled:
           willChangeValue(for: \.bandPersistenceEnabled)
-          _bandPersistenceEnabled = property.value.bValue()
+          _bandPersistenceEnabled = property.value.bValue
           didChangeValue(for: \.bandPersistenceEnabled)
 
         case .binauralRxEnabled:
           willChangeValue(for: \.binauralRxEnabled)
-          _binauralRxEnabled = property.value.bValue()
+          _binauralRxEnabled = property.value.bValue
           didChangeValue(for: \.binauralRxEnabled)
 
         case .calFreq:
           willChangeValue(for: \.calFreq)
-          _calFreq = property.value.mhzToHz()
+          _calFreq = property.value.mhzToHz
           didChangeValue(for: \.calFreq)
 
         case .callsign:
@@ -880,47 +880,47 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
         case .enforcePrivateIpEnabled:
           willChangeValue(for: \.enforcePrivateIpEnabled)
-          _enforcePrivateIpEnabled = property.value.bValue()
+          _enforcePrivateIpEnabled = property.value.bValue
           didChangeValue(for: \.enforcePrivateIpEnabled)
 
         case .freqErrorPpb:
           willChangeValue(for: \.freqErrorPpb)
-          _freqErrorPpb = property.value.iValue()
+          _freqErrorPpb = property.value.iValue
           didChangeValue(for: \.freqErrorPpb)
 
         case .fullDuplexEnabled:
           willChangeValue(for: \.fullDuplexEnabled)
-          _fullDuplexEnabled = property.value.bValue()
+          _fullDuplexEnabled = property.value.bValue
           didChangeValue(for: \.fullDuplexEnabled)
 
         case .frontSpeakerMute:
           willChangeValue(for: \.frontSpeakerMute)
-          _frontSpeakerMute = property.value.bValue()
+          _frontSpeakerMute = property.value.bValue
           didChangeValue(for: \.frontSpeakerMute)
 
         case .headphoneGain:
           willChangeValue(for: \.headphoneGain)
-          _headphoneGain = property.value.iValue()
+          _headphoneGain = property.value.iValue
           didChangeValue(for: \.headphoneGain)
 
         case .headphoneMute:
           willChangeValue(for: \.headphoneMute)
-          _headphoneMute = property.value.bValue()
+          _headphoneMute = property.value.bValue
           didChangeValue(for: \.headphoneMute)
 
         case .lineoutGain:
           willChangeValue(for: \.lineoutGain)
-          _lineoutGain = property.value.iValue()
+          _lineoutGain = property.value.iValue
           didChangeValue(for: \.lineoutGain)
 
         case .lineoutMute:
           willChangeValue(for: \.lineoutMute)
-          _lineoutMute = property.value.bValue()
+          _lineoutMute = property.value.bValue
           didChangeValue(for: \.lineoutMute)
           
         case .muteLocalAudio:
           willChangeValue(for: \.muteLocalAudio)
-          _muteLocalAudio = property.value.bValue()
+          _muteLocalAudio = property.value.bValue
           didChangeValue(for: \.muteLocalAudio)
 
         case .nickname:
@@ -930,37 +930,37 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
         case .panadapters:
           willChangeValue(for: \.availablePanadapters)
-          _availablePanadapters = property.value.iValue()
+          _availablePanadapters = property.value.iValue
           didChangeValue(for: \.availablePanadapters)
 
         case .pllDone:
           willChangeValue(for: \.startCalibration)
-          _startCalibration = !(property.value.bValue())
+          _startCalibration = !(property.value.bValue)
           didChangeValue(for: \.startCalibration)
 
         case .remoteOnEnabled:
           willChangeValue(for: \.remoteOnEnabled)
-          _remoteOnEnabled = property.value.bValue()
+          _remoteOnEnabled = property.value.bValue
           didChangeValue(for: \.remoteOnEnabled)
 
         case .rttyMark:
           willChangeValue(for: \.rttyMark)
-          _rttyMark = property.value.iValue()
+          _rttyMark = property.value.iValue
           didChangeValue(for: \.rttyMark)
 
         case .slices:
           willChangeValue(for: \.availableSlices)
-          _availableSlices = property.value.iValue()
+          _availableSlices = property.value.iValue
           didChangeValue(for: \.availableSlices)
 
         case .snapTuneEnabled:
           willChangeValue(for: \.snapTuneEnabled)
-          _snapTuneEnabled = property.value.bValue()
+          _snapTuneEnabled = property.value.bValue
           didChangeValue(for: \.snapTuneEnabled)
 
         case .tnfsEnabled:
           willChangeValue(for: \.tnfsEnabled)
-          _tnfsEnabled = property.value.bValue()
+          _tnfsEnabled = property.value.bValue
           didChangeValue(for: \.tnfsEnabled)
         }
       }
@@ -1001,19 +1001,19 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       case .autoLevel:
         if cw {
           willChangeValue(for: \.filterCwAutoEnabled)
-          _filterCwAutoEnabled = property.value.bValue()
+          _filterCwAutoEnabled = property.value.bValue
           didChangeValue(for: \.filterCwAutoEnabled)
           cw = false
         }
         if digital {
           willChangeValue(for: \.filterDigitalAutoEnabled)
-          _filterDigitalAutoEnabled = property.value.bValue()
+          _filterDigitalAutoEnabled = property.value.bValue
           didChangeValue(for: \.filterDigitalAutoEnabled)
           digital = false
         }
         if voice {
           willChangeValue(for: \.filterVoiceAutoEnabled)
-          _filterVoiceAutoEnabled = property.value.bValue()
+          _filterVoiceAutoEnabled = property.value.bValue
           didChangeValue(for: \.filterVoiceAutoEnabled)
           voice = false
         }
@@ -1027,17 +1027,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       case .level:
         if cw {
           willChangeValue(for: \.filterCwLevel)
-          _filterCwLevel = property.value.iValue()
+          _filterCwLevel = property.value.iValue
           didChangeValue(for: \.filterCwLevel)
         }
         if digital {
           willChangeValue(for: \.filterDigitalLevel)
-          _filterDigitalLevel = property.value.iValue()
+          _filterDigitalLevel = property.value.iValue
           didChangeValue(for: \.filterDigitalLevel)
         }
         if voice {
           willChangeValue(for: \.filterVoiceLevel)
-          _filterVoiceLevel = property.value.iValue()
+          _filterVoiceLevel = property.value.iValue
           didChangeValue(for: \.filterVoiceLevel)
         }
         
@@ -1106,17 +1106,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           
         case .extPresent:
           willChangeValue(for: \.extPresent)
-          _extPresent = property.value.bValue()
+          _extPresent = property.value.bValue
           didChangeValue(for: \.extPresent)
 
         case .gpsdoPresent:
           willChangeValue(for: \.gpsdoPresent)
-          _gpsdoPresent = property.value.bValue()
+          _gpsdoPresent = property.value.bValue
           didChangeValue(for: \.gpsdoPresent)
 
        case .locked:
           willChangeValue(for: \.locked)
-          _locked = property.value.bValue()
+          _locked = property.value.bValue
           didChangeValue(for: \.locked)
 
         case .setting:
@@ -1131,7 +1131,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
         case .tcxoPresent:
           willChangeValue(for: \.tcxoPresent)
-          _tcxoPresent = property.value.bValue()
+          _tcxoPresent = property.value.bValue
           didChangeValue(for: \.tcxoPresent)
         }
       }

@@ -165,22 +165,22 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
         
       case .available:
         willChangeValue(for: \.available)
-        _available = property.value.iValue()
+        _available = property.value.iValue
         didChangeValue(for: \.available)
 
       case .capacity:
         willChangeValue(for: \.capacity)
-        _capacity = property.value.iValue()
+        _capacity = property.value.iValue
         didChangeValue(for: \.capacity)
 
       case .daxIqChannel:
         willChangeValue(for: \.daxIqChannel)
-        _daxIqChannel = property.value.iValue()
+        _daxIqChannel = property.value.iValue
         didChangeValue(for: \.daxIqChannel)
 
       case .inUse:
         willChangeValue(for: \.inUse)
-        _inUse = property.value.bValue()
+        _inUse = property.value.bValue
         didChangeValue(for: \.inUse)
 
       case .ip:
@@ -195,17 +195,17 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
 
       case .port:
         willChangeValue(for: \.port)
-        _port = property.value.iValue()
+        _port = property.value.iValue
         didChangeValue(for: \.port)
 
       case .rate:
         willChangeValue(for: \.rate)
-        _rate = property.value.iValue()
+        _rate = property.value.iValue
         didChangeValue(for: \.rate)
 
       case .streaming:
         willChangeValue(for: \.streaming)
-        _streaming = property.value.bValue()
+        _streaming = property.value.bValue
         didChangeValue(for: \.streaming)
       }
     }

@@ -44,7 +44,7 @@ extension xLib6000.Slice {
   public class func create(frequency: Int, antenna: String, mode: String, callback: ReplyHandler? = nil) {
     if Api.sharedInstance.radio!.availableSlices > 0 {
       // tell the Radio to create a Slice
-      Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "\(frequency.hzToMhz()) \(antenna) \(mode)", replyTo: callback)
+      Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "\(frequency.hzToMhz) \(antenna) \(mode)", replyTo: callback)
     }
   }
   /// Create a new Slice
@@ -57,7 +57,7 @@ extension xLib6000.Slice {
   public class func create(panadapter: Panadapter, frequency: Int = 0, callback: ReplyHandler? = nil) {
     if Api.sharedInstance.radio!.availableSlices > 0 {
       // tell the Radio to create a Slice
-      Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "pan" + "=\(panadapter.id.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz())")", replyTo: callback)
+      Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "pan" + "=\(panadapter.id.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz)")", replyTo: callback)
     }
   }
   
@@ -105,7 +105,7 @@ extension xLib6000.Slice {
   ///
   private func sliceTuneCmd(_ value: Any) {
     
-    Api.sharedInstance.send(xLib6000.Slice.kTuneCmd + "0x\(id) \(value) autopan=\(_autoPan.asNumber())")
+    Api.sharedInstance.send(xLib6000.Slice.kTuneCmd + "0x\(id) \(value) autopan=\(_autoPan.asNumber)")
   }
   /// Set a Slice Lock property on the Radio
   ///
@@ -150,9 +150,9 @@ extension xLib6000.Slice {
   // ----------------------------------------------------------------------------
   // MARK: - Public methods that send Commands to the Radio (hardware)
   
-  public func setRecord(_ value: Bool) { Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) record=\(value.asNumber())") }
+  public func setRecord(_ value: Bool) { Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) record=\(value.asNumber)") }
   
-  public func setPlay(_ value: Bool) { Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) play=\(value.asNumber())") }
+  public func setPlay(_ value: Bool) { Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) play=\(value.asNumber)") }
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
@@ -165,7 +165,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var audioMute: Bool {
     get { return _audioMute }
-    set { if _audioMute != newValue { _audioMute = newValue ; audioCmd("mute", value: newValue.asNumber()) } } }
+    set { if _audioMute != newValue { _audioMute = newValue ; audioCmd("mute", value: newValue.asNumber) } } }
   
   @objc dynamic public var audioPan: Int {
     get { return _audioPan }
@@ -192,7 +192,7 @@ extension xLib6000.Slice {
   // listed in alphabetical order
   @objc dynamic public var active: Bool {
     get { return _active }
-    set { if _active != newValue { _active = newValue ; sliceCmd( .active, newValue.asNumber()) } } }
+    set { if _active != newValue { _active = newValue ; sliceCmd( .active, newValue.asNumber) } } }
   
   @objc dynamic public var agcMode: String {
     get { return _agcMode }
@@ -208,7 +208,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var anfEnabled: Bool {
     get { return _anfEnabled }
-    set { if _anfEnabled != newValue { _anfEnabled = newValue ; sliceCmd( .anfEnabled, newValue.asNumber()) } } }
+    set { if _anfEnabled != newValue { _anfEnabled = newValue ; sliceCmd( .anfEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var anfLevel: Int {
     get { return _anfLevel }
@@ -216,7 +216,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var apfEnabled: Bool {
     get { return _apfEnabled }
-    set { if _apfEnabled != newValue { _apfEnabled = newValue ; sliceCmd( .apfEnabled, newValue.asNumber()) } } }
+    set { if _apfEnabled != newValue { _apfEnabled = newValue ; sliceCmd( .apfEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var apfLevel: Int {
     get { return _apfLevel }
@@ -228,7 +228,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var dfmPreDeEmphasisEnabled: Bool {
     get { return _dfmPreDeEmphasisEnabled }
-    set { if _dfmPreDeEmphasisEnabled != newValue { _dfmPreDeEmphasisEnabled = newValue ; sliceCmd(.dfmPreDeEmphasisEnabled, newValue.asNumber()) } } }
+    set { if _dfmPreDeEmphasisEnabled != newValue { _dfmPreDeEmphasisEnabled = newValue ; sliceCmd(.dfmPreDeEmphasisEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var digitalLowerOffset: Int {
     get { return _digitalLowerOffset }
@@ -240,7 +240,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var diversityEnabled: Bool {
     get { return _diversityEnabled }
-    set { if _diversityEnabled != newValue { _diversityEnabled = newValue ; sliceCmd(.diversityEnabled, newValue.asNumber()) } } } 
+    set { if _diversityEnabled != newValue { _diversityEnabled = newValue ; sliceCmd(.diversityEnabled, newValue.asNumber) } } } 
   
   @objc dynamic public var fmDeviation: Int {
     get { return _fmDeviation }
@@ -252,7 +252,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var fmToneBurstEnabled: Bool {
     get { return _fmToneBurstEnabled }
-    set { if _fmToneBurstEnabled != newValue { _fmToneBurstEnabled = newValue ; sliceCmd( .fmToneBurstEnabled, newValue.asNumber()) } } }
+    set { if _fmToneBurstEnabled != newValue { _fmToneBurstEnabled = newValue ; sliceCmd( .fmToneBurstEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var fmToneFreq: Float {
     get { return _fmToneFreq }
@@ -264,11 +264,11 @@ extension xLib6000.Slice {
   
   @objc dynamic public var loopAEnabled: Bool {
     get { return _loopAEnabled }
-    set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; sliceCmd( .loopAEnabled, newValue.asNumber()) } } }
+    set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; sliceCmd( .loopAEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var loopBEnabled: Bool {
     get { return _loopBEnabled }
-    set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; sliceCmd( .loopBEnabled, newValue.asNumber()) } } }
+    set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; sliceCmd( .loopBEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var mode: String {
     get { return _mode }
@@ -276,7 +276,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var nbEnabled: Bool {
     get { return _nbEnabled }
-    set { if _nbEnabled != newValue { _nbEnabled = newValue ; sliceCmd( .nbEnabled, newValue.asNumber()) } } }
+    set { if _nbEnabled != newValue { _nbEnabled = newValue ; sliceCmd( .nbEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var nbLevel: Int {
     get { return _nbLevel }
@@ -284,7 +284,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var nrEnabled: Bool {
     get { return _nrEnabled }
-    set { if _nrEnabled != newValue { _nrEnabled = newValue ; sliceCmd( .nrEnabled, newValue.asNumber()) } } }
+    set { if _nrEnabled != newValue { _nrEnabled = newValue ; sliceCmd( .nrEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var nrLevel: Int {
     get { return _nrLevel }
@@ -292,11 +292,11 @@ extension xLib6000.Slice {
   
   @objc dynamic public var playbackEnabled: Bool {
     get { return _playbackEnabled }
-    set { if _playbackEnabled != newValue { _playbackEnabled = newValue ; sliceCmd( .playbackEnabled, newValue.asNumber()) } } }
+    set { if _playbackEnabled != newValue { _playbackEnabled = newValue ; sliceCmd( .playbackEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var recordEnabled: Bool {
     get { return _recordEnabled }
-    set { if recordEnabled != newValue { _recordEnabled = newValue ; sliceCmd( .recordEnabled, newValue.asNumber()) } } }
+    set { if recordEnabled != newValue { _recordEnabled = newValue ; sliceCmd( .recordEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var repeaterOffsetDirection: String {
     get { return _repeaterOffsetDirection }
@@ -308,7 +308,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var ritEnabled: Bool {
     get { return _ritEnabled }
-    set { if _ritEnabled != newValue { _ritEnabled = newValue ; sliceCmd( .ritEnabled, newValue.asNumber()) } } }
+    set { if _ritEnabled != newValue { _ritEnabled = newValue ; sliceCmd( .ritEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var ritOffset: Int {
     get { return _ritOffset }
@@ -336,7 +336,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var squelchEnabled: Bool {
     get { return _squelchEnabled }
-    set { if _squelchEnabled != newValue { _squelchEnabled = newValue ; sliceCmd( .squelchEnabled, newValue.asNumber()) } } }
+    set { if _squelchEnabled != newValue { _squelchEnabled = newValue ; sliceCmd( .squelchEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var squelchLevel: Int {
     get { return _squelchLevel }
@@ -348,7 +348,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var txEnabled: Bool {
     get { return _txEnabled }
-    set { if _txEnabled != newValue { _txEnabled = newValue ; sliceCmd( .txEnabled, newValue.asNumber()) } } }
+    set { if _txEnabled != newValue { _txEnabled = newValue ; sliceCmd( .txEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var txOffsetFreq: Float {
     get { return _txOffsetFreq }
@@ -356,7 +356,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var wnbEnabled: Bool {
     get { return _wnbEnabled }
-    set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; sliceCmd( .wnbEnabled, newValue.asNumber()) } } }
+    set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; sliceCmd( .wnbEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var wnbLevel: Int {
     get { return _wnbLevel }
@@ -364,7 +364,7 @@ extension xLib6000.Slice {
   
   @objc dynamic public var xitEnabled: Bool {
     get { return _xitEnabled }
-    set { if _xitEnabled != newValue { _xitEnabled = newValue ; sliceCmd( .xitEnabled, newValue.asNumber()) } } }
+    set { if _xitEnabled != newValue { _xitEnabled = newValue ; sliceCmd( .xitEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var xitOffset: Int {
     get { return _xitOffset }
@@ -374,5 +374,5 @@ extension xLib6000.Slice {
   
   @objc dynamic public var frequency: Int {
     get { return _frequency }
-    set { if !_locked { if _frequency != newValue { _frequency = newValue ; sliceTuneCmd( newValue.hzToMhz()) } } } }
+    set { if !_locked { if _frequency != newValue { _frequency = newValue ; sliceTuneCmd( newValue.hzToMhz) } } } }
 }

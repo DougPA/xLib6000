@@ -212,12 +212,12 @@ public final class TxAudioStream            : NSObject, DynamicModel {
         
       case .daxTx:
         willChangeValue(for: \.transmit)
-        _transmit = property.value.bValue()
+        _transmit = property.value.bValue
         didChangeValue(for: \.transmit)
 
       case .inUse:
         willChangeValue(for: \.inUse)
-        _inUse = property.value.bValue()
+        _inUse = property.value.bValue
         didChangeValue(for: \.inUse)
 
       case .ip:
@@ -227,7 +227,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
 
       case .port:
         willChangeValue(for: \.port)
-        _port = property.value.iValue()
+        _port = property.value.iValue
         didChangeValue(for: \.port)
       }
     }

@@ -96,22 +96,22 @@ public final class Interlock                : NSObject, StaticModel {
         
       case .accTxEnabled:
         willChangeValue(for: \.accTxEnabled)
-        _accTxEnabled = property.value.bValue()
+        _accTxEnabled = property.value.bValue
         didChangeValue(for: \.accTxEnabled)
 
       case .accTxDelay:
         willChangeValue(for: \.accTxDelay)
-        _accTxDelay = property.value.iValue()
+        _accTxDelay = property.value.iValue
         didChangeValue(for: \.accTxDelay)
 
       case .accTxReqEnabled:
           willChangeValue(for: \.accTxReqEnabled)
-         _accTxReqEnabled = property.value.bValue()
+         _accTxReqEnabled = property.value.bValue
          didChangeValue(for: \.accTxReqEnabled)
 
       case .accTxReqPolarity:
        willChangeValue(for: \.accTxReqPolarity)
-       _accTxReqPolarity = property.value.bValue()
+       _accTxReqPolarity = property.value.bValue
        didChangeValue(for: \.accTxReqPolarity)
 
       case .amplifier:
@@ -121,12 +121,12 @@ public final class Interlock                : NSObject, StaticModel {
 
       case .rcaTxReqEnabled:
         willChangeValue(for: \.rcaTxReqEnabled)
-        _rcaTxReqEnabled = property.value.bValue()
+        _rcaTxReqEnabled = property.value.bValue
         didChangeValue(for: \.rcaTxReqEnabled)
 
       case .rcaTxReqPolarity:
          willChangeValue(for: \.rcaTxReqPolarity)
-         _rcaTxReqPolarity = property.value.bValue()
+         _rcaTxReqPolarity = property.value.bValue
          didChangeValue(for: \.rcaTxReqPolarity)
 
       case .reason:
@@ -149,47 +149,47 @@ public final class Interlock                : NSObject, StaticModel {
 
       case .timeout:
         willChangeValue(for: \.timeout)
-        _timeout = property.value.iValue()
+        _timeout = property.value.iValue
         didChangeValue(for: \.timeout)
 
       case .txAllowed:
         willChangeValue(for: \.txAllowed)
-        _txAllowed = property.value.bValue()
+        _txAllowed = property.value.bValue
         didChangeValue(for: \.txAllowed)
 
       case .txDelay:
         willChangeValue(for: \.txDelay)
-        _txDelay = property.value.iValue()
+        _txDelay = property.value.iValue
         didChangeValue(for: \.txDelay)
 
       case .tx1Delay:
         willChangeValue(for: \.tx1Delay)
-        _tx1Delay = property.value.iValue()
+        _tx1Delay = property.value.iValue
         didChangeValue(for: \.tx1Delay)
 
       case .tx1Enabled:
         willChangeValue(for: \.tx1Enabled)
-        _tx1Enabled = property.value.bValue()
+        _tx1Enabled = property.value.bValue
         didChangeValue(for: \.tx1Enabled)
 
       case .tx2Delay:
         willChangeValue(for: \.tx2Delay)
-        _tx2Delay = property.value.iValue()
+        _tx2Delay = property.value.iValue
         didChangeValue(for: \.tx2Delay)
 
       case .tx2Enabled:
         willChangeValue(for: \.tx2Enabled)
-        _tx2Enabled = property.value.bValue()
+        _tx2Enabled = property.value.bValue
         didChangeValue(for: \.tx2Enabled)
 
       case .tx3Delay:
         willChangeValue(for: \.tx3Delay)
-        _tx3Delay = property.value.iValue()
+        _tx3Delay = property.value.iValue
         didChangeValue(for: \.tx3Delay)
 
       case .tx3Enabled:
         willChangeValue(for: \.tx3Enabled)
-        _tx3Enabled = property.value.bValue()
+        _tx3Enabled = property.value.bValue
         didChangeValue(for: \.tx3Enabled)
       }
     }

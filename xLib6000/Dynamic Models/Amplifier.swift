@@ -151,7 +151,7 @@ public final class Amplifier                : NSObject, DynamicModel {
 
       case .port:
         willChangeValue(for: \.port)
-        _port = property.value.iValue()
+        _port = property.value.iValue
         didChangeValue(for: \.port)
 
       case .serialNumber:

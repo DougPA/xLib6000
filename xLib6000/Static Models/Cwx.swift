@@ -193,7 +193,7 @@ public final class Cwx                      : NSObject, StaticModel {
           
         case .breakInDelay:
           willChangeValue(for: \.breakInDelay)
-          _breakInDelay = property.value.iValue()
+          _breakInDelay = property.value.iValue
           didChangeValue(for: \.breakInDelay)
 
         case .erase:
@@ -208,16 +208,16 @@ public final class Cwx                      : NSObject, StaticModel {
           
         case .qskEnabled:
           willChangeValue(for: \.qskEnabled)
-          _qskEnabled = property.value.bValue()
+          _qskEnabled = property.value.bValue
           didChangeValue(for: \.qskEnabled)
 
         case .sent:
           // inform the Event Handler (if any)
-          charSentEventHandler?(property.value.iValue())
+          charSentEventHandler?(property.value.iValue)
           
         case .wpm:
           willChangeValue(for: \.wpm)
-          _wpm = property.value.iValue()
+          _wpm = property.value.iValue
           didChangeValue(for: \.wpm)
         }
       }

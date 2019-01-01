@@ -177,6 +177,8 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       
       _udpBound = true
       
+      os_log("UDP: Receive port = %{public}d, Send port = %{public}d", log: _log, type: .info, _udpRcvPort, _udpSendPort)
+
       // if a Wan connection, register
       if isWan { register(clientHandle: clientHandle) }
     }
@@ -193,7 +195,6 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
     } catch let error {
       // read error
       os_log("beginReceiving error - %{public}@", log: _log, type: .error, error.localizedDescription)
-      
     }
   }
   /// Unbind from the UDP port
@@ -221,26 +222,18 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       
       return
     }
-//    Swift.print("Register entered: udpRegisterQ = \(_udpRegisterQ)")
-    
     // register & keep open the router (on a background queue)
     _udpRegisterQ.async { [unowned self] in
       
-//      Swift.print("Register Q entered, udpSocket = \(self._udpSocket.debugDescription), udpBound = \(self._udpBound)")
-      
-      // until successful Registration
       while self._udpSocket != nil && !self._udpSuccessfulRegistration && self._udpBound {
         
         // send a Registration command
         let cmd = self.kRegisterCmd + "=0x" + clientHandle
         self.sendData(cmd.data(using: String.Encoding.ascii, allowLossyConversion: false)!)
 
-//        Swift.print("Register command sent: \(cmd)")
-        
         // pause
         usleep(self.kRegistrationDelay)
       }
-
       os_log("SmartLink - register UDP successful", log: self._log, type: .info)
 
 //      // as long as connected after Registration
@@ -258,7 +251,6 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
 //      }
 //
 //      os_log("SmartLink - pinging stopped", log: self._log, type: .info)
-      
     }
   }
 

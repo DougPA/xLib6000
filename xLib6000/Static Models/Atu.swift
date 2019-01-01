@@ -77,12 +77,12 @@ public final class Atu                      : NSObject, StaticModel {
         
       case .enabled:
         willChangeValue(for: \.enabled)
-        _enabled = property.value.bValue()
+        _enabled = property.value.bValue
         didChangeValue(for: \.enabled)
 
       case .memoriesEnabled:
         willChangeValue(for: \.memoriesEnabled)
-        _memoriesEnabled = property.value.bValue()
+        _memoriesEnabled = property.value.bValue
         didChangeValue(for: \.memoriesEnabled)
 
       case .status:
@@ -92,7 +92,7 @@ public final class Atu                      : NSObject, StaticModel {
 
       case .usingMemories:
         willChangeValue(for: \.usingMemories)
-        _usingMemories = property.value.bValue()
+        _usingMemories = property.value.bValue
         didChangeValue(for: \.usingMemories)
       }
     }

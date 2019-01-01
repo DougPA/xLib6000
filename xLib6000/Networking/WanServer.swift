@@ -17,13 +17,6 @@ public struct WanUserSettings {
   public var callsign   : String
   public var firstName  : String
   public var lastName   : String
-
-//  init(callsign: String, firstName: String, lastName: String) {
-//
-//    self.callsign       = callsign
-//    self.firstName      = firstName
-//    self.lastName       = lastName
-//  }
 }
 
 public struct WanTestConnectionResults {
@@ -37,11 +30,13 @@ public struct WanTestConnectionResults {
 
   public func string() -> String {
     return
-      "UPNP TCP Working:\t\t\(upnpTcpPortWorking.description)\n" +
-      "UPNP UDP Working:\t\t\(upnpUdpPortWorking.description)\n" +
-      "Forwarded TCP Working:\t\(forwardTcpPortWorking.description)\n" +
-      "Forwarded UDP Working:\t\(forwardUdpPortWorking.description)\n" +
-      "NAT Preserves Ports:\t\t\(natSupportsHolePunch.description)"
+      "UPnP Ports:\n" +
+      "\tTCP:\t\t\(upnpTcpPortWorking.asPassFail)\n" +
+      "\tUDP:\t\(upnpUdpPortWorking.asPassFail)\n" +
+      "Forwarded Ports:\n" +
+      "\tTCP:\t\t\(forwardTcpPortWorking.asPassFail)\n" +
+      "\tUDP:\t\(forwardUdpPortWorking.asPassFail)\n" +
+      "Hole Punch Supported:\t\(natSupportsHolePunch.asYesNo)"
   }
 }
 
@@ -522,15 +517,15 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
         case .publicIp:
           radio.publicIp = property.value
         case .publicTlsPort:
-          publicTlsPort = property.value.iValue()
+          publicTlsPort = property.value.iValue
         case .publicUdpPort:
-          publicUdpPort = property.value.iValue()
+          publicUdpPort = property.value.iValue
         case .publicUpnpTlsPort:
-          publicUpnpTlsPort = property.value.iValue()
+          publicUpnpTlsPort = property.value.iValue
         case .publicUpnpUdpPort:
-          publicUpnpUdpPort = property.value.iValue()
+          publicUpnpUdpPort = property.value.iValue
         case .requiresAdditionalLicense:
-          radio.requiresAdditionalLicense = property.value.bValue()
+          radio.requiresAdditionalLicense = property.value.bValue
         case .radioLicenseId:
           radio.radioLicenseId = property.value
         case .serialNumber:
@@ -538,12 +533,11 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
         case .status:
           radio.status = property.value
         case .upnpSupported:
-          radio.upnpSupported = property.value.bValue()
+          radio.upnpSupported = property.value.bValue
         case .firmwareVersion:
           radio.firmwareVersion = property.value
         }
       }
-      
       // now continue to fill the radio parameters
       // favor using the manually defined forwarded ports if they are defined
       if (publicTlsPort != -1 && publicUdpPort != -1) {
@@ -598,17 +592,17 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       // Known tokens, in alphabetical order
       switch token {
       case .forwardTcpPortWorking:
-        results.forwardTcpPortWorking = property.value.tValue()
+        results.forwardTcpPortWorking = property.value.tValue
       case .forwardUdpPortWorking:
-        results.forwardUdpPortWorking = property.value.tValue()
+        results.forwardUdpPortWorking = property.value.tValue
       case .natSupportsHolePunch:
-        results.natSupportsHolePunch = property.value.tValue()
+        results.natSupportsHolePunch = property.value.tValue
       case .radioSerial:
         results.radioSerial = property.value
       case .upnpTcpPortWorking:
-        results.upnpTcpPortWorking = property.value.tValue()
+        results.upnpTcpPortWorking = property.value.tValue
       case .upnpUdpPortWorking:
-        results.upnpUdpPortWorking = property.value.tValue()
+        results.upnpUdpPortWorking = property.value.tValue
       }
     }
     // call delegate

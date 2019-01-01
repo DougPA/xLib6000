@@ -33,7 +33,7 @@ extension Opus {
 //  public func create(callback: ReplyHandler? = nil) {
 //
 //    // tell the Radio to enable Opus Rx
-//    Api.sharedInstance.send(Opus.kCmd + Opus.Token.remoteRxOn.rawValue + " \(value.asNumber())", replyTo: callback)
+//    Api.sharedInstance.send(Opus.kCmd + Opus.Token.remoteRxOn.rawValue + " \(value.asNumber)", replyTo: callback)
 //  }
   /// Remove this Opus Stream
   ///
@@ -66,9 +66,9 @@ extension Opus {
   // listed in alphabetical order
   @objc dynamic public var rxEnabled: Bool {
     get { return _rxEnabled }
-    set { if _rxEnabled != newValue { _rxEnabled = newValue ; opusCmd( .rxEnabled, newValue.asNumber()) } } }
+    set { if _rxEnabled != newValue { _rxEnabled = newValue ; opusCmd( .rxEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var txEnabled: Bool {
     get { return _txEnabled }
-    set { if _txEnabled != newValue { _txEnabled = newValue ; opusCmd( .txEnabled, newValue.asNumber()) } } }
+    set { if _txEnabled != newValue { _txEnabled = newValue ; opusCmd( .txEnabled, newValue.asNumber) } } }
 }

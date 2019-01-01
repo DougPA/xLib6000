@@ -69,6 +69,7 @@
 		913EF09820669DA700AF99BE /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 913EF05820669DA700AF99BE /* GCDAsyncUdpSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		913EF09920669DA700AF99BE /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 913EF05920669DA700AF99BE /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		913F7F8C2066F05B00F35E9B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 913F7F8B2066F05B00F35E9B /* README.md */; };
+		9148CEAD21D94AC400306FC0 /* WanServerCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */; };
 		9185B087207FD11E004D4C40 /* xLib6000 Overview.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */; };
 		91A0ABF2209769B3008FDB3D /* Commands.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 91A0ABF1209769B2008FDB3D /* Commands.rtf */; };
 		91A2D8D7206944A000676728 /* ChangeLog.txt in Resources */ = {isa = PBXBuildFile; fileRef = 91A2D8D6206944A000676728 /* ChangeLog.txt */; };
@@ -140,6 +141,7 @@
 		913EF05820669DA700AF99BE /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
 		913EF05920669DA700AF99BE /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 		913F7F8B2066F05B00F35E9B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WanServerCommands.swift; sourceTree = "<group>"; };
 		9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "xLib6000 Overview.pdf"; sourceTree = "<group>"; };
 		91A0ABF1209769B2008FDB3D /* Commands.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Commands.rtf; sourceTree = "<group>"; };
 		91A2D8D6206944A000676728 /* ChangeLog.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ChangeLog.txt; sourceTree = "<group>"; };
@@ -261,6 +263,7 @@
 				913EF03B20669DA700AF99BE /* TransmitCommands.swift */,
 				913EF03A20669DA700AF99BE /* TxAudioStreamCommands.swift */,
 				913EF03120669DA700AF99BE /* UsbCableCommands.swift */,
+				9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */,
 				913EF03420669DA700AF99BE /* WaterfallCommands.swift */,
 				913EF04220669DA700AF99BE /* XvtrCommands.swift */,
 			);
@@ -415,6 +418,7 @@
 				913EF05C20669DA700AF99BE /* Tnf.swift in Sources */,
 				913EF07C20669DA700AF99BE /* AudioStreamCommands.swift in Sources */,
 				913EF08020669DA700AF99BE /* TransmitCommands.swift in Sources */,
+				9148CEAD21D94AC400306FC0 /* WanServerCommands.swift in Sources */,
 				913EF08520669DA700AF99BE /* MicAudioStreamCommands.swift in Sources */,
 				913EF08420669DA700AF99BE /* EqualizerCommands.swift in Sources */,
 				913EF05E20669DA700AF99BE /* IqStream.swift in Sources */,

@@ -221,9 +221,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     }
     // parse out the values
     let rfGainInfo = reply.valuesArray( delimiter: "," )
-    _rfGainLow = rfGainInfo[0].iValue()
-    _rfGainHigh = rfGainInfo[1].iValue()
-    _rfGainStep = rfGainInfo[2].iValue()
+    _rfGainLow = rfGainInfo[0].iValue
+    _rfGainHigh = rfGainInfo[1].iValue
+    _rfGainStep = rfGainInfo[2].iValue
   }
   
   // ------------------------------------------------------------------------------
@@ -256,7 +256,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
 
       case .average:
         willChangeValue(for: \.average)
-        _average = property.value.iValue()
+        _average = property.value.iValue
         didChangeValue(for: \.average)
 
       case .band:
@@ -266,57 +266,57 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
 
       case .bandwidth:
         willChangeValue(for: \.bandwidth)
-        _bandwidth = property.value.mhzToHz()
+        _bandwidth = property.value.mhzToHz
         didChangeValue(for: \.bandwidth)
 
       case .bandZoomEnabled:
         willChangeValue(for: \.bandZoomEnabled)
-        _bandZoomEnabled = property.value.bValue()
+        _bandZoomEnabled = property.value.bValue
         didChangeValue(for: \.bandZoomEnabled)
 
       case .center:
         willChangeValue(for: \.center)
-        _center = property.value.mhzToHz()
+        _center = property.value.mhzToHz
         didChangeValue(for: \.center)
 
       case .daxIqChannel:
         willChangeValue(for: \.daxIqChannel)
-        _daxIqChannel = property.value.iValue()
+        _daxIqChannel = property.value.iValue
         didChangeValue(for: \.daxIqChannel)
 
       case .fps:
         willChangeValue(for: \.fps)
-        _fps = property.value.iValue()
+        _fps = property.value.iValue
         didChangeValue(for: \.fps)
 
       case .loopAEnabled:
         willChangeValue(for: \.loopAEnabled)
-        _loopAEnabled = property.value.bValue()
+        _loopAEnabled = property.value.bValue
         didChangeValue(for: \.loopAEnabled)
 
       case .loopBEnabled:
         willChangeValue(for: \.loopBEnabled)
-        _loopBEnabled = property.value.bValue()
+        _loopBEnabled = property.value.bValue
         didChangeValue(for: \.loopBEnabled)
 
       case .maxBw:
         willChangeValue(for: \.maxBw)
-        _maxBw = property.value.mhzToHz()
+        _maxBw = property.value.mhzToHz
         didChangeValue(for: \.maxBw)
 
       case .maxDbm:
         willChangeValue(for: \.maxDbm)
-        _maxDbm = CGFloat(property.value.fValue())
+        _maxDbm = CGFloat(property.value.fValue)
         didChangeValue(for: \.maxDbm)
 
       case .minBw:
         willChangeValue(for: \.minBw)
-        _minBw = property.value.mhzToHz()
+        _minBw = property.value.mhzToHz
         didChangeValue(for: \.minBw)
 
       case .minDbm:
         willChangeValue(for: \.minDbm)
-        _minDbm = CGFloat(property.value.fValue())
+        _minDbm = CGFloat(property.value.fValue)
         didChangeValue(for: \.minDbm)
 
       case .preamp:
@@ -326,7 +326,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
 
       case .rfGain:
         willChangeValue(for: \.rfGain)
-        _rfGain = property.value.iValue()
+        _rfGain = property.value.iValue
         didChangeValue(for: \.rfGain)
 
       case .rxAnt:
@@ -336,7 +336,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
 
       case .segmentZoomEnabled:
         willChangeValue(for: \.segmentZoomEnabled)
-        _segmentZoomEnabled = property.value.bValue()
+        _segmentZoomEnabled = property.value.bValue
         didChangeValue(for: \.segmentZoomEnabled)
 
       case .waterfallId:
@@ -346,32 +346,32 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
 
       case .wide:
         willChangeValue(for: \.wide)
-        _wide = property.value.bValue()
+        _wide = property.value.bValue
         didChangeValue(for: \.wide)
 
       case .weightedAverageEnabled:
         willChangeValue(for: \.weightedAverageEnabled)
-        _weightedAverageEnabled = property.value.bValue()
+        _weightedAverageEnabled = property.value.bValue
         didChangeValue(for: \.weightedAverageEnabled)
 
       case .wnbEnabled:
         willChangeValue(for: \.wnbEnabled)
-        _wnbEnabled = property.value.bValue()
+        _wnbEnabled = property.value.bValue
         didChangeValue(for: \.wnbEnabled)
 
       case .wnbLevel:
         willChangeValue(for: \.wnbLevel)
-        _wnbLevel = property.value.iValue()
+        _wnbLevel = property.value.iValue
         didChangeValue(for: \.wnbLevel)
 
       case .wnbUpdating:
         willChangeValue(for: \.wnbUpdating)
-        _wnbUpdating = property.value.bValue()
+        _wnbUpdating = property.value.bValue
         didChangeValue(for: \.wnbUpdating)
 
       case .xPixels:
 //        willChangeValue(for: \.xPixels)
-//        _xPixels = CGFloat(property.value.fValue())
+//        _xPixels = CGFloat(property.value.fValue)
 //        didChangeValue(for: \.xPixels)
         
         break
@@ -383,7 +383,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
 
       case .yPixels:
 //        willChangeValue(for: \.yPixels)
-//        _yPixels = CGFloat(property.value.fValue())
+//        _yPixels = CGFloat(property.value.fValue)
 //        didChangeValue(for: \.yPixels)
         
         break

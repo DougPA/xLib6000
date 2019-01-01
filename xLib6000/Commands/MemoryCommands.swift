@@ -141,7 +141,7 @@ extension Memory {
   
   @objc dynamic public var squelchEnabled: Bool {
     get { return _squelchEnabled }
-    set { if _squelchEnabled != newValue { _squelchEnabled = newValue ; memCmd( .squelchEnabled, newValue.asNumber()) } } }
+    set { if _squelchEnabled != newValue { _squelchEnabled = newValue ; memCmd( .squelchEnabled, newValue.asNumber) } } }
   
   @objc dynamic public var squelchLevel: Int {
     get { return _squelchLevel }

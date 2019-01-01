@@ -224,17 +224,17 @@ public final class Memory                   : NSObject, DynamicModel {
         
       case .digitalLowerOffset:
         willChangeValue(for: \.digitalLowerOffset)
-        _digitalLowerOffset = property.value.iValue()
+        _digitalLowerOffset = property.value.iValue
         didChangeValue(for: \.digitalLowerOffset)
 
       case .digitalUpperOffset:
         willChangeValue(for: \.digitalUpperOffset)
-        _digitalUpperOffset = property.value.iValue()
+        _digitalUpperOffset = property.value.iValue
         didChangeValue(for: \.digitalUpperOffset)
 
       case .frequency:
         willChangeValue(for: \.frequency)
-        _frequency = property.value.mhzToHz()
+        _frequency = property.value.mhzToHz
         didChangeValue(for: \.frequency)
 
       case .group:
@@ -270,47 +270,47 @@ public final class Memory                   : NSObject, DynamicModel {
 
       case .repeaterOffset:
         willChangeValue(for: \.offset)
-        _offset = property.value.iValue()
+        _offset = property.value.iValue
         didChangeValue(for: \.offset)
 
       case .rfPower:
         willChangeValue(for: \.rfPower)
-        _rfPower = property.value.iValue()
+        _rfPower = property.value.iValue
         didChangeValue(for: \.rfPower)
 
       case .rttyMark:
         willChangeValue(for: \.rttyMark)
-        _rttyMark = property.value.iValue()
+        _rttyMark = property.value.iValue
         didChangeValue(for: \.rttyMark)
 
       case .rttyShift:
         willChangeValue(for: \.rttyShift)
-        _rttyShift = property.value.iValue()
+        _rttyShift = property.value.iValue
         didChangeValue(for: \.rttyShift)
 
       case .rxFilterHigh:
         willChangeValue(for: \.filterHigh)
-        _filterHigh = filterHighLimits(property.value.iValue())
+        _filterHigh = filterHighLimits(property.value.iValue)
         didChangeValue(for: \.filterHigh)
 
       case .rxFilterLow:
         willChangeValue(for: \.filterLow)
-        _filterLow = filterLowLimits(property.value.iValue())
+        _filterLow = filterLowLimits(property.value.iValue)
         didChangeValue(for: \.filterLow)
 
       case .squelchEnabled:
         willChangeValue(for: \.squelchEnabled)
-        _squelchEnabled = property.value.bValue()
+        _squelchEnabled = property.value.bValue
         didChangeValue(for: \.squelchEnabled)
 
       case .squelchLevel:
         willChangeValue(for: \.squelchLevel)
-        _squelchLevel = property.value.iValue()
+        _squelchLevel = property.value.iValue
         didChangeValue(for: \.squelchLevel)
 
       case .step:
         willChangeValue(for: \.step)
-        _step = property.value.iValue()
+        _step = property.value.iValue
         didChangeValue(for: \.step)
 
       case .toneMode:
@@ -320,7 +320,7 @@ public final class Memory                   : NSObject, DynamicModel {
 
       case .toneValue:
         willChangeValue(for: \.toneValue)
-        _toneValue = property.value.iValue()
+        _toneValue = property.value.iValue
         didChangeValue(for: \.toneValue)
       }
     }

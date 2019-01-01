@@ -119,117 +119,117 @@ public final class Transmit                 : NSObject, StaticModel {
         
       case .amCarrierLevel:
         willChangeValue(for: \.carrierLevel)
-        _carrierLevel = property.value.iValue()
+        _carrierLevel = property.value.iValue
         didChangeValue(for: \.carrierLevel)
 
       case .companderEnabled:
         willChangeValue(for: \.companderEnabled)
-        _companderEnabled = property.value.bValue()
+        _companderEnabled = property.value.bValue
         didChangeValue(for: \.companderEnabled)
 
       case .companderLevel:
         willChangeValue(for: \.companderLevel)
-        _companderLevel = property.value.iValue()
+        _companderLevel = property.value.iValue
         didChangeValue(for: \.companderLevel)
 
       case .cwBreakInEnabled:
         willChangeValue(for: \.cwBreakInEnabled)
-        _cwBreakInEnabled = property.value.bValue()
+        _cwBreakInEnabled = property.value.bValue
         didChangeValue(for: \.cwBreakInEnabled)
 
       case .cwBreakInDelay:
         willChangeValue(for: \.cwBreakInDelay)
-        _cwBreakInDelay = property.value.iValue()
+        _cwBreakInDelay = property.value.iValue
         didChangeValue(for: \.cwBreakInDelay)
 
       case .cwIambicEnabled:
         willChangeValue(for: \.cwIambicEnabled)
-        _cwIambicEnabled = property.value.bValue()
+        _cwIambicEnabled = property.value.bValue
         didChangeValue(for: \.cwIambicEnabled)
 
       case .cwIambicMode:
         willChangeValue(for: \.cwIambicMode)
-        _cwIambicMode = property.value.iValue()
+        _cwIambicMode = property.value.iValue
         didChangeValue(for: \.cwIambicMode)
 
       case .cwlEnabled:
         willChangeValue(for: \.cwlEnabled)
-        _cwlEnabled = property.value.bValue()
+        _cwlEnabled = property.value.bValue
         didChangeValue(for: \.cwlEnabled)
 
       case .cwPitch:
         willChangeValue(for: \.cwPitch)
-        _cwPitch = property.value.iValue()
+        _cwPitch = property.value.iValue
         didChangeValue(for: \.cwPitch)
 
       case .cwSidetoneEnabled:
         willChangeValue(for: \.cwSidetoneEnabled)
-        _cwSidetoneEnabled = property.value.bValue()
+        _cwSidetoneEnabled = property.value.bValue
         didChangeValue(for: \.cwSidetoneEnabled)
 
       case .cwSpeed:
         willChangeValue(for: \.cwSpeed)
-        _cwSpeed = property.value.iValue()
+        _cwSpeed = property.value.iValue
         didChangeValue(for: \.cwSpeed)
 
       case .cwSwapPaddles:
         willChangeValue(for: \.cwSwapPaddles)
-        _cwSwapPaddles = property.value.bValue()
+        _cwSwapPaddles = property.value.bValue
         didChangeValue(for: \.cwSwapPaddles)
 
       case .cwSyncCwxEnabled:
         willChangeValue(for: \.cwSyncCwxEnabled)
-        _cwSyncCwxEnabled = property.value.bValue()
+        _cwSyncCwxEnabled = property.value.bValue
         didChangeValue(for: \.cwSyncCwxEnabled)
 
       case .daxEnabled:
         willChangeValue(for: \.daxEnabled)
-        _daxEnabled = property.value.bValue()
+        _daxEnabled = property.value.bValue
         didChangeValue(for: \.daxEnabled)
 
       case .frequency:
         willChangeValue(for: \.frequency)
-        _frequency = property.value.mhzToHz()
+        _frequency = property.value.mhzToHz
         didChangeValue(for: \.frequency)
 
       case .hwAlcEnabled:
         willChangeValue(for: \.hwAlcEnabled)
-        _hwAlcEnabled = property.value.bValue()
+        _hwAlcEnabled = property.value.bValue
         didChangeValue(for: \.hwAlcEnabled)
 
       case .inhibit:
         willChangeValue(for: \.inhibit)
-        _inhibit = property.value.bValue()
+        _inhibit = property.value.bValue
         didChangeValue(for: \.inhibit)
 
       case .maxPowerLevel:
         willChangeValue(for: \.maxPowerLevel)
-        _maxPowerLevel = property.value.iValue()
+        _maxPowerLevel = property.value.iValue
         didChangeValue(for: \.maxPowerLevel)
 
       case .metInRxEnabled:
         willChangeValue(for: \.metInRxEnabled)
-        _metInRxEnabled = property.value.bValue()
+        _metInRxEnabled = property.value.bValue
         didChangeValue(for: \.metInRxEnabled)
 
       case .micAccEnabled:
         willChangeValue(for: \.micAccEnabled)
-        _micAccEnabled = property.value.bValue()
+        _micAccEnabled = property.value.bValue
         didChangeValue(for: \.micAccEnabled)
 
       case .micBoostEnabled:
         willChangeValue(for: \.micBoostEnabled)
-        _micBoostEnabled = property.value.bValue()
+        _micBoostEnabled = property.value.bValue
         didChangeValue(for: \.micBoostEnabled)
 
       case .micBiasEnabled:
         willChangeValue(for: \.micBiasEnabled)
-        _micBiasEnabled = property.value.bValue()
+        _micBiasEnabled = property.value.bValue
         didChangeValue(for: \.micBiasEnabled)
 
       case .micLevel:
         willChangeValue(for: \.micLevel)
-        _micLevel = property.value.iValue()
+        _micLevel = property.value.iValue
         didChangeValue(for: \.micLevel)
 
       case .micSelection:
@@ -239,102 +239,102 @@ public final class Transmit                 : NSObject, StaticModel {
 
       case .rawIqEnabled:
         willChangeValue(for: \.rawIqEnabled)
-        _rawIqEnabled = property.value.bValue()
+        _rawIqEnabled = property.value.bValue
         didChangeValue(for: \.rawIqEnabled)
 
       case .rfPower:
         willChangeValue(for: \.rfPower)
-        _rfPower = property.value.iValue()
+        _rfPower = property.value.iValue
         didChangeValue(for: \.rfPower)
 
       case .speechProcessorEnabled:
         willChangeValue(for: \.speechProcessorEnabled)
-        _speechProcessorEnabled = property.value.bValue()
+        _speechProcessorEnabled = property.value.bValue
         didChangeValue(for: \.speechProcessorEnabled)
 
       case .speechProcessorLevel:
         willChangeValue(for: \.speechProcessorLevel)
-        _speechProcessorLevel = property.value.iValue()
+        _speechProcessorLevel = property.value.iValue
         didChangeValue(for: \.speechProcessorLevel)
 
       case .txFilterChanges:
         willChangeValue(for: \.txFilterChanges)
-        _txFilterChanges = property.value.bValue()
+        _txFilterChanges = property.value.bValue
         didChangeValue(for: \.txFilterChanges)
 
       case .txFilterHigh:
         willChangeValue(for: \.txFilterHigh)
-        _txFilterHigh = property.value.iValue()
+        _txFilterHigh = property.value.iValue
         didChangeValue(for: \.txFilterHigh)
 
       case .txFilterLow:
         willChangeValue(for: \.txFilterLow)
-        _txFilterLow = property.value.iValue()
+        _txFilterLow = property.value.iValue
         didChangeValue(for: \.txFilterLow)
 
       case .txInWaterfallEnabled:
         willChangeValue(for: \.txInWaterfallEnabled)
-        _txInWaterfallEnabled = property.value.bValue()
+        _txInWaterfallEnabled = property.value.bValue
         didChangeValue(for: \.txInWaterfallEnabled)
 
       case .txMonitorAvailable:
         willChangeValue(for: \.txMonitorAvailable)
-        _txMonitorAvailable = property.value.bValue()
+        _txMonitorAvailable = property.value.bValue
         didChangeValue(for: \.txMonitorAvailable)
 
       case .txMonitorEnabled:
         willChangeValue(for: \.txMonitorEnabled)
-        _txMonitorEnabled = property.value.bValue()
+        _txMonitorEnabled = property.value.bValue
         didChangeValue(for: \.txMonitorEnabled)
 
       case .txMonitorGainCw:
         willChangeValue(for: \.txMonitorGainCw)
-        _txMonitorGainCw = property.value.iValue()
+        _txMonitorGainCw = property.value.iValue
         didChangeValue(for: \.txMonitorGainCw)
 
       case .txMonitorGainSb:
         willChangeValue(for: \.txMonitorGainSb)
-        _txMonitorGainSb = property.value.iValue()
+        _txMonitorGainSb = property.value.iValue
         didChangeValue(for: \.txMonitorGainSb)
 
       case .txMonitorPanCw:
         willChangeValue(for: \.txMonitorPanCw)
-        _txMonitorPanCw = property.value.iValue()
+        _txMonitorPanCw = property.value.iValue
         didChangeValue(for: \.txMonitorPanCw)
 
       case .txMonitorPanSb:
         willChangeValue(for: \.txMonitorPanSb)
-        _txMonitorPanSb = property.value.iValue()
+        _txMonitorPanSb = property.value.iValue
         didChangeValue(for: \.txMonitorPanSb)
 
       case .txRfPowerChanges:
         willChangeValue(for: \.txRfPowerChanges)
-        _txRfPowerChanges = property.value.bValue()
+        _txRfPowerChanges = property.value.bValue
         didChangeValue(for: \.txRfPowerChanges)
 
       case .tune:
         willChangeValue(for: \.tune)
-        _tune = property.value.bValue()
+        _tune = property.value.bValue
         didChangeValue(for: \.tune)
 
       case .tunePower:
         willChangeValue(for: \.tunePower)
-        _tunePower = property.value.iValue()
+        _tunePower = property.value.iValue
         didChangeValue(for: \.tunePower)
 
       case .voxEnabled:
         willChangeValue(for: \.voxEnabled)
-        _voxEnabled = property.value.bValue()
+        _voxEnabled = property.value.bValue
         didChangeValue(for: \.voxEnabled)
 
       case .voxDelay:
         willChangeValue(for: \.voxDelay)
-        _voxDelay = property.value.iValue()
+        _voxDelay = property.value.iValue
         didChangeValue(for: \.voxDelay)
 
       case .voxLevel:
         willChangeValue(for: \.voxLevel)
-        _voxLevel = property.value.iValue()
+        _voxLevel = property.value.iValue
         didChangeValue(for: \.voxLevel)
       }
     }
