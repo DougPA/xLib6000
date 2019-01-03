@@ -377,6 +377,7 @@ public class WaterfallFrame {
     
     if timeCode > expectedIndex {
       Swift.print("Waterfall: \(timeCode - expectedIndex) Frame(s) skipped: expected = \(expectedIndex), received = \(timeCode)")
+      _binsProcessed = 0
       expectedIndex = timeCode
     }
     

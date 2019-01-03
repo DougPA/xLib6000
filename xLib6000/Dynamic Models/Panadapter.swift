@@ -426,7 +426,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     // convert the Vita struct to a PanadapterFrame
     if _panadapterframes[_index].accumulate(vita: vita, expectedIndex: &expectedIndex) {
       
-      expectedIndex += 1
+//      expectedIndex += 1
 
       // Pass the data frame to this Panadapter's delegate
       delegate?.streamHandler(_panadapterframes[_index])
@@ -535,6 +535,7 @@ public class PanadapterFrame {
     
     if frameIndex > expectedIndex {
       Swift.print("Panadapter: \(frameIndex - expectedIndex) Frame(s) skipped: expected = \(expectedIndex), received = \(frameIndex)")
+      _binsProcessed = 0
       expectedIndex = frameIndex
     }
 
@@ -551,7 +552,7 @@ public class PanadapterFrame {
       _binsProcessed += numberOfBins
       
       // reset the count if the entire frame has been accumulated
-      if _binsProcessed == totalBinsInFrame { _binsProcessed = 0 }
+      if _binsProcessed == totalBinsInFrame { _binsProcessed = 0 ; expectedIndex += 1}
     }
     
 //    Swift.print("result = \(_binsProcessed == 0), frameIndex = \(frameIndex)")
