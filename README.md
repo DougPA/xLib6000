@@ -8,6 +8,9 @@
 
 *V2.x.x drops the use of a Log Delegate and replaces it with Apple's Unified Logging
 
+*V3.x.x changes the use of dispatch queues putting parsing on the Main Queue
+
+*All new work is in the v2 Branch of this repo (including the v3,x,x code)
 
 ## Usage
 
