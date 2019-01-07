@@ -86,8 +86,10 @@ public final class Xvtr                     : NSObject, DynamicModel {
         // NO, create a new Xvtr & add it to the Xvtrs collection
         radio.xvtrs[name] = Xvtr(id: name, queue: queue)
       }
-      // pass the remaining key values to the Xvtr for parsing (dropping the Id)
-      radio.xvtrs[name]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      DispatchQueue.main.async {
+        // pass the remaining key values to the Xvtr for parsing (dropping the Id)
+        radio.xvtrs[name]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      }
       
     } else {
       

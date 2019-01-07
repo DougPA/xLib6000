@@ -162,8 +162,10 @@ public final class Slice                    : NSObject, DynamicModel {
           }
         }
       }
-      // pass the remaining key values to the Slice for parsing (dropping the Id)
-      radio.slices[sliceId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      DispatchQueue.main.async {
+        // pass the remaining key values to the Slice for parsing (dropping the Id)
+        radio.slices[sliceId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      }
       
     } else {
       
@@ -523,8 +525,8 @@ public final class Slice                    : NSObject, DynamicModel {
         didChangeValue(for: \.detached)
 
      case .dfmPreDeEmphasisEnabled:
-        willChangeValue(for: \.dfmPreDeEmphasisEnabled)
-        _dfmPreDeEmphasisEnabled = property.value.bValue
+      willChangeValue(for: \.dfmPreDeEmphasisEnabled)
+      _dfmPreDeEmphasisEnabled = property.value.bValue
         didChangeValue(for: \.dfmPreDeEmphasisEnabled)
 
       case .digitalLowerOffset:
@@ -579,7 +581,7 @@ public final class Slice                    : NSObject, DynamicModel {
         didChangeValue(for: \.fmRepeaterOffset)
 
       case .fmToneBurstEnabled:
-         willChangeValue(for: \.fmToneBurstEnabled)
+        willChangeValue(for: \.fmToneBurstEnabled)
         _fmToneBurstEnabled = property.value.bValue
         didChangeValue(for: \.fmToneBurstEnabled)
 
@@ -643,7 +645,7 @@ public final class Slice                    : NSObject, DynamicModel {
         didChangeValue(for: \.nbLevel)
 
       case .nrEnabled:
-         willChangeValue(for: \.nrEnabled)
+        willChangeValue(for: \.nrEnabled)
         _nrEnabled = property.value.bValue
         didChangeValue(for: \.nrEnabled)
 
@@ -678,9 +680,9 @@ public final class Slice                    : NSObject, DynamicModel {
         didChangeValue(for: \.postDemodBypassEnabled)
 
       case .postDemodLow:
-         willChangeValue(for: \.postDemodLow)
-         _postDemodLow = property.value.iValue
-         didChangeValue(for: \.postDemodLow)
+        willChangeValue(for: \.postDemodLow)
+        _postDemodLow = property.value.iValue
+        didChangeValue(for: \.postDemodLow)
 
       case .postDemodHigh:
         willChangeValue(for: \.postDemodHigh)
@@ -693,7 +695,7 @@ public final class Slice                    : NSObject, DynamicModel {
         didChangeValue(for: \.qskEnabled)
 
       case .recordEnabled:
-         willChangeValue(for: \.recordEnabled)
+        willChangeValue(for: \.recordEnabled)
         _recordEnabled = property.value.bValue
         didChangeValue(for: \.recordEnabled)
 
@@ -718,9 +720,9 @@ public final class Slice                    : NSObject, DynamicModel {
         didChangeValue(for: \.ritEnabled)
 
       case .rttyMark:
-         willChangeValue(for: \.rttyMark)
-         _rttyMark = property.value.iValue
-         didChangeValue(for: \.rttyMark)
+        willChangeValue(for: \.rttyMark)
+        _rttyMark = property.value.iValue
+        didChangeValue(for: \.rttyMark)
 
       case .rttyShift:
         willChangeValue(for: \.rttyShift)
@@ -738,7 +740,7 @@ public final class Slice                    : NSObject, DynamicModel {
         didChangeValue(for: \.rxAntList)
 
       case .squelchEnabled:
-         willChangeValue(for: \.squelchEnabled)
+        willChangeValue(for: \.squelchEnabled)
         _squelchEnabled = property.value.bValue
         didChangeValue(for: \.squelchEnabled)
 
@@ -783,7 +785,7 @@ public final class Slice                    : NSObject, DynamicModel {
         didChangeValue(for: \.wide)
 
       case .wnbEnabled:
-         willChangeValue(for: \.wnbEnabled)
+        willChangeValue(for: \.wnbEnabled)
         _wnbEnabled = property.value.bValue
         didChangeValue(for: \.wnbEnabled)
 
@@ -807,7 +809,7 @@ public final class Slice                    : NSObject, DynamicModel {
         break
       }
     }
-    if _initialized == false && inUse == true && panadapterId != 0 && frequency != 0 && mode != "" {
+      if _initialized == false && inUse == true && panadapterId != 0 && frequency != 0 && mode != "" {
 
       // mark it as initialized
       _initialized = true
@@ -815,22 +817,6 @@ public final class Slice                    : NSObject, DynamicModel {
       // notify all observers
       NC.post(.sliceHasBeenAdded, object: self)
     }
-  }
-  /// Update a property & signal KVO
-  ///
-  /// - Parameters:
-  ///   - property:           the property (mutable)
-  ///   - value:              the new value
-  ///   - key:                the KVO key
-  ///
-  func update<T: Equatable>(_ property: inout T, value: T, key: String) {
-    
-    // update the property & signal KVO (if needed)
-    //    if property != value {
-    willChangeValue(forKey: key)
-    property = value
-    didChangeValue(forKey: key)
-    //    }
   }
 }
 

@@ -76,8 +76,10 @@ public final class Tnf                      : NSObject, DynamicModel {
         // NO, create a new Tnf & add it to the Tnfs collection
         radio.tnfs[tnfId] = Tnf(id: tnfId, queue: queue)
       }
-      // pass the remaining key values to the Tnf for parsing (dropping the Id)
-      radio.tnfs[tnfId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      DispatchQueue.main.async {
+        // pass the remaining key values to the Tnf for parsing (dropping the Id)
+        radio.tnfs[tnfId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      }
 
     } else {
       

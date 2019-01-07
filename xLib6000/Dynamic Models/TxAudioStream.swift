@@ -80,8 +80,10 @@ public final class TxAudioStream            : NSObject, DynamicModel {
           // create a new AudioStream & add it to the AudioStreams collection
           radio.txAudioStreams[streamId] = TxAudioStream(id: streamId, queue: queue)
         }
-        // pass the remaining key values to the AudioStream for parsing (dropping the Id)
-        radio.txAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        DispatchQueue.main.async {
+          // pass the remaining key values to the AudioStream for parsing (dropping the Id)
+          radio.txAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        }
         
       } else {
         

@@ -89,9 +89,11 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
           // create a new AudioStream & add it to the AudioStreams collection
           radio.audioStreams[streamId] = AudioStream(id: streamId, queue: queue)
         }
-        // pass the remaining key values to the AudioStream for parsing
-        radio.audioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-        
+        DispatchQueue.main.async {
+          // pass the remaining key values to the AudioStream for parsing
+          radio.audioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        }
+      
       } else {
         
         // does the stream exist?

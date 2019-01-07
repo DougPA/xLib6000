@@ -91,8 +91,10 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
           // create a new Stream & add it to the Streams collection
           radio.iqStreams[streamId] = IqStream(id: streamId, queue: queue)
         }
-        // pass the remaining key values to the IqStream for parsing (dropping the Id)
-        radio.iqStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        DispatchQueue.main.async {
+          // pass the remaining key values to the IqStream for parsing (dropping the Id)
+          radio.iqStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+        }
         
       } else {
         

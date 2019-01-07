@@ -100,7 +100,9 @@ public final class Equalizer                : NSObject, DynamicModel {
     if let equalizer = equalizer {
       
       // pass the key values to the Equalizer for parsing (dropping the Type)
-      equalizer.parseProperties( Array(keyValues.dropFirst(1)) )
+      DispatchQueue.main.async {
+        equalizer.parseProperties( Array(keyValues.dropFirst(1)) )
+      }
     }
   }
   

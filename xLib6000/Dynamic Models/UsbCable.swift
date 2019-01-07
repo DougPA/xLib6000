@@ -104,8 +104,10 @@ public final class UsbCable                 : NSObject, DynamicModel {
         return
       }
     }
-    // pass the remaining key values to the Usb Cable for parsing (dropping the Id)
-    radio.usbCables[usbCableId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+    DispatchQueue.main.async {
+      // pass the remaining key values to the Usb Cable for parsing (dropping the Id)
+      radio.usbCables[usbCableId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+    }
   }
 
   // ------------------------------------------------------------------------------

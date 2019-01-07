@@ -47,7 +47,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
 
   private var _panadapterframes             = [PanadapterFrame]()
-  private var _index                   = 0
+  private var _index                        = 0
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
@@ -138,8 +138,10 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
           // NO, Create a Panadapter & add it to the Panadapters collection
           radio.panadapters[streamId] = Panadapter(id: streamId, queue: queue)
         }
-        // pass the key values to the Panadapter for parsing (dropping the Type and Id)
-        radio.panadapters[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
+        DispatchQueue.main.async {
+          // pass the key values to the Panadapter for parsing (dropping the Type and Id)
+          radio.panadapters[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
+        }
         
       } else {
         
@@ -426,8 +428,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     // convert the Vita struct to a PanadapterFrame
     if _panadapterframes[_index].accumulate(vita: vita, expectedIndex: &expectedIndex) {
       
-//      expectedIndex += 1
-
       // Pass the data frame to this Panadapter's delegate
       delegate?.streamHandler(_panadapterframes[_index])
       
@@ -459,6 +459,8 @@ public class PanadapterFrame {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
+  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "PanadapterFrame")
+
   private struct PayloadHeaderOld {                                        // struct to mimic payload layout
     var startingBinIndex                    : UInt32
     var numberOfBins                        : UInt32
@@ -528,13 +530,15 @@ public class PanadapterFrame {
     if expectedIndex == -1 { expectedIndex = frameIndex }
     
     if frameIndex < expectedIndex {
-      
-      Swift.print("Panadapter: Out of sequence Frame ignored: expected = \(expectedIndex), received = \(frameIndex)")
+      // log it
+      os_log("Out of sequence Frame ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, expectedIndex, frameIndex)
       return false
     }
     
     if frameIndex > expectedIndex {
-      Swift.print("Panadapter: \(frameIndex - expectedIndex) Frame(s) skipped: expected = \(expectedIndex), received = \(frameIndex)")
+      // log it
+      os_log("%{public}d Frame(s) skipped: expected = %{public}d, received = %{public}d", log: _log, type: .default, frameIndex - expectedIndex, expectedIndex, frameIndex)
+      // restart bin processing
       _binsProcessed = 0
       expectedIndex = frameIndex
     }

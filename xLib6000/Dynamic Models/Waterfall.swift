@@ -110,9 +110,10 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
           // NO, Create a Waterfall & add it to the Waterfalls collection
           radio.waterfalls[streamId] = Waterfall(id: streamId, queue: queue)
         }
-        // pass the key values to the Waterfall for parsing (dropping the Type and Id)
-        radio.waterfalls[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
-        
+        DispatchQueue.main.async {
+          // pass the key values to the Waterfall for parsing (dropping the Type and Id)
+          radio.waterfalls[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
+        }
       } else {
         
         // notify all observers
@@ -282,6 +283,7 @@ public class WaterfallFrame {
   
   private var _binsProcessed                = 0
   private var _byteOffsetToBins             = 0
+  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "WaterfallFrame")
 
   private struct PayloadHeaderOld {                                         // struct to mimic payload layout
     var firstBinFreq                        : UInt64                        // 8 bytes
@@ -370,13 +372,15 @@ public class WaterfallFrame {
     if expectedIndex == -1 { expectedIndex = timeCode }
     
     if timeCode < expectedIndex {
-      
-      Swift.print("Waterfall: Out of sequence Frame ignored: expected = \(expectedIndex), received = \(timeCode)")
+      // log it
+      os_log("Out of sequence Frame ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, expectedIndex, timeCode)
       return false
     }
     
     if timeCode > expectedIndex {
-      Swift.print("Waterfall: \(timeCode - expectedIndex) Frame(s) skipped: expected = \(expectedIndex), received = \(timeCode)")
+      // log it
+      os_log("%{public}d Frame(s) skipped: expected = %{public}d, received = %{public}d", log: _log, type: .default, timeCode - expectedIndex, expectedIndex, timeCode)
+      // restart bin processing
       _binsProcessed = 0
       expectedIndex = timeCode
     }
