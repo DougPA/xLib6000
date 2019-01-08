@@ -110,10 +110,9 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
           // NO, Create a Waterfall & add it to the Waterfalls collection
           radio.waterfalls[streamId] = Waterfall(id: streamId, queue: queue)
         }
-        DispatchQueue.main.async {
-          // pass the key values to the Waterfall for parsing (dropping the Type and Id)
-          radio.waterfalls[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
-        }
+        // pass the key values to the Waterfall for parsing (dropping the Type and Id)
+        radio.waterfalls[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
+        
       } else {
         
         // notify all observers

@@ -91,10 +91,9 @@ public final class Memory                   : NSObject, DynamicModel {
         memory = Memory(id: memoryId, queue: queue)
         radio.memories[memoryId] = memory
       }
-      DispatchQueue.main.async {
-        // pass the key values to the Memory for parsing (dropping the Id)
-        memory!.parseProperties( Array(keyValues.dropFirst(1)) )
-      }
+      // pass the key values to the Memory for parsing (dropping the Id)
+      memory!.parseProperties( Array(keyValues.dropFirst(1)) )
+      
     } else {
       
       // NO, notify all observers

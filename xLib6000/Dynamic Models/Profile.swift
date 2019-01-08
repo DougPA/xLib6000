@@ -81,10 +81,8 @@ public final class Profile                  : NSObject, StaticModel {
       // NO, create a new Profile & add it to the Profiles collection
       radio.profiles[profileId] = Profile(id: profileId, queue: queue)
     }
-    DispatchQueue.main.async {
-      // pass the key values to Profile for parsing (dropping the Id)
-      radio.profiles[profileId]!.parseProperties( adjustedKeyValues )
-    }
+    // pass the key values to Profile for parsing (dropping the Id)
+    radio.profiles[profileId]!.parseProperties( adjustedKeyValues )
   }
 
   // ------------------------------------------------------------------------------

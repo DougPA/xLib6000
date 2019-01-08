@@ -162,10 +162,8 @@ public final class Slice                    : NSObject, DynamicModel {
           }
         }
       }
-      DispatchQueue.main.async {
-        // pass the remaining key values to the Slice for parsing (dropping the Id)
-        radio.slices[sliceId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-      }
+      // pass the remaining key values to the Slice for parsing (dropping the Id)
+      radio.slices[sliceId]!.parseProperties( Array(keyValues.dropFirst(1)) )
       
     } else {
       
@@ -525,8 +523,8 @@ public final class Slice                    : NSObject, DynamicModel {
         didChangeValue(for: \.detached)
 
      case .dfmPreDeEmphasisEnabled:
-      willChangeValue(for: \.dfmPreDeEmphasisEnabled)
-      _dfmPreDeEmphasisEnabled = property.value.bValue
+        willChangeValue(for: \.dfmPreDeEmphasisEnabled)
+        _dfmPreDeEmphasisEnabled = property.value.bValue
         didChangeValue(for: \.dfmPreDeEmphasisEnabled)
 
       case .digitalLowerOffset:
@@ -1306,7 +1304,7 @@ extension xLib6000.Slice {
     case simplex
   }
   
-  public enum AgcMode : String {
+  public enum AgcMode : String, CaseIterable {
     case off
     case slow
     case medium
@@ -1317,7 +1315,7 @@ extension xLib6000.Slice {
     }
   }
   
-  public enum Mode : String {
+  public enum Mode : String, CaseIterable {
     case AM
     case SAM
     case CW

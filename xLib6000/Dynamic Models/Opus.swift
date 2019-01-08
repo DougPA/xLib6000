@@ -93,10 +93,8 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
         // NO, create a new Opus & add it to the OpusStreams collection
         radio.opusStreams[streamId] = Opus(id: streamId, queue: queue)
       }
-      DispatchQueue.main.async {
-        // pass the key values to Opus for parsing  (dropping the Id)
-        radio.opusStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-      }
+      // pass the key values to Opus for parsing  (dropping the Id)
+      radio.opusStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
     }
   }
 

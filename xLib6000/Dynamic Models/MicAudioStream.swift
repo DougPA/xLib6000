@@ -83,10 +83,8 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
           // create a new MicAudioStream & add it to the MicAudioStreams collection
           radio.micAudioStreams[streamId] = MicAudioStream(id: streamId, queue: queue)
         }
-        DispatchQueue.main.async {
-          // pass the remaining key values to the MicAudioStream for parsing (dropping the Id)
-          radio.micAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-        }
+        // pass the remaining key values to the MicAudioStream for parsing (dropping the Id)
+        radio.micAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
         
       } else {
         

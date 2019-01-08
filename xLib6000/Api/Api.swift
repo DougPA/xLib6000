@@ -22,10 +22,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public static let kId                     = "xLib6000"                    // API Name
   public static let kDomainId               = "net.k3tzr"                   // Domain name
   public static let kBundleIdentifier       = Api.kDomainId + "." + Api.kId
-  
+  public static let daxChannels             = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
+  public static let daxIqChannels           = ["None", "1", "2", "3", "4"]
+
   static let kTcpTimeout                    = 0.5                           // seconds
-  static let daxChannels                    = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
-  static let daxIqChannels                  = ["None", "1", "2", "3", "4"]
   static let kNoError                       = "0"
   static let kControlMin                    = 0                             // control ranges
   static let kControlMax                    = 100

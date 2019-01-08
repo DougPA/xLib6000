@@ -80,10 +80,8 @@ public final class Amplifier                : NSObject, DynamicModel {
         // NO, create a new Amplifier & add it to the Amplifiers collection
         radio.amplifiers[streamId] = Amplifier(id: streamId, queue: queue)
       }
-      DispatchQueue.main.async {
-        // pass the remaining key values to the Amplifier for parsing
-        radio.amplifiers[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-      }
+      // pass the remaining key values to the Amplifier for parsing
+      radio.amplifiers[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
       
     } else {
       

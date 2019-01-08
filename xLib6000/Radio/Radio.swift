@@ -431,9 +431,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .atu:
       //      format: <key=value> <key=value> ...<key=value>
-      DispatchQueue.main.async {
-        self.atu.parseProperties( remainder.keyValuesArray() )
-      }
+      atu.parseProperties( remainder.keyValuesArray() )
       
     case .client:
       //      kv                0         1            2
@@ -443,9 +441,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .cwx:
       // replace some characters to avoid parsing conflicts
-      DispatchQueue.main.async {
-        self.cwx.parseProperties( remainder.fix().keyValuesArray() )
-      }
+      cwx.parseProperties( remainder.fix().keyValuesArray() )
       
     case .daxiq:
       //      format: <daxChannel> <key=value> <key=value> ...<key=value>
@@ -480,15 +476,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
     case .gps:
       //     format: <key=value>#<key=value>#...<key=value>
-      DispatchQueue.main.async {
-        self.gps.parseProperties( remainder.keyValuesArray(delimiter: "#") )
-      }
+      gps.parseProperties( remainder.keyValuesArray(delimiter: "#") )
       
     case .interlock:
       //      format: <key=value> <key=value> ...<key=value>
-      DispatchQueue.main.async {
-        self.interlock.parseProperties( remainder.keyValuesArray())
-      }
+      interlock.parseProperties( remainder.keyValuesArray())
       
     case .memory:
       //      format: <memoryId> <key=value>,<key=value>,...<key=value>
@@ -536,9 +528,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .transmit:
       //      format: <key=value> <key=value> ...<key=value>
-      DispatchQueue.main.async {
-        self.transmit.parseProperties( remainder.keyValuesArray())
-      }
+      transmit.parseProperties( remainder.keyValuesArray())
       
     case .turf:
       os_log("Unprocessed %{public}@, %{public}@", log: _log, type: .default, msgType, remainder)
@@ -552,15 +542,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       UsbCable.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q)
       
     case .wan:
-      DispatchQueue.main.async {
-        self.wan.parseProperties( remainder.keyValuesArray() )
-      }
+      wan.parseProperties( remainder.keyValuesArray() )
       
     case .waveform:
       //      format: <key=value> <key=value> ...<key=value>
-      DispatchQueue.main.async {
-        self.waveform.parseProperties( remainder.keyValuesArray())
-      }
+      waveform.parseProperties( remainder.keyValuesArray())
       
     case .xvtr:
       //      format: <name> <key=value> <key=value> ...<key=value>

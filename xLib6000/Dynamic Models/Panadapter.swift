@@ -138,10 +138,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
           // NO, Create a Panadapter & add it to the Panadapters collection
           radio.panadapters[streamId] = Panadapter(id: streamId, queue: queue)
         }
-        DispatchQueue.main.async {
-          // pass the key values to the Panadapter for parsing (dropping the Type and Id)
-          radio.panadapters[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
-        }
+        // pass the key values to the Panadapter for parsing (dropping the Type and Id)
+        radio.panadapters[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
         
       } else {
         
