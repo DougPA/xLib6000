@@ -70,6 +70,10 @@ extension Interlock {
     get {  return _timeout }
     set { if _timeout != newValue { _timeout = newValue ; interlockCmd( .timeout, newValue) } } }
   
+  @objc dynamic public var txDelay: Int {
+    get { return _txDelay }
+    set { if _txDelay != newValue { _txDelay = newValue  ; interlockCmd( .txDelay, newValue) } } }
+
   @objc dynamic public var tx1Enabled: Bool {
     get { return _tx1Enabled }
     set { if _tx1Enabled != newValue { _tx1Enabled = newValue ; interlockCmd( .tx1Enabled, newValue.asLetter) } } }

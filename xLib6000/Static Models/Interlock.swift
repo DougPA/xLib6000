@@ -305,10 +305,7 @@ extension Interlock {
   
   @objc dynamic public var txAllowed: Bool {
     return _txAllowed }
-  
-  @objc dynamic public var txDelay: Int {
-    return _txDelay }
-  
+    
   // ----------------------------------------------------------------------------
   // MARK: - Interlock tokens
   
