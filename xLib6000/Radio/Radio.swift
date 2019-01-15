@@ -102,11 +102,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __enforcePrivateIpEnabled     = false                         //
   private var __extPresent                  = false                         //
   // F
-  private var __filterCwAutoLevel           = false                         //
+  private var __filterCwAutoEnabled         = false                         //
   private var __filterCwLevel               = 0                             //
-  private var __filterDigitalAutoLevel      = false                         //
+  private var __filterDigitalAutoEnabled    = false                         //
   private var __filterDigitalLevel          = 0                             //
-  private var __filterVoiceAutoLevel        = false                         //
+  private var __filterVoiceAutoEnabled      = false                         //
   private var __filterVoiceLevel            = 0                             //
   private var __fpgaMbVersion               = ""                            // FPGA version (read only)
   private var __freqErrorPpb                = 0                             // Calibration error (Hz)
@@ -1494,16 +1494,16 @@ extension Radio {
     set { _q.sync(flags: .barrier) { __extPresent = newValue } } }
   
   internal var _filterCwAutoEnabled: Bool {
-    get { return _q.sync { __filterCwAutoLevel } }
-    set { _q.sync(flags: .barrier) { __filterCwAutoLevel = newValue } } }
+    get { return _q.sync { __filterCwAutoEnabled } }
+    set { _q.sync(flags: .barrier) { __filterCwAutoEnabled = newValue } } }
   
   internal var _filterDigitalAutoEnabled: Bool {
-    get { return _q.sync { __filterDigitalAutoLevel } }
-    set { _q.sync(flags: .barrier) { __filterDigitalAutoLevel = newValue } } }
+    get { return _q.sync { __filterDigitalAutoEnabled } }
+    set { _q.sync(flags: .barrier) { __filterDigitalAutoEnabled = newValue } } }
   
   internal var _filterVoiceAutoEnabled: Bool {
-    get { return _q.sync { __filterVoiceAutoLevel } }
-    set { _q.sync(flags: .barrier) { __filterVoiceAutoLevel = newValue } } }
+    get { return _q.sync { __filterVoiceAutoEnabled } }
+    set { _q.sync(flags: .barrier) { __filterVoiceAutoEnabled = newValue } } }
   
   internal var _filterCwLevel: Int {
     get { return _q.sync { __filterCwLevel } }
