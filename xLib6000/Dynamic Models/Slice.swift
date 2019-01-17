@@ -807,8 +807,8 @@ public final class Slice                    : NSObject, DynamicModel {
         break
       }
     }
-      if _initialized == false && inUse == true && panadapterId != 0 && frequency != 0 && mode != "" {
-
+    if _initialized == false && inUse == true && panadapterId != 0 && frequency != 0 && mode != "" {
+      
       // mark it as initialized
       _initialized = true
       
@@ -834,7 +834,7 @@ extension xLib6000.Slice {
   // listed in alphabetical order
   internal var _active: Bool {
     get { return _q.sync { __active } }
-    set { _q.sync(flags: .barrier) {__active = newValue } } }
+    set { if newValue && !__active && _initialized { NC.post(.sliceBecameActive, object: self) } ; _q.sync(flags: .barrier) {__active = newValue } } }
   
   internal var _agcMode: String {
     get { return _q.sync { __agcMode } }
