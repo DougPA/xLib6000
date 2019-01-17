@@ -400,6 +400,7 @@ public extension UInt32 {
   // convert a UInt32 to a hex String (uppercase, leading zeros, 8 characters, 0x prefix)
   var hex: String { return String(format: "0x%08X", self) }
 }
+
 // ----------------------------------------------------------------------------
 // MARK: - CGFloat
 
