@@ -66,6 +66,7 @@ public enum NotificationType : String {
   
   case radiosAvailable
   
+  case sliceBecameActive
   case sliceHasBeenAdded
   case sliceWillBeRemoved
   
