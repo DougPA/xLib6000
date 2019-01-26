@@ -52,6 +52,6 @@ Version 7.6.3 of CocoaAsyncSocket is embedded in this project as source code. It
 
 ## Known Issues
 
-* None
+Please see ChangeLog.txt for a running list of changes and KnownIssues.md for a list of the known issues.
 
 Please reports any bugs you observe to douglas.adams@me.com

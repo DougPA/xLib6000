@@ -69,6 +69,7 @@
 		913EF09820669DA700AF99BE /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 913EF05820669DA700AF99BE /* GCDAsyncUdpSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		913EF09920669DA700AF99BE /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 913EF05920669DA700AF99BE /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		913F7F8C2066F05B00F35E9B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 913F7F8B2066F05B00F35E9B /* README.md */; };
+		9143BD9B21FCDA0700C2CCBD /* KnownIssues.md in Resources */ = {isa = PBXBuildFile; fileRef = 9143BD9A21FCDA0700C2CCBD /* KnownIssues.md */; };
 		9148CEAD21D94AC400306FC0 /* WanServerCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */; };
 		9185B087207FD11E004D4C40 /* xLib6000 Overview.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */; };
 		91A0ABF2209769B3008FDB3D /* Commands.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 91A0ABF1209769B2008FDB3D /* Commands.rtf */; };
@@ -141,6 +142,7 @@
 		913EF05820669DA700AF99BE /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
 		913EF05920669DA700AF99BE /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 		913F7F8B2066F05B00F35E9B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		9143BD9A21FCDA0700C2CCBD /* KnownIssues.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = KnownIssues.md; sourceTree = "<group>"; };
 		9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WanServerCommands.swift; sourceTree = "<group>"; };
 		9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "xLib6000 Overview.pdf"; sourceTree = "<group>"; };
 		91A0ABF1209769B2008FDB3D /* Commands.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Commands.rtf; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 		913EEFFC20669D6400AF99BE = {
 			isa = PBXGroup;
 			children = (
+				9143BD9A21FCDA0700C2CCBD /* KnownIssues.md */,
 				9185B085207FD11E004D4C40 /* Documentation */,
 				91A2D8D6206944A000676728 /* ChangeLog.txt */,
 				913F7F8B2066F05B00F35E9B /* README.md */,
@@ -395,6 +398,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9143BD9B21FCDA0700C2CCBD /* KnownIssues.md in Resources */,
 				91A0ABF2209769B3008FDB3D /* Commands.rtf in Resources */,
 				9185B087207FD11E004D4C40 /* xLib6000 Overview.pdf in Resources */,
 				913F7F8C2066F05B00F35E9B /* README.md in Resources */,

@@ -92,6 +92,8 @@ public enum NotificationType : String {
   case waterfallHasBeenAdded
   case waterfallWillBeRemoved
   
+  case updateRequired
+  
   case xvtrHasBeenAdded
   case xvtrWillBeRemoved
 }
