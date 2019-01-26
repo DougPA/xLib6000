@@ -357,12 +357,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     let radioVersionParts = activeRadio!.firmwareVersion.components(separatedBy: ".")
     
     // compare the versions
-//    if apiVersionParts[0] != radioVersionParts[0] || apiVersionParts[1] != radioVersionParts[1] || apiVersionParts[2] != radioVersionParts[2] {
+    if apiVersionParts[0] != radioVersionParts[0] || apiVersionParts[1] != radioVersionParts[1] || apiVersionParts[2] != radioVersionParts[2] {
     
       os_log("Update needed, Radio version = %{public}@, API supports version = %{public}@", log: _log, type: .default, activeRadio!.firmwareVersion, kApiFirmwareSupport)
       
-      NC.post(.updateRequired, object: kApiFirmwareSupport + "," + activeRadio!.firmwareVersion) 
-//    }
+      NC.post(.updateRequired, object: kApiFirmwareSupport + "," + activeRadio!.firmwareVersion)
+    }
     // set integer numbers for major and minor for fast comparision
     apiVersionMajor = Int(apiVersionParts[0]) ?? 0
     apiVersionMinor = Int(apiVersionParts[1]) ?? 0
