@@ -31,7 +31,7 @@ extension Profile {
   ///
   public class func delete(_ type: String, name: String, callback: ReplyHandler? = nil) {
     
-    // tell the Radio to delete the named Global Profile
+    // tell the Radio to delete the Profile name in the specified Profile type
     Api.sharedInstance.send(Profile.kCmd + type + " delete \"" + name + "\"", replyTo: callback)
   }
   /// Save a Profile entry
@@ -43,7 +43,7 @@ extension Profile {
   ///
   public class func save(_ type: String, name: String, callback: ReplyHandler? = nil) {
     
-    // tell the Radio to save the named Global Profile
+    // tell the Radio to save the Profile name in the specified Profile type
     Api.sharedInstance.send(Profile.kCmd + type + " save \"" + name + "\"", replyTo: callback)
   }
 
