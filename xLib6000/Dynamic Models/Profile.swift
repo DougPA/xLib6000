@@ -64,7 +64,6 @@ public final class Profile                  : NSObject, StaticModel {
   ///   - inUse:              false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format:  <streamId, > <"ip", ip> <"port", port> <"opus_rx_stream_stopped", 1|0>  <"rx_on", 1|0> <"tx_on", 1|0>
     
     let components = keyValues[0].key.split(separator: " ")
     
