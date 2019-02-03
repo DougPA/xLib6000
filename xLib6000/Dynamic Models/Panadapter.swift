@@ -556,9 +556,6 @@ public class PanadapterFrame {
       // reset the count if the entire frame has been accumulated
       if _binsProcessed == totalBinsInFrame { _binsProcessed = 0 ; expectedIndex += 1}
     }
-    
-//    Swift.print("result = \(_binsProcessed == 0), frameIndex = \(frameIndex)")
-    
     // return true if the entire frame has been accumulated
     return _binsProcessed == 0
   }
