@@ -177,8 +177,6 @@ extension Radio {
   private func radioFilterCmd( _ token1: RadioFilterSharpness,  _ token2: RadioFilterSharpness, _ value: Any) {
     
    Api.sharedInstance.send(Radio.kCmd + "filter_sharpness" + " " + token1.rawValue + " " + token2.rawValue + "=\(value)")
-    
-    Swift.print(Radio.kCmd + "filter_sharpness" + " " + token1.rawValue + " " + token2.rawValue + "=\(value)")
   }
   /// Set Xmit on the Radio
   ///
