@@ -146,7 +146,9 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
     
     // if local check ip and port
     // if remote check only ip
+    
     // TODO: this is a temporary fix and a flaw in Flex way to think.. :-)
+    
     if Api.sharedInstance.isWan {
       if Api.sharedInstance.localIP == statusIpStr {
         return true
