@@ -128,7 +128,8 @@ public final class Profile                  : NSObject, StaticModel {
     if token == Profile.Token.list {
       
       willChangeValue(for: \.list)
-      _list = Array(properties[1].key.valuesArray( delimiter: "^" ).dropLast())
+      _list = Array(properties[1].key.valuesArray( delimiter: "^" ))
+      if _list.last == "" { _list = Array(_list.dropLast()) }
       didChangeValue(for: \.list)
     }
     

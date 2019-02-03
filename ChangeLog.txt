@@ -1,5 +1,15 @@
 xLib6000 Change Log
 
+v2.3.6 03-Feb-2019
+
+Notifications.swift - added equalizerHasBeenAdded
+Notifications.swift - added transmitHasBeenAdded
+Transmit.swift - added code to send new notifications
+Equalizer.swift - added code to send new notifications
+AppExtensions.swift - in valuesArray(delimiter:valuesToLower:) added code to strip whitespace
+Profile.swift - addaed code to handle profile lists without a final ^ delimiter
+
+
 v2.3.5
 
 Notifications.swift - added updateRequired

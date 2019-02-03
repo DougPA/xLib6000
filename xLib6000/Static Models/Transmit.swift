@@ -26,7 +26,8 @@ public final class Transmit                 : NSObject, StaticModel {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "Transmit")
   private let _q                            : DispatchQueue                 // Q for object synchronization
-  
+  private var _initialized                  = false                         // True if initialized by Radio hardware
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
   private var __carrierLevel                = 0                             //
@@ -337,6 +338,14 @@ public final class Transmit                 : NSObject, StaticModel {
         _voxLevel = property.value.iValue
         didChangeValue(for: \.voxLevel)
       }
+    }
+    // is Transmit initialized?
+    if !_initialized {
+      // NO, the Radio (hardware) has acknowledged this Transmit
+      _initialized = true
+      
+      // notify all observers
+      NC.post(.transmitHasBeenAdded, object: self as Any?)
     }
   }
 }

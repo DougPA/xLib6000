@@ -28,6 +28,8 @@ public enum NotificationType : String {
   case clientDidConnect
   case clientDidDisconnect
   
+  case equalizerHasBeenAdded
+  
   case globalProfileChanged
   case globalProfileCreated
   case globalProfileRemoved
@@ -81,6 +83,8 @@ public enum NotificationType : String {
   case tnfHasBeenAdded
   case tnfWillBeRemoved
   
+  case transmitHasBeenAdded
+
   case txAudioStreamHasBeenAdded
   case txAudioStreamWillBeRemoved
   

@@ -36,7 +36,8 @@ public final class Equalizer                : NSObject, DynamicModel {
   private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Equalizer")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
-  
+  private var _initialized                  = false                         // True if initialized by Radio hardware
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
   private var __eqEnabled                   = false                         // enabled flag
@@ -190,6 +191,14 @@ public final class Equalizer                : NSObject, DynamicModel {
         _eqEnabled = property.value.bValue
         didChangeValue(for: \.eqEnabled)
       }
+    }
+    // is the Equalizer initialized?
+    if !_initialized {
+      // NO, the Radio (hardware) has acknowledged this Equalizer
+      _initialized = true
+      
+      // notify all observers
+      NC.post(.equalizerHasBeenAdded, object: self as Any?)
     }
   }
 }

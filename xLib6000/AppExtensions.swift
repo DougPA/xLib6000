@@ -220,7 +220,10 @@ public extension String {
   func valuesArray(delimiter: String = " ", valuesToLower: Bool = false) -> ValuesArray {
     
     // split it into an array of <value> values, lowercase as needed
-    return valuesToLower ? self.components(separatedBy: delimiter).map {$0.lowercased()} : self.components(separatedBy: delimiter)
+    var array = valuesToLower ? self.components(separatedBy: delimiter).map {$0.lowercased()} : self.components(separatedBy: delimiter)
+    array = array.map { $0.trimmingCharacters(in: .whitespaces) }
+    
+    return array
   }
   /// Replace spaces and equal signs in a CWX Macro with alternate characters
   ///
