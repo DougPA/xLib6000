@@ -60,7 +60,15 @@ extension xLib6000.Slice {
       Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "pan" + "=\(panadapter.id.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz)")", replyTo: callback)
     }
   }
-  
+  /// Remove the specified Slice
+  ///
+  /// - Parameter id:         a SliceId
+  ///
+  public class func removeSlice(id: SliceId) {
+    // tell the Radio to remove the Slice
+    Api.sharedInstance.send(xLib6000.Slice.kRemoveCmd + id)
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Public Instance methods that send Commands to the Radio (hardware)
   

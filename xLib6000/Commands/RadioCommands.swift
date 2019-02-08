@@ -27,13 +27,13 @@ extension Radio {
   static let kXmitCmd                       = "xmit "
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Public methods that send Commands to the Radio (hardware)
 
   /// Request a list of antenns
   ///
   /// - Parameter callback:   ReplyHandler (optional)
   ///
-  public class func antennaListRequest(callback: ReplyHandler? = nil) {
+  public func antennaListRequest(callback: ReplyHandler? = nil) {
     
     // ask the Radio to send a list of antennas
     Api.sharedInstance.send(Api.Command.antList.rawValue, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)

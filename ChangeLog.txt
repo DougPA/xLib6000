@@ -1,5 +1,13 @@
 xLib6000 Change Log
 
+v2.3.7 07-Feb-2019
+
+SliceCommands.swift - added class removeSlice(id:)
+RadioCommands.swift - changed antennaListRequest(callback:) from "class" to "instance"
+RadioCommands.swift - corrected commands
+Api.swift - changed kNoError from "internal" to "public"
+
+
 v2.3.6 03-Feb-2019
 
 Notifications.swift - added equalizerHasBeenAdded
