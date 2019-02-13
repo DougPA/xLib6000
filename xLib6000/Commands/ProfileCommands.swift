@@ -65,7 +65,7 @@ extension Profile {
   // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
   
   // listed in alphabetical order
-  @objc dynamic public var selection: ProfileId {
+  @objc dynamic public var selection: ProfileName {
     get {  return _selection }
     set { if _selection != newValue { _selection = newValue ; profileCmd(newValue) } } }
   

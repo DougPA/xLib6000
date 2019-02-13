@@ -9,7 +9,8 @@
 import Foundation
 import os
 
-public typealias ProfileId = String
+public typealias ProfileId                  = String
+public typealias ProfileName                 = String
 
 // --------------------------------------------------------------------------------
 // MARK: - Profile Class implementation
@@ -20,7 +21,6 @@ public typealias ProfileId = String
 //
 // --------------------------------------------------------------------------------
 
-public typealias ProfileString              = String
 
 public final class Profile                  : NSObject, StaticModel {
 
@@ -43,7 +43,7 @@ public final class Profile                  : NSObject, StaticModel {
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
-  private var __list           = [ProfileString]()             // list of Profile names
+  private var __list           = [ProfileName]()               // list of Profile names
   private var __selection      : ProfileId = ""                // selected Profile name
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -140,7 +140,7 @@ public final class Profile                  : NSObject, StaticModel {
       didChangeValue(for: \.selection)
     }
     // is the Profile initialized?
-    if !_initialized && _list.count > 0 && _selection != "" {
+    if !_initialized && _list.count > 0 {
       
       // YES, the Radio (hardware) has acknowledged this Panadapter
       _initialized = true
@@ -164,11 +164,11 @@ extension Profile {
   // MARK: - Internal properties - with synchronization
   
   // listed in alphabetical order
-  internal var _list: [ProfileString] {
+  internal var _list: [ProfileName] {
     get { return _q.sync { __list } }
     set { _q.sync(flags: .barrier) { __list = newValue } } }
 
-  internal var _selection: ProfileId {
+  internal var _selection: ProfileName {
     get { return _q.sync { __selection } }
     set { _q.sync(flags: .barrier) { __selection = newValue } } }
 
@@ -178,7 +178,7 @@ extension Profile {
   // FIXME: Should any of these send a message to the Radio?
   //          If yes, implement it, if not should they be "get" only?
   
-  @objc dynamic public var list: [ProfileString] {
+  @objc dynamic public var list: [ProfileName] {
     return _list }
   
   // ----------------------------------------------------------------------------
