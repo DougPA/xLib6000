@@ -283,7 +283,7 @@ extension Radio {
   
   @objc dynamic public var startCalibration: Bool {
     get { return _startCalibration }
-    set { if _startCalibration != newValue { _startCalibration = newValue ; if newValue { Swift.print("startCalibration") ; radioCmd("pll_start", "") } } } }
+    set { if _startCalibration != newValue { _startCalibration = newValue ; if newValue { radioCmd("pll_start", "") } } } }
   
   @objc dynamic public var callsign: String {
     get {  return _callsign }

@@ -9,7 +9,7 @@
 import Foundation
 import os
 
-public typealias MeterId = String
+public typealias MeterNumber = String
 public typealias MeterName = String
 
 // --------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var id                : MeterId = ""                  // Id that uniquely identifies this Meter
+  public private(set) var number                : MeterNumber = ""          // Number that uniquely identifies this Meter
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -59,7 +59,7 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
   private var _fps                          = 0                             // frames per second
   private var _high: Float                  = 0.0                           // high limit
   private var _low: Float                   = 0.0                           // low limit
-  private var _number                       = ""                            // Id of the source
+  private var _group                        = ""                            // group
   private var _name                         = ""                            // abbreviated description
   private var _peak                         : Float = 0.0                   // peak value
   private var _source                       = ""                            // source
@@ -102,20 +102,20 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
     for i in 0..<numberOfMeters {
       
       // get the Meter number and the Meter value
-      let meterNumber: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: 2 * i).pointee)
-      let meterValue: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: (2 * i) + 1).pointee)
+      let number: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: 2 * i).pointee)
+      let value: UInt16 = CFSwapInt16BigToHost(ptr16.advanced(by: (2 * i) + 1).pointee)
       
       // is this a duplicate?
-      if !metersFound.contains(meterNumber) {
+      if !metersFound.contains(number) {
         
         // NO, add it to the list
-        metersFound.append(meterNumber)
+        metersFound.append(number)
         
         // find the meter (if present) & update it
-        if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", meterNumber)] {
+        if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", number)] {
           
           // interpret it as a signed value
-          meter.streamHandler( Int16(bitPattern: meterValue) )
+          meter.streamHandler( Int16(bitPattern: value) )
         }
       }
 //      else {
@@ -176,42 +176,42 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       let components = keyValues[0].key.components(separatedBy: ".")
       if components.count != 2 {return }
 
-      // the Meter Id is the 0th item (MeterNumber)
-      let meterId = components[0]
+      // the Meter Number is the 0th item
+      let number = components[0]
       
       // does the meter exist?
-      if radio.meters[meterId] == nil {
+      if radio.meters[number] == nil {
         
         // DOES NOT EXIST, create a new Meter & add it to the Meters collection
-        radio.meters[meterId] = Meter(id: meterId, queue: queue)
+        radio.meters[number] = Meter(number: number, queue: queue)
       }
       
       // pass the key values to the Meter for parsing
-      radio.meters[meterId]!.parseProperties( keyValues )
+      radio.meters[number]!.parseProperties( keyValues )
 
     } else {
       
       // NOT IN USE, extract the Meter Number
-      let meterId = keyValues[0].key.components(separatedBy: " ")[0]
+      let number = keyValues[0].key.components(separatedBy: " ")[0]
       
       // does it exist?
-      if let meter = radio.meters[meterId] {
+      if let meter = radio.meters[number] {
         
         // is it a Slice meter?
         if meter.source == Meter.Source.slice.rawValue {
           
           // YES, get the Slice
-          if let slice = radio.slices[meter.number] {
+          if let slice = radio.slices[meter.group] {
             
             // remove it from the Slice
-            slice.removeMeter(meterId)
+            slice.removeMeter(number)
           }
         }
         // notify all observers
-        NC.post(.meterWillBeRemoved, object: radio.meters[meterId] as Any?)
+        NC.post(.meterWillBeRemoved, object: radio.meters[number] as Any?)
         
         // remove it
-        radio.meters[meterId] = nil
+        radio.meters[number] = nil
       }
     }
   }
@@ -225,9 +225,9 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
   ///   - id:                 a Meter Id
   ///   - queue:              Concurrent queue
   ///
-  public init(id: MeterId, queue: DispatchQueue) {
+  public init(number: MeterNumber, queue: DispatchQueue) {
     
-    self.id = id
+    self.number = number
     _q = queue
     
     // FIXME:
@@ -257,8 +257,8 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       // get the Key
       let key = numberAndKey[1]
       
-      // set the Meter Number
-      id = numberAndKey[0]
+//      // set the Meter Number
+//      number = numberAndKey[0]
       
       // check for unknown Keys
       guard let token = Token(rawValue: key) else {
@@ -287,9 +287,9 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       case .name:
         name = property.value.lowercased()
         
-      case .number:
-        number = property.value
-        
+      case .group:
+        group = property.value
+
       case .source:
         source = property.value.lowercased()
         
@@ -297,7 +297,7 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
         units = property.value.lowercased()
       }
     }
-    if !_initialized && number != "" && units != "" {
+    if !_initialized && group != "" && units != "" {
       
       // the Radio (hardware) has acknowledged this Meter
       _initialized = true
@@ -306,7 +306,7 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       if source == Meter.Source.slice.rawValue {
         
         // YES, does the Slice exist (yet)
-        if let slice = _api.radio!.slices[number] {
+        if let slice = _api.radio!.slices[group] {
           
           // YES, add it to the Slice
           slice.addMeter(self)
@@ -403,9 +403,9 @@ extension Meter {
     get { return _q.sync { _name } }
     set { _q.sync(flags: .barrier) { _name = newValue } } }
   
-  @objc dynamic public var number: String {
-    get { return _q.sync { _number } }
-    set { _q.sync(flags: .barrier) { _number = newValue } } }
+  @objc dynamic public var group: String {
+    get { return _q.sync { _group } }
+    set { _q.sync(flags: .barrier) { _group = newValue } } }
   
   @objc dynamic public var peak: Float {
     get { return _q.sync { _peak } }
@@ -432,7 +432,7 @@ extension Meter {
     case high       = "hi"
     case low
     case name       = "nam"
-    case number     = "num"
+    case group      = "num"
     case source     = "src"
     case units      = "unit"
   }

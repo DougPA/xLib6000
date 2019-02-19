@@ -44,7 +44,7 @@ public final class Slice                    : NSObject, DynamicModel {
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ---------
   //
-  private var _meters                       = [String: Meter]()             // Dictionary of Meters (on this Slice)
+  private var _meters                       = [MeterNumber: Meter]()        // Dictionary of Meters (on this Slice)
   //
   private var __daxClients                  = 0                             // DAX clients for this slice
   //
@@ -299,15 +299,15 @@ public final class Slice                    : NSObject, DynamicModel {
   ///   - meter:      a reference to a Meter
   ///
   func addMeter(_ meter: Meter) {
-    meters[meter.id] = meter
+    meters[meter.number] = meter
   }
   /// Remove a Meter from this Slice's Meters collection
   ///
   /// - Parameters:
   ///   - meter:      a reference to a Meter
   ///
-  func removeMeter(_ id: MeterId) {
-    meters[id] = nil
+  func removeMeter(_ number: MeterNumber) {
+    meters[number] = nil
   }
   /// Set the default Filter widths
   ///

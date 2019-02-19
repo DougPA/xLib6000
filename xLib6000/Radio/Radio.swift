@@ -63,7 +63,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var _equalizers                   = [Equalizer.EqType: Equalizer]() // Dictionary of Equalizers
   private var _iqStreams                    = [DaxStreamId: IqStream]()     // Dictionary of Dax Iq streams
   private var _memories                     = [MemoryId: Memory]()          // Dictionary of Memories
-  private var _meters                       = [MeterId: Meter]()            // Dictionary of Meters
+  private var _meters                       = [MeterNumber: Meter]()        // Dictionary of Meters
   private var _micAudioStreams              = [DaxStreamId: MicAudioStream]() // Dictionary of MicAudio streams
   private var _opusStreams                  = [OpusId: Opus]()              // Dictionary of Opus Streams
   private var _panadapters                  = [PanadapterId: Panadapter]()  // Dictionary of Panadapters
@@ -1809,7 +1809,7 @@ extension Radio {
     get { return _q.sync { _memories } }
     set { _q.sync(flags: .barrier) { _memories = newValue } } }
   
-  public var meters: [MeterId: Meter] {
+  public var meters: [MeterNumber: Meter] {
     get { return _q.sync { _meters } }
     set { _q.sync(flags: .barrier) { _meters = newValue } } }
   
