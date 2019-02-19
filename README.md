@@ -1,4 +1,5 @@
-# xLib6000
+# xLib6000 (Deprecated, please see the v2 Branch of this repo)
+
 ## Mac implementation of the FlexRadio (TM) series 6000 software defined radios API (FlexLib)
 
 ### Built on:
