@@ -9,17 +9,19 @@
 import Foundation
 import os
 
-// --------------------------------------------------------------------------------
-// MARK: - Interlock Class implementation
-//
-//      creates an Interlock instance to be used by a Client to support the
-//      processing of interlocks. Interlock objects are added, removed and 
-//      updated by the incoming TCP messages.
-//
-// --------------------------------------------------------------------------------
-
+/// Interlock Class implementation
+///
+///      creates an Interlock instance to be used by a Client to support the
+///      processing of interlocks. Interlock objects are added, removed and
+///      updated by the incoming TCP messages.
+///
 public final class Interlock                : NSObject, StaticModel {
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
+  static let kCmd                           = "interlock "
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -66,10 +68,11 @@ public final class Interlock                : NSObject, StaticModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse an Interlock status message
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -195,23 +198,12 @@ public final class Interlock                : NSObject, StaticModel {
     }
   }
 }
-  // ------------------------------------------------------------------------------
-  // MARK: - Private methods
-  
-
-// --------------------------------------------------------------------------------
-// MARK: - Interlock Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Interlock tokens
-// --------------------------------------------------------------------------------
 
 extension Interlock {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _accTxEnabled: Bool {
     get { return _q.sync { __accTxEnabled } }
     set { _q.sync(flags: .barrier) { __accTxEnabled = newValue } } }
@@ -289,7 +281,7 @@ extension Interlock {
     set { _q.sync(flags: .barrier) { __tx3Enabled = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
   @objc dynamic public var reason: String {
     return _reason }
@@ -307,8 +299,10 @@ extension Interlock {
     return _txAllowed }
     
   // ----------------------------------------------------------------------------
-  // MARK: - Interlock tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token: String {
     case accTxEnabled       = "acc_tx_enabled"
     case accTxDelay         = "acc_tx_delay"
@@ -330,7 +324,8 @@ extension Interlock {
     case tx3Enabled         = "tx3_enabled"
     case tx3Delay           = "tx3_delay"
   }
-  
+  /// States
+  ///
   internal enum State: String {
     case receive            = "RECEIVE"
     case ready              = "READY"
@@ -342,14 +337,16 @@ extension Interlock {
     case stuckInput         = "STUCK_INPUT"
     case unKeyRequested     = "UNKEY_REQUESTED"
   }
-  
+  /// Sources
+  ///
   internal enum PttSource: String {
     case software           = "SW"
     case mic                = "MIC"
     case acc                = "ACC"
     case rca                = "RCA"
   }
-
+  /// Reasons
+  ///
   internal enum Reasons: String {
     case rcaTxRequest       = "RCA_TXREQ"
     case accTxRequest       = "ACC_TXREQ"

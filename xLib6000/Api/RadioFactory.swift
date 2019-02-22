@@ -8,14 +8,11 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - RadioFactory implementation
-//
-//      listens for the udp broadcasts announcing the presence of a Flex-6000
-//      Radio, reports changes to the list of available radios
-//
-// --------------------------------------------------------------------------------
-
+/// RadioFactory implementation
+///
+///      listens for the udp broadcasts announcing the presence of a Flex-6000
+///      Radio, reports changes to the list of available radios
+///
 public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegate {
   
   typealias IpAddress                       = String                        // dotted decimal form
@@ -175,10 +172,11 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - GCDAsyncUdpSocket delegate methods
-  //    Note: called on its GCD thread
+  // MARK: - GCDAsyncUdp delegate method
   
   /// The Socket received data
+  ///
+  ///   GCDAsyncUdpSocket delegate method, executes on the udpReceiveQ
   ///
   /// - Parameters:
   ///   - sock:           the GCDAsyncUdpSocket

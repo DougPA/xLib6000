@@ -8,22 +8,13 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Tnf Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Tnf {
   
-  static let kCreateCmd                     = "tnf create "                 // Command prefixes
-  static let kRemoveCmd                     = "tnf remove "
-  static let kSetCmd                        = "tnf set "
-  
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
 
   /// Create a Tnf
   ///
@@ -38,7 +29,7 @@ extension Tnf {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
 
   /// Remove a Tnf
   ///
@@ -73,9 +64,8 @@ extension Tnf {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
-  // listed in alphabetical order
   @objc dynamic public var depth: Int {
     get { return _depth }
     set { if _depth != newValue { if depth.within(Depth.normal.rawValue, Depth.veryDeep.rawValue) {

@@ -8,19 +8,15 @@
 
 import Foundation
 
-
-// --------------------------------------------------------------------------------
-// MARK: - WanServer Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension WanServer {
 
   static let kSetCmd                        = "wan set "                  // Command prefixes
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
   
   /// Setup SmartLink ports
   ///

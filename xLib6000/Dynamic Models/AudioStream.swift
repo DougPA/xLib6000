@@ -13,18 +13,22 @@ public typealias DaxStreamId = UInt32
 public typealias DaxChannel = Int
 public typealias DaxIqChannel = Int
 
-// ------------------------------------------------------------------------------
-// MARK: - AudioStream Class implementation
-//
-//      creates an AudioStream instance to be used by a Client to support the
-//      processing of a stream of Audio from the Radio to the client. AudioStream
-//      objects are added / removed by the incoming TCP messages. AudioStream
-//      objects periodically receive Audio in a UDP stream.
-//
-// ------------------------------------------------------------------------------
-
+/// AudioStream Class implementation
+///
+///      creates an AudioStream instance to be used by a Client to support the
+///      processing of a stream of Audio from the Radio to the client. AudioStream
+///      objects are added / removed by the incoming TCP messages. AudioStream
+///      objects periodically receive Audio in a UDP stream.
+///
 public final class AudioStream              : NSObject, DynamicModelWithStream {
 
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
+  static let kCmd                           = "audio stream "               // Command prefixes
+  static let kStreamCreateCmd               = "stream create "
+  static let kStreamRemoveCmd               = "stream remove "
+  
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
@@ -57,13 +61,11 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
 
   /// Parse an AudioStream status message
+  ///
+  ///   StatusParser Protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -106,6 +108,10 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
       }
     }
   }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   /// Check if an Audio Stream belongs to us
   ///
   /// - Parameters:
@@ -194,10 +200,11 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   }
 
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
-
+  // MARK: - Protocol instance methods
+  
   /// Parse Audio Stream key/value pairs
+  ///
+  ///   PropertiesParser Protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -261,16 +268,11 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
       NC.post(.audioStreamHasBeenAdded, object: self as Any?)
     }
   }
-
-  // ----------------------------------------------------------------------------
-  // MARK: - VitaProcessor Protocol method
-  
-  //      called by Radio on the streamQ
-  //
-  //      The payload of the incoming Vita struct is converted to an AudioStreamFrame and
-  //      passed to the Audio Stream Handler
-  
   /// Process the AudioStream Vita struct
+  ///
+  ///   VitaProcessor Protocol method, executes on the streamQ
+  ///      The payload of the incoming Vita struct is converted to an AudioStreamFrame and
+  ///      passed to the Audio Stream Handler, called by Radio
   ///
   /// - Parameters:
   ///   - vita:       a Vita struct
@@ -334,52 +336,11 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - AudioStreamFrame struct implementation
-// --------------------------------------------------------------------------------
-//
-//  Populated by the Audio Stream vitaHandler
-//
-
-/// Struct containing Audio Stream data
-///
-public struct AudioStreamFrame {
-  
-  public var daxChannel                     = -1
-  public private(set) var samples           = 0                             // number of samples (L/R) in this frame
-  public var leftAudio                      = [Float]()                     // Array of left audio samples
-  public var rightAudio                     = [Float]()                     // Array of right audio samples
-  
-  /// Initialize an AudioStreamFrame
-  ///
-  /// - Parameters:
-  ///   - payload:        pointer to a Vita packet payload
-  ///   - numberOfBytes:  number of bytes in the payload
-  ///
-  public init(payload: UnsafeRawPointer, numberOfBytes: Int) {
-    
-    // 4 byte each for left and right sample (4 * 2)
-    self.samples = numberOfBytes / (4 * 2)
-    
-    // allocate the samples arrays
-    self.leftAudio = [Float](repeating: 0, count: samples)
-    self.rightAudio = [Float](repeating: 0, count: samples)
-  }
-}
-
-// --------------------------------------------------------------------------------
-// MARK: - AudioStream Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - AudioStream tokens
-// --------------------------------------------------------------------------------
-
 extension AudioStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _daxChannel: Int {
     get { return _q.sync { __daxChannel } }
     set { _q.sync(flags: .barrier) { __daxChannel = newValue } } }
@@ -409,12 +370,8 @@ extension AudioStream {
     set { _q.sync(flags: .barrier) { __slice = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
-  // FIXME: Should any of these send a message to the Radio?
-  //          If yes, implement it, if not should they be "get" only?
-  
-  // listed in alphabetical order
   @objc dynamic public var daxChannel: Int {
     get { return _daxChannel }
     set {
@@ -447,15 +404,17 @@ extension AudioStream {
     set { if _slice != newValue { _slice = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
+  // MARK: - NON Public properties (KVO compliant)
   
   public var delegate: StreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // Mark: - AudioStream tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token: String {
     case daxChannel                         = "dax"
     case daxClients                         = "dax_clients"
@@ -465,3 +424,5 @@ extension AudioStream {
     case slice
   }
 }
+
+

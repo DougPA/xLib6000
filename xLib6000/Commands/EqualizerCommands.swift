@@ -8,25 +8,13 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Equalizer Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Equalizer {
   
-  //
-  //  NOTE:   Equalizer Commands are in the following format:
-  //
-  //              eq <id> <valueName>=<value>
-  //
-  
-  static let kCmd                           = "eq "                         // Command prefixes
-  
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
   
   /// Return a list of Equalizer values
   ///
@@ -67,9 +55,8 @@ extension Equalizer {
   }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
-  // listed in alphabetical order
   @objc dynamic public var eqEnabled: Bool {
     get { return  _eqEnabled }
     set { if _eqEnabled != newValue { _eqEnabled = newValue ; eqCmd( .enabled, newValue.asNumber) } } }

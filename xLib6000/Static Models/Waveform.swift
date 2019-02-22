@@ -9,15 +9,12 @@
 import Foundation
 import os
 
-// --------------------------------------------------------------------------------
-// MARK: - Waveform Class implementation
-//
-//      creates a Waveform instance to be used by a Client to support the
-//      processing of installed Waveform functions. Waveform objects are added,
-//      removed and updated by the incoming TCP messages.
-//
-// --------------------------------------------------------------------------------
-
+/// Waveform Class implementation
+///
+///      creates a Waveform instance to be used by a Client to support the
+///      processing of installed Waveform functions. Waveform objects are added,
+///      removed and updated by the incoming TCP messages.
+///
 public final class Waveform                 : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
@@ -48,10 +45,11 @@ public final class Waveform                 : NSObject, StaticModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse a Waveform status message
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -81,32 +79,26 @@ public final class Waveform                 : NSObject, StaticModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Waveform Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Waveform tokens
-// --------------------------------------------------------------------------------
-
 extension Waveform {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _waveformList: String {
     get { return _q.sync { __waveformList } }
     set { _q.sync(flags: .barrier) { __waveformList = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
   @objc dynamic public var waveformList: String {
     return _waveformList }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Waveform Tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token: String {
     case waveformList = "installed_list"
   }

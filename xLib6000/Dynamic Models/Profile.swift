@@ -12,18 +12,17 @@ import os
 public typealias ProfileId                  = String
 public typealias ProfileName                 = String
 
-// --------------------------------------------------------------------------------
-// MARK: - Profile Class implementation
-//
-//      creates a Profiles instance to be used by a Client to support the
-//      processing of the profiles. Profile objects are added, removed and
-//      updated by the incoming TCP messages.
-//
-// --------------------------------------------------------------------------------
-
-
+/// Profile Class implementation
+///
+///      creates a Profiles instance to be used by a Client to support the
+///      processing of the profiles. Profile objects are added, removed and
+///      updated by the incoming TCP messages.
+///
 public final class Profile                  : NSObject, StaticModel {
 
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
   public static let kGlobal                 = "global"
   public static let kMic                    = "mic"
   public static let kTx                     = "tx"
@@ -49,13 +48,11 @@ public final class Profile                  : NSObject, StaticModel {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
   
   /// Parse a Profile status message
+  ///
+  ///   StatusParser protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:          a KeyValuesArray
@@ -101,10 +98,11 @@ public final class Profile                  : NSObject, StaticModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse a Profile status message
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -151,17 +149,10 @@ public final class Profile                  : NSObject, StaticModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Profile Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Profile tokens
-// --------------------------------------------------------------------------------
-
 extension Profile {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
   // listed in alphabetical order
   internal var _list: [ProfileName] {
@@ -173,17 +164,16 @@ extension Profile {
     set { _q.sync(flags: .barrier) { __selection = newValue } } }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
-  
-  // FIXME: Should any of these send a message to the Radio?
-  //          If yes, implement it, if not should they be "get" only?
+  // MARK: - Public properties (KVO compliant)
   
   @objc dynamic public var list: [ProfileName] {
     return _list }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Profile Tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   public enum Token: String {
     case list       = "list"
     case selection  = "current"

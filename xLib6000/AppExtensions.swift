@@ -8,9 +8,6 @@
 
 import Foundation
 
-// ----------------------------------------------------------------------------
-// MARK: - Date
-
 public extension Date {
   
   /// Create a Date/Time in the local time zone
@@ -25,9 +22,6 @@ public extension Date {
     return dtf.string(from: self)
   }
 }
-
-// ----------------------------------------------------------------------------
-// MARK: - NotificationCenter
 
 public extension NotificationCenter {
   
@@ -90,9 +84,6 @@ public extension NotificationCenter {
   }
 }
 
-// ----------------------------------------------------------------------------
-// MARK: - Sequence Type
-
 public extension Sequence {
   
   /// Find an element in an array
@@ -109,9 +100,6 @@ public extension Sequence {
     return nil
   }
 }
-
-// ----------------------------------------------------------------------------
-// MARK: - String
 
 public typealias KeyValuesArray = [(key:String, value:String)]
 public typealias ValuesArray = [String]
@@ -294,9 +282,6 @@ public extension String {
   }
 }
 
-// ----------------------------------------------------------------------------
-// MARK: - Bool
-
 public extension Bool {
   
   /// Return 1 / 0 for true / false Booleans
@@ -350,9 +335,6 @@ public extension Bool {
   }
 }
 
-// ----------------------------------------------------------------------------
-// MARK: - Int
-
 public extension Int {
   
   /// Convert an Int Hz value to a Mhz string
@@ -389,9 +371,6 @@ public extension Int {
   }
 }
 
-// ----------------------------------------------------------------------------
-// MARK: - UInt32
-
 public extension UInt32 {
   
   // convert a UInt32 to a hax String (defaults to "0xXXXXXXXX")
@@ -403,9 +382,6 @@ public extension UInt32 {
   // convert a UInt32 to a hex String (uppercase, leading zeros, 8 characters, 0x prefix)
   var hex: String { return String(format: "0x%08X", self) }
 }
-
-// ----------------------------------------------------------------------------
-// MARK: - CGFloat
 
 public extension CGFloat {
   

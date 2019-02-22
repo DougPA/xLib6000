@@ -9,17 +9,22 @@
 import Foundation
 import os
 
-// --------------------------------------------------------------------------------
-// MARK: - Atu Class implementation
-//
-//      creates an Atu instance to be used by a Client to support the
-//      processing of the Antenna Tuning Unit (if installed). Atu objects are
-//      added, removed and updated by the incoming TCP messages.
-//
-// --------------------------------------------------------------------------------
-
+/// Atu Class implementation
+///
+///      creates an Atu instance to be used by a Client to support the
+///      processing of the Antenna Tuning Unit (if installed). Atu objects are
+///      added, removed and updated by the incoming TCP messages.
+///
 public final class Atu                      : NSObject, StaticModel {
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
   
+  static let kClearCmd                      = "atu clear"                   // Command prefixes
+  static let kStartCmd                      = "atu start"
+  static let kBypassCmd                     = "atu bypass"
+  static let kCmd                           = "atu "
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -51,10 +56,11 @@ public final class Atu                      : NSObject, StaticModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse an Atu status message
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -99,19 +105,11 @@ public final class Atu                      : NSObject, StaticModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Atu Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Atu tokens
-// --------------------------------------------------------------------------------
-
 extension Atu {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _enabled: Bool {
     get { return _q.sync { __enabled } }
     set { _q.sync(flags: .barrier) { __enabled = newValue } } }
@@ -129,7 +127,7 @@ extension Atu {
     set { _q.sync(flags: .barrier) { __usingMemories = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
   @objc dynamic public var status: String {
     var value = ""
@@ -159,16 +157,22 @@ extension Atu {
   @objc dynamic public var usingMemories: Bool {
     return _usingMemories }
   
+  @objc dynamic public var enabled: Bool {
+    return _enabled }
+
   // ----------------------------------------------------------------------------
-  // MARK: - Atu tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token: String {
     case status
     case enabled          = "atu_enabled"
     case memoriesEnabled  = "memories_enabled"
     case usingMemories    = "using_mem"
   }
-  
+  /// Statuses
+  ///
   internal enum Status: String {
     case none             = "NONE"
     case tuneNotStarted   = "TUNE_NOT_STARTED"

@@ -8,14 +8,11 @@
 
 import Foundation
 
-// ------------------------------------------------------------------------------
-// MARK: - Pinger Class implementation
-//
-//      generates "ping" messages once a second, if no reply is received
-//      sends a .tcpPingTimeout Notification
-//
-// ------------------------------------------------------------------------------
-
+///  Pinger Class implementation
+///
+///      generates "ping" messages once a second, if no reply is received
+///      sends a .tcpPingTimeout Notification
+///
 final class Pinger {
   
   // ----------------------------------------------------------------------------
@@ -25,6 +22,7 @@ final class Pinger {
   private var _pingTimer                    : DispatchSourceTimer!          // periodic timer for ping
   private var _pingQ                        : DispatchQueue!                // Queue for Pinger synchronization
   private var _lastPingRxTime               : Date!                         // Time of the last ping response
+  private var _pingFirstResponse            = true
   
   private let kKeepAlive                    = "keepalive enable"
   private let kPing                         = "ping"
@@ -53,16 +51,18 @@ final class Pinger {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods
+  // MARK: - Internal methods
   
   /// Process the Response to a Ping
   ///
   func pingReply(_ command: String, seqNum: String, responseValue: String, reply: String) {
     
-    _pingQ.async {
-      
+    // notification can be used to signal that the Radio is now fully initialized
+    if _pingFirstResponse { _pingFirstResponse = false ; NC.post(.tcpPingFirstResponse, object: nil) }
+
+    _pingQ.async { [weak self] in
       // save the time of the Response
-      self._lastPingRxTime = Date(timeIntervalSinceNow: 0)
+      self?._lastPingRxTime = Date(timeIntervalSinceNow: 0)
     }
   }
   
@@ -118,7 +118,9 @@ final class Pinger {
   private func stopPingTimer() {
     
     // stop the Timer (if any)
-    _pingTimer?.cancel();
+    _pingTimer?.cancel()
+    
+    _pingFirstResponse = true
   }
   
 }

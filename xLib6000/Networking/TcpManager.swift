@@ -10,27 +10,10 @@ public typealias ReplyHandler = (_ command: String, _ seqNum: String, _ response
 public typealias SequenceId = String
 public typealias ReplyTuple = (replyTo: ReplyHandler?, command: String)
 
-// --------------------------------------------------------------------------------
-// MARK: - TcpManager delegate protocol
-//
-// --------------------------------------------------------------------------------
-
-protocol TcpManagerDelegate: class {
-  
-//  func addReplyHandler(_ sequenceId: SequenceId, replyTuple: ReplyTuple)
-  func receivedMessage(_ text: String)
-  func sentMessage(_ text: String)
-//  func tcpError(_ message: String)
-  func tcpState(connected: Bool, host: String, port: UInt16, error: String)
-}
-
-// ------------------------------------------------------------------------------
-// MARK: - TcpManager Class implementation
-//
-//      manages all TCP communication between the API and the Radio (hardware)
-//
-// ------------------------------------------------------------------------------
-
+///  TcpManager Class implementation
+///
+///      manages all TCP communication between the API and the Radio (hardware)
+///
 final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
 
   public private(set) var interfaceIpAddress = "0.0.0.0"
@@ -94,7 +77,7 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods
+  // MARK: - Internal methods
   
   /// Attempt to connect to the Radio (hardware)
   ///

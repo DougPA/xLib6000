@@ -8,30 +8,13 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Slice Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension xLib6000.Slice {
   
-  static let kCreateCmd                     = "slice create "               // Command prefixes
-  static let kRemoveCmd                     = "slice remove "
-  static let kCmd                           = "slice "
-  static let kSetCmd                        = "slice set "
-  static let kTuneCmd                       = "slice tune "
-  static let kAudioCmd                      = "audio client 0 slice "
-  static let kFilterCmd                     = "filt "
-  static let kListCmd                       = "slice list"
-
-  static let kMinOffset                     = -99_999                       // frequency offset range
-  static let kMaxOffset                     = 99_999
-  
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
   
   /// Create a new Slice
   ///
@@ -70,7 +53,7 @@ extension xLib6000.Slice {
   }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
   
   /// Remove this Slice
   ///
@@ -101,6 +84,15 @@ extension xLib6000.Slice {
     
     // ask the Radio for a list of Slices
     Api.sharedInstance.send(xLib6000.Slice.kCmd + "list", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+  }
+  public func setRecord(_ value: Bool) {
+    
+    Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) record=\(value.asNumber)")
+  }
+  
+  public func setPlay(_ value: Bool) {
+    
+    Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) play=\(value.asNumber)")
   }
 
   // ----------------------------------------------------------------------------
@@ -156,14 +148,7 @@ extension xLib6000.Slice {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
-  
-  public func setRecord(_ value: Bool) { Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) record=\(value.asNumber)") }
-  
-  public func setPlay(_ value: Bool) { Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) play=\(value.asNumber)") }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
   // ***** AUDIO COMMANDS *****
   

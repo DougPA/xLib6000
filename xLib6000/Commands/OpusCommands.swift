@@ -8,21 +8,13 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Opus Class extensions
-//              - Static command prefix properties
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Opus {
-  
-  static let kCmd                           = "remote_audio "               // Command prefixes
-  static let kStreamCreateCmd               = "stream create "
-  static let kStreamRemoveCmd               = "stream remove "
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
 
   /// Turn Opus Rx On/Off
   ///
@@ -61,9 +53,8 @@ extension Opus {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
-  // listed in alphabetical order
   @objc dynamic public var rxEnabled: Bool {
     get { return _rxEnabled }
     set { if _rxEnabled != newValue { _rxEnabled = newValue ; opusCmd( .rxEnabled, newValue.asNumber) } } }

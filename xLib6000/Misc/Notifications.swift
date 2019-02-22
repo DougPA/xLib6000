@@ -66,17 +66,19 @@ public enum NotificationType : String {
   case radioWillBeRemoved
   case radioHasBeenRemoved
   
-  case radiosAvailable
+  case radiosAvailable                      // Radios have appeared / disappeared
   
   case sliceBecameActive
   case sliceHasBeenAdded
   case sliceWillBeRemoved
   
   case sliceMeterHasBeenAdded
-  
+  case sliceMeterWillBeRemoved
+
   case tcpDidConnect
   case tcpDidDisconnect
   case tcpPingStarted
+  case tcpPingFirstResponse                 // the first ping reponse was received
   case tcpPingTimeout
   case tcpWillDisconnect
   
@@ -96,7 +98,7 @@ public enum NotificationType : String {
   case waterfallHasBeenAdded
   case waterfallWillBeRemoved
   
-  case updateRequired
+  case updateRequired                       // API and Radio versions incompatible
   
   case xvtrHasBeenAdded
   case xvtrWillBeRemoved

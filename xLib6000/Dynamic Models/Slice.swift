@@ -11,17 +11,29 @@ import os
 
 public typealias SliceId = String
 
-// ------------------------------------------------------------------------------
-// MARK: - Slice Class implementation
-//
-//      creates a Slice instance to be used by a Client to support the
-//      rendering of a Slice. Slice objects are added, removed and
-//      updated by the incoming TCP messages.
-//
-// ------------------------------------------------------------------------------
-
+/// Slice Class implementation
+///
+///      creates a Slice instance to be used by a Client to support the
+///      rendering of a Slice. Slice objects are added, removed and
+///      updated by the incoming TCP messages.
+///
 public final class Slice                    : NSObject, DynamicModel {
-
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
+  static let kCreateCmd                     = "slice create "               // Command prefixes
+  static let kRemoveCmd                     = "slice remove "
+  static let kCmd                           = "slice "
+  static let kSetCmd                        = "slice set "
+  static let kTuneCmd                       = "slice tune "
+  static let kAudioCmd                      = "audio client 0 slice "
+  static let kFilterCmd                     = "filt "
+  static let kListCmd                       = "slice list"
+  
+  static let kMinOffset                     = -99_999                       // frequency offset range
+  static let kMaxOffset                     = 99_999
+  
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
@@ -123,13 +135,11 @@ public final class Slice                    : NSObject, DynamicModel {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ---------
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
   
   /// Parse a Slice status message
+  ///
+  ///   StatusParser Protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -175,6 +185,10 @@ public final class Slice                    : NSObject, DynamicModel {
       
     }
   }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   /// Disable all TxEnabled
   ///
   public class func disableAllTx() {
@@ -291,7 +305,7 @@ public final class Slice                    : NSObject, DynamicModel {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal methods
+  // MARK: - Instance methods
   
   /// Add a Meter to this Slice's Meters collection
   ///
@@ -424,10 +438,11 @@ public final class Slice                    : NSObject, DynamicModel {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse Slice key/value pairs
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -818,18 +833,10 @@ public final class Slice                    : NSObject, DynamicModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Slice Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Slice tokens
-//              - Slice related enums
-// --------------------------------------------------------------------------------
-
 extension xLib6000.Slice {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
   // listed in alphabetical order
   internal var _active: Bool {
@@ -1125,12 +1132,8 @@ extension xLib6000.Slice {
     set { _q.sync(flags: .barrier) { __xitOffset = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
-  // FIXME: Should any of these send a message to the Radio?
-  //          If yes, implement it, if not should they be "get" only?
-  
-  // listed in alphabetical order
   @objc dynamic public var autoPan: Bool {
     get { return _autoPan }
     set { if _autoPan != newValue { _autoPan = newValue } } }
@@ -1211,15 +1214,17 @@ extension xLib6000.Slice {
     set { _wide = newValue } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant Setters / Getters with synchronization
+  // MARK: - Public properties (KVO compliant)
   
   @objc dynamic public var meters: [String: Meter] { 
     get { return _q.sync { _meters } }
     set { _q.sync(flags: .barrier) { _meters = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Slice tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token : String {
     case active
     case agcMode                    = "agc_mode"
@@ -1229,9 +1234,9 @@ extension xLib6000.Slice {
     case anfLevel                   = "anf_level"
     case apfEnabled                 = "apf"
     case apfLevel                   = "apf_level"
-    case audioGain                  = "audio_gain"
-    case audioMute                  = "audio_mute"
-    case audioPan                   = "audio_pan"
+    case audioGain                  = "audio_gain"                  // "gain"
+    case audioMute                  = "audio_mute"                  // "mute"
+    case audioPan                   = "audio_pan"                   // "pan"
     case daxChannel                 = "dax"
     case daxClients                 = "dax_clients"
     case daxTxEnabled               = "dax_tx"
@@ -1253,7 +1258,7 @@ extension xLib6000.Slice {
     case frequency                  = "rf_frequency"
     case ghost
     case inUse                      = "in_use"
-    case locked                     = "lock"
+    case locked                     = "lock"                        // "lock" / "unlock"
     case loopAEnabled               = "loopa"
     case loopBEnabled               = "loopb"
     case mode
@@ -1294,16 +1299,15 @@ extension xLib6000.Slice {
     case xitEnabled                 = "xit_on"
     case xitOffset                  = "xit_freq"
   }
-  
-  // ----------------------------------------------------------------------------
-  // Mark: - Other Slice related enums
-  
+  /// Offsets
+  ///
   public enum RepeaterOffsetDirection : String {
     case up
     case down
     case simplex
   }
-  
+  /// AGC types
+  ///
   public enum AgcMode : String, CaseIterable {
     case off
     case slow
@@ -1314,7 +1318,8 @@ extension xLib6000.Slice {
       return [AgcMode.off.rawValue, AgcMode.slow.rawValue, AgcMode.medium.rawValue, AgcMode.fast.rawValue]
     }
   }
-  
+  /// Modes
+  ///
   public enum Mode : String, CaseIterable {
     case AM
     case SAM

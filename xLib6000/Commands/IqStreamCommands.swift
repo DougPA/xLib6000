@@ -8,22 +8,13 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - IqStream Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension IqStream {
-  
-  static let kCmd                           = "dax iq "                     // Command prefixes
-  static let kStreamCreateCmd               = "stream create "
-  static let kStreamRemoveCmd               = "stream remove "
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
 
   /// Create an IQ Stream
   ///
@@ -52,7 +43,7 @@ extension IqStream {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
 
   /// Remove this IQ Stream
   ///
@@ -81,7 +72,7 @@ extension IqStream {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
   @objc dynamic public var rate: Int {
     get { return _rate }

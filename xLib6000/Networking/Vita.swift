@@ -9,14 +9,11 @@
 import Foundation
 import os
 
-// ------------------------------------------------------------------------------
-// MARK: - VITA header struct implementation
-//
-//      provides decoding and encoding services for Vita encoding
-//      see http://www.vita.com
-//
-// ------------------------------------------------------------------------------
-
+///  VITA header struct implementation
+///
+///      provides decoding and encoding services for Vita encoding
+///      see http://www.vita.com
+///
 public struct VitaHeader {
   
   // this struct mirrors the structure of a Vita Header
@@ -38,18 +35,23 @@ public struct VitaHeader {
   var fractionalTimeStampLsb                : UInt32 = 0
 }
 
-// ------------------------------------------------------------------------------
-// MARK: - VITA class implementation
-// ------------------------------------------------------------------------------
-
+///  VITA class implementation
+///     this class includes, in a more readily inspectable form, all of the properties
+///     needed to populate a Vita Data packet. The "encode" instance method converts this
+///     struct into a Vita Data packet. The "decode" static method converts a supplied
+///     Vita Data packet into a Vita struct.
 public class Vita {
-  
-  // this struct includes, in a more readily inspectable form, all of the properties
-  // needed to populate a Vita Data packet. The "encode" instance method converts this
-  // struct into a Vita Data packet. The "decode" static method converts a supplied
-  // Vita Data packet into a Vita struct.
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
   
   static let DiscoveryStreamId              : UInt32 = 0x00000800
+  // Flex specific codes
+  static let kFlexOui                       : UInt32 = 0x1c2d
+  static let kOuiMask                       : UInt32 = 0x00ffffff
+  static let kFlexInformationClassCode      : UInt32 = 0x534c
+  static let kClassIdPresentMask            : UInt8 = 0x08
+  static let kTrailerPresentMask            : UInt8 = 0x04
 
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
@@ -445,7 +447,7 @@ public class Vita {
   }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Instance methods
+  // MARK: - Public methods
   
   /// Return a String description of a Vita class
   ///
@@ -495,27 +497,19 @@ public class Vita {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Vita Class extensions
-//              - Static properties
-//              - DiscoveryToken enum
-//              - Vita Packet enums
-// --------------------------------------------------------------------------------
-
 extension Vita {
   
-  // Flex specific codes
-  static let kFlexOui                       : UInt32 = 0x1c2d
-  static let kOuiMask                       : UInt32 = 0x00ffffff
-  static let kFlexInformationClassCode      : UInt32 = 0x534c
-  static let kClassIdPresentMask            : UInt8 = 0x08
-  static let kTrailerPresentMask            : UInt8 = 0x04
+  // ----------------------------------------------------------------------------
+  // MARK: - Tokens
   
+  /// Types
+  ///
   enum VitaType {
     case opusTx
     case txAudio
   }
-  
+  /// Discovery properties
+  ///
   enum DiscoveryToken : String {            // Discovery Tokens
     case callsign
     case discoveryVersion                   = "discovery_protocol_version"
@@ -536,6 +530,8 @@ extension Vita {
     
     case lastSeen   // not a real token
   }
+  /// Packet Types
+  ///
   public enum PacketType : UInt8 {          // Packet Types
     case ifData                             = 0x00
     case ifDataWithStream                   = 0x01
@@ -561,6 +557,8 @@ extension Vita {
       }
     }
   }
+  /// Tsi Types
+  ///
   public enum TsiType : UInt8 {             // Timestamp - Integer
     case none                               = 0x00
     case utc                                = 0x01
@@ -580,6 +578,8 @@ extension Vita {
       }
     }
   }
+  /// Tsf Types
+  ///
   public enum TsfType : UInt8 {             // Timestamp - Fractional
     case none                               = 0x00
     case sampleCount                        = 0x01
@@ -599,6 +599,8 @@ extension Vita {
       }
     }
   }
+  /// Class codes
+  ///
   public enum PacketClassCode : UInt16 {    // Packet Class Codes
     case meter                              = 0x8002
     case panadapter                         = 0x8003

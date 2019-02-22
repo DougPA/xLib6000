@@ -8,21 +8,13 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Cwx Class extensions
-//              - Static command prefix properties
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Cwx {
 
-  static let kInsertCmd                     = "cwx insert "
-  static let kMacroCmd                      = "cwx macro "
-  static let kSendCmd                       = "cwx send "
-
   // ------------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Public instance methods that send Commands
 
   /// Clear the character buffer
   ///
@@ -128,14 +120,6 @@ extension Cwx {
   }
   
   // ----------------------------------------------------------------------------
-  
-  // NOTE:    most outgoing commands use the same Token value as is found
-  //          in the incoming Status messages, SOME DO NOT. The alternate
-  //          form of the ...Cmd methods were created to deal with this issue.
-    
-  static let kCmd                           = "cwx "                        // Command prefixes
-  
-  // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   
   /// Set a Cwx property on the Radio
@@ -161,9 +145,8 @@ extension Cwx {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
-  // listed in alphabetical order
   @objc dynamic public var breakInDelay: Int {
     get { return _breakInDelay }
     set { if _breakInDelay != newValue { let value = newValue.bound(kMinDelayMs, kMaxDelayMs) ;  _breakInDelay = value ; cwxCmd( "delay", value) } } }

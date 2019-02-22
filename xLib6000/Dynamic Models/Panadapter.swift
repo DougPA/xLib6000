@@ -12,20 +12,23 @@ import simd
 
 public typealias PanadapterId = UInt32
 
-// --------------------------------------------------------------------------------
-// MARK: - Panadapter implementation
-//
-//      creates a Panadapter instance to be used by a Client to support the
-//      processing of a Panadapter. Panadapter objects are added / removed by the
-//      incoming TCP messages. Panadapter objects periodically receive Panadapter
-//      data in a UDP stream.
-//
-// --------------------------------------------------------------------------------
-
+/// Panadapter implementation
+///
+///      creates a Panadapter instance to be used by a Client to support the
+///      processing of a Panadapter. Panadapter objects are added / removed by the
+///      incoming TCP messages. Panadapter objects periodically receive Panadapter
+///      data in a UDP stream.
+///
 public final class Panadapter               : NSObject, DynamicModelWithStream {
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
   static let kMaxBins                       = 5120
-//  static let daxIqChannels                  = ["None", "1", "2", "3", "4"]
+  static let kCreateCmd                     = "display pan create"          // Command prefixes
+  static let kRemoveCmd                     = "display pan remove "
+  static let kCmd                           = "display pan "
+  static let kSetCmd                        = "display panafall set "
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -95,13 +98,11 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private let _numberOfPanadapterFrames     = 6
 
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
   
   /// Parse a Panadapter status message
+  ///
+  ///   StatusParser Protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -148,6 +149,10 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       }
     }
   }
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   /// Find the active Panadapter
   ///
   /// - Returns:      a reference to a Panadapter (or nil)
@@ -202,7 +207,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Panadapter Reply Handler
+  // MARK: - Instance methods
   
   /// Process the Reply to an Rf Gain Info command, reply format: <value>,<value>,...<value>
   ///
@@ -227,10 +232,11 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
   
   /// Parse Panadapter key/value pairs
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -407,16 +413,11 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       NC.post(.panadapterHasBeenAdded, object: self as Any?)
     }
   }
-
-  // ----------------------------------------------------------------------------
-  // MARK: - VitaProcessor Protocol method
-  
-  //      called by Radio on the streamQ
-  //
-  //      The payload of the incoming Vita struct is converted to a PanadapterFrame and
-  //      passed to the Panadapter Stream Handler
-  
   /// Process the Panadapter Vita struct
+  ///
+  ///   VitaProcessor protocol method, executes on the streamQ
+  ///      The payload of the incoming Vita struct is converted to a PanadapterFrame and
+  ///      passed to the Panadapter Stream Handler
   ///
   /// - Parameters:
   ///   - vita:        a Vita struct
@@ -435,143 +436,10 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - PanadapterFrame class implementation
-// --------------------------------------------------------------------------------
-//
-//  Populated by the Panadapter vitaProcessor
-//
-
-public class PanadapterFrame {
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties
-  
-  public private(set) var startingBinIndex  = 0                             // Index of first bin
-  public private(set) var numberOfBins      = 0                             // Number of bins
-  public private(set) var binSize           = 0                             // Bin size in bytes
-  public private(set) var totalBinsInFrame  = 0                             // number of bins in the complete frame
-  public private(set) var frameIndex        = 0                             // Frame index
-  public var bins                           = [UInt16]()                    // Array of bin values
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Private properties
-  
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "PanadapterFrame")
-
-  private struct PayloadHeaderOld {                                        // struct to mimic payload layout
-    var startingBinIndex                    : UInt32
-    var numberOfBins                        : UInt32
-    var binSize                             : UInt32
-    var frameIndex                          : UInt32
-  }
-  private struct PayloadHeader {                                            // struct to mimic payload layout
-    var startingBinIndex                    : UInt16
-    var numberOfBins                        : UInt16
-    var binSize                             : UInt16
-    var totalBinsInFrame                    : UInt16
-    var frameIndex                          : UInt32
-  }
-  private var _expectedIndex                = 0
-  private var _binsProcessed                = 0
-  private var _byteOffsetToBins             = 0
-  
-  /// Initialize a PanadapterFrame
-  ///
-  /// - Parameter frameSize:    max number of Panadapter samples
-  ///
-  public init(frameSize: Int) {
-    
-    // allocate the bins array
-    self.bins = [UInt16](repeating: 0, count: frameSize)
-  }
-  /// Accumulate Vita object(s) into a PanadapterFrame
-  ///
-  /// - Parameter vita:         incoming Vita object
-  /// - Returns:                true if entire frame processed
-  ///
-  public func accumulate(vita: Vita, expectedIndex: inout Int) -> Bool {
-  
-    let payloadPtr = UnsafeRawPointer(vita.payloadData)
-    
-    if Api.sharedInstance.radioVersionMajor == 2 && Api.sharedInstance.radioVersionMinor >= 3 {
-      // 2.3.x or greater
-      // Bins are just beyond the payload
-      _byteOffsetToBins = MemoryLayout<PayloadHeader>.size
-
-      // map the payload to the New Payload struct
-      let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
-
-      // byte swap and convert each payload component
-      startingBinIndex = Int(CFSwapInt16BigToHost(p.pointee.startingBinIndex))
-      numberOfBins = Int(CFSwapInt16BigToHost(p.pointee.numberOfBins))
-      binSize = Int(CFSwapInt16BigToHost(p.pointee.binSize))
-      totalBinsInFrame = Int(CFSwapInt16BigToHost(p.pointee.totalBinsInFrame))
-      frameIndex = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
-      
-    } else {
-      // pre 2.3.x
-      // Bins are just beyond the payload
-      _byteOffsetToBins = MemoryLayout<PayloadHeaderOld>.size
-
-      // map the payload to the Old Payload struct
-      let p = payloadPtr.bindMemory(to: PayloadHeaderOld.self, capacity: 1)
-      
-      // byte swap and convert each payload component
-      startingBinIndex = Int(CFSwapInt32BigToHost(p.pointee.startingBinIndex))
-      numberOfBins = Int(CFSwapInt32BigToHost(p.pointee.numberOfBins))
-      binSize = Int(CFSwapInt32BigToHost(p.pointee.binSize))
-      totalBinsInFrame = numberOfBins
-      frameIndex = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
-    }
-    // is this the first frame?
-    if expectedIndex == -1 { expectedIndex = frameIndex }
-    
-    if frameIndex < expectedIndex {
-      // log it
-      os_log("Out of sequence Frame ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, expectedIndex, frameIndex)
-      return false
-    }
-    
-    if frameIndex > expectedIndex {
-      // log it
-      os_log("%{public}d Frame(s) skipped: expected = %{public}d, received = %{public}d", log: _log, type: .default, frameIndex - expectedIndex, expectedIndex, frameIndex)
-      // restart bin processing
-      _binsProcessed = 0
-      expectedIndex = frameIndex
-    }
-
-    if frameIndex == expectedIndex {
-
-      // get a pointer to the Bins in the payload
-      let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
-      
-      // Swap the byte ordering of the data & place it in the bins
-      for i in 0..<numberOfBins {
-        bins[i+startingBinIndex] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
-      }
-      // update the count of bins processed
-      _binsProcessed += numberOfBins
-      
-      // reset the count if the entire frame has been accumulated
-      if _binsProcessed == totalBinsInFrame { _binsProcessed = 0 ; expectedIndex += 1}
-    }
-    // return true if the entire frame has been accumulated
-    return _binsProcessed == 0
-  }
-}
-
-// --------------------------------------------------------------------------------
-// MARK: - Panadapter Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Panadapter tokens
-// --------------------------------------------------------------------------------
-
 extension Panadapter {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
   internal var _antList: [String] {
     get { return _q.sync { __antList } }
@@ -715,12 +583,8 @@ extension Panadapter {
   
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
-  // FIXME: Should any of these send a message to the Radio?
-  //          If yes, implement it, if not should they be "get" only?
-  
-  // listed in alphabetical order
   @objc dynamic public var antList: [String] {
     return _antList }
   
@@ -757,17 +621,18 @@ extension Panadapter {
   @objc dynamic public var xvtrLabel: String {
     return _xvtrLabel }
   
-  
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
+  // MARK: - NON Public properties (KVO compliant)
   
   public var delegate: StreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Panadapter tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token : String {
     // on Panadapter
     case antList                    = "ant_list"
@@ -794,9 +659,9 @@ extension Panadapter {
     case wnbEnabled                 = "wnb"
     case wnbLevel                   = "wnb_level"
     case wnbUpdating                = "wnb_updating"
-    case xPixels                    = "x_pixels"
+    case xPixels                    = "x_pixels"                // "xpixels"
     case xvtrLabel                  = "xvtr"
-    case yPixels                    = "y_pixels"
+    case yPixels                    = "y_pixels"                // "ypixels"
     // ignored by Panadapter
     case available
     case capacity

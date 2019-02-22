@@ -8,26 +8,13 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Radio Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Radio {
   
-  static let kApfCmd                        = "eq apf "                     // Text of command messages
-  static let kCmd                           = "radio "
-  static let kSetCmd                        = "radio set "
-  static let kMixerCmd                      = "mixer "
-  static let kUptimeCmd                     = "radio uptime"
-  static let kLicenseCmd                    = "license "
-  static let kXmitCmd                       = "xmit "
-
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
 
   /// Request a list of antenns
   ///
@@ -190,9 +177,7 @@ extension Radio {
   }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (with message sent to Radio)
-  
-  // listed in alphabetical order
+  // MARK: - Properties (KVO compliant) that send Commands
   
   // ***** APF COMMANDS *****
   

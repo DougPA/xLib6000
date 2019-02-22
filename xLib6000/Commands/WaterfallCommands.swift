@@ -8,11 +8,8 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Waterfall Class extensions
-//              - Static command prefix properties
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Waterfall {
   
@@ -33,9 +30,8 @@ extension Waterfall {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
-  // listed in alphabetical order
   @objc dynamic public var autoBlackEnabled: Bool {
     get { return _autoBlackEnabled }
     set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; waterfallCmd( .autoBlackEnabled, newValue.asNumber) } } }

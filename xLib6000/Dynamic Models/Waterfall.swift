@@ -11,27 +11,13 @@ import os
 
 public typealias WaterfallId = UInt32
 
-// --------------------------------------------------------------------------------
-// MARK: - WaterfallStreamHandler protocol
-//
-// --------------------------------------------------------------------------------
-
-//public protocol WaterfallStreamHandler      : class {
-//
-//  // method to process Waterfall data stream
-//  func streamHandler(_ dataFrame: WaterfallFrame ) -> Void
-//}
-
-// --------------------------------------------------------------------------------
-// MARK: - Waterfall Class implementation
-//
-//      creates a Waterfall instance to be used by a Client to support the
-//      processing of a Waterfall. Waterfall objects are added / removed by the
-//      incoming TCP messages. Waterfall objects periodically receive Waterfall
-//      data in a UDP stream.
-//
-// --------------------------------------------------------------------------------
-
+/// Waterfall Class implementation
+///
+///      creates a Waterfall instance to be used by a Client to support the
+///      processing of a Waterfall. Waterfall objects are added / removed by the
+///      incoming TCP messages. Waterfall objects periodically receive Waterfall
+///      data in a UDP stream.
+///
 public final class Waterfall                : NSObject, DynamicModelWithStream {
   
   // ----------------------------------------------------------------------------
@@ -72,13 +58,11 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   private let _numberOfDataFrames           = 10
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
   
   /// Parse a Waterfall status message
+  ///
+  ///   StatusParser protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -152,10 +136,11 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
   
   /// Parse Waterfall key/value pairs
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -221,16 +206,11 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       NC.post(.waterfallHasBeenAdded, object: self as Any?)
     }
   }
-
-  // ----------------------------------------------------------------------------
-  // MARK: - VitaProcessor protocol methods
-  
-  //      called by Radio on the streamQ
-  //
-  //      The payload of the incoming Vita struct is converted to a WaterfallFrame and
-  //      passed to the Waterfall Stream Handler
-  
   /// Process the Waterfall Vita struct
+  ///
+  ///   VitaProcessor protocol method, executes on the streamQ
+  ///      The payload of the incoming Vita struct is converted to a WaterfallFrame and
+  ///      passed to the Waterfall Stream Handler, called by Radio
   ///
   /// - Parameters:
   ///   - vita:       a Vita struct
@@ -254,170 +234,11 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   }
 }
 
-// ------------------------------------------------------------------------------
-// MARK: - WaterfallFrame class implementation
-// --------------------------------------------------------------------------------
-//
-//  Populated by the Waterfall vitaHandler
-//
-
-public class WaterfallFrame {
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties
-  
-  public private(set) var firstBinFreq      : CGFloat   = 0.0               // Frequency of first Bin (Hz)
-  public private(set) var binBandwidth      : CGFloat   = 0.0               // Bandwidth of a single bin (Hz)
-  public private(set) var lineDuration      = 0                             // Duration of this line (ms)
-  public private(set) var numberOfBins      = 0                             // Number of bins
-  public private(set) var height            = 0                             // Height of frame (pixels)
-  public private(set) var timeCode          = 0                             // Time code
-  public private(set) var autoBlackLevel    : UInt32 = 0                    // Auto black level
-  public private(set) var totalBinsInFrame  = 0                             //
-  public private(set) var startingBinIndex  = 0                             //
-  public var bins                           = [UInt16]()                    // Array of bin values
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Private properties
-  
-  private var _binsProcessed                = 0
-  private var _byteOffsetToBins             = 0
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "WaterfallFrame")
-
-  private struct PayloadHeaderOld {                                         // struct to mimic payload layout
-    var firstBinFreq                        : UInt64                        // 8 bytes
-    var binBandwidth                        : UInt64                        // 8 bytes
-    var lineDuration                        : UInt32                        // 4 bytes
-    var numberOfBins                        : UInt16                        // 2 bytes
-    var lineHeight                          : UInt16                        // 2 bytes
-    var timeCode                            : UInt32                        // 4 bytes
-    var autoBlackLevel                      : UInt32                        // 4 bytes
-  }
-
-  private struct PayloadHeader {                                            // struct to mimic payload layout
-    var firstBinFreq                        : UInt64                        // 8 bytes
-    var binBandwidth                        : UInt64                        // 8 bytes
-    var lineDuration                        : UInt32                        // 4 bytes
-    var numberOfBins                        : UInt16                        // 2 bytes
-    var height                              : UInt16                        // 2 bytes
-    var timeCode                            : UInt32                        // 4 bytes
-    var autoBlackLevel                      : UInt32                        // 4 bytes
-    var totalBinsInFrame                    : UInt16                        // 2 bytes
-    var firstBinIndex                       : UInt16                        // 2 bytes
-  }
-    
-  // ----------------------------------------------------------------------------
-  // MARK: - Initialization
-  
-  /// Initialize a WaterfallFrame
-  ///
-  /// - Parameter frameSize:    max number of Waterfall samples
-  ///
-  public init(frameSize: Int) {
-    
-    // allocate the bins array
-    self.bins = [UInt16](repeating: 0, count: frameSize)
-  }
-  /// Accumulate Vita object(s) into a WaterfallFrame
-  ///
-  /// - Parameter vita:         incoming Vita object
-  /// - Returns:                true if entire frame processed
-  ///
-  public func accumulate(vita: Vita, expectedIndex: inout Int) -> Bool {
-    
-    let payloadPtr = UnsafeRawPointer(vita.payloadData)
-
-    if Api.sharedInstance.radioVersionMajor == 2 && Api.sharedInstance.radioVersionMinor >= 3 {
-      // 2.3.x or greater
-      // map the payload to the New Payload struct
-      let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
-      
-      // 2.3.x or greater
-      // Bins are just beyond the payload
-      _byteOffsetToBins = MemoryLayout<PayloadHeader>.size
-
-      // byte swap and convert each payload component
-      firstBinFreq = CGFloat(CFSwapInt64BigToHost(p.pointee.firstBinFreq)) / 1.048576E6
-      binBandwidth = CGFloat(CFSwapInt64BigToHost(p.pointee.binBandwidth)) / 1.048576E6
-      lineDuration = Int( CFSwapInt32BigToHost(p.pointee.lineDuration) )
-      numberOfBins = Int( CFSwapInt16BigToHost(p.pointee.numberOfBins) )
-      height = Int( CFSwapInt16BigToHost(p.pointee.height) )
-      timeCode = Int( CFSwapInt32BigToHost(p.pointee.timeCode) )
-      autoBlackLevel = CFSwapInt32BigToHost(p.pointee.autoBlackLevel)
-      totalBinsInFrame = Int( CFSwapInt16BigToHost(p.pointee.totalBinsInFrame) )
-      startingBinIndex = Int( CFSwapInt16BigToHost(p.pointee.firstBinIndex) )
-      
-    } else {
-      // pre 2.3.x
-      // map the payload to the Old Payload struct
-      let p = payloadPtr.bindMemory(to: PayloadHeaderOld.self, capacity: 1)
-      
-      // pre 2.3.x
-      // Bins are just beyond the payload
-      _byteOffsetToBins = MemoryLayout<PayloadHeaderOld>.size
-
-      // byte swap and convert each payload component
-      firstBinFreq = CGFloat(CFSwapInt64BigToHost(p.pointee.firstBinFreq)) / 1.048576E6
-      binBandwidth = CGFloat(CFSwapInt64BigToHost(p.pointee.binBandwidth)) / 1.048576E6
-      lineDuration = Int( CFSwapInt32BigToHost(p.pointee.lineDuration) )
-      numberOfBins = Int( CFSwapInt16BigToHost(p.pointee.numberOfBins) )
-      height = Int( CFSwapInt16BigToHost(p.pointee.lineHeight) )
-      timeCode = Int( CFSwapInt32BigToHost(p.pointee.timeCode) )
-      autoBlackLevel = CFSwapInt32BigToHost(p.pointee.autoBlackLevel)
-      totalBinsInFrame = numberOfBins
-      startingBinIndex = 0
-    }
-    // is this the first frame?
-    if expectedIndex == -1 { expectedIndex = timeCode }
-    
-    if timeCode < expectedIndex {
-      // log it
-      os_log("Out of sequence Frame ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, expectedIndex, timeCode)
-      return false
-    }
-    
-    if timeCode > expectedIndex {
-      // log it
-      os_log("%{public}d Frame(s) skipped: expected = %{public}d, received = %{public}d", log: _log, type: .default, timeCode - expectedIndex, expectedIndex, timeCode)
-      // restart bin processing
-      _binsProcessed = 0
-      expectedIndex = timeCode
-    }
-    
-    if timeCode == expectedIndex {
-      
-      // get a pointer to the Bins in the payload
-      let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
-      
-      // Swap the byte ordering of the data & place it in the bins
-      for i in 0..<numberOfBins {
-        bins[i+startingBinIndex] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
-      }
-      // update the count of bins processed
-      _binsProcessed += numberOfBins
-      
-      // reset the count if the entire frame has been accumulated
-      if _binsProcessed == totalBinsInFrame { _binsProcessed = 0 }
-    }
-
-    // return true if the entire frame has been accumulated
-    return _binsProcessed == 0
-  }
-}
-
-// --------------------------------------------------------------------------------
-// MARK: - Waterfall Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Waterfall tokens
-// --------------------------------------------------------------------------------
-
 extension Waterfall {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _autoBlackEnabled: Bool {
     get { return _q.sync { __autoBlackEnabled } }
     set { _q.sync(flags: .barrier) {__autoBlackEnabled = newValue } } }
@@ -447,12 +268,8 @@ extension Waterfall {
     set { _q.sync(flags: .barrier) { __panadapterId = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
-  // FIXME: Should any of these send a message to the Radio?
-  //          If yes, implement it, if not should they be "get" only?
-  
-  // listed in alphabetical order
   @objc dynamic public var autoBlackLevel: UInt32 {
     return _autoBlackLevel }
   
@@ -460,15 +277,17 @@ extension Waterfall {
     return _panadapterId }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
+  // MARK: - NON Public properties (KVO compliant)
   
   public var delegate: StreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Waterfall tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token : String {
     // on Waterfall
     case autoBlackEnabled     = "auto_black"
@@ -496,3 +315,4 @@ extension Waterfall {
     case xvtr
   }
 }
+

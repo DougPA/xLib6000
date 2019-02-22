@@ -11,16 +11,20 @@ import os
 
 public typealias TnfId = String
 
-// ------------------------------------------------------------------------------
-// MARK: - TNF Class implementation
-//
-//      creates a Tnf instance to be used by a Client to support the
-//      rendering of a Tnf. Tnf objects are added, removed and
-//      updated by the incoming TCP messages.
-//
-// ------------------------------------------------------------------------------
-
+/// TNF Class implementation
+///
+///      creates a Tnf instance to be used by a Client to support the
+///      rendering of a Tnf. Tnf objects are added, removed and
+///      updated by the incoming TCP messages.
+///
 public final class Tnf                      : NSObject, DynamicModel {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
+  static let kCreateCmd                     = "tnf create "                 // Command prefixes
+  static let kRemoveCmd                     = "tnf remove "
+  static let kSetCmd                        = "tnf set "
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -48,13 +52,11 @@ public final class Tnf                      : NSObject, DynamicModel {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
   
   /// Parse a Tnf status message
+  ///
+  ///   StatusParser Protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -88,6 +90,10 @@ public final class Tnf                      : NSObject, DynamicModel {
       Api.sharedInstance.radio!.tnfs[tnfId]  = nil
     }
   }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   /// Given a Frequency, return a reference to the Tnf containing it (if any)
   ///
   /// - Parameters:
@@ -210,10 +216,11 @@ public final class Tnf                      : NSObject, DynamicModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse Tnf key/value pairs
+  ///
+  ///   PropertiesParser Protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -265,19 +272,11 @@ public final class Tnf                      : NSObject, DynamicModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Tnf Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Tnf tokens
-// --------------------------------------------------------------------------------
-
 extension Tnf {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _depth: Int {
     get { return _q.sync { __depth } }
     set { _q.sync(flags: .barrier) { __depth = newValue } } }
@@ -295,20 +294,18 @@ extension Tnf {
     set { _q.sync(flags: .barrier) { __width = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Tokens
   
-  // ----- None -----
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Tnf tokens
-  
+  /// Properties
+  ///
   internal enum Token : String {
     case depth
     case frequency      = "freq"
     case permanent
     case width
   }
-  
+  /// Depths
+  ///
   public enum Depth : Int {
     case normal         = 1
     case deep           = 2

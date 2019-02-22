@@ -11,16 +11,20 @@ import os
 
 public typealias AmplifierId = String
 
-// ------------------------------------------------------------------------------
-// MARK: - Amplifier Class implementation
-//
-//      creates an Amplifier instance to be used by a Client to support the
-//      control of an external Amplifier. Amplifier objects are added, removed and
-//      updated by the incoming TCP messages.
-//
-// ------------------------------------------------------------------------------
-
+/// Amplifier Class implementation
+///
+///      creates an Amplifier instance to be used by a Client to support the
+///      control of an external Amplifier. Amplifier objects are added, removed and
+///      updated by the incoming TCP messages.
+///
 public final class Amplifier                : NSObject, DynamicModel {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
+  static let kSetCmd                        = "amplifier set "              // Command prefixes
+  static let kOperate                       = "OPERATE"
+  static let kStandby                       = "STANDBY"
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -47,13 +51,11 @@ public final class Amplifier                : NSObject, DynamicModel {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
   
   /// Parse an Amplifier status message
+  ///
+  ///   StatusParser Protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -111,10 +113,11 @@ public final class Amplifier                : NSObject, DynamicModel {
   }
 
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
   
   /// Parse Amplifier key/value pairs
+  ///
+  ///   PropertiesParser Protocol method, , executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -175,17 +178,10 @@ public final class Amplifier                : NSObject, DynamicModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Amplifier Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Amplifier tokens
-// --------------------------------------------------------------------------------
-
 extension Amplifier {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
   // listed in alphabetical order
   internal var _ant: String {
@@ -213,13 +209,10 @@ extension Amplifier {
     set { _q.sync(flags: .barrier) {__serialNumber = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Tokens
   
-  // None
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Amplifier tokens
-  
+  /// Properties
+  ///
   internal enum Token : String {
     case ant
     case ip

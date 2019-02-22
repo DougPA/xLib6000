@@ -40,38 +40,11 @@ public struct WanTestConnectionResults {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - WanServerDelegate protocol
-//
-// --------------------------------------------------------------------------------
-
-public protocol WanServerDelegate           : class {
-
-  /// Received radio list from server
-  ///
-  func wanRadioListReceived(wanRadioList: [RadioParameters])
-  
-  /// Received user settings from server
-  ///
-  func wanUserSettings(_ userSettings: WanUserSettings)
-  
-  /// Radio is ready to connect
-  ///
-  func wanRadioConnectReady(handle: String, serial: String)
-  
-  /// Received Wan test results
-  ///
-  func wanTestConnectionResultsReceived(results: WanTestConnectionResults)
-}
-
-// --------------------------------------------------------------------------------
-// MARK: - WanServer Class implementation
-//
-//      creates a WanServer instance to communicate with the SmartLink server
-//      to get access to a remote Flexradio
-//
-// --------------------------------------------------------------------------------
-
+///  WanServer Class implementation
+///
+///      creates a WanServer instance to communicate with the SmartLink server
+///      to get access to a remote Flexradio
+///
 public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
 
   static let kAddress                       = "smartlink.flexradio.com"
@@ -215,17 +188,15 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   }
 
   // ------------------------------------------------------------------------------
-  // MARK: - Parser methods
-  //     called by socket(:didReadData:withTag:), executes on the socketQ
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - First Level Parser
+  // MARK: - Private methods
   
   /// Parse a received WanServer message
   ///
+  ///   called by socket(:didReadData:withTag:), executes on the socketQ
+  ///
   /// - Parameter text:         the entire message
   ///
-  internal func parseMsg(_ text: String) {
+  private func parseMsg(_ text: String) {
     
     let msg = text.trimmingCharacters(in: .whitespacesAndNewlines)
     
@@ -255,15 +226,11 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       parseRadio(remainder)
     }
   }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Second Level Parsers
-  
   /// Parse a received "application" message
   ///
   /// - Parameter msg:        the message (after the primary type)
   ///
-  internal func parseApplication(_ msg: String) {
+  private func parseApplication(_ msg: String) {
     
     // find the space & get the secondary msgType
     let spaceIndex = msg.index(of: " ")!
@@ -298,7 +265,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   ///
   /// - Parameter msg:        the message (after the primary type)
   ///
-  internal func parseRadio(_ msg: String) {
+  private func parseRadio(_ msg: String) {
     
     // find the space & get the secondary msgType
     guard let spaceIndex = msg.index(of: " ") else {
@@ -334,10 +301,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       parseTestConnectionResults(remainder.keyValuesArray())
     }
   }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Third Level Parsers
-  
   /// Parse Application properties
   ///
   /// - Parameter properties:         a KeyValuesArray
@@ -608,10 +571,6 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // call delegate
     _delegate?.wanTestConnectionResultsReceived(results: results)
   }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Private methods
-  
   /// Read the next data block (with an indefinite timeout)
   ///
   private func readNext() {
@@ -750,19 +709,10 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Wan Class extensions
-//              - Synchronized private properties
-//              - Public properties
-//              - WanServer tokens
-// --------------------------------------------------------------------------------
-
 extension WanServer {
 
   // ----------------------------------------------------------------------------
-  // MARK: - Private properties - with synchronization
-  
-  // listed in alphabetical order
+  // MARK: - Private properties
   
   private var _isConnected: Bool {
     get { return _objectQ.sync { __isConnected } }
@@ -773,7 +723,7 @@ extension WanServer {
     set { _objectQ.sync(flags: .barrier) { __sslClientPublicIp = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant
+  // MARK: - Public properties (KVO compliant)
   
   @objc dynamic public var isConnected: Bool {
     return _isConnected }
@@ -782,40 +732,48 @@ extension WanServer {
     return _sslClientPublicIp }
   
   // ----------------------------------------------------------------------------
-  // MARK: - WanServer Tokens
+  // MARK: - Tokens
   
+  /// Types
+  ///
   private enum Token: String {
     case application
     case radio
   }
-  
+  /// Application Types
+  ///
   private enum ApplicationToken: String {
     case info
     case registrationInvalid        = "registration_invalid"
     case userSettings               = "user_settings"
   }
-  
+  /// Info Types
+  ///
   private enum ApplicationInfoToken: String {
     case publicIp                   = "public_ip"
   }
-  
+  /// User Settings
+  ///
   private enum ApplicationUserSettingsToken: String {
     case callsign
     case firstName                  = "first_name"
     case lastName                   = "last_name"
   }
-  
+  /// Radio types
+  ///
   private enum RadioToken: String {
     case connectReady               = "connect_ready"
     case list
     case testConnection             = "test_connection"
   }
-  
+  /// Connection
+  ///
   private enum RadioConnectReadyToken: String {
     case handle
     case serial
   }
-  
+  /// Radio list
+  ///
   private enum RadioListToken: String {
     case lastSeen                   = "last_seen"
 
@@ -837,7 +795,8 @@ extension WanServer {
     case status
     case upnpSupported              = "upnp_supported"
   }
-  
+  /// Test types
+  ///
   private enum RadioTestConnectionResultsToken: String {
     case forwardTcpPortWorking      = "forward_tcp_port_working"
     case forwardUdpPortWorking      = "forward_udp_port_working"

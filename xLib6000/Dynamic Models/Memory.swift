@@ -11,16 +11,21 @@ import os
 
 public typealias MemoryId = String
 
-// --------------------------------------------------------------------------------
-// MARK: - Memory Class implementation
-//
-//      creates a Memory instance to be used by a Client to support the
-//      processing of a Memory. Memory objects are added, removed and
-//      updated by the incoming TCP messages.
-//
-// --------------------------------------------------------------------------------
-
+/// Memory Class implementation
+///
+///      creates a Memory instance to be used by a Client to support the
+///      processing of a Memory. Memory objects are added, removed and
+///      updated by the incoming TCP messages.
+///
 public final class Memory                   : NSObject, DynamicModel {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
+  static let kCreateCmd                     = "memory create"               // Command prefixes
+  static let kRemoveCmd                     = "memory remove "
+  static let kSetCmd                        = "memory set "
+  static let kApplyCmd                      = "memory apply "
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -60,13 +65,11 @@ public final class Memory                   : NSObject, DynamicModel {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
   
   /// Parse a Memory status message
+  ///
+  ///   StatusParser protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -122,7 +125,7 @@ public final class Memory                   : NSObject, DynamicModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Private methods
+  // MARK: - Internal instance methods
   
   /// Restrict the Filter High value
   ///
@@ -200,10 +203,11 @@ public final class Memory                   : NSObject, DynamicModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse Memory key/value pairs
+  ///
+  ///   PropertiesParser Protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -336,19 +340,11 @@ public final class Memory                   : NSObject, DynamicModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Memory Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Memory tokens
-// --------------------------------------------------------------------------------
-
 extension Memory {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _digitalLowerOffset: Int {
     get { return _q.sync { __digitalLowerOffset } }
     set { _q.sync(flags: .barrier) { __digitalLowerOffset = newValue } } }
@@ -424,14 +420,12 @@ extension Memory {
   internal var _toneValue: Int {
     get { return _q.sync { __toneValue } }
     set { _q.sync(flags: .barrier) { __toneValue = newValue } } }
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
-  
-  // ----- None -----
   
   // ----------------------------------------------------------------------------
-  // Mark: - Memory tokens
+  // Mark: - Tokens
   
+  /// Properties
+  ///
   internal enum Token : String {
     case digitalLowerOffset                 = "digl_offset"
     case digitalUpperOffset                 = "digu_offset"
@@ -455,16 +449,15 @@ extension Memory {
     case toneMode                           = "tone_mode"
     case toneValue                          = "tone_value"
   }
-  
-  // ----------------------------------------------------------------------------
-  // Mark: - Memory related enums
-  
+  /// Offsets
+  ///
   public enum TXOffsetDirection : String {  // Tx offset types
     case down
     case simplex
     case up
   }
-  
+  /// Tone choices
+  ///
   public enum ToneMode : String {           // Tone modes
     case ctcssTx = "ctcss_tx"
     case off

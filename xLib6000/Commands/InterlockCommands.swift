@@ -8,22 +8,10 @@
 
 import Foundation
 
-
-// --------------------------------------------------------------------------------
-// MARK: - Interlock Class extensions
-//              - Static command prefix properties
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Interlock {
-  
-  //
-  //  NOTE:   Interlock Commands are in the following format:
-  //
-  //              interlock <valueName>=<value>
-  //
-  
-  static let kCmd                           = "interlock "
   
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
@@ -40,7 +28,7 @@ extension Interlock {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
   @objc dynamic public var accTxEnabled: Bool {
     get { return _accTxEnabled }

@@ -9,26 +9,10 @@
 import Foundation
 import os.log
 
-// --------------------------------------------------------------------------------
-// MARK: - UdpManager delegate protocol
-//
-// --------------------------------------------------------------------------------
-
-protocol UdpManagerDelegate                 : class {
-  
-  // if any of theses are not needed, implement a stub in the delegate that does nothing
-  
-  func udpState(bound: Bool, port: UInt16, error: String)                   // report a UDP state change
-  func udpStreamHandler(_ vita: Vita)                                       // process a Vita stream
-}
-
-// ------------------------------------------------------------------------------
-// MARK: - UDP Manager Class implementation
-//
-//      manages all Udp communication between the API and the Radio (hardware)
-//
-// ------------------------------------------------------------------------------
-
+///  UDP Manager Class implementation
+///
+///      manages all Udp communication between the API and the Radio (hardware)
+///
 final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegate {
 
   // ----------------------------------------------------------------------------
@@ -94,7 +78,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods
+  // MARK: - Internal methods
   
   /// Send message encoded as Data to the Radio (on the current ip & port)
   ///
@@ -295,7 +279,6 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       
       // pass the error to the delegate
       os_log("Unable to decode received packet", log: _log, type: .default)
-      
     }
   }
 }

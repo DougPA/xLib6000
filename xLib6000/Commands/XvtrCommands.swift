@@ -8,13 +8,8 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Xvtr Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Xvtr {
   
@@ -23,7 +18,7 @@ extension Xvtr {
   static let kSetCmd                        = "xvtr set "
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
 
   /// Create an Xvtr
   ///
@@ -37,7 +32,7 @@ extension Xvtr {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
   
   /// Remove this Xvtr
   ///
@@ -65,9 +60,8 @@ extension Xvtr {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
-  // listed in alphabetical order
   @objc dynamic public var ifFrequency: Int {
     get { return _ifFrequency }
     set { if _ifFrequency != newValue { _ifFrequency = newValue ; xvtrCmd( .ifFrequency, newValue) } } }

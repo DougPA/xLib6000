@@ -8,19 +8,15 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Profile Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Profile {
   
   static let kCmd                           = "profile "                    // Command prefixes
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
 
   /// Delete a Profile entry
   ///
@@ -62,9 +58,8 @@ extension Profile {
     Api.sharedInstance.send(Profile.kCmd + id + " load \"\(value)\"")
   }
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
-  // listed in alphabetical order
   @objc dynamic public var selection: ProfileName {
     get {  return _selection }
     set { if _selection != newValue { _selection = newValue ; profileCmd(newValue) } } }

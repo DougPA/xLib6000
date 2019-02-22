@@ -9,17 +9,17 @@
 import Foundation
 import os
 
-// --------------------------------------------------------------------------------
-// MARK: - Gps Class implementation
-//
-//      creates a Gps instance to be used by a Client to support the
-//      processing of the internal Gps (if installed). Gps objects are added,
-//      removed and updated by the incoming TCP messages.
-//
-// --------------------------------------------------------------------------------
-
+/// Gps Class implementation
+///
+///      creates a Gps instance to be used by a Client to support the
+///      processing of the internal Gps (if installed). Gps objects are added,
+///      removed and updated by the incoming TCP messages.
+///
 public final class Gps                      : NSObject, StaticModel {
 
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
   static let kGpsCmd                        = "radio gps "
 
   // ----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ public final class Gps                      : NSObject, StaticModel {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   
   // ----------------------------------------------------------------------------
-  // MARK: - Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
   
   /// Gps Install
   ///
@@ -84,10 +84,11 @@ public final class Gps                      : NSObject, StaticModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse a Gps status message
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -168,19 +169,11 @@ public final class Gps                      : NSObject, StaticModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Gps Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Gps tokens
-// --------------------------------------------------------------------------------
-
 extension Gps {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _altitude: String {
     get { return _q.sync { __altitude } }
     set { _q.sync(flags: .barrier) { __altitude = newValue } } }
@@ -226,7 +219,7 @@ extension Gps {
     set { _q.sync(flags: .barrier) { __visible = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
   @objc dynamic public var altitude: String {
     return _altitude }
@@ -261,11 +254,12 @@ extension Gps {
   @objc dynamic public var visible: Bool {
     return _visible }
   
-  
   // ----------------------------------------------------------------------------
-  // MARK: - Gps tokens
+  // MARK: - Tokens
   
-  internal enum Token: String {
+  /// Properties
+  ///
+internal enum Token: String {
     case altitude
     case frequencyError = "freq_error"
     case grid

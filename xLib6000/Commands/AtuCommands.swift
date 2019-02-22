@@ -8,22 +8,13 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Atu Class extensions
-//              - Static command prefix properties
-//              - Public methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Atu {
   
-  static let kClearCmd                      = "atu clear"                   // Command prefixes
-  static let kStartCmd                      = "atu start"
-  static let kBypassCmd                     = "atu bypass"
-  static let kCmd                           = "atu "
-  
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
 
   /// Clear the ATU
   ///
@@ -68,16 +59,10 @@ extension Atu {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
   @objc dynamic public var memoriesEnabled: Bool {
     get {  return _memoriesEnabled }
     set { if _memoriesEnabled != newValue { _memoriesEnabled = newValue ; atuCmd( .memoriesEnabled, newValue.asNumber) } } }
-  
-//  @objc dynamic public var enabled: Bool {
-//    get {  return _enabled }
-//    set { if _enabled != newValue { _enabled = newValue ; atuCmd( .enabled, newValue.asNumber) } } }
-  @objc dynamic public var enabled: Bool {
-      return _enabled }
 }
 

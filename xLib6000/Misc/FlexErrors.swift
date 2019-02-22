@@ -8,14 +8,14 @@
 
 import Foundation
 
-// ----------------------------------------------------------------------------
-// MARK: - FlexErrors enum
-//
-//      Flex 6000 error codes
-//      see http://wiki.flexradio.com/index.php?title=Known_API_Responses
-//
-// ----------------------------------------------------------------------------
-
+/// Given an errorcode return an errorlevel
+///
+///      Flex 6000 error codes
+///      see http://wiki.flexradio.com/index.php?title=Known_API_Responses
+///
+/// - Parameter errorCode:      error code from reply
+/// - Returns:                  error level
+///
 public func flexErrorLevel(errorCode: String) -> String {
   var errorLevel = ""
   
@@ -41,6 +41,11 @@ public func flexErrorLevel(errorCode: String) -> String {
 }
 
 
+/// Given an errorcode return an explanation
+///
+/// - Parameter errorCode:      error code from reply
+/// - Returns:                  error explanation
+///
 public func flexErrorString(errorCode: String) -> String {
   var errorString = ""
   
@@ -288,6 +293,10 @@ enum FlexErrors: UInt32 {
   case SLM_I_UNKNOWN_CLIENT                           = 0x10000002
   case SL_I_CWX_NOTHING_TO_ERASE                      = 0x10000003
   
+  /// Convert an error Enum to a String explanation
+  ///
+  /// - Returns:                the explanation
+  ///
   func toString() -> String {
     
     switch self {

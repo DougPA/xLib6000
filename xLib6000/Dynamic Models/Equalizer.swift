@@ -11,20 +11,22 @@ import os
 
 public typealias EqualizerId = String
 
-// ------------------------------------------------------------------------------
-// MARK: - Equalizer Class implementation
-//
-//      creates an Equalizer instance to be used by a Client to support the
-//      rendering of an Equalizer. Equalizer objects are added, removed and
-//      updated by the incoming TCP messages.
-//
-//      Note: ignores the non-"sc" version of Equalizer messages
-//            The "sc" version is the standard for API Version 1.4 and greater
-//
-// ------------------------------------------------------------------------------
-
+/// Equalizer Class implementation
+///
+///      creates an Equalizer instance to be used by a Client to support the
+///      rendering of an Equalizer. Equalizer objects are added, removed and
+///      updated by the incoming TCP messages.
+///
+///      Note: ignores the non-"sc" version of Equalizer messages
+///            The "sc" version is the standard for API Version 1.4 and greater
+///
 public final class Equalizer                : NSObject, DynamicModel {
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
+  static let kCmd                           = "eq "                         // Command prefixes
+
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
@@ -53,13 +55,11 @@ public final class Equalizer                : NSObject, DynamicModel {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
+  // MARK: - Protocol class methods
   
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
-
   /// Parse a Stream status message
+  ///
+  ///   StatusParser Protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -123,10 +123,11 @@ public final class Equalizer                : NSObject, DynamicModel {
   }
 
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse Equalizer key/value pairs
+  ///
+  ///   PropertiesParser Protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -203,17 +204,10 @@ public final class Equalizer                : NSObject, DynamicModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Equalizer Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Equalizer tokens
-// --------------------------------------------------------------------------------
-
 extension Equalizer {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
   internal var _eqEnabled: Bool {
     get { return _q.sync { __eqEnabled } }
@@ -252,24 +246,23 @@ extension Equalizer {
     set { _q.sync(flags: .barrier) { __level8000Hz = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Tokens
   
-  // ----- None -----
-  
-  // ----------------------------------------------------------------------------
-  // Mark: - Equalizer tokens
-  
+  /// Properties
+  ///
   internal enum Token : String {
-    case level63Hz                          = "63hz"
-    case level125Hz                         = "125hz"
-    case level250Hz                         = "250hz"
-    case level500Hz                         = "500hz"
-    case level1000Hz                        = "1000hz"
-    case level2000Hz                        = "2000hz"
-    case level4000Hz                        = "4000hz"
-    case level8000Hz                        = "8000hz"
+    case level63Hz                          = "63hz"            // "63Hz"
+    case level125Hz                         = "125hz"           // "125Hz"
+    case level250Hz                         = "250hz"           // "250Hz"
+    case level500Hz                         = "500hz"           // "500Hz"
+    case level1000Hz                        = "1000hz"          // "1000Hz"
+    case level2000Hz                        = "2000hz"          // "2000Hz"
+    case level4000Hz                        = "4000hz"          // "4000Hz"
+    case level8000Hz                        = "8000hz"          // "8000Hz"
     case enabled                            = "mode"
   }
+  /// Types
+  ///
   public enum EqType: String {
     case rx                                 // deprecated type
     case rxsc

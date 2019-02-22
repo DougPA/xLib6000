@@ -9,16 +9,24 @@
 import Foundation
 import os
 
-// --------------------------------------------------------------------------------
-// MARK: - Radio Class implementation
-//
-//      as the object analog to the Radio (hardware), manages the use of all of
-//      the other model objects
-//
-// --------------------------------------------------------------------------------
-
+//// Radio Class implementation
+///
+///      as the object analog to the Radio (hardware), manages the use of all of
+///      the other model objects
+///
 public final class Radio                    : NSObject, StaticModel, ApiDelegate {
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
   
+  static let kApfCmd                        = "eq apf "                     // Text of command messages
+  static let kCmd                           = "radio "
+  static let kSetCmd                        = "radio set "
+  static let kMixerCmd                      = "mixer "
+  static let kUptimeCmd                     = "radio uptime"
+  static let kLicenseCmd                    = "license "
+  static let kXmitCmd                       = "xmit "
+
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (Read Only)
   
@@ -186,7 +194,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     cwx = Cwx(queue: _q)
     gps = Gps(queue: _q)
     interlock = Interlock(queue: _q)
-//    profile = Profile(queue: _q)
     transmit = Transmit(queue: _q)
     wan = Wan(queue: _q)
     waveform = Waveform(queue: _q)
@@ -195,6 +202,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     equalizers[.rxsc] = Equalizer(id: Equalizer.EqType.rxsc.rawValue, queue: _q)
     equalizers[.txsc] = Equalizer(id: Equalizer.EqType.txsc.rawValue, queue: _q)
   }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods
+  
   /// Remove all Radio objects
   ///
   public func removeAll() {
@@ -303,12 +314,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
   
-  // --------------------------------------------------------------------------------
-  //      Second level parsers
-  //      Note: All are executed on the parseQ
-  // --------------------------------------------------------------------------------
-  
   /// Parse a Message. format: <messageNumber>|<messageText>
+  ///
+  ///   executed on the parseQ
   ///
   /// - Parameters:
   ///   - commandSuffix:      a Command Suffix
@@ -338,6 +346,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // FIXME: Take action on some/all errors?
   }
   /// Parse a Reply. format: <sequenceNumber>|<hexResponse>|<message>[|<debugOutput>]
+  ///
+  ///   executed on the parseQ
   ///
   /// - Parameters:
   ///   - commandSuffix:      a Reply Suffix
@@ -382,6 +392,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
   }
   /// Parse a Status. format: <apiHandle>|<message>, where <message> is of the form: <msgType> <otherMessageComponents>
+  ///
+  ///   executed on the parseQ
   ///
   /// - Parameters:
   ///   - commandSuffix:      a Command Suffix
@@ -555,6 +567,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   }
   /// Parse a Client status message
   ///
+  ///   executed on the parseQ
+  ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
   ///   - radio:          the current Radio class
@@ -587,6 +601,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
   }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
+  ///
+  ///   executed on the parseQ
   ///
   /// - Parameters:
   ///   - properties:          a KeyValuesArray
@@ -699,6 +715,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   }
   /// Parse the Reply to a Client Ip command, reply format: <key=value> <key=value> ...<key=value>
   ///
+  ///   executed on the parseQ
+  ///
   /// - Parameters:
   ///   - keyValues:          a KeyValuesArray
   ///
@@ -762,6 +780,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 //  }
   /// Parse the Reply to a Version command, reply format: <key=value>#<key=value>#...<key=value>
   ///
+  ///   executed on the parseQ
+  ///
   /// - Parameters:
   ///   - keyValues:          a KeyValuesArray
   ///
@@ -808,10 +828,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   }
   
   // --------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     executes on the radioQ
+  // MARK: - Protocol instance methods
   
   /// Parse a Radio status message
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - properties:      a KeyValuesArray
@@ -977,6 +998,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   }
   /// Parse a Filter Properties status message
   ///
+  ///   PropertiesParser protocol method, executes on the parseQ
+  ///
   /// - Parameters:
   ///   - properties:      a KeyValuesArray
   ///
@@ -1048,6 +1071,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   }
   /// Parse a Static Net Properties status message
   ///
+  ///   PropertiesParser protocol method, executes on the parseQ
+  ///
   /// - Parameters:
   ///   - properties:      a KeyValuesArray
   ///
@@ -1084,6 +1109,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
   }
   /// Parse an Oscillator Properties status message
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - properties:      a KeyValuesArray
@@ -1136,17 +1163,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         }
       }
     }
-    
   
   // ----------------------------------------------------------------------------
   // MARK: - Api delegate methods
   
   /// Parse inbound Tcp messages
   ///
+  ///   executes on the parseQ
+  ///
   /// - Parameter msg:        the Message String
   ///
   public func receivedMessage(_ msg: String) {
-    // arrives on the parseQ
     
     // get all except the first character
     let suffix = String(msg.dropFirst())
@@ -1182,6 +1209,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   }
   /// Add a Reply Handler for a specific Sequence/Command
   ///
+  ///   executes on the parseQ
+  ///
   /// - Parameters:
   ///   - sequenceId:     sequence number of the Command
   ///   - replyTuple:     a Reply Tuple
@@ -1192,6 +1221,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     replyHandlers[seqNumber] = replyTuple
   }
   /// Process the Reply to a command, reply format: <value>,<value>,...<value>
+  ///
+  ///   executes on the parseQ
   ///
   /// - Parameters:
   ///   - command:        the original command
@@ -1334,6 +1365,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   }
   /// Process received UDP Vita packets
   ///
+  ///   arrives on the udpReceiveQ, calls targets on the streamQ
+  ///
   /// - Parameter vitaPacket:       a Vita packet
   ///
   public func vitaParser(_ vitaPacket: Vita) {
@@ -1409,26 +1442,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Radio Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Display tokens
-//              - Equalizer Apf tokens
-//              - Info reply tokens
-//              - Radio tokens
-//              - Status tokens
-//              - Version reply tokens
-//              - Radio related enums
-//              - Type aliases
-// --------------------------------------------------------------------------------
-
 extension Radio {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _apfEnabled: Bool {
     get { return _q.sync { __apfEnabled } }
     set { _q.sync(flags: .barrier) { __apfEnabled = newValue } } }
@@ -1686,12 +1704,8 @@ extension Radio {
     set { _q.sync(flags: .barrier) { __tnfsEnabled = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
-  // FIXME: Should any of these send a message to the Radio?
-  //          If yes, implement it, if not should they be "get" only?
-  
-  // listed in alphabetical order
   @objc dynamic public var atuPresent: Bool {
     return _atuPresent }
   
@@ -1786,7 +1800,7 @@ extension Radio {
     return _tcxoPresent }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
+  // MARK: - NON Public properties (KVO compliant)
   
   // collections
   public var amplifiers: [AmplifierId: Amplifier] {
@@ -1858,27 +1872,23 @@ extension Radio {
     set { _q.sync(flags: .barrier) { _xvtrs = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Token enums in alphabetical order.
-  // ----------------------------------------------------------------------------
+  // MARK: - Tokens
   
-  // ----------------------------------------------------------------------------
-  // MARK: - Display tokens
-  
+  /// Types
+  ///
   internal enum DisplayToken: String {
     case panadapter                         = "pan"
     case waterfall
   }
-  // ----------------------------------------------------------------------------
-  // MARK: - Equalizer Apf tokens
-  
+  /// EqApf
+  ///
   internal enum EqApfToken: String {
     case gain
     case mode
     case qFactor
   }
-  // ----------------------------------------------------------------------------
-  // MARK: - Info reply tokens
-  
+  /// Info properties
+  ///
   internal enum InfoToken: String {
     case atuPresent                         = "atu_present"
     case callsign
@@ -1899,9 +1909,8 @@ extension Radio {
     case screensaver
     case softwareVersion                    = "software_ver"
   }
-  // ----------------------------------------------------------------------------
-  // MARK: - Radio tokens
-  
+  /// Radio properties
+  ///
   internal enum RadioToken: String {
     case backlight
     case bandPersistenceEnabled             = "band_persistence_enabled"
@@ -1912,12 +1921,12 @@ extension Radio {
     case freqErrorPpb                       = "freq_error_ppb"
     case frontSpeakerMute                   = "front_speaker_mute"
     case fullDuplexEnabled                  = "full_duplex_enabled"
-    case headphoneGain                      = "headphone_gain"
-    case headphoneMute                      = "headphone_mute"
-    case lineoutGain                        = "lineout_gain"
-    case lineoutMute                        = "lineout_mute"
+    case headphoneGain                      = "headphone_gain"                  // "headphone gain"
+    case headphoneMute                      = "headphone_mute"                  // "headphone mute"
+    case lineoutGain                        = "lineout_gain"                    // "lineout gain"
+    case lineoutMute                        = "lineout_mute"                    // "lineout mute"
     case muteLocalAudio                     = "mute_local_audio_when_remote"
-    case nickname
+    case nickname                                                               // "name"
     case panadapters
     case pllDone                            = "pll_done"
     case remoteOnEnabled                    = "remote_on_enabled"
@@ -1926,13 +1935,15 @@ extension Radio {
     case snapTuneEnabled                    = "snap_tune_enabled"
     case tnfsEnabled                        = "tnf_enabled"
   }
-  
+  /// Radio categories
+  ///
   internal enum RadioTokenCategory: String {
     case filterSharpness                    = "filter_sharpness"
     case staticNetParams                    = "static_net_params"
     case oscillator
   }
-  
+  /// Sharpness properties
+  ///
   internal enum RadioFilterSharpness: String {
     case cw
     case CW
@@ -1943,13 +1954,15 @@ extension Radio {
     case autoLevel                          = "auto_level"
     case level
   }
-  
+  /// Static Net properties
+  ///
   internal enum RadioStaticNet: String {
     case gateway
     case ip
     case netmask
   }
-  
+  /// Oscillator properties
+  ///
   internal enum RadioOscillator: String {
     case extPresent                         = "ext_present"
     case gpsdoPresent                       = "gpsdo_present"
@@ -1958,10 +1971,8 @@ extension Radio {
     case state
     case tcxoPresent                        = "tcxo_present"
   }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Status tokens
-  
+  /// Status properties
+  ///
   internal enum StatusToken : String {
     case amplifier
     case audioStream                        = "audio_stream"
@@ -1992,9 +2003,8 @@ extension Radio {
     case waveform
     case xvtr
   }
-  // ----------------------------------------------------------------------------
-  // MARK: - Version reply tokens
-  
+  /// Version properties
+  ///
   internal enum VersionToken: String {
     case fpgaMb                             = "fpga-mb"
     case psocMbPa100                        = "psoc-mbpa100"
@@ -2002,10 +2012,8 @@ extension Radio {
     case smartSdrMB                         = "smartsdr-mb"
     case picDecpu                           = "pic-decpu"
   }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Radio related enums
-  
+  /// Filter properties
+  ///
   public struct FilterSpec {
     var filterHigh                          : Int
     var filterLow                           : Int
@@ -2014,13 +2022,15 @@ extension Radio {
     var txFilterHigh                        : Int
     var txFilterLow                         : Int
   }
+  /// Tx Filter properties
+  ///
   public struct TxFilter {
     var high                                = 0
     var low                                 = 0
   }
   
   // --------------------------------------------------------------------------------
-  // MARK: - Type Alias (alphabetical)
+  // MARK: - Aliases
   
   public typealias AntennaPort              = String
   public typealias FilterMode               = String

@@ -8,13 +8,8 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - MicAudioStream Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension MicAudioStream {
 
@@ -22,7 +17,7 @@ extension MicAudioStream {
   static let kStreamRemoveCmd               = "stream remove "
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
 
   /// Create a Mic Audio Stream
   ///
@@ -45,7 +40,7 @@ extension MicAudioStream {
   }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
 
   /// Remove this Mic Audio Stream
   ///
@@ -57,9 +52,4 @@ extension MicAudioStream {
     // tell the Radio to remove the Stream
     Api.sharedInstance.send(MicAudioStream.kStreamRemoveCmd + "\(id.hex)", replyTo: callback)
   }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
-  
-  // ----- NONE -----
 }

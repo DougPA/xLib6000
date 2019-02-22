@@ -8,23 +8,13 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Panadapter Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Panadapter {
   
-  static let kCreateCmd                     = "display pan create"          // Command prefixes
-  static let kRemoveCmd                     = "display pan remove "
-  static let kCmd                           = "display pan "
-  static let kSetCmd                        = "display panafall set "
-  
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
 
   /// Create a Panafall
   ///
@@ -60,7 +50,7 @@ extension Panadapter {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
 
   /// Remove this Panafall
   ///
@@ -82,6 +72,11 @@ extension Panadapter {
     
     // FIXME: ???
     Api.sharedInstance.send(xLib6000.Slice.kCmd + "m " + "\(frequency.hzToMhz)" + " pan=\(id.hex)", replyTo: callback)
+  }
+  /// Request Rf Gain values
+  ///
+  public func requestRfGainInfo() {
+    Api.sharedInstance.send(Panadapter.kCmd + "rf_gain_info " + "\(id.hex)", replyTo: replyHandler)
   }
 
   // ----------------------------------------------------------------------------
@@ -110,14 +105,8 @@ extension Panadapter {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods that Request Information from the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
-  public func requestRfGainInfo() { Api.sharedInstance.send(Panadapter.kCmd + "rf_gain_info " + "\(id.hex)", replyTo: replyHandler) }
-    
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
-  
-  // listed in alphabetical order
   @objc dynamic public var average: Int {
     get { return _average }
     set {if _average != newValue { _average = newValue ; panadapterSet( .average, newValue) } } }

@@ -8,22 +8,13 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - AudioStream Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension AudioStream {
-  
-  static let kCmd                           = "audio stream "               // Command prefixes
-  static let kStreamCreateCmd               = "stream create "
-  static let kStreamRemoveCmd               = "stream remove "
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
 
   /// Create an Audio Stream
   ///
@@ -39,7 +30,7 @@ extension AudioStream {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
 
   /// Remove this Audio Stream
   ///
@@ -68,9 +59,8 @@ extension AudioStream {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
-  // listed in alphabetical order
   @objc dynamic public var rxGain: Int {
     get { return _rxGain  }
     set { if _rxGain != newValue {

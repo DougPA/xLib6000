@@ -9,15 +9,12 @@
 import Foundation
 import os
 
-// --------------------------------------------------------------------------------
-// MARK: - Wan Class implementation
-//
-//      creates a Wan instance to be used by a Client to support the
-//      processing of the Wan-related activities. Wan objects are added,
-//      removed and updated by the incoming TCP messages.
-//
-// --------------------------------------------------------------------------------
-
+/// Wan Class implementation
+///
+///      creates a Wan instance to be used by a Client to support the
+///      processing of the Wan-related activities. Wan objects are added,
+///      removed and updated by the incoming TCP messages.
+///
 public final class Wan                      : NSObject, StaticModel {
   
   // ----------------------------------------------------------------------------
@@ -49,10 +46,11 @@ public final class Wan                      : NSObject, StaticModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse a Wan status message
+  ///
+  ///   PropertiesParser Protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -86,19 +84,10 @@ public final class Wan                      : NSObject, StaticModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Wan Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Wan tokens
-// --------------------------------------------------------------------------------
-
 extension Wan {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
-  
-  // listed in alphabetical order
+  // MARK: - Internal properties
   
   internal var _radioAuthenticated: Bool {
     get { return _q.sync { __radioAuthenticated } }
@@ -109,7 +98,7 @@ extension Wan {
     set { _q.sync(flags: .barrier) { __serverConnected = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
   @objc dynamic public var radioAuthenticated: Bool {
     return _radioAuthenticated }
@@ -118,8 +107,10 @@ extension Wan {
     return _serverConnected }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Wan Tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token: String {
     case serverConnected = "server_connected"
     case radioAuthenticated = "radio_authenticated"

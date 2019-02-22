@@ -8,24 +8,10 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Transmit Class extensions
-//              - Static command prefix properties
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Transmit {
-  
-  static let kTuneCmd                       = "transmit "                   // command prefixes
-  static let kSetCmd                        = "transmit set "
-  static let kCwCmd                         = "cw "
-  static let kMicCmd                        = "mic "
-  static let kMinPitch                      = 100
-  static let kMaxPitch                      = 6_000
-  static let kMinWpm                        = 5
-  static let kMaxWpm                        = 100
-  static let kMinDelay                      = 0
-  static let kMaxDelay                      = 2_000
   
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
@@ -93,7 +79,7 @@ extension Transmit {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
   // ***** CW COMMANDS *****
   
@@ -137,10 +123,6 @@ extension Transmit {
     get {  return _cwSyncCwxEnabled }
     set { if _cwSyncCwxEnabled != newValue { _cwSyncCwxEnabled = newValue ; cwCmd( .cwSyncCwxEnabled, newValue.asNumber) } } }
   
-  @objc dynamic public var cwWeight: Int {
-    get {  return _cwWeight }
-    set { if _cwWeight != newValue { _cwWeight = newValue ; cwCmd( "weight", newValue) } } }
-  
   // ***** MIC COMMANDS *****
   
   @objc dynamic public var micAccEnabled: Bool {
@@ -172,10 +154,6 @@ extension Transmit {
   @objc dynamic public var companderLevel: Int {
     get {  return _companderLevel }
     set { if _companderLevel != newValue { _companderLevel = newValue.bound(Api.kControlMin, Api.kControlMax) ; transmitCmd( .companderLevel, newValue) } } }
-  
-  @objc dynamic public var cwAutoSpaceEnabled: Bool {
-    get {  return _cwAutoSpaceEnabled }
-    set { if _cwAutoSpaceEnabled != newValue { _cwAutoSpaceEnabled = newValue ; transmitCmd( "auto_space", newValue.asNumber) } } }
   
   @objc dynamic public var daxEnabled: Bool {
     get {  return _daxEnabled }
@@ -212,10 +190,6 @@ extension Transmit {
   @objc dynamic public var speechProcessorLevel: Int {
     get {  return _speechProcessorLevel }
     set { if _speechProcessorLevel != newValue { _speechProcessorLevel = newValue ; transmitCmd( .speechProcessorLevel, newValue) } } }
-  
-  @objc dynamic public var ssbPeakControlEnabled: Bool {
-    get {  return _ssbPeakControlEnabled }
-    set { if _ssbPeakControlEnabled != newValue { _ssbPeakControlEnabled = newValue ; transmitCmd("ssb_peak_control", newValue.asNumber) } } }
   
   @objc dynamic public var tunePower: Int {
     get {  return _tunePower }

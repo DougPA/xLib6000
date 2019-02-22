@@ -9,13 +9,10 @@
 import Foundation
 import os.log
 
-// --------------------------------------------------------------------------------
-// MARK: - RadioParameters implementation
-//
-//      structure used internally to represent a Radio (hardware) instance
-//
-// --------------------------------------------------------------------------------
-
+///  RadioParameters implementation
+///
+///      structure used internally to represent a Radio (hardware) instance
+///
 public final class RadioParameters          : Equatable {
   
   // ----------------------------------------------------------------------------

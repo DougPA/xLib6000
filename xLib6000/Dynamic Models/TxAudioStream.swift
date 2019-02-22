@@ -9,16 +9,13 @@
 import Cocoa
 import os
 
-// ------------------------------------------------------------------------------
-// MARK: - TxAudioStream Class implementation
-//
-//      creates a TxAudioStream instance to be used by a Client to support the
-//      processing of a stream of Audio from the client to the Radio. TxAudioStream
-//      objects are added / removed by the incoming TCP messages. TxAudioStream
-//      objects periodically send Tx Audio in a UDP stream.
-//
-// ------------------------------------------------------------------------------
-
+/// TxAudioStream Class implementation
+///
+///      creates a TxAudioStream instance to be used by a Client to support the
+///      processing of a stream of Audio from the client to the Radio. TxAudioStream
+///      objects are added / removed by the incoming TCP messages. TxAudioStream
+///      objects periodically send Tx Audio in a UDP stream.
+///
 public final class TxAudioStream            : NSObject, DynamicModel {
   
   // ------------------------------------------------------------------------------
@@ -48,13 +45,11 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
   
   /// Parse a TxAudioStream status message
+  ///
+  ///   StatusParser protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -116,9 +111,17 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Public methods for sending tx audio to the Radio (hardware)
+  // MARK: - Public instance methods
   
   private var _vita: Vita?
+  /// Send Tx Audio to the Radio
+  ///
+  /// - Parameters:
+  ///   - left:                   array of left samples
+  ///   - right:                  array of right samples
+  ///   - samples:                number of samples
+  /// - Returns:                  success
+  ///
   public func sendTXAudio(left: [Float], right: [Float], samples: Int) -> Bool {
     
     // skip this if we are not the DAX TX Client
@@ -188,10 +191,11 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse TX Audio Stream key/value pairs
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -243,17 +247,10 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - MicAudioStream Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - TxAudioStream tokens
-// --------------------------------------------------------------------------------
-
 extension TxAudioStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
   // listed in alphabetical order
   internal var _inUse: Bool {
@@ -281,12 +278,8 @@ extension TxAudioStream {
     set { _q.sync(flags: .barrier) { __txGainScalar = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
-  // FIXME: Should any of these send a message to the Radio?
-  //          If yes, implement it, if not should they be "get" only?
-  
-  // listed in alphabetical order
   @objc dynamic public var inUse: Bool {
     return _inUse }
   
@@ -297,7 +290,6 @@ extension TxAudioStream {
   @objc dynamic public var port: Int {
     get { return _port  }
     set { if _port != newValue { _port = newValue } } }
-  
   
   @objc dynamic public var txGain: Int {
     get { return _txGain  }
@@ -320,8 +312,10 @@ extension TxAudioStream {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - TxAudioStream tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token: String {
     case daxTx      = "dax_tx"
     case inUse      = "in_use"

@@ -8,15 +8,13 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Meter Class extensions
-//              - Public class methods that send Commands to the Radio (hardware)
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Meter {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
 
   public class func subscribe(number: MeterNumber) {
     
@@ -39,9 +37,4 @@ extension Meter {
     // ask the Radio for a list of Meters
     Api.sharedInstance.send(Api.Command.meterList.rawValue, replyTo: callback)
   }
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
-  
-  // ----- NONE -----
 }

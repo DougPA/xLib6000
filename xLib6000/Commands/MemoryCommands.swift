@@ -8,23 +8,13 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - Memory Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Memory {
     
-  static let kCreateCmd                     = "memory create"               // Command prefixes
-  static let kRemoveCmd                     = "memory remove "
-  static let kSetCmd                        = "memory set "
-  static let kApplyCmd                      = "memory apply "
-
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
 
   /// Create a Memory
   ///
@@ -37,7 +27,7 @@ extension Memory {
   }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
 
   /// Apply a Memory
   ///
@@ -60,6 +50,11 @@ extension Memory {
     Api.sharedInstance.send(Memory.kRemoveCmd + "\(id)", replyTo: callback)
   }
 
+  public func select() {
+    
+    Api.sharedInstance.send("memory apply \(id)")
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   
@@ -73,16 +68,10 @@ extension Memory {
     
     Api.sharedInstance.send(Memory.kSetCmd + "\(id) " + token.rawValue + "=\(value)")
   }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Public methods that send commands to the Radio (hardware)
-  
-  public func select() { Api.sharedInstance.send("memory apply \(id)") }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
-  // listed in alphabetical order
   @objc dynamic public var digitalLowerOffset: Int {
     get { return _digitalLowerOffset }
     set { if _digitalLowerOffset != newValue { _digitalLowerOffset = newValue ; memCmd( .digitalLowerOffset, newValue) } } }

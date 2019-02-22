@@ -71,6 +71,7 @@
 		913F7F8C2066F05B00F35E9B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 913F7F8B2066F05B00F35E9B /* README.md */; };
 		9143BD9B21FCDA0700C2CCBD /* KnownIssues.md in Resources */ = {isa = PBXBuildFile; fileRef = 9143BD9A21FCDA0700C2CCBD /* KnownIssues.md */; };
 		9148CEAD21D94AC400306FC0 /* WanServerCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */; };
+		91612E41221E4F8D0002C4F9 /* Frames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91612E40221E4F8D0002C4F9 /* Frames.swift */; };
 		9185B087207FD11E004D4C40 /* xLib6000 Overview.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */; };
 		91A0ABF2209769B3008FDB3D /* Commands.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 91A0ABF1209769B2008FDB3D /* Commands.rtf */; };
 		91A2D8D7206944A000676728 /* ChangeLog.txt in Resources */ = {isa = PBXBuildFile; fileRef = 91A2D8D6206944A000676728 /* ChangeLog.txt */; };
@@ -144,6 +145,7 @@
 		913F7F8B2066F05B00F35E9B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9143BD9A21FCDA0700C2CCBD /* KnownIssues.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = KnownIssues.md; sourceTree = "<group>"; };
 		9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WanServerCommands.swift; sourceTree = "<group>"; };
+		91612E40221E4F8D0002C4F9 /* Frames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Frames.swift; sourceTree = "<group>"; };
 		9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "xLib6000 Overview.pdf"; sourceTree = "<group>"; };
 		91A0ABF1209769B2008FDB3D /* Commands.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Commands.rtf; sourceTree = "<group>"; };
 		91A2D8D6206944A000676728 /* ChangeLog.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ChangeLog.txt; sourceTree = "<group>"; };
@@ -292,6 +294,7 @@
 				913EF04D20669DA700AF99BE /* UdpManager.swift */,
 				913EF04F20669DA700AF99BE /* Vita.swift */,
 				913EF05120669DA700AF99BE /* WanServer.swift */,
+				91612E40221E4F8D0002C4F9 /* Frames.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -434,6 +437,7 @@
 				913EF06520669DA700AF99BE /* TxAudioStream.swift in Sources */,
 				913EF06120669DA700AF99BE /* Amplifier.swift in Sources */,
 				913EF08620669DA700AF99BE /* MemoryCommands.swift in Sources */,
+				91612E41221E4F8D0002C4F9 /* Frames.swift in Sources */,
 				913EF06720669DA700AF99BE /* Equalizer.swift in Sources */,
 				913EF09120669DA700AF99BE /* Vita.swift in Sources */,
 				913EF09420669DA700AF99BE /* RadioFactory.swift in Sources */,

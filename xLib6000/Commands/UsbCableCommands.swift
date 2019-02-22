@@ -8,23 +8,15 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - UsbCable Class extensions
-//              - Static command prefix properties
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send Commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension UsbCable {
   
   // FIXME: Add additional UsbCable commands
   
-  static let kCmd                           = "usb_cable "                  // Command prefixes
-  static let kSetCmd                        = "usb_cable set "
-  static let kSetBitCmd                     = "usb_cable set bit "
-  
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
 
   /// Remove this UsbCable
   ///
@@ -53,9 +45,8 @@ extension UsbCable {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant, that send Commands to the Radio (hardware)
+  // MARK: - Properties (KVO compliant) that send Commands
   
-  // listed in alphabetical order
   @objc dynamic public var autoReport: Bool {
     get { return _autoReport }
     set { if _autoReport != newValue { _autoReport = newValue ; usbCableCmd( .autoReport, newValue.asNumber) } } }

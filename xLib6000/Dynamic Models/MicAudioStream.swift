@@ -9,23 +9,19 @@
 import Cocoa
 import os
 
-// ------------------------------------------------------------------------------
-// MARK: - MicAudioStream Class implementation
-//
-//      creates a MicAudioStream instance to be used by a Client to support the
-//      processing of a stream of Mic Audio from the Radio to the client. MicAudioStream
-//      objects are added / removed by the incoming TCP messages. MicAudioStream
-//      objects periodically receive Mic Audio in a UDP stream.
-//
-// ------------------------------------------------------------------------------
-
+/// MicAudioStream Class implementation
+///
+///      creates a MicAudioStream instance to be used by a Client to support the
+///      processing of a stream of Mic Audio from the Radio to the client. MicAudioStream
+///      objects are added / removed by the incoming TCP messages. MicAudioStream
+///      objects periodically receive Mic Audio in a UDP stream.
+///
 public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
   public private(set) var id                : DaxStreamId = 0               // The Mic Audio stream id
-
   public var rxLostPacketCount              = 0                             // Rx lost packet count
 
   // ------------------------------------------------------------------------------
@@ -51,13 +47,11 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
   
   /// Parse a Mic AudioStream status message
+  ///
+  ///   StatusParser Protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -119,10 +113,11 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse Mic Audio Stream key/value pairs
+  ///
+  ///   PropertiesParser Protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -168,16 +163,11 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       NC.post(.micAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
-
-  // ----------------------------------------------------------------------------
-  // MARK: - VitaProcessor protocol methods
-  
-  //      called by Radio on the streamQ
-  //
-  //      The payload of the incoming Vita struct is converted to a MicAudioStreamFrame and
-  //      passed to the Mic Audio Stream Handler
-  
   /// Process the Mic Audio Stream Vita struct
+  ///
+  ///   VitaProcessor protocol method, executes on the streamQ
+  ///      The payload of the incoming Vita struct is converted to a MicAudioStreamFrame and
+  ///      passed to the Mic Audio Stream Handler, called by Radio
   ///
   /// - Parameters:
   ///   - vitaPacket:         a Vita struct
@@ -247,49 +237,10 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - MicAudioStreamFrame struct implementation
-// --------------------------------------------------------------------------------
-//
-//  Populated by the Mic Audio Stream vitaHandler
-//
-
-/// Struct containing Mic Audio Stream data
-///
-public struct MicAudioStreamFrame {
-  
-  public private(set) var samples           = 0                             // number of samples (L/R) in this frame
-  public var leftAudio                      = [Float]()                     // Array of left audio samples
-  public var rightAudio                     = [Float]()                     // Array of right audio samples
-  
-  /// Initialize a AudioStreamFrame
-  ///
-  /// - Parameters:
-  ///   - payload:        pointer to a Vita packet payload
-  ///   - numberOfWords:  number of 32-bit Words in the payload
-  ///
-  public init(payload: UnsafeRawPointer, numberOfBytes: Int) {
-    
-    // 4 byte each for left and right sample (4 * 2)
-    self.samples = numberOfBytes / (4 * 2)
-    
-    // allocate the samples arrays
-    self.leftAudio = [Float](repeating: 0, count: samples)
-    self.rightAudio = [Float](repeating: 0, count: samples)
-  }
-}
-
-// --------------------------------------------------------------------------------
-// MARK: - MicAudioStream Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - MicAudioStream tokens
-// --------------------------------------------------------------------------------
-
 extension MicAudioStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
   // listed in alphabetical order
   internal var _inUse: Bool {
@@ -313,12 +264,8 @@ extension MicAudioStream {
     set { _q.sync(flags: .barrier) { __micGainScalar = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
-  // FIXME: Should any of these send a message to the Radio?
-  //          If yes, implement it, if not should they be "get" only?
-  
-  // listed in alphabetical order
   @objc dynamic public var inUse: Bool {
     return _inUse }
   
@@ -351,19 +298,20 @@ extension MicAudioStream {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
+  // MARK: - NON Public properties (KVO compliant)
   
   public var delegate: StreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - MicAudioStream tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token: String {
     case inUse      = "in_use"
     case ip
     case port
   }
-  
 }

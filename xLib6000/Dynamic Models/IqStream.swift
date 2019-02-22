@@ -10,23 +10,26 @@ import Foundation
 import os
 import Accelerate
 
-// ------------------------------------------------------------------------------
-// MARK: - IqStream Class implementation
-//
-//      creates an IqStream instance to be used by a Client to support the
-//      processing of a stream of IQ data from the Radio to the client. IqStream
-//      objects are added / removed by the incoming TCP messages. IqStream
-//      objects periodically receive IQ data in a UDP stream.
-//
-// ------------------------------------------------------------------------------
-
+/// IqStream Class implementation
+///
+///      creates an IqStream instance to be used by a Client to support the
+///      processing of a stream of IQ data from the Radio to the client. IqStream
+///      objects are added / removed by the incoming TCP messages. IqStream
+///      objects periodically receive IQ data in a UDP stream.
+///
 public final class IqStream                 : NSObject, DynamicModelWithStream {
+ 
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
   
+  static let kCmd                           = "dax iq "                     // Command prefixes
+  static let kStreamCreateCmd               = "stream create "
+  static let kStreamRemoveCmd               = "stream remove "
+
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
   public private(set) var id                : DaxStreamId = 0               // Stream Id
-
   public private(set) var rxLostPacketCount = 0                             // Rx lost packet count
 
   // ------------------------------------------------------------------------------
@@ -59,13 +62,11 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -------
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
 
   /// Parse a Stream status message
+  ///
+  ///   StatusParser Protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -108,6 +109,10 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
       }
     }
   }
+  
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
   /// Find the IQ Stream for a DaxIqChannel
   ///
   /// - Parameters:
@@ -142,10 +147,11 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
   }
 
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse IQ Stream key/value pairs
+  ///
+  ///   PropertiesParser Protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -219,26 +225,16 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
       NC.post(.iqStreamHasBeenAdded, object: self as Any?)
     }
   }
-
-  // ----------------------------------------------------------------------------
-  // MARK: - VitaProcessor Protocol method
-  
-  //      called by Radio on the streamQ
-  //
-  //      The payload of the incoming Vita struct is converted to an IqStreamFrame and
-  //      passed to the IQ Stream Handler
-  
   /// Process the IqStream Vita struct
+  ///
+  ///   VitaProcessor Protocol method, executes on the streamQ
+  ///      The payload of the incoming Vita struct is converted to an IqStreamFrame and
+  ///      passed to the IQ Stream Handler, called by Radio
   ///
   /// - Parameters:
   ///   - vita:       a Vita struct
   ///
   func vitaProcessor(_ vita: Vita) {
-    
-//    guard vita.classCode == .daxIq24 ||
-//          vita.classCode == .daxIq48 ||
-//          vita.classCode == .daxIq96 ||
-//          vita.classCode == .daxIq192  else { return }
     
     // if there is a delegate, process the Panadapter stream
     if let delegate = delegate {
@@ -291,52 +287,11 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - IqStreamFrame struct implementation
-// --------------------------------------------------------------------------------
-//
-//  Populated by the IQ Stream vitaHandler
-//
-
-/// Struct containing IQ Stream data
-///
-public struct IqStreamFrame {
-  
-  public var daxIqChannel                   = -1
-  public private(set) var samples           = 0                             // number of samples (L/R) in this frame
-  public var realSamples                    = [Float]()                     // Array of real (I) samples
-  public var imagSamples                    = [Float]()                     // Array of imag (Q) samples
-  
-  /// Initialize an IqtreamFrame
-  ///
-  /// - Parameters:
-  ///   - payload:        pointer to a Vita packet payload
-  ///   - numberOfBytes:  number of bytes in the payload
-  ///
-  public init(payload: UnsafeRawPointer, numberOfBytes: Int) {
-    
-    // 4 byte each for left and right sample (4 * 2)
-    self.samples = numberOfBytes / (4 * 2)
-    
-    // allocate the samples arrays
-    self.realSamples = [Float](repeating: 0, count: samples)
-    self.imagSamples = [Float](repeating: 0, count: samples)
-  }
-}
-
-// --------------------------------------------------------------------------------
-// MARK: - IqStream Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - IqStream tokens
-// --------------------------------------------------------------------------------
-
 extension IqStream {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _available: Int {
     get { return _q.sync { __available } }
     set { _q.sync(flags: .barrier) { __available = newValue } } }
@@ -374,12 +329,8 @@ extension IqStream {
     set { _q.sync(flags: .barrier) { __streaming = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
-  // FIXME: Should any of these send a message to the Radio?
-  //          If yes, implement it, if not should they be "get" only?
-  
-  // listed in alphabetical order
   @objc dynamic public var available: Int {
     return _available }
   
@@ -405,15 +356,17 @@ extension IqStream {
     return _streaming  }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
+  // MARK: - Public properties
   
   public var delegate: StreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // Mark: - IqStream tokens
+  // Mark: - Tokens
   
+  /// Properties
+  ///
   internal enum Token: String {
     case available
     case capacity
@@ -426,3 +379,4 @@ extension IqStream {
     case streaming
   }
 }
+

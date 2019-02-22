@@ -11,15 +11,12 @@ public typealias XvtrId = String
 import Foundation
 import os
 
-// --------------------------------------------------------------------------------
-// MARK: - Xvtr Class implementation
-//
-//      creates an Xvtr instance to be used by a Client to support the
-//      processing of an Xvtr. Xvtr objects are added, removed and updated by
-//      the incoming TCP messages.
-//
-// --------------------------------------------------------------------------------
-
+/// Xvtr Class implementation
+///
+///      creates an Xvtr instance to be used by a Client to support the
+///      processing of an Xvtr. Xvtr objects are added, removed and updated by
+///      the incoming TCP messages.
+///
 public final class Xvtr                     : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
@@ -53,13 +50,11 @@ public final class Xvtr                     : NSObject, DynamicModel {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
   
   /// Parse an Xvtr status message
+  ///
+  ///   StatusParser protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -117,10 +112,11 @@ public final class Xvtr                     : NSObject, DynamicModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse Xvtr key/value pairs
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -213,19 +209,11 @@ public final class Xvtr                     : NSObject, DynamicModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Xvtr Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Xvtr tokens
-// --------------------------------------------------------------------------------
-
 extension Xvtr {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _ifFrequency: Int {
     get { return _q.sync { __ifFrequency } }
     set { _q.sync(flags: .barrier) {__ifFrequency = newValue } } }
@@ -275,12 +263,8 @@ extension Xvtr {
     set { _q.sync(flags: .barrier) {__twoMeterInt = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
-  // FIXME: Should any of these send a message to the Radio?
-  //          If yes, implement it, if not should they be "get" only?
-  
-  // listed in alphabetical order
   @objc dynamic public var inUse: Bool {
     return _inUse }
   
@@ -294,8 +278,10 @@ extension Xvtr {
     return _twoMeterInt }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Xvtr tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token : String {
     case name
     case ifFrequency        = "if_freq"

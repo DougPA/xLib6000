@@ -98,3 +98,80 @@ public protocol StreamHandler               : class {
   func streamHandler<T>(_ streamFrame: T)
 }
 
+protocol MeterStreamHandler                 : class {
+  
+  /// Process Meter data
+  ///
+  /// - Parameter value:            meter value
+  ///
+  func streamHandler(_ value: Int16 )
+}
+
+protocol TcpManagerDelegate: class {
+  
+  // if any of theses are not needed, implement a stub in the delegate that does nothing
+  
+  /// Process a Tcp message from the Radio
+  ///
+  /// - Parameter text:             text of the message
+  ///
+  func receivedMessage(_ text: String)
+  
+  /// Process a Tcp message sent to the Radio
+  ///
+  /// - Parameter text:             text of the message
+  ///
+  func sentMessage(_ text: String)
+  
+  /// Process a change of Tcp state
+  ///
+  /// - Parameters:
+  ///   - connected:                is Connected
+  ///   - host:                     host Ip address
+  ///   - port:                     host Port number
+  ///   - error:                    error message (may be blank)
+  ///
+  func tcpState(connected: Bool, host: String, port: UInt16, error: String)
+}
+
+protocol UdpManagerDelegate                 : class {
+  
+  // if any of theses are not needed, implement a stub in the delegate that does nothing
+  
+  /// Process a change of Udp state
+  ///
+  /// - Parameters:
+  ///   - bound:                    is Bound
+  ///   - port:                     Port number
+  ///   - error:                    error message (may be blank)
+  ///
+  func udpState(bound: Bool, port: UInt16, error: String)
+  
+  /// Process a Udp Vita packet
+  ///
+  /// - Parameter vita:             a Vita packet
+  ///
+  func udpStreamHandler(_ vita: Vita)
+}
+
+public protocol WanServerDelegate           : class {
+  
+  /// Received radio list from server
+  ///
+  func wanRadioListReceived(wanRadioList: [RadioParameters])
+  
+  /// Received user settings from server
+  ///
+  func wanUserSettings(_ userSettings: WanUserSettings)
+  
+  /// Radio is ready to connect
+  ///
+  func wanRadioConnectReady(handle: String, serial: String)
+  
+  /// Received Wan test results
+  ///
+  func wanTestConnectionResultsReceived(results: WanTestConnectionResults)
+}
+
+
+

@@ -9,17 +9,22 @@
 import Foundation
 import os
 
-// --------------------------------------------------------------------------------
-// MARK: - Cwx Class implementation
-//
-//      creates a Cwx instance to be used by a Client to support the
-//      rendering of a Cwx. Cwx objects are added, removed and updated 
-//      by the incoming TCP messages.
-//
-// --------------------------------------------------------------------------------
-
+/// Cwx Class implementation
+///
+///      creates a Cwx instance to be used by a Client to support the
+///      rendering of a Cwx. Cwx objects are added, removed and updated
+///      by the incoming TCP messages.
+///
 public final class Cwx                      : NSObject, StaticModel {
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
   
+  static let kCmd                           = "cwx "                        // Command prefixes
+  static let kInsertCmd                     = "cwx insert "
+  static let kMacroCmd                      = "cwx macro "
+  static let kSendCmd                       = "cwx send "
+
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
@@ -69,7 +74,7 @@ public final class Cwx                      : NSObject, StaticModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - Public methods
+  // MARK: - Public instance methods
   
   /// Get the specified Cwx Macro
   ///
@@ -91,8 +96,8 @@ public final class Cwx                      : NSObject, StaticModel {
     return true
   }
   
-  // --------------------------------------------------------------------------------
-  // MARK: - Cwx Reply Handler
+  // ------------------------------------------------------------------------------
+  // MARK: - Instance methods
   
   /// Process a Cwx command reply
   ///
@@ -152,10 +157,11 @@ public final class Cwx                      : NSObject, StaticModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
-  /// Parse Cwx key/value pairs, called by Radio, executes on the radioQ
+  /// Parse Cwx key/value pairs, called by Radio
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -225,19 +231,11 @@ public final class Cwx                      : NSObject, StaticModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Cwx Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Cwx tokens
-// --------------------------------------------------------------------------------
-
 extension Cwx {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _breakInDelay: Int {
     get { return _q.sync { __breakInDelay } }
     set { _q.sync(flags: .barrier) { __breakInDelay = newValue } } }
@@ -250,17 +248,13 @@ extension Cwx {
     get { return _q.sync { __wpm } }
     set { _q.sync(flags: .barrier) { __wpm = newValue } } }
   
-  
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // Mark: - Tokens
   
-  // ----- None -----
-  
-  // ----------------------------------------------------------------------------
-  // Mark: - Cwx tokens
-  
+  /// Properties
+  ///
   internal enum Token : String {
-    case breakInDelay   = "break_in_delay"
+    case breakInDelay   = "break_in_delay"            // "delay"
     case qskEnabled     = "qsk_enabled"
     case erase
     case sent

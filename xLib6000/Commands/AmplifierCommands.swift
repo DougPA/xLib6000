@@ -8,23 +8,13 @@
 
 import Foundation
 
-
-// --------------------------------------------------------------------------------
-// MARK: - Amplifier Class extensions
-//              - Static command prefix properties
-//              - Public class methods that send Commands to the Radio (hardware)
-//              - Public instance methods that send Commands to the Radio (hardware)
-//              - Dynamic public properties that send commands to the Radio
-// --------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// MARK: - Command extension
 
 extension Amplifier {
   
-  static let kSetCmd                        = "amplifier set "              // Command prefixes
-  static let kOperate                       = "OPERATE"
-  static let kStandby                       = "STANDBY"
-  
   // ----------------------------------------------------------------------------
-  // MARK: - Public Class methods that send Commands to the Radio (hardware)
+  // MARK: - Class methods that send Commands
 
   /// Create an Amplifier record
   ///
@@ -42,7 +32,7 @@ extension Amplifier {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public Instance methods that send Commands to the Radio (hardware)
+  // MARK: - Instance methods that send Commands
 
   /// Remove this Amplifier record
   ///
@@ -78,9 +68,8 @@ extension Amplifier {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (with message sent to Radio)
+  // MARK: - Properties (KVO compliant) that send Commands
   
-  // listed in alphabetical order
   @objc dynamic public var ant: String {
     get { return _ant }
     set { if _ant != newValue { _ant = newValue ; amplifierCmd(.ant, newValue) } } }

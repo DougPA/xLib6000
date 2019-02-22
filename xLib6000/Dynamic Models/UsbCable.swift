@@ -11,22 +11,25 @@ import os
 
 public typealias UsbCableId = String
 
-// --------------------------------------------------------------------------------
-// MARK: - USB Cable Class implementation
-//
-//      creates a USB Cable instance to be used by a Client to support the
-//      processing of USB connections to the Radio (hardware). USB Cable objects
-//      are added, removed and updated by the incoming TCP messages.
-//
-// --------------------------------------------------------------------------------
-
+/// USB Cable Class implementation
+///
+///      creates a USB Cable instance to be used by a Client to support the
+///      processing of USB connections to the Radio (hardware). USB Cable objects
+///      are added, removed and updated by the incoming TCP messages.
+///
 public final class UsbCable                 : NSObject, DynamicModel {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
+  
+  static let kCmd                           = "usb_cable "                  // Command prefixes
+  static let kSetCmd                        = "usb_cable set "
+  static let kSetBitCmd                     = "usb_cable set bit "
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   public private(set) var id                : UsbCableId = ""               // Id that uniquely identifies this UsbCable
-
   public private(set) var cableType         : UsbCableType                  // Type of this UsbCable
 
   // ----------------------------------------------------------------------------
@@ -61,13 +64,11 @@ public final class UsbCable                 : NSObject, DynamicModel {
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
-  
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
   
   /// Parse a USB Cable status message
+  ///
+  ///   StatusParser Protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -128,10 +129,11 @@ public final class UsbCable                 : NSObject, DynamicModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse USB Cable key/value pairs
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -280,19 +282,11 @@ public final class UsbCable                 : NSObject, DynamicModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - UsbCable Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - UsbCable tokens
-// --------------------------------------------------------------------------------
-
 extension UsbCable {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _autoReport: Bool {
     get { return _q.sync { __autoReport } }
     set { _q.sync(flags: .barrier) {__autoReport = newValue } } }
@@ -367,13 +361,10 @@ extension UsbCable {
   //
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Tokens
   
-  // None
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - UsbCable tokens
-  
+  /// Properties
+  ///
   internal enum Token : String {
     case autoReport       = "auto_report"
     case band
@@ -395,10 +386,8 @@ extension UsbCable {
     case usbLog           = "log"
     //        case usbLogLine = "log_line"
   }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - UsbCable related enum
-  
+  /// Types
+  ///
   public enum UsbCableType: String {
     case bcd
     case bit

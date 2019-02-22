@@ -6,18 +6,18 @@
 //  Copyright © 2018 Douglas Adams & Mario Illgen. All rights reserved.
 //
 
-// --------------------------------------------------------------------------------
-// MARK: - API Class implementation
-//
-//      manages the connections to the Radio (hardware), responsible for the
-//      creation / destruction of the Radio class (the object analog of the
-//      Radio hardware)
-//
-// --------------------------------------------------------------------------------
-
 import os
 
+/// API Class implementation
+///
+///      manages the connections to the Radio (hardware), responsible for the
+///      creation / destruction of the Radio class (the object analog of the
+///      Radio hardware)
+///
 public final class Api                      : NSObject, TcpManagerDelegate, UdpManagerDelegate {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
   
   public static let kId                     = "xLib6000"                    // API Name
   public static let kDomainId               = "net.k3tzr"                   // Domain name
@@ -61,7 +61,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // MARK: - Private properties
   
   private var _log                          = OSLog(subsystem: kBundleIdentifier, category: "Api")
-  private var _apiState                     : Api.NewState! {
+  private var _apiState                     : Api.State! {
     didSet { os_log("Api state == %{public}@", log: _log, type: .info, _apiState.rawValue) }
   }
   private var _tcp                          : TcpManager!                   // TCP connection class (commands)
@@ -277,7 +277,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // send the secondary commands
     sendCommandList(_secondaryCommands)
   }
-
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Internal methods
+  
   /// A Client has been connected
   ///
   func clientConnected() {
@@ -510,13 +513,17 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   @objc private func tcpPingTimeout(_ note: Notification) {
     
     os_log("Pinger timeout", log: _log, type: .error)
+    
+    // FIXME: Should this close the Radio?
   }
   
   // ----------------------------------------------------------------------------
   // MARK: - TcpManagerDelegate methods
-  //    arrives on the tcpReceiveQ
 
   /// Process a received message
+  ///
+  ///   TcpManagerDelegate method, arrives on the tcpReceiveQ
+  ///   calls delegate methods on the parseQ
   ///
   /// - Parameter msg:        text of the message
   ///
@@ -527,6 +534,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // YES, pass it to the parser (async on the parseQ)
       _parseQ.async { [ unowned self ] in
+        
         self.delegate?.receivedMessage( String(msg.dropLast()) )
 
         // pass it to xAPITester (if present)
@@ -535,6 +543,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     }
   }
   /// Process a sent message
+  ///
+  ///   TcpManagerDelegate method, arrives on the tcpReceiveQ
   ///
   /// - Parameter msg:         text of the message
   ///
@@ -546,6 +556,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     testerDelegate?.sentMessage( String(msg.dropLast()) )
   }
   /// Respond to a TCP Connection/Disconnection event
+  ///
+  ///   TcpManagerDelegate method, arrives on the tcpReceiveQ
   ///
   /// - Parameters:
   ///   - connected:  state of connection
@@ -626,9 +638,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   // ----------------------------------------------------------------------------
   // MARK: - UdpManager delegate methods
-  //    arrives on the udpReceiveQ
   
   /// Respond to a UDP Connection/Disconnection event
+  ///
+  ///   UdpManager delegate method, arrives on the udpReceiveQ
   ///
   /// - Parameters:
   ///   - bound:  state of binding
@@ -666,6 +679,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   }
   /// Receive a UDP Stream packet
   ///
+  ///   UdpManager delegate method, arrives on the udpReceiveQ
+  ///
   /// - Parameter vita: a Vita packet
   ///
   func udpStreamHandler(_ vitaPacket: Vita) {
@@ -677,16 +692,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Api Class extensions
-//              - Public properties, no message to Radio
-//              - Api enums
-// --------------------------------------------------------------------------------
-
 extension Api {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
   public var localIP: String {
     get { return _objectQ.sync { _localIP } }
@@ -697,11 +706,12 @@ extension Api {
     set { _objectQ.sync(flags: .barrier) { _localUDPPort = newValue } } }
 
   // ----------------------------------------------------------------------------
-  // MARK: - Api enums
+  // MARK: - Enums
   
+  /// Commands
   ///
-  ///     Note: The "clientUdpPort" command must be sent AFTER the actual Udp port number has been determined.
-  ///           The default port number may already be in use by another application.
+  ///     The "clientUdpPort" command must be sent AFTER the actual Udp port number has been determined.
+  ///     The default port number may already be in use by another application.
   ///
   public enum Command: String, Equatable {
     
@@ -764,7 +774,9 @@ extension Api {
     }
   }
     
-  public enum MeterShortName : String {
+  /// Meter names
+  ///
+  public enum MeterShortName : String, CaseIterable {
     case codecOutput            = "codec"
     case microphoneAverage      = "mic"
     case microphoneOutput       = "sc_mic"
@@ -789,16 +801,10 @@ extension Api {
     case voltageAfterFuse       = "+13.8b"
     case voltageBeforeFuse      = "+13.8a"
     case voltageHwAlc           = "hwalc"
-
-    public static func allMeters() -> [MeterShortName] {
-      return [.codecOutput, .microphoneAverage, .microphoneOutput, .microphonePeak,
-              .postClipper, .postFilter1, .postFilter2, .postGain, .postRamp, .postSoftwareAlc,
-              .powerForward, .powerReflected, .preWaveAgc, .preWaveShim, .signal24Khz,
-              .signalPassband, .signalPostNrAnf, .signalPostAgc, .swr, .temperaturePa,
-              .voltageAfterFuse, .voltageBeforeFuse, .voltageHwAlc]
-    }
   }
   
+  /// Disconnect reasons
+  ///
   public enum DisconnectReason: Equatable {
     public static func ==(lhs: Api.DisconnectReason, rhs: Api.DisconnectReason) -> Bool {
       
@@ -811,8 +817,9 @@ extension Api {
     case normal
     case error (errorMessage: String)
   }
-  
-  public enum NewState: String {
+  /// States
+  ///
+  public enum State: String {
     case start
     case tcpConnected
     case udpBound
@@ -822,8 +829,14 @@ extension Api {
   }
 
   // --------------------------------------------------------------------------------
-  // MARK: - Type Alias (alphabetical)
+  // MARK: - Aliases
   
+  /// Definition for a Command Tuple
+  ///
+  ///   command:        a Radio command String
+  ///   diagnostic:     if true, send as a Diagnostic command
+  ///   replyHandler:   method to process the reply (may be nil)
+  ///
   public typealias CommandTuple = (command: String, diagnostic: Bool, replyHandler: ReplyHandler?)
   
 }

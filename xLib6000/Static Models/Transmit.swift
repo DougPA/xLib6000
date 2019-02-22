@@ -9,17 +9,28 @@
 import Foundation
 import os
 
-// --------------------------------------------------------------------------------
-// MARK: - Transmit Class implementation
-//
-//      creates a Transmit instance to be used by a Client to support the
-//      processing of the Transmit-related activities. Transmit objects are added,
-//      removed and updated by the incoming TCP messages.
-//
-// --------------------------------------------------------------------------------
-
+/// Transmit Class implementation
+///
+///      creates a Transmit instance to be used by a Client to support the
+///      processing of the Transmit-related activities. Transmit objects are added,
+///      removed and updated by the incoming TCP messages.
+///
 public final class Transmit                 : NSObject, StaticModel {
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Static properties
   
+  static let kTuneCmd                       = "transmit "                   // command prefixes
+  static let kSetCmd                        = "transmit set "
+  static let kCwCmd                         = "cw "
+  static let kMicCmd                        = "mic "
+  static let kMinPitch                      = 100
+  static let kMaxPitch                      = 6_000
+  static let kMinWpm                        = 5
+  static let kMaxWpm                        = 100
+  static let kMinDelay                      = 0
+  static let kMaxDelay                      = 2_000
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -33,7 +44,6 @@ public final class Transmit                 : NSObject, StaticModel {
   private var __carrierLevel                = 0                             //
   private var __companderEnabled            = false                         //
   private var __companderLevel              = 0                             //
-  private var __cwAutoSpaceEnabled          = false                         //
   private var __cwBreakInDelay              = 0                             //
   private var __cwBreakInEnabled            = false                         //
   private var __cwIambicEnabled             = false                         //
@@ -43,7 +53,6 @@ public final class Transmit                 : NSObject, StaticModel {
   private var __cwSidetoneEnabled           = false                         //
   private var __cwSwapPaddles               = false                         //
   private var __cwSyncCwxEnabled            = false                         //
-  private var __cwWeight                    = 0                             // CW weight (0 - 100)
   private var __cwSpeed                     = 5                             // CW speed (wpm, 5 - 100)
   private var __daxEnabled                  = false                         // Dax enabled
   private var __frequency                   = 0                             //
@@ -60,7 +69,6 @@ public final class Transmit                 : NSObject, StaticModel {
   private var __rfPower                     = 0                             // Power level (0 - 100)
   private var __speechProcessorEnabled      = false                         //
   private var __speechProcessorLevel        = 0                             //
-  private var __ssbPeakControlEnabled       = false                         //
   private var __txFilterChanges             = false                         //
   private var __txFilterHigh                = 0                             //
   private var __txFilterLow                 = 0                             //
@@ -95,10 +103,11 @@ public final class Transmit                 : NSObject, StaticModel {
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by Radio.parseStatusMessage(_:), executes on the parseQ
+  // MARK: - Protocol class methods
 
   /// Parse a Transmit status message
+  ///
+  ///   PropertiesParser protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -350,19 +359,11 @@ public final class Transmit                 : NSObject, StaticModel {
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Transmit Class extensions
-//              - Synchronized internal properties
-//              - Public properties, no message to Radio
-//              - Transmit tokens
-// --------------------------------------------------------------------------------
-
 extension Transmit {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Internal properties - with synchronization
+  // MARK: - Internal properties
   
-  // listed in alphabetical order
   internal var _carrierLevel: Int {
     get { return _q.sync { __carrierLevel } }
     set { _q.sync(flags: .barrier) { __carrierLevel = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
@@ -374,10 +375,6 @@ extension Transmit {
   internal var _companderLevel: Int {
     get { return _q.sync { __companderLevel } }
     set { _q.sync(flags: .barrier) { __companderLevel = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
-  
-  internal var _cwAutoSpaceEnabled: Bool {
-    get { return _q.sync { __cwAutoSpaceEnabled } }
-    set { _q.sync(flags: .barrier) { __cwAutoSpaceEnabled = newValue } } }
   
   internal var _cwBreakInEnabled: Bool {
     get { return _q.sync { __cwBreakInEnabled } }
@@ -414,10 +411,6 @@ extension Transmit {
   internal var _cwSyncCwxEnabled: Bool {
     get { return _q.sync { __cwSyncCwxEnabled } }
     set { _q.sync(flags: .barrier) { __cwSyncCwxEnabled = newValue } } }
-  
-  internal var _cwWeight: Int {
-    get { return _q.sync { __cwWeight } }
-    set { _q.sync(flags: .barrier) { __cwWeight = newValue } } }
   
   internal var _cwSpeed: Int {
     get { return _q.sync { __cwSpeed } }
@@ -482,10 +475,6 @@ extension Transmit {
   internal var _speechProcessorLevel: Int {
     get { return _q.sync { __speechProcessorLevel } }
     set { _q.sync(flags: .barrier) { __speechProcessorLevel = newValue } } }
-  
-  internal var _ssbPeakControlEnabled: Bool {
-    get { return _q.sync { __ssbPeakControlEnabled } }
-    set { _q.sync(flags: .barrier) { __ssbPeakControlEnabled = newValue } } }
   
   internal var _txFilterChanges: Bool {
     get { return _q.sync { __txFilterChanges } }
@@ -552,7 +541,7 @@ extension Transmit {
     set { _q.sync(flags: .barrier) { __voxLevel = newValue.bound(Api.kControlMin, Api.kControlMax) } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
   @objc dynamic public var frequency: Int {
     get {  return _frequency }
@@ -571,21 +560,23 @@ extension Transmit {
     return _txRfPowerChanges }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Transmit tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token: String {
-    case amCarrierLevel           = "am_carrier_level"
+    case amCarrierLevel           = "am_carrier_level"              // "am_carrier"
     case companderEnabled         = "compander"
     case companderLevel           = "compander_level"
     case cwBreakInDelay           = "break_in_delay"
     case cwBreakInEnabled         = "break_in"
     case cwIambicEnabled          = "iambic"
-    case cwIambicMode             = "iambic_mode"
+    case cwIambicMode             = "iambic_mode"                   // "mode"
     case cwlEnabled               = "cwl_enabled"
     case cwPitch                  = "pitch"
     case cwSidetoneEnabled        = "sidetone"
-    case cwSpeed                  = "speed"
-    case cwSwapPaddles            = "swap_paddles"
+    case cwSpeed                  = "speed"                         // "wpm"
+    case cwSwapPaddles            = "swap_paddles"                  // "swap"
     case cwSyncCwxEnabled         = "synccwx"
     case daxEnabled               = "dax"
     case frequency                = "freq"
@@ -593,11 +584,11 @@ extension Transmit {
     case inhibit
     case maxPowerLevel            = "max_power_level"
     case metInRxEnabled           = "met_in_rx"
-    case micAccEnabled            = "mic_acc"
-    case micBoostEnabled          = "mic_boost"
-    case micBiasEnabled           = "mic_bias"
-    case micLevel                 = "mic_level"
-    case micSelection             = "mic_selection"
+    case micAccEnabled            = "mic_acc"                       // "acc"
+    case micBoostEnabled          = "mic_boost"                     // "boost"
+    case micBiasEnabled           = "mic_bias"                      // "bias"
+    case micLevel                 = "mic_level"                     // "miclevel"
+    case micSelection             = "mic_selection"                 // "input"
     case rawIqEnabled             = "raw_iq_enable"
     case rfPower                  = "rfpower"
     case speechProcessorEnabled   = "speech_processor_enable"
@@ -605,11 +596,11 @@ extension Transmit {
     case tune
     case tunePower                = "tunepower"
     case txFilterChanges          = "tx_filter_changes_allowed"
-    case txFilterHigh             = "hi"
-    case txFilterLow              = "lo"
+    case txFilterHigh             = "hi"                            // "filter_high"
+    case txFilterLow              = "lo"                            // "filter_low"
     case txInWaterfallEnabled     = "show_tx_in_waterfall"
     case txMonitorAvailable       = "mon_available"
-    case txMonitorEnabled         = "sb_monitor"
+    case txMonitorEnabled         = "sb_monitor"                    // "mon"
     case txMonitorGainCw          = "mon_gain_cw"
     case txMonitorGainSb          = "mon_gain_sb"
     case txMonitorPanCw           = "mon_pan_cw"

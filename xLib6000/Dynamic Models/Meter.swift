@@ -12,27 +12,13 @@ import os
 public typealias MeterNumber = String
 public typealias MeterName = String
 
-// --------------------------------------------------------------------------------
-// MARK: - MeterStreamHandler protocol
-//
-// --------------------------------------------------------------------------------
-
-protocol MeterStreamHandler                 : class {
-  
-  // method to process Meter data
-  func streamHandler(_ value: Int16 ) -> Void
-}
-
-// ----------------------------------------------------------------------------------
-// MARK: - Meter Class implementation
-//
-//      creates a Meter instance to be used by a Client to support the
-//      rendering of a Meter. Meter objects are added / removed by the
-//      incoming TCP messages. Meters are periodically updated by a UDP
-//      stream containing multiple Meters.
-//
-// ----------------------------------------------------------------------------------
-
+/// Meter Class implementation
+///
+///      creates a Meter instance to be used by a Client to support the
+///      rendering of a Meter. Meter objects are added / removed by the
+///      incoming TCP messages. Meters are periodically updated by a UDP
+///      stream containing multiple Meters.
+///
 public final class Meter                    : NSObject, DynamicModel, MeterStreamHandler {
   
   // ----------------------------------------------------------------------------
@@ -69,17 +55,13 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   
   // ------------------------------------------------------------------------------
-  // MARK: - Class methods
+  // MARK: - Protocol class methods
   
-  // ----------------------------------------------------------------------------
-  //      VitaProcessor protocol methods
-  
-  //      called by Radio on the streamQ
-  //
-  //      The payload of the incoming Vita struct is converted to Meter values
-  //      which are passed to their respective Meter Stream Handlers
-
   /// Process the Meter Vita struct
+  ///
+  ///   VitaProcessor protocol methods, executes on the streamQ
+  ///      The payload of the incoming Vita struct is converted to Meter values
+  ///      which are passed to their respective Meter Stream Handlers, called by Radio
   ///
   /// - Parameters:
   ///   - vita:        a Vita struct
@@ -118,45 +100,11 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
           meter.streamHandler( Int16(bitPattern: value) )
         }
       }
-//      else {
-//
-//        // duplicate meter in packet, log it and ignore it
-//        Log.sharedInstance.msg("Duplicate meter in packet, number = \(meterNumber)", level: .warning, function: #function, file: #file, line: #line)
-//      }
     }
   }
-  /// Find Meters by a Slice Id
-  ///
-  /// - Parameters:
-  ///   - sliceId:    a Slice id
-  /// - Returns:      an array of Meters
-  ///
-  public class func findBy(sliceId: SliceId) -> [Meter] {
-    
-    // find the Meters on the specified Slice (if any)
-    return Api.sharedInstance.radio!.meters.values.filter { $0.source == "slc" && $0.number == sliceId }
-  }
-  /// Find a Meter by its ShortName
-  ///
-  /// - Parameters:
-  ///   - name:       Short Name of a Meter
-  /// - Returns:      a Meter reference
-  ///
-  public class func findBy(shortName name: MeterName) -> Meter? {
-
-    // find the Meters with the specified Name (if any)
-    let meters = Api.sharedInstance.radio!.meters.values.filter { $0.name == name }
-    guard meters.count >= 1 else { return nil }
-    
-    // return the first one
-    return meters[0]
-  }
-
-  // ----------------------------------------------------------------------------
-  //      StatusParser Protocol method
-  //      called by Radio.parseStatusMessage(_:), executes on the parseQ
-  
   /// Parse a Meter status message
+  ///
+  ///   StatusParser Protocol method, executes on the parseQ
   ///
   /// - Parameters:
   ///   - keyValues:      a KeyValuesArray
@@ -175,7 +123,7 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       // IN USE, extract the Meter Number from the first KeyValues entry
       let components = keyValues[0].key.components(separatedBy: ".")
       if components.count != 2 {return }
-
+      
       // the Meter Number is the 0th item
       let number = components[0]
       
@@ -188,7 +136,7 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       
       // pass the key values to the Meter for parsing
       radio.meters[number]!.parseProperties( keyValues )
-
+      
     } else {
       
       // NOT IN USE, extract the Meter Number
@@ -203,17 +151,52 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
           // YES, get the Slice
           if let slice = radio.slices[meter.group] {
             
+            // notify all observers
+            NC.post(.sliceMeterWillBeRemoved, object: radio.meters[number] as Any?)
+            
             // remove it from the Slice
             slice.removeMeter(number)
           }
+          
+        } else {
+          // notify all observers
+          NC.post(.meterWillBeRemoved, object: radio.meters[number] as Any?)
+          
+          // remove it
+          radio.meters[number] = nil
         }
-        // notify all observers
-        NC.post(.meterWillBeRemoved, object: radio.meters[number] as Any?)
-        
-        // remove it
-        radio.meters[number] = nil
       }
     }
+  }
+
+  // ------------------------------------------------------------------------------
+  // MARK: - Class methods
+  
+  /// Find Meters by a Slice Id
+  ///
+  /// - Parameters:
+  ///   - sliceId:    a Slice id
+  /// - Returns:      an array of Meters
+  ///
+  public class func findBy(sliceId: SliceId) -> [Meter] {
+    
+    // find the Meters on the specified Slice (if any)
+    return Api.sharedInstance.radio!.meters.values.filter { $0.source == "slc" && $0.group == sliceId }
+  }
+  /// Find a Meter by its ShortName
+  ///
+  /// - Parameters:
+  ///   - name:       Short Name of a Meter
+  /// - Returns:      a Meter reference
+  ///
+  public class func findBy(shortName name: MeterName) -> Meter? {
+
+    // find the Meters with the specified Name (if any)
+    let meters = Api.sharedInstance.radio!.meters.values.filter { $0.name == name }
+    guard meters.count >= 1 else { return nil }
+    
+    // return the first one
+    return meters[0]
   }
 
   // ----------------------------------------------------------------------------
@@ -239,10 +222,11 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
   }
   
   // ------------------------------------------------------------------------------
-  // MARK: - PropertiesParser Protocol method
-  //     called by parseStatus(_:radio:queue:inUse:), executes on the parseQ
+  // MARK: - Protocol instance methods
 
   /// Parse Meter key/value pairs
+  ///
+  ///   PropertiesParser Protocol method, executes on the parseQ
   ///
   /// - Parameter properties:       a KeyValuesArray
   ///
@@ -256,9 +240,6 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       
       // get the Key
       let key = numberAndKey[1]
-      
-//      // set the Meter Number
-//      number = numberAndKey[0]
       
       // check for unknown Keys
       guard let token = Token(rawValue: key) else {
@@ -322,11 +303,9 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       }
     }
   }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - MeterStreamHandler protocol methods
-  
   /// Process the UDP Stream Data for the Meter (arrives on the streamQ)
+  ///
+  ///   MeterStreamHandler protocol method, executes on the streamQ
   ///
   /// - Parameters:
   ///   - newValue:   the new value for the Meter
@@ -367,22 +346,11 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
   }
 }
 
-// --------------------------------------------------------------------------------
-// MARK: - Meter Class extensions
-//              - Public properties, no message to Radio
-//              - Meter tokens
-//              - Meter related enums
-// --------------------------------------------------------------------------------
-
 extension Meter {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public properties - KVO compliant (no message to Radio)
+  // MARK: - Public properties (KVO compliant)
   
-  // FIXME: Should any of these send a message to the Radio?
-  //          If yes, implement it, if not should they be "get" only?
-  
-  // listed in alphabetical order
   @objc dynamic public var desc: String {
     get { return _q.sync { _desc } }
     set { _q.sync(flags: .barrier) { _desc = newValue } } }
@@ -424,8 +392,10 @@ extension Meter {
     set { _q.sync(flags: .barrier) { _value = newValue } } }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Meter tokens
+  // MARK: - Tokens
   
+  /// Properties
+  ///
   internal enum Token : String {
     case desc
     case fps
@@ -436,17 +406,16 @@ extension Meter {
     case source     = "src"
     case units      = "unit"
   }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Meter related enums
-  
+  /// Sources
+  ///
   public enum Source: String {
     case codec      = "cod"
     case tx
     case slice      = "slc"
     case radio      = "rad"
   }
-  
+  /// Units
+  ///
   public enum Units : String {
     case none
     case amps
@@ -461,5 +430,4 @@ extension Meter {
     case volts
     case watts
   }
-  
 }
