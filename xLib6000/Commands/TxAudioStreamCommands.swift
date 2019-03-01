@@ -64,5 +64,5 @@ extension TxAudioStream {
   
   @objc dynamic public var transmit: Bool {
     get { return _transmit  }
-    set { if _transmit != newValue { _transmit = newValue ; txAudioCmd( newValue.asNumber) } } }
+    set { if _transmit != newValue { _transmit = newValue ; txAudioCmd( newValue.as1or0) } } }
 }

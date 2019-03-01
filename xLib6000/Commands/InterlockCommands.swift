@@ -32,7 +32,7 @@ extension Interlock {
   
   @objc dynamic public var accTxEnabled: Bool {
     get { return _accTxEnabled }
-    set { if _accTxEnabled != newValue { _accTxEnabled = newValue ; interlockCmd( .accTxEnabled, newValue.asLetter) } } }
+    set { if _accTxEnabled != newValue { _accTxEnabled = newValue ; interlockCmd( .accTxEnabled, newValue.asTF) } } }
   
   @objc dynamic public var accTxDelay: Int {
     get { return _accTxDelay }
@@ -40,19 +40,19 @@ extension Interlock {
   
   @objc dynamic public var accTxReqEnabled: Bool {
     get {  return _accTxReqEnabled }
-    set { if _accTxReqEnabled != newValue { _accTxReqEnabled = newValue ; interlockCmd( .accTxReqEnabled, newValue.asNumber) } } }
+    set { if _accTxReqEnabled != newValue { _accTxReqEnabled = newValue ; interlockCmd( .accTxReqEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var accTxReqPolarity: Bool {
     get {  return _accTxReqPolarity }
-    set { if _accTxReqPolarity != newValue { _accTxReqPolarity = newValue ; interlockCmd( .accTxReqPolarity, newValue.asNumber) } } }
+    set { if _accTxReqPolarity != newValue { _accTxReqPolarity = newValue ; interlockCmd( .accTxReqPolarity, newValue.as1or0) } } }
   
   @objc dynamic public var rcaTxReqEnabled: Bool {
     get {  return _rcaTxReqEnabled}
-    set { if _rcaTxReqEnabled != newValue { _rcaTxReqEnabled = newValue ; interlockCmd( .rcaTxReqEnabled, newValue.asLetter) } } }
+    set { if _rcaTxReqEnabled != newValue { _rcaTxReqEnabled = newValue ; interlockCmd( .rcaTxReqEnabled, newValue.asTF) } } }
   
   @objc dynamic public var rcaTxReqPolarity: Bool {
     get {  return _rcaTxReqPolarity }
-    set { if _rcaTxReqPolarity != newValue { _rcaTxReqPolarity = newValue ; interlockCmd( .rcaTxReqPolarity, newValue.asLetter) } } }
+    set { if _rcaTxReqPolarity != newValue { _rcaTxReqPolarity = newValue ; interlockCmd( .rcaTxReqPolarity, newValue.asTF) } } }
   
   @objc dynamic public var timeout: Int {
     get {  return _timeout }
@@ -64,7 +64,7 @@ extension Interlock {
 
   @objc dynamic public var tx1Enabled: Bool {
     get { return _tx1Enabled }
-    set { if _tx1Enabled != newValue { _tx1Enabled = newValue ; interlockCmd( .tx1Enabled, newValue.asLetter) } } }
+    set { if _tx1Enabled != newValue { _tx1Enabled = newValue ; interlockCmd( .tx1Enabled, newValue.asTF) } } }
   
   @objc dynamic public var tx1Delay: Int {
     get { return _tx1Delay }
@@ -72,7 +72,7 @@ extension Interlock {
   
   @objc dynamic public var tx2Enabled: Bool {
     get { return _tx2Enabled }
-    set { if _tx2Enabled != newValue { _tx2Enabled = newValue ; interlockCmd( .tx2Enabled, newValue.asLetter) } } }
+    set { if _tx2Enabled != newValue { _tx2Enabled = newValue ; interlockCmd( .tx2Enabled, newValue.asTF) } } }
   
   @objc dynamic public var tx2Delay: Int {
     get { return _tx2Delay }
@@ -80,7 +80,7 @@ extension Interlock {
   
   @objc dynamic public var tx3Enabled: Bool {
     get { return _tx3Enabled }
-    set { if _tx3Enabled != newValue { _tx3Enabled = newValue ; interlockCmd( .tx3Enabled, newValue.asLetter) } } }
+    set { if _tx3Enabled != newValue { _tx3Enabled = newValue ; interlockCmd( .tx3Enabled, newValue.asTF) } } }
   
   @objc dynamic public var tx3Delay: Int {
     get { return _tx3Delay }

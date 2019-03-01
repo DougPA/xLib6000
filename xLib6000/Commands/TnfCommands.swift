@@ -77,7 +77,7 @@ extension Tnf {
   
   @objc dynamic public var permanent: Bool {
     get { return _permanent }
-    set { if _permanent != newValue { _permanent = newValue ; tnfCmd( .permanent, newValue.asNumber) } } }
+    set { if _permanent != newValue { _permanent = newValue ; tnfCmd( .permanent, newValue.as1or0) } } }
   
   @objc dynamic public var width: Int {
     get { return _width  }

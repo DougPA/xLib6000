@@ -63,6 +63,6 @@ extension Atu {
   
   @objc dynamic public var memoriesEnabled: Bool {
     get {  return _memoriesEnabled }
-    set { if _memoriesEnabled != newValue { _memoriesEnabled = newValue ; atuCmd( .memoriesEnabled, newValue.asNumber) } } }
+    set { if _memoriesEnabled != newValue { _memoriesEnabled = newValue ; atuCmd( .memoriesEnabled, newValue.as1or0) } } }
 }
 

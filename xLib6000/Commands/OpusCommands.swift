@@ -57,9 +57,9 @@ extension Opus {
   
   @objc dynamic public var rxEnabled: Bool {
     get { return _rxEnabled }
-    set { if _rxEnabled != newValue { _rxEnabled = newValue ; opusCmd( .rxEnabled, newValue.asNumber) } } }
+    set { if _rxEnabled != newValue { _rxEnabled = newValue ; opusCmd( .rxEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var txEnabled: Bool {
     get { return _txEnabled }
-    set { if _txEnabled != newValue { _txEnabled = newValue ; opusCmd( .txEnabled, newValue.asNumber) } } }
+    set { if _txEnabled != newValue { _txEnabled = newValue ; opusCmd( .txEnabled, newValue.as1or0) } } }
 }

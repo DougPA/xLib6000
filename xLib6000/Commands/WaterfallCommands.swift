@@ -34,7 +34,7 @@ extension Waterfall {
   
   @objc dynamic public var autoBlackEnabled: Bool {
     get { return _autoBlackEnabled }
-    set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; waterfallCmd( .autoBlackEnabled, newValue.asNumber) } } }
+    set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; waterfallCmd( .autoBlackEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var blackLevel: Int {
     get { return _blackLevel }

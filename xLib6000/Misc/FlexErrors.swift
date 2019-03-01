@@ -40,7 +40,6 @@ public func flexErrorLevel(errorCode: String) -> String {
   return errorLevel
 }
 
-
 /// Given an errorcode return an explanation
 ///
 /// - Parameter errorCode:      error code from reply
@@ -70,6 +69,8 @@ public func flexErrorString(errorCode: String) -> String {
   return errorString
 }
 
+/// Enum of all possible Error codes returned by the Radio
+///
 enum FlexErrors: UInt32 {
   
   // Fatal
@@ -293,7 +294,7 @@ enum FlexErrors: UInt32 {
   case SLM_I_UNKNOWN_CLIENT                           = 0x10000002
   case SL_I_CWX_NOTHING_TO_ERASE                      = 0x10000003
   
-  /// Convert an error Enum to a String explanation
+  /// Converts an error Enum to a String explanation
   ///
   /// - Returns:                the explanation
   ///

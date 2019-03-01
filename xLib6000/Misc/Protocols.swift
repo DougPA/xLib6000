@@ -11,6 +11,76 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
+/// Models for which there will only be one instance
+///
+///   Static Model objects are created / destroyed in the Radio class.
+///   Static Model object properties are set in the instance's parseProperties method.
+///
+protocol StaticModel                        : class {
+  
+  /// Parse <key=value> arrays to set object properties
+  ///
+  /// - Parameter keyValues:    a KeyValues array containing object property values
+  ///
+  func parseProperties(_ keyValues: KeyValuesArray)
+}
+
+/// Models for which there can be multiple instances
+///
+///   Dynamic Model objects are created / destroyed in the Model's parseStatus static method.
+///   Dynamic Model object properties are set in the instance's parseProperties method.
+///
+protocol DynamicModel                       : StaticModel {
+  
+  /// Parse <key=value> arrays to determine object status
+  ///
+  /// - Parameters:
+  ///   - keyValues:            a KeyValues array containing a Status message for an object type
+  ///   - radio:                the current Radio object
+  ///   - queue:                the GCD queue associated with the object type in the status message
+  ///   - inUse:                a flag indicating whether the object in the status message is active
+  ///
+  static func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool)
+}
+
+/// Dynamic models which have an accompanying UDP Stream
+///
+///   Some Dynamic Models have associated with them a UDP data stream & must
+///   provide a method to process the Vita packets from the UDP stream
+///
+protocol DynamicModelWithStream             : DynamicModel {
+  
+  /// Process vita packets
+  ///
+  /// - Parameter vitaPacket:       a Vita packet
+  ///
+  func vitaProcessor(_ vitaPacket: Vita)
+}
+
+/// UDP Stream handler protocol
+///
+public protocol StreamHandler               : class {
+  
+  /// Process a frame of Stream data
+  ///
+  /// - Parameter frame:            a frame of data
+  ///
+  func streamHandler<T>(_ frame: T)
+}
+
+/// UDP Stream handler protocol for Meter data
+///
+//protocol MeterStreamHandler                 : class {
+//  
+//  /// Process Meter data
+//  ///
+//  /// - Parameter value:            meter value
+//  ///
+//  func streamHandler(_ value: Int16 )
+//}
+
+/// Delegate protocol for the Api layer
+///
 public protocol ApiDelegate {
   
   /// A message has been sent to the Radio (hardware)
@@ -49,64 +119,8 @@ public protocol ApiDelegate {
   func vitaParser(_ vitaPacket: Vita)
 }
 
-protocol StaticModel                        : class {
-  
-  //  Static Model objects are created / destroyed in the Radio class.
-  //  Static Model object properties are set in the instance's parseProperties method.
-  
-  /// Parse <key=value> arrays to set object properties
-  ///
-  /// - Parameter keyValues:    a KeyValues array containing object property values
-  ///
-  func parseProperties(_ keyValues: KeyValuesArray)
-}
-
-protocol DynamicModel                       : StaticModel {
-  
-  //  Dynamic Model objects are created / destroyed in the Model's parseStatus static method.
-  //  Dynamic Model object properties are set in the instance's parseProperties method.
-  
-  /// Parse <key=value> arrays to determine object status
-  ///
-  /// - Parameters:
-  ///   - keyValues:            a KeyValues array containing a Status message for an object type
-  ///   - radio:                the current Radio object
-  ///   - queue:                the GCD queue associated with the object type in the status message
-  ///   - inUse:                a flag indicating whether the object in the status message is active
-  ///
-  static func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool)
-}
-
-protocol DynamicModelWithStream             : DynamicModel {
-  
-  // Some Dynamic Models have associated with them a UDP data stream & must
-  // provide a method to process the Vita packets from the UDP stream
-  
-  /// Process vita packets
-  ///
-  /// - Parameter vitaPacket:       a Vita packet
-  ///
-  func vitaProcessor(_ vitaPacket: Vita)
-}
-
-public protocol StreamHandler               : class {
-  
-  /// Process a frame of Stream data
-  ///
-  /// - Parameter streamFrame:              a frame of data
-  ///
-  func streamHandler<T>(_ streamFrame: T)
-}
-
-protocol MeterStreamHandler                 : class {
-  
-  /// Process Meter data
-  ///
-  /// - Parameter value:            meter value
-  ///
-  func streamHandler(_ value: Int16 )
-}
-
+/// Delegate protocol for the TcpManager class
+///
 protocol TcpManagerDelegate: class {
   
   // if any of theses are not needed, implement a stub in the delegate that does nothing
@@ -134,6 +148,8 @@ protocol TcpManagerDelegate: class {
   func tcpState(connected: Bool, host: String, port: UInt16, error: String)
 }
 
+/// Delegate protocol for the UdpManager class
+///
 protocol UdpManagerDelegate                 : class {
   
   // if any of theses are not needed, implement a stub in the delegate that does nothing
@@ -154,6 +170,8 @@ protocol UdpManagerDelegate                 : class {
   func udpStreamHandler(_ vita: Vita)
 }
 
+/// Delegate protocol for the WanServer class
+///
 public protocol WanServerDelegate           : class {
   
   /// Received radio list from server

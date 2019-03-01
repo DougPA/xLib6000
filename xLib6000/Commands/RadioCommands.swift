@@ -52,7 +52,7 @@ extension Radio {
   public func cwKeyImmediate(state: Bool, callback: ReplyHandler? = nil) {
     
     // tell the Radio to change the keydown state
-   Api.sharedInstance.send(Transmit.kCwCmd + "key immediate" + " \(state.asNumber)", replyTo: callback)
+   Api.sharedInstance.send(Transmit.kCwCmd + "key immediate" + " \(state.as1or0)", replyTo: callback)
   }
   
   /// Refresh the Radio License
@@ -183,7 +183,7 @@ extension Radio {
   
   @objc dynamic public var apfEnabled: Bool {
     get {  return _apfEnabled }
-    set { if _apfEnabled != newValue { _apfEnabled = newValue ; apfCmd( .mode, newValue.asNumber) } } }
+    set { if _apfEnabled != newValue { _apfEnabled = newValue ; apfCmd( .mode, newValue.as1or0) } } }
   
   @objc dynamic public var apfQFactor: Int {
     get {  return _apfQFactor }
@@ -201,7 +201,7 @@ extension Radio {
   
   @objc dynamic public var headphoneMute: Bool {
     get {  return _headphoneMute }
-    set { if _headphoneMute != newValue { _headphoneMute = newValue; mixerCmd( "headphone mute", newValue.asNumber) } } }
+    set { if _headphoneMute != newValue { _headphoneMute = newValue; mixerCmd( "headphone mute", newValue.as1or0) } } }
   
   @objc dynamic public var lineoutGain: Int {
     get {  return _lineoutGain }
@@ -209,17 +209,17 @@ extension Radio {
   
   @objc dynamic public var lineoutMute: Bool {
     get {  return _lineoutMute }
-    set { if _lineoutMute != newValue { _lineoutMute = newValue ; mixerCmd( "lineout mute", newValue.asNumber) } } }
+    set { if _lineoutMute != newValue { _lineoutMute = newValue ; mixerCmd( "lineout mute", newValue.as1or0) } } }
   
   // ***** RADIO SET COMMANDS *****
   
   @objc dynamic public var bandPersistenceEnabled: Bool {
     get {  return _bandPersistenceEnabled }
-    set { if _bandPersistenceEnabled != newValue { _bandPersistenceEnabled = newValue ; radioSetCmd( .bandPersistenceEnabled, newValue.asNumber) } } }
+    set { if _bandPersistenceEnabled != newValue { _bandPersistenceEnabled = newValue ; radioSetCmd( .bandPersistenceEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var binauralRxEnabled: Bool {
     get {  return _binauralRxEnabled }
-    set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.asNumber) } } }
+    set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var calFreq: Int {
     get {  return _calFreq }
@@ -227,7 +227,7 @@ extension Radio {
   
   @objc dynamic public var enforcePrivateIpEnabled: Bool {
     get {  return _enforcePrivateIpEnabled }
-    set { if _enforcePrivateIpEnabled != newValue { _enforcePrivateIpEnabled = newValue ; radioSetCmd( .enforcePrivateIpEnabled, newValue.asNumber) } } }
+    set { if _enforcePrivateIpEnabled != newValue { _enforcePrivateIpEnabled = newValue ; radioSetCmd( .enforcePrivateIpEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var freqErrorPpb: Int {
     get {  return _freqErrorPpb }
@@ -237,15 +237,15 @@ extension Radio {
   
   @objc dynamic public var frontSpeakerMute: Bool {
     get {  return _frontSpeakerMute }
-    set { if _frontSpeakerMute != newValue { _frontSpeakerMute = newValue ; radioSetCmd( .frontSpeakerMute, newValue.asNumber) } } }
+    set { if _frontSpeakerMute != newValue { _frontSpeakerMute = newValue ; radioSetCmd( .frontSpeakerMute, newValue.as1or0) } } }
   
   @objc dynamic public var fullDuplexEnabled: Bool {
     get {  return _fullDuplexEnabled }
-    set { if _fullDuplexEnabled != newValue { _fullDuplexEnabled = newValue ; radioSetCmd( .fullDuplexEnabled, newValue.asNumber) } } }
+    set { if _fullDuplexEnabled != newValue { _fullDuplexEnabled = newValue ; radioSetCmd( .fullDuplexEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var remoteOnEnabled: Bool {
     get {  return _remoteOnEnabled }
-    set { if _remoteOnEnabled != newValue { _remoteOnEnabled = newValue ; radioSetCmd( .remoteOnEnabled, newValue.asNumber) } } }
+    set { if _remoteOnEnabled != newValue { _remoteOnEnabled = newValue ; radioSetCmd( .remoteOnEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var rttyMark: Int {
     get {  return _rttyMark }
@@ -253,11 +253,11 @@ extension Radio {
   
   @objc dynamic public var snapTuneEnabled: Bool {
     get {  return _snapTuneEnabled }
-    set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; radioSetCmd( .snapTuneEnabled, newValue.asNumber) } } }
+    set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; radioSetCmd( .snapTuneEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var tnfsEnabled: Bool {
     get {  return _tnfsEnabled }
-    set { if _tnfsEnabled != newValue { _tnfsEnabled = newValue ; radioSetCmd( .tnfsEnabled, newValue.asString) } } }
+    set { if _tnfsEnabled != newValue { _tnfsEnabled = newValue ; radioSetCmd( .tnfsEnabled, newValue.asTrueFalse) } } }
   
   // ***** RADIO COMMANDS *****  
   
@@ -276,7 +276,7 @@ extension Radio {
   
   @objc dynamic public var muteLocalAudio: Bool {
     get { return _muteLocalAudio }
-    set { if _muteLocalAudio != newValue { _muteLocalAudio = newValue ; radioSetCmd( "mute_local_audio", newValue.asNumber) } } }
+    set { if _muteLocalAudio != newValue { _muteLocalAudio = newValue ; radioSetCmd( "mute_local_audio", newValue.as1or0) } } }
   
   @objc dynamic public var nickname: String {
     get {  return _nickname }
@@ -290,15 +290,15 @@ extension Radio {
   
   @objc dynamic public var filterCwAutoEnabled: Bool { 
     get {  return _filterCwAutoEnabled }
-    set { if _filterCwAutoEnabled != newValue { _filterCwAutoEnabled = newValue ; radioFilterCmd( .cw, .autoLevel, newValue.asNumber) } } }
+    set { if _filterCwAutoEnabled != newValue { _filterCwAutoEnabled = newValue ; radioFilterCmd( .cw, .autoLevel, newValue.as1or0) } } }
   
   @objc dynamic public var filterDigitalAutoEnabled: Bool {
     get {  return _filterDigitalAutoEnabled }
-    set { if _filterDigitalAutoEnabled != newValue { _filterDigitalAutoEnabled = newValue ; radioFilterCmd( .digital, .autoLevel, newValue.asNumber) } } }
+    set { if _filterDigitalAutoEnabled != newValue { _filterDigitalAutoEnabled = newValue ; radioFilterCmd( .digital, .autoLevel, newValue.as1or0) } } }
   
   @objc dynamic public var filterVoiceAutoEnabled: Bool {
     get {  return _filterVoiceAutoEnabled }
-    set { if _filterVoiceAutoEnabled != newValue { _filterVoiceAutoEnabled = newValue ; radioFilterCmd( .voice, .autoLevel, newValue.asNumber) } } }
+    set { if _filterVoiceAutoEnabled != newValue { _filterVoiceAutoEnabled = newValue ; radioFilterCmd( .voice, .autoLevel, newValue.as1or0) } } }
   
   @objc dynamic public var filterCwLevel: Int {
     get {  return _filterCwLevel }
@@ -330,6 +330,6 @@ extension Radio {
   
   @objc dynamic public var mox: Bool {
     get { return _mox }
-    set { if _mox != newValue { _mox = newValue ; xmitCmd( newValue.asNumber) } } }
+    set { if _mox != newValue { _mox = newValue ; xmitCmd( newValue.as1or0) } } }
   
 }

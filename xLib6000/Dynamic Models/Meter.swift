@@ -19,7 +19,7 @@ public typealias MeterName = String
 ///      incoming TCP messages. Meters are periodically updated by a UDP
 ///      stream containing multiple Meters.
 ///
-public final class Meter                    : NSObject, DynamicModel, MeterStreamHandler {
+public final class Meter                    : NSObject, DynamicModel, StreamHandler {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
@@ -96,8 +96,10 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
         // find the meter (if present) & update it
         if let meter = Api.sharedInstance.radio?.meters[String(format: "%i", number)] {
           
-          // interpret it as a signed value
-          meter.streamHandler( Int16(bitPattern: value) )
+//          // interpret it as a signed value
+//          meter.streamHandler( Int16(bitPattern: value) )
+          //
+          meter.streamHandler( value)
         }
       }
     }
@@ -303,14 +305,16 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
       }
     }
   }
-  /// Process the UDP Stream Data for the Meter (arrives on the streamQ)
+  /// Process the UDP Stream Data for Meters
   ///
-  ///   MeterStreamHandler protocol method, executes on the streamQ
+  ///   StreamHandler protocol method, executes on the streamQ
   ///
-  /// - Parameters:
-  ///   - newValue:   the new value for the Meter
+  /// - Parameter streamFrame:        a Meter frame (Int16)
   ///
-  func streamHandler(_ newValue: Int16) {
+  public func streamHandler<T>(_ meterFrame: T) {
+
+    let newValue = Int16(bitPattern: meterFrame as! UInt16)
+    
     let previousValue = value
     
     // check for unknown Units
@@ -325,23 +329,23 @@ public final class Meter                    : NSObject, DynamicModel, MeterStrea
     switch token {
       
     case .db, .dbm, .dbfs, .swr:
-      adjNewValue = Float(newValue) / kDbDbmDbfsSwrDenom
+      adjNewValue = Float(exactly: newValue)! / kDbDbmDbfsSwrDenom
       
     case .volts, .amps:
-      adjNewValue = Float(newValue) / _voltsAmpsDenom
+      adjNewValue = Float(exactly: newValue)! / _voltsAmpsDenom
       
     case .degc, .degf:
-      adjNewValue = Float(newValue) / kDegDenom
+      adjNewValue = Float(exactly: newValue)! / kDegDenom
     
     case .rpm, .watts, .percent, .none:
-      adjNewValue = Float(newValue)
+      adjNewValue = Float(exactly: newValue)!
     }
     // did it change?
     if adjNewValue != previousValue {
+      value = adjNewValue
+
       // notify all observers
       NC.post(.meterUpdated, object: self as Any?)
-      
-      value = adjNewValue
     }
   }
 }

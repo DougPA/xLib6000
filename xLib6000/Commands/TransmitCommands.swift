@@ -89,11 +89,11 @@ extension Transmit {
   
   @objc dynamic public var cwBreakInEnabled: Bool {
     get {  return _cwBreakInEnabled }
-    set { if _cwBreakInEnabled != newValue { _cwBreakInEnabled = newValue ; cwCmd( .cwBreakInEnabled, newValue.asNumber) } } }
+    set { if _cwBreakInEnabled != newValue { _cwBreakInEnabled = newValue ; cwCmd( .cwBreakInEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var cwIambicEnabled: Bool {
     get {  return _cwIambicEnabled }
-    set { if _cwIambicEnabled != newValue { _cwIambicEnabled = newValue ; cwCmd( .cwIambicEnabled, newValue.asNumber) } } }
+    set { if _cwIambicEnabled != newValue { _cwIambicEnabled = newValue ; cwCmd( .cwIambicEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var cwIambicMode: Int {
     get {  return _cwIambicMode }
@@ -101,7 +101,7 @@ extension Transmit {
   
   @objc dynamic public var cwlEnabled: Bool {
     get {  return _cwlEnabled }
-    set { if _cwlEnabled != newValue { _cwlEnabled = newValue ; cwCmd( .cwlEnabled, newValue.asNumber) } } }
+    set { if _cwlEnabled != newValue { _cwlEnabled = newValue ; cwCmd( .cwlEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var cwPitch: Int {
     get {  return _cwPitch }
@@ -109,7 +109,7 @@ extension Transmit {
   
   @objc dynamic public var cwSidetoneEnabled: Bool {
     get {  return _cwSidetoneEnabled }
-    set { if _cwSidetoneEnabled != newValue { _cwSidetoneEnabled = newValue ; cwCmd( .cwSidetoneEnabled, newValue.asNumber) } } }
+    set { if _cwSidetoneEnabled != newValue { _cwSidetoneEnabled = newValue ; cwCmd( .cwSidetoneEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var cwSpeed: Int {
     get {  return _cwSpeed }
@@ -117,11 +117,11 @@ extension Transmit {
   
   @objc dynamic public var cwSwapPaddles: Bool {
     get {  return _cwSwapPaddles }
-    set { if _cwSwapPaddles != newValue { _cwSwapPaddles = newValue ; cwCmd( "swap", newValue.asNumber) } } }
+    set { if _cwSwapPaddles != newValue { _cwSwapPaddles = newValue ; cwCmd( "swap", newValue.as1or0) } } }
   
   @objc dynamic public var cwSyncCwxEnabled: Bool {
     get {  return _cwSyncCwxEnabled }
-    set { if _cwSyncCwxEnabled != newValue { _cwSyncCwxEnabled = newValue ; cwCmd( .cwSyncCwxEnabled, newValue.asNumber) } } }
+    set { if _cwSyncCwxEnabled != newValue { _cwSyncCwxEnabled = newValue ; cwCmd( .cwSyncCwxEnabled, newValue.as1or0) } } }
   
   // ***** MIC COMMANDS *****
   
@@ -149,7 +149,7 @@ extension Transmit {
   
   @objc dynamic public var companderEnabled: Bool {
     get {  return _companderEnabled }
-    set { if _companderEnabled != newValue { _companderEnabled = newValue ; transmitCmd( .companderEnabled, newValue.asNumber) } } }
+    set { if _companderEnabled != newValue { _companderEnabled = newValue ; transmitCmd( .companderEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var companderLevel: Int {
     get {  return _companderLevel }
@@ -157,15 +157,15 @@ extension Transmit {
   
   @objc dynamic public var daxEnabled: Bool {
     get {  return _daxEnabled }
-    set { if _daxEnabled != newValue { _daxEnabled = newValue ; transmitCmd( .daxEnabled, newValue.asNumber) } } }
+    set { if _daxEnabled != newValue { _daxEnabled = newValue ; transmitCmd( .daxEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var hwAlcEnabled: Bool {
     get {  return _hwAlcEnabled }
-    set { if _hwAlcEnabled != newValue { _hwAlcEnabled = newValue ; transmitCmd( .hwAlcEnabled, newValue.asNumber) } } }
+    set { if _hwAlcEnabled != newValue { _hwAlcEnabled = newValue ; transmitCmd( .hwAlcEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var inhibit: Bool {
     get {  return _inhibit }
-    set { if _inhibit != newValue { _inhibit = newValue ; transmitCmd( .inhibit, newValue.asNumber) } } }
+    set { if _inhibit != newValue { _inhibit = newValue ; transmitCmd( .inhibit, newValue.as1or0) } } }
   
   @objc dynamic public var maxPowerLevel: Int {
     get {  return _maxPowerLevel }
@@ -173,7 +173,7 @@ extension Transmit {
   
   @objc dynamic public var metInRxEnabled: Bool {
     get {  return _metInRxEnabled }
-    set { if _metInRxEnabled != newValue { _metInRxEnabled = newValue ; transmitCmd( .metInRxEnabled, newValue.asNumber) } } }
+    set { if _metInRxEnabled != newValue { _metInRxEnabled = newValue ; transmitCmd( .metInRxEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var micLevel: Int {
     get {  return _micLevel }
@@ -185,7 +185,7 @@ extension Transmit {
   
   @objc dynamic public var speechProcessorEnabled: Bool {
     get {  return _speechProcessorEnabled }
-    set { if _speechProcessorEnabled != newValue { _speechProcessorEnabled = newValue ; transmitCmd( .speechProcessorEnabled, newValue.asNumber) } } }
+    set { if _speechProcessorEnabled != newValue { _speechProcessorEnabled = newValue ; transmitCmd( .speechProcessorEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var speechProcessorLevel: Int {
     get {  return _speechProcessorLevel }
@@ -205,11 +205,11 @@ extension Transmit {
   
   @objc dynamic public var txInWaterfallEnabled: Bool {
     get { return _txInWaterfallEnabled }
-    set { if _txInWaterfallEnabled != newValue { _txInWaterfallEnabled = newValue ; transmitCmd( .txInWaterfallEnabled, newValue.asNumber) } } }
+    set { if _txInWaterfallEnabled != newValue { _txInWaterfallEnabled = newValue ; transmitCmd( .txInWaterfallEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var txMonitorEnabled: Bool {
     get {  return _txMonitorEnabled }
-    set { if _txMonitorEnabled != newValue { _txMonitorEnabled = newValue ; transmitCmd( "mon", newValue.asNumber) } } }
+    set { if _txMonitorEnabled != newValue { _txMonitorEnabled = newValue ; transmitCmd( "mon", newValue.as1or0) } } }
   
   @objc dynamic public var txMonitorGainCw: Int {
     get {  return _txMonitorGainCw }
@@ -229,7 +229,7 @@ extension Transmit {
   
   @objc dynamic public var voxEnabled: Bool {
     get { return _voxEnabled }
-    set { if _voxEnabled != newValue { _voxEnabled = newValue ; transmitCmd( .voxEnabled, newValue.asNumber) } } }
+    set { if _voxEnabled != newValue { _voxEnabled = newValue ; transmitCmd( .voxEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var voxDelay: Int {
     get { return _voxDelay }
@@ -243,7 +243,7 @@ extension Transmit {
   
   @objc dynamic public var tune: Bool {
     get {  return _tune }
-    set { if _tune != newValue { _tune = newValue ; tuneCmd( .tune, newValue.asNumber) } } }
+    set { if _tune != newValue { _tune = newValue ; tuneCmd( .tune, newValue.as1or0) } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal methods

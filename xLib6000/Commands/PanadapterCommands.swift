@@ -121,7 +121,7 @@ extension Panadapter {
   
   @objc dynamic public var bandZoomEnabled: Bool {
     get { return _bandZoomEnabled }
-    set { if _bandZoomEnabled != newValue { _bandZoomEnabled = newValue ; panadapterSet( .bandZoomEnabled, newValue.asNumber) } } }
+    set { if _bandZoomEnabled != newValue { _bandZoomEnabled = newValue ; panadapterSet( .bandZoomEnabled, newValue.as1or0) } } }
   
   // FIXME: Where does autoCenter come from?
   
@@ -139,7 +139,7 @@ extension Panadapter {
   
   @objc dynamic public var loggerDisplayEnabled: Bool {
     get { return _loggerDisplayEnabled }
-    set { if _loggerDisplayEnabled != newValue { _loggerDisplayEnabled = newValue ; panadapterSet( .n1mmSpectrumEnable, newValue.asNumber) } } }
+    set { if _loggerDisplayEnabled != newValue { _loggerDisplayEnabled = newValue ; panadapterSet( .n1mmSpectrumEnable, newValue.as1or0) } } }
   
   @objc dynamic public var loggerDisplayIpAddress: String {
     get { return _loggerDisplayIpAddress }
@@ -155,11 +155,11 @@ extension Panadapter {
   
   @objc dynamic public var loopAEnabled: Bool {
     get { return _loopAEnabled }
-    set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; panadapterSet( .loopAEnabled, newValue.asNumber) } } }
+    set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; panadapterSet( .loopAEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var loopBEnabled: Bool {
     get { return _loopBEnabled }
-    set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; panadapterSet( .loopBEnabled, newValue.asNumber) } } }
+    set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; panadapterSet( .loopBEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var maxDbm: CGFloat {
     get { return _maxDbm }
@@ -179,15 +179,15 @@ extension Panadapter {
   
   @objc dynamic public var segmentZoomEnabled: Bool {
     get { return _segmentZoomEnabled }
-    set { if _segmentZoomEnabled != newValue { _segmentZoomEnabled = newValue ; panadapterSet( .segmentZoomEnabled, newValue.asNumber) } } }
+    set { if _segmentZoomEnabled != newValue { _segmentZoomEnabled = newValue ; panadapterSet( .segmentZoomEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var weightedAverageEnabled: Bool {
     get { return _weightedAverageEnabled }
-    set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; panadapterSet( .weightedAverageEnabled, newValue.asNumber) } } }
+    set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; panadapterSet( .weightedAverageEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var wnbEnabled: Bool {
     get { return _wnbEnabled }
-    set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; panadapterSet( .wnbEnabled, newValue.asNumber) } } }
+    set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; panadapterSet( .wnbEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var wnbLevel: Int {
     get { return _wnbLevel }

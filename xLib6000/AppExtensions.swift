@@ -288,28 +288,28 @@ public extension Bool {
   ///
   /// - Returns:      a String
   ///
-  var asInt : Int {
+  var as1or0Int : Int {
     return (self ? 1 : 0)
   }
   /// Return "1" / "0" for true / false Booleans
   ///
   /// - Returns:      a String
   ///
-  var asNumber : String {
+  var as1or0 : String {
     return (self ? "1" : "0")
   }
   /// Return "True" / "False" Strings for true / false Booleans
   ///
   /// - Returns:      a String
   ///
-  var asString : String {
+  var asTrueFalse : String {
     return (self ? "True" : "False")
   }
   /// Return "T" / "F" Strings for true / false Booleans
   ///
   /// - Returns:      a String
   ///
-  var asLetter : String {
+  var asTF : String {
     return (self ? "T" : "F")
   }
   /// Return "on" / "off" Strings for true / false Booleans
