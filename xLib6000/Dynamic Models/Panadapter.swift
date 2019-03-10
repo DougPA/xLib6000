@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import os
+import os.log
 import simd
 
 public typealias PanadapterId = UInt32

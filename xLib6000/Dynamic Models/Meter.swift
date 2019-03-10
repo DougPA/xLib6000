@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import os
+import os.log
 
 public typealias MeterNumber = String
 public typealias MeterName = String
@@ -151,22 +151,21 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
         if meter.source == Meter.Source.slice.rawValue {
           
           // YES, get the Slice
-          if let slice = radio.slices[meter.group] {
+          if let _ = radio.slices[meter.group] {
             
             // notify all observers
             NC.post(.sliceMeterWillBeRemoved, object: radio.meters[number] as Any?)
             
-            // remove it from the Slice
-            slice.removeMeter(number)
+//            // remove it from the Slice
+//            slice.removeMeter(number)
           }
           
         } else {
           // notify all observers
           NC.post(.meterWillBeRemoved, object: radio.meters[number] as Any?)
-          
-          // remove it
-          radio.meters[number] = nil
         }
+        // remove it
+        radio.meters[number] = nil
       }
     }
   }
@@ -288,15 +287,15 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       // is it a Slice meter?
       if source == Meter.Source.slice.rawValue {
         
-        // YES, does the Slice exist (yet)
-        if let slice = _api.radio!.slices[group] {
-          
-          // YES, add it to the Slice
-          slice.addMeter(self)
-          
-          // notify all observers
-          NC.post(.sliceMeterHasBeenAdded, object: self as Any?)
-        }
+        // notify all observers
+        NC.post(.sliceMeterHasBeenAdded, object: self as Any?)
+
+//        // YES, does the Slice exist (yet)
+//        if let slice = _api.radio!.slices[group] {
+//          
+//          // YES, add it to the Slice
+//          slice.addMeter(self)
+//        }
 
       } else {
         

@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import os
+import os.log
 
 ///  VITA header struct implementation
 ///

@@ -9,7 +9,7 @@
 public typealias XvtrId = String
 
 import Foundation
-import os
+import os.log
 
 /// Xvtr Class implementation
 ///

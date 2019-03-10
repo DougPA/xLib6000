@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import os
+import os.log
 
 public typealias SliceId = String
 
@@ -56,7 +56,7 @@ public final class Slice                    : NSObject, DynamicModel {
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ---------
   //
-  private var _meters                       = [MeterNumber: Meter]()        // Dictionary of Meters (on this Slice)
+//  private var _meters                       = [MeterNumber: Meter]()        // Dictionary of Meters (on this Slice)
   //
   private var __daxClients                  = 0                             // DAX clients for this slice
   //
@@ -161,16 +161,16 @@ public final class Slice                    : NSObject, DynamicModel {
         // NO, create a new Slice & add it to the Slices collection
         radio.slices[sliceId] = xLib6000.Slice(id: sliceId, queue: queue)
         
-        // scan the meters
-        for (_, meter) in radio.meters {
-          
-          // is this meter associated with this slice?
-          if meter.source == Meter.Source.slice.rawValue && meter.number == sliceId {
-            
-            // YES, add it to this Slice
-            radio.slices[sliceId]!.addMeter(meter)
-          }
-        }
+//        // scan the meters
+//        for (_, meter) in radio.meters {
+//
+//          // is this meter associated with this slice?
+//          if meter.source == Meter.Source.slice.rawValue && meter.number == sliceId {
+//
+//            // YES, add it to this Slice
+//            radio.slices[sliceId]!.addMeter(meter)
+//          }
+//        }
       }
       // pass the remaining key values to the Slice for parsing (dropping the Id)
       radio.slices[sliceId]!.parseProperties( Array(keyValues.dropFirst(1)) )
@@ -312,17 +312,17 @@ public final class Slice                    : NSObject, DynamicModel {
   /// - Parameters:
   ///   - meter:      a reference to a Meter
   ///
-  func addMeter(_ meter: Meter) {
-    meters[meter.number] = meter
-  }
+//  func addMeter(_ meter: Meter) {
+//    meters[meter.number] = meter
+//  }
   /// Remove a Meter from this Slice's Meters collection
   ///
   /// - Parameters:
   ///   - meter:      a reference to a Meter
   ///
-  func removeMeter(_ number: MeterNumber) {
-    meters[number] = nil
-  }
+//  func removeMeter(_ number: MeterNumber) {
+//    meters[number] = nil
+//  }
   /// Set the default Filter widths
   ///
   /// - Parameters:
@@ -1216,9 +1216,9 @@ extension xLib6000.Slice {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
   
-  @objc dynamic public var meters: [String: Meter] { 
-    get { return _q.sync { _meters } }
-    set { _q.sync(flags: .barrier) { _meters = newValue } } }
+//  @objc dynamic public var meters: [String: Meter] {
+//    get { return _q.sync { _meters } }
+//    set { _q.sync(flags: .barrier) { _meters = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Tokens

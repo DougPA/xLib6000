@@ -7,7 +7,7 @@
 //
 
 import Cocoa
-import os
+import os.log
 
 /// MicAudioStream Class implementation
 ///

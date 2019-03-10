@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import os
+import os.log
 
 /// Waveform Class implementation
 ///

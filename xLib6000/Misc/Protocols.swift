@@ -68,17 +68,6 @@ public protocol StreamHandler               : class {
   func streamHandler<T>(_ frame: T)
 }
 
-/// UDP Stream handler protocol for Meter data
-///
-//protocol MeterStreamHandler                 : class {
-//  
-//  /// Process Meter data
-//  ///
-//  /// - Parameter value:            meter value
-//  ///
-//  func streamHandler(_ value: Int16 )
-//}
-
 /// Delegate protocol for the Api layer
 ///
 public protocol ApiDelegate {

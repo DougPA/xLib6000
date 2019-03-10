@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import os
+import os.log
 import Accelerate
 
 /// IqStream Class implementation

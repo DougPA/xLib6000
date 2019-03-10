@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import os
+import os.log
 
 public typealias ProfileId                  = String
 public typealias ProfileName                 = String

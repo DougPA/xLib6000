@@ -7,7 +7,7 @@
 //
 
 import Cocoa
-import os
+import os.log
 
 /// TxAudioStream Class implementation
 ///

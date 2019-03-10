@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import os
+import os.log
 
 public typealias DaxStreamId = UInt32
 public typealias DaxChannel = Int

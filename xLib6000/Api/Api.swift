@@ -6,7 +6,7 @@
 //  Copyright © 2018 Douglas Adams & Mario Illgen. All rights reserved.
 //
 
-import os
+import os.log
 
 /// API Class implementation
 ///
