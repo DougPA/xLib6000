@@ -24,7 +24,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var number                : MeterNumber = ""          // Number that uniquely identifies this Meter
+  public private(set) var number            : MeterNumber = ""              // Number that uniquely identifies this Meter
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -147,23 +147,9 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       // does it exist?
       if let meter = radio.meters[number] {
         
-        // is it a Slice meter?
-        if meter.source == Meter.Source.slice.rawValue {
-          
-          // YES, get the Slice
-          if let _ = radio.slices[meter.group] {
-            
-            // notify all observers
-            NC.post(.sliceMeterWillBeRemoved, object: radio.meters[number] as Any?)
-            
-//            // remove it from the Slice
-//            slice.removeMeter(number)
-          }
-          
-        } else {
-          // notify all observers
-          NC.post(.meterWillBeRemoved, object: radio.meters[number] as Any?)
-        }
+        // notify all observers
+        NC.post(.meterWillBeRemoved, object: meter as Any?)
+        
         // remove it
         radio.meters[number] = nil
       }
@@ -284,24 +270,8 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       // the Radio (hardware) has acknowledged this Meter
       _initialized = true
       
-      // is it a Slice meter?
-      if source == Meter.Source.slice.rawValue {
-        
-        // notify all observers
-        NC.post(.sliceMeterHasBeenAdded, object: self as Any?)
-
-//        // YES, does the Slice exist (yet)
-//        if let slice = _api.radio!.slices[group] {
-//          
-//          // YES, add it to the Slice
-//          slice.addMeter(self)
-//        }
-
-      } else {
-        
-        // notify all observers
-        NC.post(.meterHasBeenAdded, object: self as Any?)
-      }
+      // notify all observers
+      NC.post(.meterHasBeenAdded, object: self as Any?)
     }
   }
   /// Process the UDP Stream Data for Meters

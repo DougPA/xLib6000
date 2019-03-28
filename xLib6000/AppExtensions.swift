@@ -31,7 +31,7 @@ public extension NotificationCenter {
   ///   - notification:   Notification Name
   ///   - object:         associated object
   ///
-  public class func post(_ name: String, object: Any?) {
+  class func post(_ name: String, object: Any?) {
     
     NotificationCenter.default.post(name: NSNotification.Name(rawValue: name), object: object)
     
@@ -42,7 +42,7 @@ public extension NotificationCenter {
   ///   - notification:   Notification Type
   ///   - object:         associated object
   ///
-  public class func post(_ notification: NotificationType, object: Any?) {
+  class func post(_ notification: NotificationType, object: Any?) {
     
     NotificationCenter.default.post(name: Notification.Name(rawValue: notification.rawValue), object: object)
     
@@ -55,7 +55,7 @@ public extension NotificationCenter {
   ///   - type:           Notification name
   ///   - object:         associated object (if any)
   ///
-  public class func makeObserver(_ observer: Any, with selector: Selector, of name: String, object: Any? = nil) {
+  class func makeObserver(_ observer: Any, with selector: Selector, of name: String, object: Any? = nil) {
     
     NotificationCenter.default.addObserver(observer, selector: selector, name: NSNotification.Name(rawValue: name), object: object)
   }
@@ -67,7 +67,7 @@ public extension NotificationCenter {
   ///   - type:           Notification type
   ///   - object:         associated object (if any)
   ///
-  public class func makeObserver(_ observer: Any, with selector: Selector, of type: NotificationType, object: Any? = nil) {
+  class func makeObserver(_ observer: Any, with selector: Selector, of type: NotificationType, object: Any? = nil) {
     
     NotificationCenter.default.addObserver(observer, selector: selector, name: NSNotification.Name(rawValue: type.rawValue), object: object)
   }
@@ -78,7 +78,7 @@ public extension NotificationCenter {
   ///   - type:           Notification type
   ///   - object:         associated object (if any)
   ///
-  public class func deleteObserver(_ observer: Any, of type: NotificationType, object: Any?) {
+  class func deleteObserver(_ observer: Any, of type: NotificationType, object: Any?) {
     
     NotificationCenter.default.removeObserver(observer, name: NSNotification.Name(rawValue: type.rawValue), object: object)
   }
@@ -165,7 +165,7 @@ public extension String {
   ///   - valuesToLower:      convert all values to lower case (defaults to NO)
   /// - Returns:              a KeyValues array
   ///
-  public func keyValuesArray(delimiter: String = " ", keysToLower: Bool = true, valuesToLower: Bool = false) -> KeyValuesArray {
+  func keyValuesArray(delimiter: String = " ", keysToLower: Bool = true, valuesToLower: Bool = false) -> KeyValuesArray {
     var kvArray = KeyValuesArray()
     
     // split it into an array of <key=value> values

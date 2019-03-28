@@ -294,7 +294,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // set the streaming UDP port
       if isWan {
         // Wan, establish a UDP port for the Data Streams
-        _udp.bind(radioParameters: activeRadio!, isWan: true, clientHandle: connectionHandle)
+        let _ = _udp.bind(radioParameters: activeRadio!, isWan: true, clientHandle: connectionHandle)
         
       } else {
         // Local

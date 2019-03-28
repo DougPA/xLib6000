@@ -201,7 +201,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     let msg = text.trimmingCharacters(in: .whitespacesAndNewlines)
     
     // find the space & get the primary msgType
-    let spaceIndex = msg.index(of: " ")!
+    let spaceIndex = msg.firstIndex(of: " ")!
     let msgType = String(msg[..<spaceIndex])
     
     // everything past the msgType is in the remainder
@@ -233,7 +233,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   private func parseApplication(_ msg: String) {
     
     // find the space & get the secondary msgType
-    let spaceIndex = msg.index(of: " ")!
+    let spaceIndex = msg.firstIndex(of: " ")!
     let msgType = String(msg[..<spaceIndex])
     
     // everything past the msgType is in the remainder
@@ -268,7 +268,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   private func parseRadio(_ msg: String) {
     
     // find the space & get the secondary msgType
-    guard let spaceIndex = msg.index(of: " ") else {
+    guard let spaceIndex = msg.firstIndex(of: " ") else {
       // only one word/command
       // example: "radio list" when no remote radio is registered with the server
       // TODO: do not handle it for now

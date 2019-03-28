@@ -174,7 +174,7 @@ public final class Cwx                      : NSObject, StaticModel {
       if property.key.hasPrefix("macro") && property.key.lengthOfBytes(using: String.Encoding.ascii) > 5 {
         
         // YES, get the index
-        let oIndex = property.key.index(of: "o")!
+        let oIndex = property.key.firstIndex(of: "o")!
         let numberIndex = property.key.index(after: oIndex)
         let index = Int( property.key[numberIndex...] ) ?? 0
         

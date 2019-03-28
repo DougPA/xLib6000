@@ -334,8 +334,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       return
     }
     // bits 24-25 are the errorCode???
-    let msgNumber = UInt32(components[0]) ?? 0
-    let errorCode = Int((msgNumber & 0x03000000) >> 24)
+//    let msgNumber = UInt32(components[0]) ?? 0
+//    let errorCode = Int((msgNumber & 0x03000000) >> 24)
     let msgText = components[1]
     
     // FIXME: use errorCode properly
@@ -410,7 +410,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       return
     }
     // find the space & get the msgType
-    let spaceIndex = components[1].index(of: " ")!
+    let spaceIndex = components[1].firstIndex(of: " ")!
     let msgType = String(components[1][..<spaceIndex])
     
     // everything past the msgType is in the remainder
