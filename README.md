@@ -3,7 +3,7 @@
 
 ### Built on:
 *  macOS 10.14.4 (Deployment Target of macOS 10.12)
-*  Xcode 10.01(10E125)
+*  Xcode 10.2(10E125)
 *  Swift 5.0
 
 *V2.x.x drops the use of a Log Delegate and replaces it with Apple's Unified Logging
