@@ -190,7 +190,7 @@ public final class Cwx                      : NSObject, StaticModel {
         guard let token = Token(rawValue: property.key) else {
           
           // unknown token, log it and ignore the token
-          os_log("Unknown Cwx token = %{public}@", log: _log, type: .default, property.key)
+          os_log("Unknown Cwx token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
           
           continue
         }

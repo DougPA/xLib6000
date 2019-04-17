@@ -9,6 +9,8 @@
 import Foundation
 import os.log
 
+public typealias Handle = UInt32
+
 /// Interlock Class implementation
 ///
 ///      creates an Interlock instance to be used by a Client to support the
@@ -43,6 +45,7 @@ public final class Interlock                : NSObject, StaticModel {
   private var __state                       = ""                            //
   private var __timeout                     = 0                             //
   private var __txAllowed                   = false                         //
+  private var __txClientHandle              : UInt32 = 0
   private var __txDelay                     = 0                             //
   private var __tx1Delay                    = 0                             //
   private var __tx1Enabled                  = false                         //
@@ -90,7 +93,7 @@ public final class Interlock                : NSObject, StaticModel {
       guard let token = Token(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-        os_log("Unknown Interlock token = %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Interlock token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }
@@ -160,6 +163,11 @@ public final class Interlock                : NSObject, StaticModel {
         _txAllowed = property.value.bValue
         didChangeValue(for: \.txAllowed)
 
+      case .txClientHandle:
+        willChangeValue(for: \.txClientHandle)
+        _txClientHandle = UInt32(String(property.value.dropFirst(2)), radix: 16) ?? 0
+        didChangeValue(for: \.txClientHandle)
+        
       case .txDelay:
         willChangeValue(for: \.txDelay)
         _txDelay = property.value.iValue
@@ -252,6 +260,10 @@ extension Interlock {
     get { return _q.sync { __txAllowed } }
     set { _q.sync(flags: .barrier) { __txAllowed = newValue } } }
   
+  internal var _txClientHandle: UInt32 {
+    get { return _q.sync { __txClientHandle } }
+    set { _q.sync(flags: .barrier) { __txClientHandle = newValue } } }
+  
   internal var _txDelay: Int {
     get { return _q.sync { __txDelay } }
     set { _q.sync(flags: .barrier) { __txDelay = newValue } } }
@@ -316,6 +328,7 @@ extension Interlock {
     case state
     case timeout
     case txAllowed          = "tx_allowed"
+    case txClientHandle     = "tx_client_handle"
     case txDelay            = "tx_delay"
     case tx1Enabled         = "tx1_enabled"
     case tx1Delay           = "tx1_delay"

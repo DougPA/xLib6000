@@ -63,7 +63,7 @@ public final class Wan                      : NSObject, StaticModel {
       guard let token = Token(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-        os_log("Unknown Wan token = %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Wan token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
 
         continue
       }

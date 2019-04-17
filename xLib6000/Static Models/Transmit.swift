@@ -69,6 +69,7 @@ public final class Transmit                 : NSObject, StaticModel {
   private var __rfPower                     = 0                             // Power level (0 - 100)
   private var __speechProcessorEnabled      = false                         //
   private var __speechProcessorLevel        = 0                             //
+  private var __txAntenna                   = ""                            //
   private var __txFilterChanges             = false                         //
   private var __txFilterHigh                = 0                             //
   private var __txFilterLow                 = 0                             //
@@ -80,6 +81,7 @@ public final class Transmit                 : NSObject, StaticModel {
   private var __txMonitorPanCw              = 0                             //
   private var __txMonitorPanSb              = 0                             //
   private var __txRfPowerChanges            = false                         //
+  private var __txSliceMode                 = ""                            //
   private var __tune                        = false                         //
   private var __tunePower                   = 0                             //
   private var __voxDelay                    = 0                             // VOX delay (seconds?)
@@ -120,7 +122,7 @@ public final class Transmit                 : NSObject, StaticModel {
       guard let token = Token(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-        os_log("Unknown Transmit token = %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Transmit token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }
@@ -267,6 +269,11 @@ public final class Transmit                 : NSObject, StaticModel {
         _speechProcessorLevel = property.value.iValue
         didChangeValue(for: \.speechProcessorLevel)
 
+      case .txAntenna:
+        willChangeValue(for: \.txAntenna)
+        _txAntenna = property.value
+        didChangeValue(for: \.txAntenna)
+        
       case .txFilterChanges:
         willChangeValue(for: \.txFilterChanges)
         _txFilterChanges = property.value.bValue
@@ -322,6 +329,11 @@ public final class Transmit                 : NSObject, StaticModel {
         _txRfPowerChanges = property.value.bValue
         didChangeValue(for: \.txRfPowerChanges)
 
+      case .txSliceMode:
+        willChangeValue(for: \.txSliceMode)
+        _txSliceMode = property.value
+        didChangeValue(for: \.txSliceMode)
+        
       case .tune:
         willChangeValue(for: \.tune)
         _tune = property.value.bValue
@@ -476,6 +488,10 @@ extension Transmit {
     get { return _q.sync { __speechProcessorLevel } }
     set { _q.sync(flags: .barrier) { __speechProcessorLevel = newValue } } }
   
+  internal var _txAntenna: String {
+    get { return _q.sync { __txAntenna } }
+    set { _q.sync(flags: .barrier) { __txAntenna = newValue } } }
+  
   internal var _txFilterChanges: Bool {
     get { return _q.sync { __txFilterChanges } }
     set { _q.sync(flags: .barrier) { __txFilterChanges = newValue } } }
@@ -520,6 +536,10 @@ extension Transmit {
     get { return _q.sync { __txRfPowerChanges } }
     set { _q.sync(flags: .barrier) { __txRfPowerChanges = newValue } } }
   
+  internal var _txSliceMode: String {
+    get { return _q.sync { __txSliceMode } }
+    set { _q.sync(flags: .barrier) { __txSliceMode = newValue } } }
+  
   internal var _tune: Bool {
     get { return _q.sync { __tune } }
     set { _q.sync(flags: .barrier) { __tune = newValue } } }
@@ -550,6 +570,9 @@ extension Transmit {
   @objc dynamic public var rawIqEnabled: Bool {
     return _rawIqEnabled }
   
+  @objc dynamic public var txAntenna: String {
+    return _txAntenna }
+
   @objc dynamic public var txFilterChanges: Bool {
     return _txFilterChanges }
   
@@ -558,6 +581,9 @@ extension Transmit {
   
   @objc dynamic public var txRfPowerChanges: Bool {
     return _txRfPowerChanges }
+
+  @objc dynamic public var txSliceMode: String {
+    return _txSliceMode }
   
   // ----------------------------------------------------------------------------
   // MARK: - Tokens
@@ -595,6 +621,7 @@ extension Transmit {
     case speechProcessorLevel     = "speech_processor_level"
     case tune
     case tunePower                = "tunepower"
+    case txAntenna                = "tx_antenna"
     case txFilterChanges          = "tx_filter_changes_allowed"
     case txFilterHigh             = "hi"                            // "filter_high"
     case txFilterLow              = "lo"                            // "filter_low"
@@ -606,6 +633,7 @@ extension Transmit {
     case txMonitorPanCw           = "mon_pan_cw"
     case txMonitorPanSb           = "mon_pan_sb"
     case txRfPowerChanges         = "tx_rf_power_changes_allowed"
+    case txSliceMode              = "tx_slice_mode"
     case voxEnabled               = "vox_enable"
     case voxDelay                 = "vox_delay"
     case voxLevel                 = "vox_level"
