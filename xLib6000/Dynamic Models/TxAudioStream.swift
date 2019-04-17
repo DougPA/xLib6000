@@ -14,7 +14,8 @@ import os.log
 ///      creates a TxAudioStream instance to be used by a Client to support the
 ///      processing of a stream of Audio from the client to the Radio. TxAudioStream
 ///      objects are added / removed by the incoming TCP messages. TxAudioStream
-///      objects periodically send Tx Audio in a UDP stream.
+///      objects periodically send Tx Audio in a UDP stream. They are collected in
+///      the txAudioStreams collection on the Radio object.
 ///
 public final class TxAudioStream            : NSObject, DynamicModel {
   
@@ -207,7 +208,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        os_log("Unknown TxAudioStream token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown TxAudioStream token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }

@@ -15,7 +15,8 @@ public typealias MemoryId = String
 ///
 ///      creates a Memory instance to be used by a Client to support the
 ///      processing of a Memory. Memory objects are added, removed and
-///      updated by the incoming TCP messages.
+///      updated by the incoming TCP messages. They are collected in the
+///      memories collection on the Radio object.
 ///
 public final class Memory                   : NSObject, DynamicModel {
   
@@ -219,7 +220,7 @@ public final class Memory                   : NSObject, DynamicModel {
       // Check for Unknown token
       guard let token = Token(rawValue: property.key) else {
         // unknown token, log it and ignore the token
-        os_log("Unknown Memory token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Memory token - %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }

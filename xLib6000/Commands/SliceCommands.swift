@@ -150,39 +150,6 @@ extension xLib6000.Slice {
   // ----------------------------------------------------------------------------
   // MARK: - Properties (KVO compliant) that send Commands
   
-  // ***** AUDIO COMMANDS *****
-  
-  @objc dynamic public var audioGain: Int {
-    get { return _audioGain }
-    set { if _audioGain != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioGain = newValue ; audioCmd("gain", value: newValue) } } } }
-  
-  @objc dynamic public var audioMute: Bool {
-    get { return _audioMute }
-    set { if _audioMute != newValue { _audioMute = newValue ; audioCmd("mute", value: newValue.as1or0) } } }
-  
-  @objc dynamic public var audioPan: Int {
-    get { return _audioPan }
-    set { if _audioPan != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioPan = newValue ; audioCmd("pan", value: newValue) } } } }
-  
-  // ***** FILTER COMMANDS *****
-
-  @objc dynamic public var filterHigh: Int {
-    get { return _filterHigh }
-    set { if _filterHigh != newValue { let value = filterHighLimits(newValue) ; _filterHigh = value ; filterCmd( low: _filterLow, high: value) } } }
-  
-  @objc dynamic public var filterLow: Int {
-    get { return _filterLow }
-    set { if _filterLow != newValue { let value = filterLowLimits(newValue) ; _filterLow = value ; filterCmd( low: value, high: _filterHigh) } } }
-  
-  // ***** SLICE LOCK COMMANDS *****
-  
-  @objc dynamic public var locked: Bool {
-    get { return _locked }
-    set { if _locked != newValue { _locked = newValue ; sliceLock( newValue == true ? "lock" : "unlock") } } }
-  
-  // ***** SLICE COMMANDS *****
-  
-  // listed in alphabetical order
   @objc dynamic public var active: Bool {
     get { return _active }
     set { if _active != newValue { _active = newValue ; sliceCmd( .active, newValue.as1or0) } } }
@@ -215,6 +182,28 @@ extension xLib6000.Slice {
     get { return _apfLevel }
     set { if _apfLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _apfLevel = newValue ; sliceCmd( .apfLevel, newValue) } } } }
   
+  @objc dynamic public var audioGain: Int {
+    get { return _audioGain }
+    set { if _audioGain != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioGain = newValue ; audioCmd("gain", value: newValue) } } } }
+  
+  @objc dynamic public var audioMute: Bool {
+    get { return _audioMute }
+    set { if _audioMute != newValue { _audioMute = newValue ; audioCmd("mute", value: newValue.as1or0) } } }
+  
+  @objc dynamic public var audioPan: Int {
+    get { return _audioPan }
+//    set { if _audioPan != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioPan = newValue ; audioCmd("pan", value: newValue) } } } }
+    set { if _audioPan != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioPan = newValue ; sliceCmd(.audioPan, newValue) } } } }
+
+  @objc dynamic public var audioLevel: Int {
+    get { return _audioLevel }
+    set { if _audioLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioLevel = newValue ; sliceCmd(.audioLevel, newValue) } } } }
+  
+  // FIXME: Command ???
+  @objc dynamic public var clientHandle: ClientHandle {
+    get { return _clientHandle }
+    set { if _clientHandle != newValue { _clientHandle = newValue  } } }
+  
   @objc dynamic public var daxChannel: Int {
     get { return _daxChannel }
     set { if _daxChannel != newValue { _daxChannel = newValue ; sliceCmd(.daxChannel, newValue) } } }
@@ -235,6 +224,14 @@ extension xLib6000.Slice {
     get { return _diversityEnabled }
     set { if _diversityEnabled != newValue { _diversityEnabled = newValue ; sliceCmd(.diversityEnabled, newValue.as1or0) } } } 
   
+  @objc dynamic public var filterHigh: Int {
+    get { return _filterHigh }
+    set { if _filterHigh != newValue { let value = filterHighLimits(newValue) ; _filterHigh = value ; filterCmd( low: _filterLow, high: value) } } }
+  
+  @objc dynamic public var filterLow: Int {
+    get { return _filterLow }
+    set { if _filterLow != newValue { let value = filterLowLimits(newValue) ; _filterLow = value ; filterCmd( low: value, high: _filterHigh) } } }
+  
   @objc dynamic public var fmDeviation: Int {
     get { return _fmDeviation }
     set { if _fmDeviation != newValue { _fmDeviation = newValue ; sliceCmd(.fmDeviation, newValue) } } }
@@ -254,6 +251,14 @@ extension xLib6000.Slice {
   @objc dynamic public var fmToneMode: String {
     get { return _fmToneMode }
     set { if _fmToneMode != newValue { _fmToneMode = newValue ; sliceCmd( .fmToneMode, newValue) } } }
+  
+  @objc dynamic public var frequency: Int {
+    get { return _frequency }
+    set { if !_locked { if _frequency != newValue { _frequency = newValue ; sliceTuneCmd( newValue.hzToMhz) } } } }
+
+  @objc dynamic public var locked: Bool {
+    get { return _locked }
+    set { if _locked != newValue { _locked = newValue ; sliceLock( newValue == true ? "lock" : "unlock") } } }
   
   @objc dynamic public var loopAEnabled: Bool {
     get { return _loopAEnabled }
@@ -362,10 +367,4 @@ extension xLib6000.Slice {
   @objc dynamic public var xitOffset: Int {
     get { return _xitOffset }
     set { if _xitOffset != newValue { if newValue.within(Slice.kMinOffset, Slice.kMaxOffset) {  _xitOffset = newValue ; sliceCmd( .xitOffset, newValue) } } } }
-  
-  // ***** TUNE COMMANDS *****
-  
-  @objc dynamic public var frequency: Int {
-    get { return _frequency }
-    set { if !_locked { if _frequency != newValue { _frequency = newValue ; sliceTuneCmd( newValue.hzToMhz) } } } }
 }

@@ -58,6 +58,10 @@ extension Interlock {
     get {  return _timeout }
     set { if _timeout != newValue { _timeout = newValue ; interlockCmd( .timeout, newValue) } } }
   
+  @objc dynamic public var txClientHandle: UInt32 {
+    get { return _txClientHandle }
+    set { if _txClientHandle != newValue { _txClientHandle = newValue} } }
+  
   @objc dynamic public var txDelay: Int {
     get { return _txDelay }
     set { if _txDelay != newValue { _txDelay = newValue  ; interlockCmd( .txDelay, newValue) } } }

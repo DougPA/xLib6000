@@ -15,7 +15,8 @@ public typealias AmplifierId = String
 ///
 ///      creates an Amplifier instance to be used by a Client to support the
 ///      control of an external Amplifier. Amplifier objects are added, removed and
-///      updated by the incoming TCP messages.
+///      updated by the incoming TCP messages. They are collected in the amplifiers
+///      collection on the Radio object.
 ///
 public final class Amplifier                : NSObject, DynamicModel {
   
@@ -130,7 +131,7 @@ public final class Amplifier                : NSObject, DynamicModel {
       guard let token = Token(rawValue: property.key) else {
         
         // log it and ignore the Key
-        os_log("Unknown Amplifier token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Amplifier token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
 
         continue
       }

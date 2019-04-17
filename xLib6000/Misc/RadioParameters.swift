@@ -20,16 +20,27 @@ public final class RadioParameters          : Equatable {
   
   public var lastSeen                       = Date()                        // data/time last broadcast from Radio
 
+  public var availableClients               = 0
+  public var availablePanadapters           = 0
+  public var availableSlices                = 0
   public var callsign                       = ""                            // user assigned call sign
   public var discoveryVersion               = ""                            // e.g. 2.0.0.1
   public var firmwareVersion                = ""                            // Radio firmware version (e.g. 2.0.1.17)
   public var fpcMac                         = ""                            // ??
+  public var guiClientHandles               : [String] = []
+  public var guiClientHosts                 : [String] = []
+  public var guiClientIps                   : [String] = []
+  public var guiClientPrograms              : [String] = []
+  public var guiClientStations              : [String] = []
   public var inUseHost                      = ""                            // ??
   public var inUseIp                        = ""                            // ??
   public var isPortForwardOn                = false
+  public var licensedClients                = 0
   public var localInterfaceIP               = ""
   public var lowBandwidthConnect            = false
   public var maxLicensedVersion             = ""                            // Highest licensed version
+  public var maxPanadapters                 = 0                             //
+  public var maxSlices                      = 0                             //
   public var model                          = ""                            // Radio model (e.g. FLEX-6500)
   public var negotiatedHolePunchPort        = -1
   public var nickname                       = ""                            // user assigned Radio name
@@ -50,16 +61,27 @@ public final class RadioParameters          : Equatable {
       
       var dict = [String : Any]()
       
+      dict[Param.availableClients.rawValue]               = availableClients
+      dict[Param.availablePanadapters.rawValue]           = availablePanadapters
+      dict[Param.availableSlices.rawValue]                = availableSlices
       dict[Param.callsign.rawValue]                       = callsign
       dict[Param.discoveryVersion.rawValue]               = discoveryVersion
       dict[Param.fpcMac.rawValue]                         = fpcMac
       dict[Param.firmwareVersion.rawValue]                = firmwareVersion
+      dict[Param.guiClientHandles.rawValue]               = guiClientHandles
+      dict[Param.guiClientHosts.rawValue]                 = guiClientHosts
+      dict[Param.guiClientIps.rawValue]                   = guiClientIps
+      dict[Param.guiClientPrograms.rawValue]              = guiClientPrograms
+      dict[Param.guiClientStations.rawValue]              = guiClientStations
       dict[Param.inUseHost.rawValue]                      = inUseHost
       dict[Param.inUseIp.rawValue]                        = inUseIp
       dict[Param.isPortForwardOn.rawValue]                = isPortForwardOn
+      dict[Param.licensedClients.rawValue]                = licensedClients
       dict[Param.localInterfaceIP.rawValue]               = localInterfaceIP
       dict[Param.lowBandwidthConnect.rawValue]            = lowBandwidthConnect
       dict[Param.maxLicensedVersion.rawValue]             = maxLicensedVersion
+      dict[Param.maxPanadapters.rawValue]                 = maxPanadapters
+      dict[Param.maxSlices.rawValue]                      = maxSlices
       dict[Param.model.rawValue]                          = model
       dict[Param.negotiatedHolePunchPort.rawValue]        = negotiatedHolePunchPort
       dict[Param.nickname.rawValue]                       = nickname
@@ -99,16 +121,27 @@ public final class RadioParameters          : Equatable {
   private enum Param : String {
     case lastSeen
     
+    case availableClients
+    case availablePanadapters
+    case availableSlices
     case callsign
     case discoveryVersion
     case fpcMac
     case firmwareVersion
+    case guiClientHandles
+    case guiClientHosts
+    case guiClientIps
+    case guiClientPrograms
+    case guiClientStations
     case inUseHost
     case inUseIp
     case isPortForwardOn
+    case licensedClients
     case localInterfaceIP
     case lowBandwidthConnect
     case maxLicensedVersion
+    case maxPanadapters
+    case maxSlices
     case model
     case negotiatedHolePunchPort
     case nickname
@@ -143,16 +176,27 @@ public final class RadioParameters          : Equatable {
     // lastSeen will be "Now"
     lastSeen                                 = Date()
     
+    availableClients                        = dict[Param.availableClients.rawValue] as? Int ?? 0
+    availablePanadapters                    = dict[Param.availablePanadapters.rawValue] as? Int ?? 0
+    availableSlices                         = dict[Param.availableSlices.rawValue] as? Int ?? 0
     callsign                                = dict[Param.callsign.rawValue] as? String ?? ""
     discoveryVersion                        = dict[Param.discoveryVersion.rawValue] as? String ?? ""
     fpcMac                                  = dict[Param.fpcMac.rawValue] as? String ?? ""
     firmwareVersion                         = dict[Param.firmwareVersion.rawValue] as? String ?? ""
+    guiClientHandles                        = dict[Param.guiClientHandles.rawValue] as? [String] ?? []
+    guiClientHosts                          = dict[Param.guiClientHosts.rawValue] as? [String] ?? []
+    guiClientIps                            = dict[Param.guiClientIps.rawValue] as? [String] ?? []
+    guiClientPrograms                       = dict[Param.guiClientPrograms.rawValue] as? [String] ?? []
+    guiClientStations                       = dict[Param.guiClientStations.rawValue] as? [String] ?? []
     inUseHost                               = dict[Param.inUseHost.rawValue] as? String ?? ""
     inUseIp                                 = dict[Param.inUseHost.rawValue] as? String ?? ""
     isPortForwardOn                         = dict[Param.isPortForwardOn.rawValue] as? Bool ?? false
+    licensedClients                         = dict[Param.licensedClients.rawValue] as? Int ?? 0
     localInterfaceIP                        = dict[Param.localInterfaceIP.rawValue] as? String ?? "0.0.0.0"
     lowBandwidthConnect                     = dict[Param.lowBandwidthConnect.rawValue] as? Bool ?? false
     maxLicensedVersion                      = dict[Param.maxLicensedVersion.rawValue] as? String ?? ""
+    maxPanadapters                          = dict[Param.maxPanadapters.rawValue] as? Int ?? 0
+    maxSlices                               = dict[Param.maxSlices.rawValue] as? Int ?? 0 
     model                                   = dict[Param.model.rawValue] as? String ?? ""
     negotiatedHolePunchPort                 = dict[Param.negotiatedHolePunchPort.rawValue] as? Int ?? -1
     nickname                                = dict[Param.nickname.rawValue] as? String ?? ""

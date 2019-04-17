@@ -316,70 +316,103 @@ public class Vita {
       let payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize - 1, encoding: String.Encoding.ascii.rawValue)! as String
 
       // parse into a KeyValuesArray
-      let keyValues = payloadData.keyValuesArray()
+      let properties = payloadData.keyValuesArray()
       
       // process each key/value pair, <key=value>
-      for kv in keyValues {
+      for property in properties {
         
         // check for unknown keys
-        guard let token = DiscoveryToken(rawValue: kv.key) else {
+        guard let token = DiscoveryToken(rawValue: property.key) else {
           
           // unknown Key, log it and ignore the Key          
           let log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "Vita")
-          os_log("Unknown Discovery token - %{public}@", log: log, type: .default, kv.key)
+          os_log("Unknown Discovery token - %{public}@ = %{public}@", log: log, type: .default, property.key, property.value)
 
           continue
         }
         
         switch token {
           
-        case .callsign:
-          discoveredRadio.callsign = kv.value
+        case .availableClients:
+          discoveredRadio.availableClients = property.value.iValue
+
+        case .availablePanadapters:
+          discoveredRadio.availablePanadapters = property.value.iValue
+          
+        case .availableSlices:
+          discoveredRadio.availableSlices = property.value.iValue
+          
+       case .callsign:
+          discoveredRadio.callsign = property.value
           
         case .discoveryVersion:
-          discoveredRadio.discoveryVersion = kv.value
+          discoveredRadio.discoveryVersion = property.value
           
         case .firmwareVersion:
-          discoveredRadio.firmwareVersion = kv.value
+          discoveredRadio.firmwareVersion = property.value
           
         case .fpcMac:
-          discoveredRadio.fpcMac = kv.value
+          discoveredRadio.fpcMac = property.value
+          
+        case .guiClientHandles:
+          discoveredRadio.guiClientHandles = property.value.valuesArray()
+
+        case .guiClientHosts:
+          discoveredRadio.guiClientHosts = property.value.valuesArray()
+          
+        case .guiClientIps:
+          discoveredRadio.guiClientIps = property.value.valuesArray()
+          
+        case .guiClientPrograms:
+          discoveredRadio.guiClientPrograms = property.value.valuesArray()
+          
+        case .guiClientStations:
+          discoveredRadio.guiClientStations = property.value.valuesArray()
           
         case .inUseHost:
-          discoveredRadio.inUseHost = kv.value
+          discoveredRadio.inUseHost = property.value
           
         case .inUseIp:
-          discoveredRadio.inUseIp = kv.value
+          discoveredRadio.inUseIp = property.value
+          
+        case .licensedClients:
+          discoveredRadio.licensedClients = property.value.iValue
           
         case .maxLicensedVersion:
-          discoveredRadio.maxLicensedVersion = kv.value
+          discoveredRadio.maxLicensedVersion = property.value
           
+        case .maxPanadapters:
+          discoveredRadio.maxPanadapters = property.value.iValue
+
+        case .maxSlices:
+          discoveredRadio.maxSlices = property.value.iValue
+
         case .model:
-          discoveredRadio.model = kv.value
+          discoveredRadio.model = property.value
           
         case .nickname:
-          discoveredRadio.nickname = kv.value
+          discoveredRadio.nickname = property.value
           
         case .port:
-          discoveredRadio.port = kv.value.iValue
+          discoveredRadio.port = property.value.iValue
           
         case .publicIp:
-          discoveredRadio.publicIp = kv.value
+          discoveredRadio.publicIp = property.value
           
         case .radioLicenseId:
-          discoveredRadio.radioLicenseId = kv.value
+          discoveredRadio.radioLicenseId = property.value
           
         case .requiresAdditionalLicense:
-          discoveredRadio.requiresAdditionalLicense = kv.value.bValue
+          discoveredRadio.requiresAdditionalLicense = property.value.bValue
           
         case .serialNumber:
-          discoveredRadio.serialNumber = kv.value
+          discoveredRadio.serialNumber = property.value
           
         case .status:
-          discoveredRadio.status = kv.value
+          discoveredRadio.status = property.value
           
         case .wanConnected:
-          discoveredRadio.wanConnected = kv.value.bValue
+          discoveredRadio.wanConnected = property.value.bValue
           
         // satisfy the switch statement, not a real token
         case .lastSeen:
@@ -511,13 +544,24 @@ extension Vita {
   /// Discovery properties
   ///
   enum DiscoveryToken : String {            // Discovery Tokens
+    case availableClients                   = "available_clients"
+    case availablePanadapters               = "available_panadapters"
+    case availableSlices                    = "available_slices"
     case callsign
     case discoveryVersion                   = "discovery_protocol_version"
     case firmwareVersion                    = "version"
     case fpcMac                             = "fpc_mac"
+    case guiClientHandles                   = "gui_client_handles"
+    case guiClientHosts                     = "gui_client_hosts"
+    case guiClientIps                       = "gui_client_ips"
+    case guiClientPrograms                  = "gui_client_programs"
+    case guiClientStations                  = "gui_client_stations"
     case inUseHost                          = "inuse_host"
     case inUseIp                            = "inuse_ip"
+    case licensedClients                    = "licensed_clients"
     case maxLicensedVersion                 = "max_licensed_version"
+    case maxPanadapters                     = "max_panadapters"
+    case maxSlices                          = "max_slices"
     case model
     case nickname                           = "nickname"
     case port

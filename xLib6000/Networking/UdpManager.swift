@@ -97,7 +97,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   ///   - isWan:              Wan enabled
   ///   - clientHandle:       handle
   ///
-  func bind(radioParameters: RadioParameters, isWan: Bool, clientHandle: String = "") -> Bool {
+  func bind(radioParameters: RadioParameters, isWan: Bool, clientHandle: UInt32? = nil) -> Bool {
     
     var success               = false
     var tmpPort               : UInt16 = 0
@@ -198,9 +198,9 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   /// - Parameters:
   ///   - clientHandle:       our client handle
   ///
-  private func register(clientHandle: String) {
+  private func register(clientHandle: UInt32?) {
     
-    guard clientHandle != "" else {
+    guard clientHandle != nil else {
       // should not happen
       os_log("No client handle in register UDP", log: _log, type: .error)
       
@@ -212,7 +212,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       while self._udpSocket != nil && !self._udpSuccessfulRegistration && self._udpBound {
         
         // send a Registration command
-        let cmd = self.kRegisterCmd + "=0x" + clientHandle
+        let cmd = self.kRegisterCmd + clientHandle!.hex
         self.sendData(cmd.data(using: String.Encoding.ascii, allowLossyConversion: false)!)
 
         // pause

@@ -18,7 +18,8 @@ public typealias DaxIqChannel = Int
 ///      creates an AudioStream instance to be used by a Client to support the
 ///      processing of a stream of Audio from the Radio to the client. AudioStream
 ///      objects are added / removed by the incoming TCP messages. AudioStream
-///      objects periodically receive Audio in a UDP stream.
+///      objects periodically receive Audio in a UDP stream. They are collected
+///      in the audioStreams collection on the Radio object.
 ///
 public final class AudioStream              : NSObject, DynamicModelWithStream {
 
@@ -216,7 +217,7 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        os_log("Unknown AudioStream token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown AudioStream token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }

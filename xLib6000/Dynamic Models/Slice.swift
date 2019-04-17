@@ -15,7 +15,8 @@ public typealias SliceId = String
 ///
 ///      creates a Slice instance to be used by a Client to support the
 ///      rendering of a Slice. Slice objects are added, removed and
-///      updated by the incoming TCP messages.
+///      updated by the incoming TCP messages. They are collected in the
+///      slices collection on the Radio object.
 ///
 public final class Slice                    : NSObject, DynamicModel {
   
@@ -69,9 +70,11 @@ public final class Slice                    : NSObject, DynamicModel {
   private var __apfEnabled                  = false                         //
   private var __apfLevel                    = 0                             // DSP APF Level (0 - 100)
   private var __audioGain                   = 0                             // Slice audio gain (0 - 100)
+  private var __audioLevel                  = 0                             //
   private var __audioMute                   = false                         // State of slice audio MUTE
   private var __audioPan                    = 50                            // Slice audio pan (0 - 100)
   private var __autoPan                     = false                         // panadapter frequency follows slice
+  private var __clientHandle                : ClientHandle = 0              //
   private var __daxChannel                  = 0                             // DAX channel for this slice (1-8)
   private var __daxTxEnabled                = false                         // DAX for transmit
   private var __detached                    = false                         //
@@ -90,6 +93,7 @@ public final class Slice                    : NSObject, DynamicModel {
   private var __fmToneFreq                  : Float = 0.0                   // FM CTCSS tone frequency
   private var __fmToneMode                  = ""                            // FM CTCSS tone mode (ON | OFF)
   private var __frequency                   = 0                             // Slice frequency in Hz
+  private var __indexLetter                 = ""                            //
   private var __inUse                       = false                         // True = being used
   private var __locked                      = false                         // Slice frequency locked
   private var __loopAEnabled                = false                         // Loop A enable
@@ -118,6 +122,7 @@ public final class Slice                    : NSObject, DynamicModel {
   private var __rttyShift                   = 0                             // Rtty Shift
   private var __rxAnt                       = ""                            // RX Antenna port for this slice
   private var __rxAntList                   = [String]()                    // Array of available Rx Antenna ports
+  private var __sliceLetter                 : String?                       // Radio assigned slice letter
   private var __step                        = 0                             // Frequency step value
   private var __squelchEnabled              = false                         // Squelch enabled
   private var __squelchLevel                = 0                             // Squelch level (0 - 100)
@@ -454,7 +459,7 @@ public final class Slice                    : NSObject, DynamicModel {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        os_log("Unknown Slice token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Slice token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }
@@ -506,6 +511,11 @@ public final class Slice                    : NSObject, DynamicModel {
         _audioGain = property.value.iValue
         didChangeValue(for: \.audioGain)
 
+      case .audioLevel:
+        willChangeValue(for: \.audioLevel)
+        _audioLevel = property.value.iValue
+        didChangeValue(for: \.audioLevel)
+        
       case .audioMute:
         willChangeValue(for: \.audioMute)
         _audioMute = property.value.bValue
@@ -515,6 +525,11 @@ public final class Slice                    : NSObject, DynamicModel {
         willChangeValue(for: \.audioPan)
         _audioPan = property.value.iValue
         didChangeValue(for: \.audioPan)
+
+      case .clientHandle:
+        willChangeValue(for: \.clientHandle)
+        _clientHandle = property.value.handle ?? 0
+        didChangeValue(for: \.clientHandle)
 
       case .daxChannel:
         if _daxChannel != 0 && property.value.iValue == 0 {
@@ -679,7 +694,7 @@ public final class Slice                    : NSObject, DynamicModel {
 
       case .panadapterId:     // does have leading "0x"
         willChangeValue(for: \.panadapterId)
-        _panadapterId = UInt32(property.value.dropFirst(2), radix: 16) ?? 0
+        _panadapterId = property.value.handle ?? 0
         didChangeValue(for: \.panadapterId)
 
       case .playbackEnabled:
@@ -762,7 +777,12 @@ public final class Slice                    : NSObject, DynamicModel {
         _squelchLevel = property.value.iValue
         didChangeValue(for: \.squelchLevel)
 
-      case .step:
+      case .sliceLetter:
+        willChangeValue(for: \.sliceLetter)
+        _sliceLetter = property.value
+        didChangeValue(for: \.sliceLetter)
+        
+     case .step:
         willChangeValue(for: \.step)
         _step = property.value.iValue
         didChangeValue(for: \.step)
@@ -875,6 +895,10 @@ extension xLib6000.Slice {
     get { return _q.sync { __audioGain } }
     set { _q.sync(flags: .barrier) { __audioGain = newValue } } }
   
+  internal var _audioLevel: Int {
+    get { return _q.sync { __audioLevel } }
+    set { _q.sync(flags: .barrier) { __audioLevel = newValue } } }
+  
   internal var _audioMute: Bool {
     get { return _q.sync { __audioMute } }
     set { _q.sync(flags: .barrier) { __audioMute = newValue } } }
@@ -886,6 +910,10 @@ extension xLib6000.Slice {
   internal var _autoPan: Bool {
     get { return _q.sync { __autoPan } }
     set { _q.sync(flags: .barrier) { __autoPan = newValue } } }
+  
+  internal var _clientHandle: ClientHandle {
+    get { return _q.sync { __clientHandle } }
+    set { _q.sync(flags: .barrier) { __clientHandle = newValue } } }
   
   internal var _daxChannel: Int {
     get { return _q.sync { __daxChannel } }
@@ -1079,6 +1107,10 @@ extension xLib6000.Slice {
     get { return _q.sync { __rxAntList } }
     set { _q.sync(flags: .barrier) { __rxAntList = newValue } } }
   
+  internal var _sliceLetter: String? {
+    get { return _q.sync { __sliceLetter } }
+    set { _q.sync(flags: .barrier) { __sliceLetter = newValue } } }
+  
   internal var _step: Int {
     get { return _q.sync { __step } }
     set { _q.sync(flags: .barrier) { __step = newValue } } }
@@ -1215,6 +1247,9 @@ extension xLib6000.Slice {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
+
+  @objc dynamic public var sliceLetter: String? {
+    return _sliceLetter }
   
 //  @objc dynamic public var meters: [String: Meter] {
 //    get { return _q.sync { _meters } }
@@ -1235,8 +1270,10 @@ extension xLib6000.Slice {
     case apfEnabled                 = "apf"
     case apfLevel                   = "apf_level"
     case audioGain                  = "audio_gain"                  // "gain"
+    case audioLevel                 = "audio_level"
     case audioMute                  = "audio_mute"                  // "mute"
     case audioPan                   = "audio_pan"                   // "pan"
+    case clientHandle               = "client_handle"
     case daxChannel                 = "dax"
     case daxClients                 = "dax_clients"
     case daxTxEnabled               = "dax_tx"
@@ -1287,6 +1324,7 @@ extension xLib6000.Slice {
     case rxAntList                  = "ant_list"
     case squelchEnabled             = "squelch"
     case squelchLevel               = "squelch_level"
+    case sliceLetter                = "index_letter"
     case step
     case stepList                   = "step_list"
     case txEnabled                  = "tx"

@@ -15,7 +15,8 @@ public typealias TnfId = String
 ///
 ///      creates a Tnf instance to be used by a Client to support the
 ///      rendering of a Tnf. Tnf objects are added, removed and
-///      updated by the incoming TCP messages.
+///      updated by the incoming TCP messages. They are collected in the
+///      tnfs collection on the Radio object.
 ///
 public final class Tnf                      : NSObject, DynamicModel {
   
@@ -232,7 +233,7 @@ public final class Tnf                      : NSObject, DynamicModel {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        os_log("Unknown Tnf token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Tnf token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }

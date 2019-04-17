@@ -16,7 +16,8 @@ public typealias WaterfallId = UInt32
 ///      creates a Waterfall instance to be used by a Client to support the
 ///      processing of a Waterfall. Waterfall objects are added / removed by the
 ///      incoming TCP messages. Waterfall objects periodically receive Waterfall
-///      data in a UDP stream.
+///      data in a UDP stream. They are collected in the waterfalls collection
+///      on the Radio object.
 ///
 public final class Waterfall                : NSObject, DynamicModelWithStream {
   
@@ -46,7 +47,9 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   private var __autoBlackEnabled            = false                         // State of auto black
   private var __autoBlackLevel              : UInt32 = 0                    // Radio generated black level
   private var __blackLevel                  = 0                             // Setting of black level (1 -> 100)
+  private var __clientHandle                : ClientHandle = 0              // Client owning this Waterfall
   private var __colorGain                   = 0                             // Setting of color gain (1 -> 100)
+  private var __daxIqChannel                = 0                             // DAX IQ channel number (0=none)
   private var __gradientIndex               = 0                             // Index of selected color gradient
   private var __lineDuration                = 0                             // Line duration (milliseconds)
   private var __panadapterId                : PanadapterId = 0              // Panadaptor above this waterfall
@@ -71,7 +74,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format: <"waterfall", ""> <id, ""> <"x_pixels", value> <"center", value> <"bandwidth", value> <"line_duration", value>
+    // Format: <"waterfall", ""> <id, ""> <"client_handle", ClientHandle> <"x_pixels", value> <"center", value> <"bandwidth", value> <"line_duration", value>
     //          <"rfgain", value> <"rxant", value> <"wide", 1|0> <"loopa", 1|0> <"loopb", 1|0> <"band", value> <"daxiq", value>
     //          <"daxiq_rate", value> <"capacity", value> <"available", value> <"panadapter", streamId>=40000000 <"color_gain", value>
     //          <"auto_black", 1|0> <"black_level", value> <"gradient_index", value> <"xvtr", value>
@@ -83,7 +86,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
     // Format: <"waterfall", ""> <id, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
     
     // get the streamId (remove the "0x" prefix)
-    if let streamId = UInt32(String(keyValues[1].key.dropFirst(2)), radix: 16) {
+    if let streamId = keyValues[1].key.handle {
       
       // is the Waterfall in use?
       if inUse {
@@ -153,7 +156,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-        os_log("Unknown Waterfall token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Waterfall token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }
@@ -170,11 +173,21 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
         _blackLevel = property.value.iValue
         didChangeValue(for: \.blackLevel)
 
+      case .clientHandle:
+        willChangeValue(for: \.clientHandle)
+        _clientHandle = property.value.handle ?? 0
+        didChangeValue(for: \.clientHandle)
+        
       case .colorGain:
         willChangeValue(for: \.colorGain)
         _colorGain = property.value.iValue
         didChangeValue(for: \.colorGain)
 
+      case .daxIqChannel:
+        willChangeValue(for: \.daxIqChannel)
+        _daxIqChannel = property.value.iValue
+        didChangeValue(for: \.daxIqChannel)
+        
       case .gradientIndex:
          willChangeValue(for: \.gradientIndex)
         _gradientIndex = property.value.iValue
@@ -185,9 +198,9 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
         _lineDuration = property.value.iValue
         didChangeValue(for: \.lineDuration)
 
-      case .panadapterId:     // does not have leading "0x"
+      case .panadapterId:
         willChangeValue(for: \.panadapterId)
-        _panadapterId = UInt32(property.value, radix: 16) ?? 0
+        _panadapterId = property.value.handle ?? 0
         didChangeValue(for: \.panadapterId)
 
       case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqRate,
@@ -251,9 +264,17 @@ extension Waterfall {
     get { return _q.sync { __blackLevel } }
     set { _q.sync(flags: .barrier) {__blackLevel = newValue } } }
   
+  internal var _clientHandle: ClientHandle {
+    get { return _q.sync { __clientHandle } }
+    set { _q.sync(flags: .barrier) { __clientHandle = newValue } } }
+  
   internal var _colorGain: Int {
     get { return _q.sync { __colorGain } }
     set { _q.sync(flags: .barrier) {__colorGain = newValue } } }
+  
+  internal var _daxIqChannel: Int {
+    get { return _q.sync { __daxIqChannel } }
+    set { _q.sync(flags: .barrier) { __daxIqChannel = newValue } } }
   
   internal var _gradientIndex: Int {
     get { return _q.sync { __gradientIndex } }
@@ -272,6 +293,9 @@ extension Waterfall {
   
   @objc dynamic public var autoBlackLevel: UInt32 {
     return _autoBlackLevel }
+  
+  @objc dynamic public var clientHandle: ClientHandle {
+    return _clientHandle }
   
   @objc dynamic public var panadapterId: PanadapterId {
     return _panadapterId }
@@ -292,7 +316,9 @@ extension Waterfall {
     // on Waterfall
     case autoBlackEnabled     = "auto_black"
     case blackLevel           = "black_level"
+    case clientHandle         = "client_handle"
     case colorGain            = "color_gain"
+    case daxIqChannel         = "daxiq_channel"
     case gradientIndex        = "gradient_index"
     case lineDuration         = "line_duration"
     // unused here

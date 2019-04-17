@@ -14,7 +14,8 @@ import os.log
 ///      creates a MicAudioStream instance to be used by a Client to support the
 ///      processing of a stream of Mic Audio from the Radio to the client. MicAudioStream
 ///      objects are added / removed by the incoming TCP messages. MicAudioStream
-///      objects periodically receive Mic Audio in a UDP stream.
+///      objects periodically receive Mic Audio in a UDP stream. They are collected
+///      in the micAudioStreams collection on the Radio object.
 ///
 public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   
@@ -129,7 +130,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        os_log("Unknown MicAudioStream token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown MicAudioStream token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }

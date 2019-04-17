@@ -15,7 +15,8 @@ import os.log
 ///
 ///      creates an Xvtr instance to be used by a Client to support the
 ///      processing of an Xvtr. Xvtr objects are added, removed and updated by
-///      the incoming TCP messages.
+///      the incoming TCP messages. They are collected in the xvtrs
+///      collection on the Radio object.
 ///
 public final class Xvtr                     : NSObject, DynamicModel {
   
@@ -129,7 +130,7 @@ public final class Xvtr                     : NSObject, DynamicModel {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-        os_log("Unknown Xvtr token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Xvtr token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }

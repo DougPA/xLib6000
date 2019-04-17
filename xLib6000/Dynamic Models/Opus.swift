@@ -17,6 +17,7 @@ public typealias OpusId = UInt32
 ///      processing of a stream of Audio to/from the Radio. Opus
 ///      objects are added / removed by the incoming TCP messages. Opus
 ///      objects periodically receive/send Opus Audio in a UDP stream.
+///      They are collected in the opusStreams collection on the Radio object.
 ///
 public final class Opus                     : NSObject, DynamicModelWithStream {
   
@@ -173,7 +174,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-        os_log("Unknown Opus token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Opus token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }

@@ -15,7 +15,8 @@ import Accelerate
 ///      creates an IqStream instance to be used by a Client to support the
 ///      processing of a stream of IQ data from the Radio to the client. IqStream
 ///      objects are added / removed by the incoming TCP messages. IqStream
-///      objects periodically receive IQ data in a UDP stream.
+///      objects periodically receive IQ data in a UDP stream. They are collected
+///      in the iqStreams collection on the Radio object.
 ///
 public final class IqStream                 : NSObject, DynamicModelWithStream {
  
@@ -162,7 +163,7 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
       
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        os_log("Unknown IqStream token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown IqStream token - %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }

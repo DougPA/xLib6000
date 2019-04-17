@@ -44,6 +44,10 @@ extension Waterfall {
     get { return _colorGain }
     set { if _colorGain != newValue { _colorGain = newValue ; waterfallCmd( .colorGain, newValue) } } }
   
+  @objc dynamic public var daxIqChannel: Int {
+    get { return _daxIqChannel }
+    set { if _daxIqChannel != newValue { _daxIqChannel = newValue ; waterfallCmd( .daxIqChannel, newValue) } } }
+  
   @objc dynamic public var gradientIndex: Int {
     get { return _gradientIndex }
     set { if _gradientIndex != newValue { _gradientIndex = newValue ; waterfallCmd( .gradientIndex, newValue) } } }

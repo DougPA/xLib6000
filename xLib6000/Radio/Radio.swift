@@ -20,6 +20,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // MARK: - Static properties
   
   static let kApfCmd                        = "eq apf "                     // Text of command messages
+  static let kClientCmd                     = "client "
+  static let kClientSetCmd                  = "client set "
   static let kCmd                           = "radio "
   static let kSetCmd                        = "radio set "
   static let kMixerCmd                      = "mixer "
@@ -68,7 +70,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // object collections
   private var _amplifiers                   = [AmplifierId: Amplifier]()    // Dictionary of Amplifiers
   private var _audioStreams                 = [DaxStreamId: AudioStream]()  // Dictionary of Audio streams
+  private var _bandSettings                 = [BandId: BandSetting]()       // Dictionary of Band Settings
   private var _equalizers                   = [Equalizer.EqType: Equalizer]() // Dictionary of Equalizers
+  private var _guiClients                   = [UInt32: GuiClient]()         // Dictionary of Gui Clients
   private var _iqStreams                    = [DaxStreamId: IqStream]()     // Dictionary of Dax Iq streams
   private var _memories                     = [MemoryId: Memory]()          // Dictionary of Memories
   private var _meters                       = [MeterNumber: Meter]()        // Dictionary of Meters
@@ -86,6 +90,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   
   private var _gpsPresent                   = false
   private var _atuPresent                   = false
+  private var _clientInitialized            = false
   
   // individual values
   // A
@@ -102,6 +107,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __calFreq                     = 0                             // Calibration frequency
   private var __callsign                    = ""                            // Callsign
   private var __chassisSerial               = ""                            // Radio serial number (read only)
+  private var __boundClientId               : UUID?                         // The Client Id of this client's GUI
   private var __clientIp                    = ""                            // Ip address returned by "client ip" command
   // D
   private var __daxIqAvailable              = 0                             //
@@ -131,6 +137,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // L
   private var __lineoutGain                 = 0                             // Speaker gain (1-100)
   private var __lineoutMute                 = false                         // Speaker muted
+  private var __localPtt                    = false                         // PTT usage
   private var __location                    = ""                            // (read only)
   private var __locked                      = false                         //
   // M
@@ -147,6 +154,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __oscillator                  = ""                            //
   // P
   private var __picDecpuVersion             = ""                            // 
+  private var __program                     = ""                            // Client program
   private var __psocMbPa100Version          = ""                            // Power amplifier software version
   private var __psocMbtrxVersion            = ""                            // System supervisor software version
   // R
@@ -163,6 +171,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __softwareVersion             = ""                            // (read only)
   private var __startCalibration            = false                         // true if a Calibration is in progress
   private var __state                       = ""                            //
+  private var __station                     = ""                            // Station name
   private var __staticGateway               = ""                            // Static Gateway address
   private var __staticIp                    = ""                            // Static IpAddress
   private var __staticNetmask               = ""                            // Static Netmask
@@ -276,6 +285,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     micList.removeAll()
     rfGainList.removeAll()
     sliceList.removeAll()
+    
+    _clientInitialized = false
   }
   
   // ----------------------------------------------------------------------------
@@ -447,10 +458,25 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .client:
       //      kv                0         1            2
-      //      format: client <handle> connected
-      //      format: client <handle> disconnected <forced=1/0>      
-      parseClient(remainder.keyValuesArray(), radio: self, queue: _q)
-      
+      //      format: client <handle> connected <client_id=ID> <program=Program> <station=Station> <local_ptt=0/1>
+      //      format: client <handle> disconnected <forced=0/1>
+
+//      Swift.print("Client status: \(remainder)")
+
+      let keyValues = remainder.keyValuesArray()
+      GuiClient.parseStatus(keyValues, radio: self, queue: _q)
+
+      // is my Client initialized now?
+      if let handle = keyValues[0].key.handle {
+        if guiClients[handle] != nil && !_clientInitialized {
+          // YES
+          _clientInitialized = true
+          
+          // Finish the UDP initialization & set the API state
+          _api.clientConnected()
+        }
+      }
+
     case .cwx:
       // replace some characters to avoid parsing conflicts
       cwx.parseProperties( remainder.fix().keyValuesArray() )
@@ -492,7 +518,18 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .interlock:
       //      format: <key=value> <key=value> ...<key=value>
-      interlock.parseProperties( remainder.keyValuesArray())
+      
+      var keyValues = remainder.keyValuesArray()
+      
+      // is it a Band Setting?
+      if keyValues[0].key == "band" {
+        // YES, drop the "band"
+        keyValues = Array(keyValues.dropFirst())
+        BandSetting.parseStatus( keyValues, radio: self, queue: _q, inUse: true)
+      } else {
+        // NO, standard Interlock
+        interlock.parseProperties( keyValues)
+      }
       
     case .memory:
       //      format: <memoryId> <key=value>,<key=value>,...<key=value>
@@ -540,7 +577,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     case .transmit:
       //      format: <key=value> <key=value> ...<key=value>
-      transmit.parseProperties( remainder.keyValuesArray())
+      var keyValues = remainder.keyValuesArray()
+      
+      // is it a Band Setting?
+      if keyValues[0].key == "band" {
+        // YES, drop the "band"
+        keyValues = Array(keyValues.dropFirst())
+        BandSetting.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
+      } else {
+        // NO, standard Transmit
+        transmit.parseProperties( keyValues)
+      }
       
     case .turf:
       os_log("Unprocessed %{public}@, %{public}@", log: _log, type: .default, msgType, remainder)
@@ -565,41 +612,83 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       Xvtr.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
     }
   }
-  /// Parse a Client status message
-  ///
-  ///   executed on the parseQ
-  ///
-  /// - Parameters:
-  ///   - keyValues:      a KeyValuesArray
-  ///   - radio:          the current Radio class
-  ///   - queue:          a parse Queue for the object
-  ///   - inUse:          false = "to be deleted"
-  ///
-  private func parseClient(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    
-    guard keyValues.count >= 2 else {
-      
-      os_log("Invalid client status", log: _log, type: .default)
-      return
-    }
-    // guard that the message has my API Handle
-    guard ("0x" + _api.connectionHandle == keyValues[0].key) else { return }
-    
-    // what is the message?
-    if keyValues[1].key == "connected" {
-      // Connected
-      _api.clientConnected()
-      
-    } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
-      // FIXME: Handle the disconnect?
-      // Disconnected
-      os_log("Disconnect, forced = %{public}@", log: _log, type: .info, keyValues[2].value)
-
-    } else {
-      // Unrecognized
-      os_log("Unprocessed Client message, %{public}@", log: _log, type: .default, keyValues[0].key)
-    }
-  }
+//  /// Parse a Client status message
+//  ///
+//  ///   executed on the parseQ
+//  ///     client <handle> <client_id=UUID> <program=Program> <station=Station> <local_ptt=0/1>
+//  ///
+//  /// - Parameters:
+//  ///   - keyValues:      a KeyValuesArray
+//  ///   - radio:          the current Radio class
+//  ///   - queue:          a parse Queue for the object
+//  ///   - inUse:          false = "to be deleted"
+//  ///
+//  private func parseClient(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
+//    
+//    guard keyValues.count >= 2 else {
+//      
+//      os_log("Invalid client status", log: _log, type: .default)
+//      return
+//    }
+//    
+//    // guard that the message has my API Handle
+//    guard ("0x" + _api.connectionHandle == keyValues[0].key) else { return }
+//    
+//    // what is the message?
+//    if keyValues[1].key == "connected" {
+//
+//      let properties = keyValues.dropFirst(2)
+//      for property in properties {
+//        
+//        // check for unknown Keys
+//        guard let token = ClientToken(rawValue: property.key) else {
+//          // log it and ignore this Key
+//          os_log("Unknown Client token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
+//          continue
+//        }
+//        // Known keys, in alphabetical order
+//        switch token {
+//          
+//        case .clientId:
+//          willChangeValue(for: \.clientId)
+//          _clientId = property.value
+//          didChangeValue(for: \.clientId)
+//
+//        case .program:
+//          willChangeValue(for: \.program)
+//          _program = property.value
+//          didChangeValue(for: \.program)
+//
+//        case .station:
+//          willChangeValue(for: \.station)
+//          _station = property.value
+//          didChangeValue(for: \.station)
+//
+//        case .localPtt:
+//          willChangeValue(for: \.localPtt)
+//          _localPtt = property.value.bValue
+//          didChangeValue(for: \.localPtt)
+//        }
+//      }
+//      // is the Client initialized now?
+//      if !_clientInitialized {
+//        // YES
+//        _clientInitialized = true
+//        
+//        // Finish the UDP initialization & set the API state
+//        _api.clientConnected()
+//      }
+//      
+//    } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
+//      // FIXME: Handle the disconnect?
+//      // Disconnected
+//      os_log("Disconnect, forced = %{public}@", log: _log, type: .info, keyValues[2].value)
+//
+//    } else {
+//      // Unrecognized
+//      os_log("Unprocessed Client message, %{public}@", log: _log, type: .default, keyValues[0].key)
+//    }
+//  }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
   ///
   ///   executed on the parseQ
@@ -615,7 +704,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Keys
       guard let token = InfoToken(rawValue: property.key) else {
         // log it and ignore this Key
-        os_log("Unknown Info token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Info token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         continue
       }
       // Known keys, in alphabetical order
@@ -713,6 +802,23 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
     }
   }
+  /// Parse the Reply to a Client Gui command, reply format: <key=value> <key=value> ...<key=value>
+  ///
+  ///   executed on the parseQ
+  ///
+  /// - Parameters:
+  ///   - keyValues:          a KeyValuesArray
+  ///
+  private func parseGuiReply(_ properties: KeyValuesArray) {
+    
+    // only v3 returns a Client Id
+    for property in properties {
+      // save the returned ID
+      _boundClientId = UUID(uuidString: property.key)
+      break
+    }
+    
+  }
   /// Parse the Reply to a Client Ip command, reply format: <key=value> <key=value> ...<key=value>
   ///
   ///   executed on the parseQ
@@ -793,7 +899,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Tokens
       guard let token = VersionToken(rawValue: property.key) else {
         // log it and ignore this Token
-        os_log("Unknown Version token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Version token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         continue
       }
       // Known tokens, in alphabetical order
@@ -868,7 +974,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         guard let token = RadioToken(rawValue: property.key)  else {
           
           // log it and ignore this token
-          os_log("Unknown Radio token - %{public}@", log: _log, type: .default, property.key)
+          os_log("Unknown Radio token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
           continue
         }
         // Known tokens, in alphabetical order
@@ -899,6 +1005,16 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           _callsign = property.value
           didChangeValue(for: \.callsign)
 
+        case .daxIqAvailable:
+          willChangeValue(for: \.daxIqAvailable)
+          _daxIqAvailable = property.value.iValue
+          didChangeValue(for: \.daxIqAvailable)
+          
+        case .daxIqCapacity:
+          willChangeValue(for: \.daxIqCapacity)
+          _daxIqCapacity = property.value.iValue
+          didChangeValue(for: \.daxIqCapacity)
+          
         case .enforcePrivateIpEnabled:
           willChangeValue(for: \.enforcePrivateIpEnabled)
           _enforcePrivateIpEnabled = property.value.bValue
@@ -1015,7 +1131,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       guard let token = RadioFilterSharpness(rawValue: property.key)  else {
         
         // log it and ignore this token
-        os_log("Unknown Filter token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Filter token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1085,7 +1201,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       guard let token = RadioStaticNet(rawValue: property.key)  else {
         
         // log it and ignore this token
-        os_log("Unknown Static token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Static token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1124,7 +1240,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         guard let token = RadioOscillator(rawValue: property.key)  else {
           
           // log it and ignore this token
-          os_log("Unknown Oscillator token - %{public}@", log: _log, type: .default, property.key)
+          os_log("Unknown Oscillator token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
           
           continue
         }
@@ -1182,7 +1298,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     switch msg[msg.startIndex] {
       
     case "H", "h":   // Handle type
-      _api.connectionHandle = suffix
+      _api.connectionHandle = suffix.handle
       
     case "M", "m":   // Message Type
       parseMessage(suffix)
@@ -1269,6 +1385,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
     // which command?
     switch command {
+      
+    case Api.Command.clientGui.rawValue:
+      // process the reply
+      parseGuiReply( reply.keyValuesArray() )
       
     case Api.Command.clientIp.rawValue:
       // process the reply
@@ -1491,6 +1611,10 @@ extension Radio {
     get { return _q.sync { __chassisSerial } }
     set { _q.sync(flags: .barrier) { __chassisSerial = newValue } } }
   
+  internal var _boundClientId: UUID? {
+    get { return _q.sync { __boundClientId } }
+    set { _q.sync(flags: .barrier) { __boundClientId = newValue } } }
+  
   internal var _clientIp: String {
     get { return _q.sync { __clientIp } }
     set { _q.sync(flags: .barrier) { __clientIp = newValue } } }
@@ -1587,6 +1711,10 @@ extension Radio {
     get { return _q.sync { __lineoutMute } }
     set { _q.sync(flags: .barrier) { __lineoutMute = newValue } } }
   
+  internal var _localPtt: Bool {
+    get { return _q.sync { __localPtt } }
+    set { _q.sync(flags: .barrier) { __localPtt = newValue } } }
+  
   internal var _locked: Bool {
     get { return _q.sync { __locked } }
     set { _q.sync(flags: .barrier) { __locked = newValue } } }
@@ -1626,6 +1754,10 @@ extension Radio {
   internal var _picDecpuVersion: String {
     get { return _q.sync { __picDecpuVersion } }
     set { _q.sync(flags: .barrier) { __picDecpuVersion = newValue } } }
+  
+  internal var _program: String {
+    get { return _q.sync { __program } }
+    set { _q.sync(flags: .barrier) { __program = newValue } } }
   
   internal var _psocMbPa100Version: String {
     get { return _q.sync { __psocMbPa100Version } }
@@ -1682,6 +1814,10 @@ extension Radio {
   internal var _state: String {
     get { return _q.sync { __state } }
     set { _q.sync(flags: .barrier) { __state = newValue } } }
+  
+  internal var _station: String {
+    get { return _q.sync { __station } }
+    set { _q.sync(flags: .barrier) { __station = newValue } } }
   
   internal var _staticGateway: String {
     get { return _q.sync { __staticGateway } }
@@ -1811,9 +1947,17 @@ extension Radio {
     get { return _q.sync { _audioStreams } }
     set { _q.sync(flags: .barrier) { _audioStreams = newValue } } }
   
+  public var bandSettings: [BandId: BandSetting] {
+    get { return _q.sync { _bandSettings } }
+    set { _q.sync(flags: .barrier) { _bandSettings = newValue } } }
+  
   public var equalizers: [Equalizer.EqType: Equalizer] {
     get { return _q.sync { _equalizers } }
     set { _q.sync(flags: .barrier) { _equalizers = newValue } } }
+  
+  public var guiClients: [UInt32: GuiClient] {
+    get { return _q.sync { _guiClients } }
+    set { _q.sync(flags: .barrier) { _guiClients = newValue } } }
   
   public var iqStreams: [DaxStreamId: IqStream] {
     get { return _q.sync { _iqStreams } }
@@ -1887,6 +2031,14 @@ extension Radio {
     case mode
     case qFactor
   }
+  /// Client properties
+  ///
+  internal enum ClientToken: String {
+    case clientId                           = "client_id"
+    case program
+    case station
+    case localPtt                           = "local_ptt"
+  }
   /// Info properties
   ///
   internal enum InfoToken: String {
@@ -1917,6 +2069,8 @@ extension Radio {
     case binauralRxEnabled                  = "binaural_rx"
     case calFreq                            = "cal_freq"
     case callsign
+    case daxIqAvailable                     = "daxiq_available"
+    case daxIqCapacity                      = "daxiq_capacity"
     case enforcePrivateIpEnabled            = "enforce_private_ip_connections"
     case freqErrorPpb                       = "freq_error_ppb"
     case frontSpeakerMute                   = "front_speaker_mute"

@@ -17,7 +17,8 @@ public typealias MeterName = String
 ///      creates a Meter instance to be used by a Client to support the
 ///      rendering of a Meter. Meter objects are added / removed by the
 ///      incoming TCP messages. Meters are periodically updated by a UDP
-///      stream containing multiple Meters.
+///      stream containing multiple Meters. They are collected in the
+///      meters collection on the Radio object.
 ///
 public final class Meter                    : NSObject, DynamicModel, StreamHandler {
   
@@ -232,7 +233,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       guard let token = Token(rawValue: key) else {
         
         // unknown Key, log it and ignore the Key
-        os_log("Unknown Meter token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Meter token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }

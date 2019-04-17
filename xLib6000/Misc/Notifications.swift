@@ -30,7 +30,8 @@ public enum NotificationType : String {
   case globalProfileRemoved
   case globalProfileUpdated
   
-  case guiConnectionEstablished
+  case guiClientHasBeenAdded
+  case guiClientWillBeRemoved
   
   case iqStreamHasBeenAdded
   case iqStreamWillBeRemoved
@@ -61,7 +62,7 @@ public enum NotificationType : String {
   case radioWillBeRemoved
   case radioHasBeenRemoved
   
-  case radiosAvailable                      // Radios have appeared / disappeared
+  case radiosAvailable
   
   case sliceBecameActive
   case sliceHasBeenAdded
@@ -73,7 +74,7 @@ public enum NotificationType : String {
   case tcpDidConnect
   case tcpDidDisconnect
   case tcpPingStarted
-  case tcpPingFirstResponse                 // the first ping reponse was received
+  case tcpPingFirstResponse
   case tcpPingTimeout
   case tcpWillDisconnect
   
@@ -93,7 +94,7 @@ public enum NotificationType : String {
   case waterfallHasBeenAdded
   case waterfallWillBeRemoved
   
-  case updateRequired                       // API and Radio versions incompatible
+  case updateRequired
   
   case xvtrHasBeenAdded
   case xvtrWillBeRemoved

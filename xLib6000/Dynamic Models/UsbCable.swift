@@ -15,7 +15,8 @@ public typealias UsbCableId = String
 ///
 ///      creates a USB Cable instance to be used by a Client to support the
 ///      processing of USB connections to the Radio (hardware). USB Cable objects
-///      are added, removed and updated by the incoming TCP messages.
+///      are added, removed and updated by the incoming TCP messages. They are
+///      collected in the usbCables collection on the Radio object.
 ///
 public final class UsbCable                 : NSObject, DynamicModel {
   
@@ -159,7 +160,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
         guard let token = Token(rawValue: property.key) else {
           
           // unknown Key, log it and ignore the Key
-          os_log("Unknown UsbCable token - %{public}@", log: _log, type: .default, property.key)
+          os_log("Unknown UsbCable token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
           
           continue
         }

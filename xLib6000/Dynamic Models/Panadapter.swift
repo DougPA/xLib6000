@@ -11,13 +11,15 @@ import os.log
 import simd
 
 public typealias PanadapterId = UInt32
+public typealias ClientHandle = UInt32
 
 /// Panadapter implementation
 ///
 ///      creates a Panadapter instance to be used by a Client to support the
 ///      processing of a Panadapter. Panadapter objects are added / removed by the
 ///      incoming TCP messages. Panadapter objects periodically receive Panadapter
-///      data in a UDP stream.
+///      data in a UDP stream. They are collected in the panadapters
+///      collection on the Radio object.
 ///
 public final class Panadapter               : NSObject, DynamicModelWithStream {
   
@@ -61,6 +63,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private var __bandwidth                   = 0                             // Bandwidth in Hz
   private var __bandZoomEnabled             = false                         //
   private var __center                      = 0                             // Center in Hz
+  private var __clientHandle                : ClientHandle = 0              // Client owning this Panadapter
   private var __daxIqChannel                = 0                             // DAX IQ channel number (0=none)
   private var __fps                         = 0                             // Refresh rate (frames/second)
   private var __loopAEnabled                = false                         // Enable LOOPA for RXA
@@ -81,7 +84,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private var __rfGainValues                = ""                            // Possible Rf Gain values
   private var __rxAnt                       = ""                            // Receive antenna name
   private var __segmentZoomEnabled          = false                         //
-  private var __waterfallId                 : UInt32 = 0                    // Waterfall below this Panadapter
+  private var __waterfallId                 : WaterfallId = 0               // Waterfall below this Panadapter
   private var __weightedAverageEnabled      = false                         // Enable weighted averaging
   private var __wide                        = false                         // Preselector state
   private var __wnbEnabled                  = false                         // Wideband noise blanking enabled
@@ -111,7 +114,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format: <"pan", ""> <id, ""> <"wnb", 1|0> <"wnb_level", value> <"wnb_updating", 1|0> <"x_pixels", value> <"y_pixels", value>
+    // Format: <"pan", ""> <id, ""> <"client_handle", ClientHandle> <"wnb", 1|0> <"wnb_level", value> <"wnb_updating", 1|0> <"x_pixels", value> <"y_pixels", value>
     //          <"center", value>, <"bandwidth", value> <"min_dbm", value> <"max_dbm", value> <"fps", value> <"average", value>
     //          <"weighted_average", 1|0> <"rfgain", value> <"rxant", value> <"wide", 1|0> <"loopa", 1|0> <"loopb", 1|0>
     //          <"band", value> <"daxiq", 1|0> <"daxiq_rate", value> <"capacity", value> <"available", value> <"waterfall", streamId>
@@ -128,7 +131,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     // Format: <"pan", ""> <id, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
     
     // get the streamId (remove the "0x" prefix)
-    if let streamId = UInt32(String(keyValues[1].key.dropFirst(2)), radix: 16) {
+    if let streamId = keyValues[1].key.handle {
       
       // is the Panadapter in use?
       if inUse {
@@ -144,7 +147,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
         
       } else {
         
-        // notify all observers
+        // NO, notify all observers
         NC.post(.panadapterWillBeRemoved, object: radio.panadapters[streamId] as Any?)
       }
     }
@@ -248,7 +251,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        os_log("Unknown Panadapter token - %{public}@", log: _log, type: .default, property.key)
+        os_log("Unknown Panadapter token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         
         continue
       }
@@ -285,6 +288,11 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
         _center = property.value.mhzToHz
         didChangeValue(for: \.center)
 
+      case .clientHandle:
+        willChangeValue(for: \.clientHandle)
+        _clientHandle = property.value.handle ?? 0
+        didChangeValue(for: \.clientHandle)
+        
       case .daxIqChannel:
         willChangeValue(for: \.daxIqChannel)
         _daxIqChannel = property.value.iValue
@@ -347,7 +355,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
 
       case .waterfallId:
          willChangeValue(for: \.waterfallId)
-        _waterfallId = UInt32(property.value, radix: 16) ?? 0
+        _waterfallId = property.value.handle ?? 0
         didChangeValue(for: \.waterfallId)
 
       case .wide:
@@ -465,6 +473,10 @@ extension Panadapter {
     get { return _q.sync { __center } }
     set { _q.sync(flags: .barrier) { __center = newValue } } }
   
+  internal var _clientHandle: ClientHandle {
+    get { return _q.sync { __clientHandle } }
+    set { _q.sync(flags: .barrier) { __clientHandle = newValue } } }
+  
   internal var _daxIqChannel: Int {
     get { return _q.sync { __daxIqChannel } }
     set { _q.sync(flags: .barrier) { __daxIqChannel = newValue } } }
@@ -580,13 +592,15 @@ extension Panadapter {
   internal var _yPixels: CGFloat {
     get { return _q.sync { __yPixels } }
     set { _q.sync(flags: .barrier) { __yPixels = newValue } } }
-  
-  
+    
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
   
   @objc dynamic public var antList: [String] {
     return _antList }
+  
+  @objc dynamic public var clientHandle: UInt32 {
+    return _clientHandle }
   
   @objc dynamic public var maxBw: Int {
     return _maxBw }
@@ -641,7 +655,8 @@ extension Panadapter {
     case bandwidth
     case bandZoomEnabled            = "band_zoom"
     case center
-    case daxIqChannel               = "daxiq"
+    case clientHandle               = "client_handle"
+    case daxIqChannel               = "daxiq_channel"
     case fps
     case loopAEnabled               = "loopa"
     case loopBEnabled               = "loopb"

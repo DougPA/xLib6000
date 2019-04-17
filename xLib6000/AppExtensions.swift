@@ -106,6 +106,14 @@ public typealias ValuesArray = [String]
 
 public extension String {
   
+  /// Convert a Handle string to a UInt32
+  ///
+  /// - Returns:      the UInt32 equivalent or nil
+  ///
+  var handle: UInt32? {
+    return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16)
+  }
+  
   /// Convert a Mhz string to an Hz Int
   ///
   /// - Returns:      the Int equivalent
