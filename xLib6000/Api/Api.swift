@@ -151,7 +151,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       secondaryCmdTypes: [Api.Command] = [.allSecondary],
                       subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) -> Bool {
 
-    // must be in the Ready state to connect
+    // must be in the Disconnected state to connect
     guard _apiState == .disconnected else { return false }
     
     _clientName = clientName
