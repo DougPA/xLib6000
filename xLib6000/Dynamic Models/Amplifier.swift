@@ -133,6 +133,7 @@ public final class Amplifier                : NSObject, DynamicModel {
         // log it and ignore the Key
         os_log("Unknown Amplifier token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
 
+//        Api.sharedInstance.log(msg: "Unknown Amplifier token - \(property.key) = \(property.value)", file: #file, function: #function)
         continue
       }
       // Known keys, in alphabetical order

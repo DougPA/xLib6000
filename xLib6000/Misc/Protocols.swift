@@ -165,7 +165,7 @@ public protocol WanServerDelegate           : class {
   
   /// Received radio list from server
   ///
-  func wanRadioListReceived(wanRadioList: [RadioParameters])
+  func wanRadioListReceived(wanRadioList: [DiscoveredRadio])
   
   /// Received user settings from server
   ///

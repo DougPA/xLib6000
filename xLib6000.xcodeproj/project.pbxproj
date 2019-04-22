@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		913ECFE7226BF87E00804D69 /* DiscoveredClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913ECFE6226BF87E00804D69 /* DiscoveredClient.swift */; };
 		913EF05A20669DA700AF99BE /* Xvtr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01220669DA700AF99BE /* Xvtr.swift */; };
 		913EF05B20669DA700AF99BE /* UsbCable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01320669DA700AF99BE /* UsbCable.swift */; };
 		913EF05C20669DA700AF99BE /* Tnf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01420669DA700AF99BE /* Tnf.swift */; };
@@ -54,7 +55,6 @@
 		913EF08820669DA700AF99BE /* InterlockCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04320669DA700AF99BE /* InterlockCommands.swift */; };
 		913EF08920669DA700AF99BE /* OpusCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04420669DA700AF99BE /* OpusCommands.swift */; };
 		913EF08A20669DA700AF99BE /* PanadapterCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04520669DA700AF99BE /* PanadapterCommands.swift */; };
-		913EF08C20669DA700AF99BE /* RadioParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04920669DA700AF99BE /* RadioParameters.swift */; };
 		913EF08D20669DA700AF99BE /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04A20669DA700AF99BE /* Notifications.swift */; };
 		913EF08E20669DA700AF99BE /* FlexErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04B20669DA700AF99BE /* FlexErrors.swift */; };
 		913EF08F20669DA700AF99BE /* UdpManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04D20669DA700AF99BE /* UdpManager.swift */; };
@@ -82,6 +82,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		913ECFE6226BF87E00804D69 /* DiscoveredClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveredClient.swift; sourceTree = "<group>"; };
 		913EF00620669D6400AF99BE /* xLib6000.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = xLib6000.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		913EF01220669DA700AF99BE /* Xvtr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Xvtr.swift; sourceTree = "<group>"; };
 		913EF01320669DA700AF99BE /* UsbCable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsbCable.swift; sourceTree = "<group>"; };
@@ -131,7 +132,6 @@
 		913EF04320669DA700AF99BE /* InterlockCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterlockCommands.swift; sourceTree = "<group>"; };
 		913EF04420669DA700AF99BE /* OpusCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpusCommands.swift; sourceTree = "<group>"; };
 		913EF04520669DA700AF99BE /* PanadapterCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PanadapterCommands.swift; sourceTree = "<group>"; };
-		913EF04920669DA700AF99BE /* RadioParameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadioParameters.swift; sourceTree = "<group>"; };
 		913EF04A20669DA700AF99BE /* Notifications.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		913EF04B20669DA700AF99BE /* FlexErrors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlexErrors.swift; sourceTree = "<group>"; };
 		913EF04D20669DA700AF99BE /* UdpManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UdpManager.swift; sourceTree = "<group>"; };
@@ -290,7 +290,6 @@
 				913EF04B20669DA700AF99BE /* FlexErrors.swift */,
 				913EF04A20669DA700AF99BE /* Notifications.swift */,
 				91A9000520B264B900BFDCF9 /* Protocols.swift */,
-				913EF04920669DA700AF99BE /* RadioParameters.swift */,
 			);
 			path = Misc;
 			sourceTree = "<group>";
@@ -313,6 +312,7 @@
 			children = (
 				913EF05420669DA700AF99BE /* Api.swift */,
 				913EF05320669DA700AF99BE /* RadioFactory.swift */,
+				913ECFE6226BF87E00804D69 /* DiscoveredClient.swift */,
 			);
 			path = Api;
 			sourceTree = "<group>";
@@ -430,7 +430,6 @@
 				913EF09620669DA700AF99BE /* GCDAsyncUdpSocket.m in Sources */,
 				913EF05F20669DA700AF99BE /* MicAudioStream.swift in Sources */,
 				913EF09520669DA700AF99BE /* Api.swift in Sources */,
-				913EF08C20669DA700AF99BE /* RadioParameters.swift in Sources */,
 				9148A1D42258E2C500020663 /* BandSetting.swift in Sources */,
 				913EF06F20669DA700AF99BE /* Wan.swift in Sources */,
 				913EF05C20669DA700AF99BE /* Tnf.swift in Sources */,
@@ -451,6 +450,7 @@
 				91612E41221E4F8D0002C4F9 /* Frames.swift in Sources */,
 				913EF06720669DA700AF99BE /* Equalizer.swift in Sources */,
 				913EF09120669DA700AF99BE /* Vita.swift in Sources */,
+				913ECFE7226BF87E00804D69 /* DiscoveredClient.swift in Sources */,
 				9148A1D62258E9C100020663 /* BandSettingCommands.swift in Sources */,
 				913EF09420669DA700AF99BE /* RadioFactory.swift in Sources */,
 				913EF06020669DA700AF99BE /* Memory.swift in Sources */,

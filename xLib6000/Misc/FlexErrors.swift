@@ -22,6 +22,8 @@ public func flexErrorLevel(errorCode: String) -> String {
   let number = UInt32(errorCode, radix: 16) ?? 0
   
   switch number {
+  case 0:
+    errorLevel = "None"
   case 0x10000001...0x10000003:
     errorLevel = "Info"
   case 0x31000001...0x31000009:
@@ -51,6 +53,8 @@ public func flexErrorString(errorCode: String) -> String {
   let number = UInt32(errorCode, radix: 16) ?? 0
   
   switch number {
+  case 0:
+    errorString = ""
   case 0x10000001...0x10000003:
     errorString = FlexErrors(rawValue: number )!.toString()
   case 0x31000001...0x31000009:

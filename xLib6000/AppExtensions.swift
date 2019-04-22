@@ -215,6 +215,8 @@ public extension String {
   ///
   func valuesArray(delimiter: String = " ", valuesToLower: Bool = false) -> ValuesArray {
     
+    guard self != "" else {return [String]() }
+    
     // split it into an array of <value> values, lowercase as needed
     var array = valuesToLower ? self.components(separatedBy: delimiter).map {$0.lowercased()} : self.components(separatedBy: delimiter)
     array = array.map { $0.trimmingCharacters(in: .whitespaces) }

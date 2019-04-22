@@ -20,9 +20,9 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var availableRadios: [RadioParameters] {
-    get { return _radiosQ.sync { _availableRadios } }
-    set { _radiosQ.sync(flags: .barrier) { _availableRadios = newValue } } }
+  public private(set) var discoveredRadios: [DiscoveredRadio] {
+    get { return _radiosQ.sync { _discoveredRadios } }
+    set { _radiosQ.sync(flags: .barrier) { _discoveredRadios = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -37,7 +37,8 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS -----
   //
-  private var _availableRadios              = [RadioParameters]()           // Array of Radio Parameters
+  private var _discoveredRadios              = [DiscoveredRadio]()          // Array of Discovered Radios
+  private var _discoveredClients             = [DiscoveredClient]()         // Array of Discovered Clients
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS -----
 
@@ -98,13 +99,18 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
           var deleteList = [Int]()
           
           // check the timestamps of the UDPBroadcasts
-          for (i, params) in self.availableRadios.enumerated() {
+          for (i, radio) in self.discoveredRadios.enumerated() {
+            
+            let interval = abs(radio.lastSeen.timeIntervalSinceNow)
             
             // is it past expiration?
-            if params.lastSeen.timeIntervalSinceNow < -notSeenInterval {
+            if interval > notSeenInterval {
               
               // YES, add to the delete list
               deleteList.append(i)
+            
+            } else {
+              radio.lastSeen = Date()
             }
           }
           // are there any deletions?
@@ -113,10 +119,10 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
             // YES, remove the Radio(s)
             for index in deleteList.reversed() {
               
-              self.availableRadios.remove(at: index)
+              self.discoveredRadios.remove(at: index)
             }
             // send the updated list of radios to all observers
-            NC.post(.radiosAvailable, object: self.availableRadios as Any?)
+            NC.post(.radiosAvailable, object: self.discoveredRadios as Any?)
           }
         }
         
@@ -168,7 +174,7 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
   public func updateAvailableRadios() {
     
     // send the current list of radios to all observers
-    NC.post(.radiosAvailable, object: self.availableRadios as Any?)
+    NC.post(.radiosAvailable, object: self.discoveredRadios as Any?)
   }
   
   // ----------------------------------------------------------------------------
@@ -187,38 +193,132 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
   @objc public func udpSocket(_ sock: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext filterContext: Any?) {
     var knownRadio = false
     
+    // local func to detect changes in status or clients
+    func hasChanged(_ previous: DiscoveredRadio, _ current: DiscoveredRadio ) -> Bool {
+      // is the status different?
+      if previous.status != current.status { return true }
+
+      // are the clients different?
+      if previous.guiClientHandles != current.guiClientHandles { return true }
+      if previous.guiClientHosts != current.guiClientHosts { return true }
+      if previous.guiClientIps != current.guiClientIps { return true }
+      if previous.guiClientPrograms != current.guiClientPrograms { return true }
+      if previous.guiClientStations != current.guiClientStations { return true }
+
+      return false
+    }
+    
     // VITA encoded Discovery packet?
     guard let vita = Vita.decodeFrom(data: data) else { return }
     
-    // parse the packet to obtain a RadioParameters (updates the timestamp)
+    // parse the packet to obtain a DiscoveredRadio (updates the timestamp)
     guard let discoveredRadio = Vita.parseDiscovery(vita) else { return }
     
-    // is it already in the availableRadios array? ( == compares serialNumbers )
-    for (i, radio) in availableRadios.enumerated() where radio == discoveredRadio {
-
-      let previousStatus = availableRadios[i].status
+    // is it already in the DiscoverdRadios array? ( == compares serialNumbers )
+    if !discoveredRadios.contains(discoveredRadio) {
       
-      // YES, update the existing entry
-      availableRadios[i] = discoveredRadio
+      // NO, add it to discoveredRadios
+      discoveredRadios.append(discoveredRadio)
+      GuiClient.parseDiscoveryClients(discoveredRadio)
       
-      // indicate it was a known radio
-      knownRadio = true
+      // send the updated array of Discovered Radios to all observers
+      NC.post(.radiosAvailable, object: discoveredRadios as Any?)
       
-      // has a known Radio's Status changed?
-      if knownRadio && previousStatus != discoveredRadio.status {
-
-        // YES, send the updated array of radio dictionaries to all observers
-        NC.post(.radiosAvailable, object: availableRadios as Any?)
+    } else {
+      
+      for (i, _) in discoveredRadios.enumerated()  {
+        
+        if discoveredRadios[i] == discoveredRadio {
+          
+          // has its status or clients changed?
+          if hasChanged( discoveredRadios[i], discoveredRadio) {
+            
+            // YES, update the existing entry
+            discoveredRadios[i] = discoveredRadio
+            GuiClient.parseDiscoveryClients(discoveredRadio)
+            
+            // YES, send the updated array of Discovered Radios to all observers
+            NC.post(.radiosAvailable, object: discoveredRadios as Any?)
+          }
+        }
       }
-    }
-    // Is it a known radio?
-    if knownRadio == false {
-      
-      // NO, add it to the array
-      availableRadios.append(discoveredRadio)
-      
-      // send the updated array of radio dictionaries to all observers
-      NC.post(.radiosAvailable, object: availableRadios as Any?)
     }
   }
 }
+
+public class DiscoveredRadio : Equatable {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
+  public var lastSeen                       = Date()                        // data/time last broadcast from Radio
+  
+  public var availableClients               = 0
+  public var availablePanadapters           = 0
+  public var availableSlices                = 0
+  public var callsign                       = ""                            // user assigned call sign
+  public var discoveryVersion               = ""                            // e.g. 2.0.0.1
+  public var firmwareVersion                = ""                            // Radio firmware version (e.g. 2.0.1.17)
+  public var fpcMac                         = ""                            // ??
+  public var guiClients                     = [DiscoveredClient]()
+
+  public var guiClientHandles               = ""
+  public var guiClientHosts                 = ""
+  public var guiClientIps                   = ""
+  public var guiClientPrograms              = ""
+  public var guiClientStations              = ""
+
+  public var inUseHost                      = ""                            // -- Deprecated --
+  public var inUseIp                        = ""                            // -- Deprecated --
+  public var isPortForwardOn                = false
+  public var licensedClients                = 0
+  public var localInterfaceIP               = ""
+  public var lowBandwidthConnect            = false
+  public var maxLicensedVersion             = ""                            // Highest licensed version
+  public var maxPanadapters                 = 0                             //
+  public var maxSlices                      = 0                             //
+  public var model                          = ""                            // Radio model (e.g. FLEX-6500)
+  public var negotiatedHolePunchPort        = -1
+  public var nickname                       = ""                            // user assigned Radio name
+  public var port                           = -1                            // port # broadcast received on
+  public var publicIp                       = ""                            // IP Address (dotted decimal)
+  public var publicTlsPort                  = -1
+  public var publicUdpPort                  = -1
+  public var radioLicenseId                 = ""                            // The current License of the Radio
+  public var requiresAdditionalLicense      = false                         // License needed?
+  public var requiresHolePunch              = false
+  public var serialNumber                   = ""                            // serial number
+  public var status                         = ""                            // available, in_use, connected, update, etc.
+  public var upnpSupported                  = false
+  public var wanConnected                   = false
+  
+  public var description : String {
+    return """
+    Radio Serial:\t\t\(serialNumber)
+    Licensed Version:\t\(maxLicensedVersion)
+    Radio ID:\t\t\t\(radioLicenseId)
+    Radio IP:\t\t\t\(publicIp)
+    Radio Firmware:\t\t\(firmwareVersion)
+    
+    Handles:\t\(guiClientHandles)
+    Hosts:\t\(guiClientHosts)
+    Ips:\t\t\(guiClientIps)
+    Programs:\t\(guiClientPrograms)
+    Stations:\t\(guiClientStations)
+    """
+  }
+
+  // ----------------------------------------------------------------------------
+  // MARK: - Static methods
+  
+  /// Returns a Boolean value indicating whether two DiscoveredRadio instances are equal.
+  ///
+  /// - Parameters:
+  ///   - lhs:            A value to compare.
+  ///   - rhs:            Another value to compare.
+  ///
+  public static func ==(lhs: DiscoveredRadio, rhs: DiscoveredRadio) -> Bool {
+    return lhs.serialNumber == rhs.serialNumber
+  }
+}
+

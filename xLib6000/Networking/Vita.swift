@@ -304,17 +304,20 @@ public class Vita {
   ///
   /// - Returns:        a RadioParameters struct (or nil)
   ///
-  public class func parseDiscovery(_ vita: Vita) -> RadioParameters? {
-    
+  public class func parseDiscovery(_ vita: Vita) -> DiscoveredRadio? {
+
     // is this a Discovery packet?
     if vita.classIdPresent && vita.classCode == .discovery {
       
       // YES, create a minimal RadioParameters with now as "lastSeen"
-      let discoveredRadio = RadioParameters()
-      
-      // Payload is a series of strings of the form <key=value> separated by ' ' (space)
-      let payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize - 1, encoding: String.Encoding.ascii.rawValue)! as String
+      let radio = DiscoveredRadio()
 
+      // Payload is a series of strings of the form <key=value> separated by ' ' (space)
+      var payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
+
+      // eliminate any Nulls at the end of the payload
+      payloadData = payloadData.trimmingCharacters(in: CharacterSet(charactersIn: "\0"))
+      
       // parse into a KeyValuesArray
       let properties = payloadData.keyValuesArray()
       
@@ -334,85 +337,85 @@ public class Vita {
         switch token {
           
         case .availableClients:
-          discoveredRadio.availableClients = property.value.iValue
+          radio.availableClients = property.value.iValue
 
         case .availablePanadapters:
-          discoveredRadio.availablePanadapters = property.value.iValue
+          radio.availablePanadapters = property.value.iValue
           
         case .availableSlices:
-          discoveredRadio.availableSlices = property.value.iValue
+          radio.availableSlices = property.value.iValue
           
        case .callsign:
-          discoveredRadio.callsign = property.value
+          radio.callsign = property.value
           
         case .discoveryVersion:
-          discoveredRadio.discoveryVersion = property.value
+          radio.discoveryVersion = property.value
           
         case .firmwareVersion:
-          discoveredRadio.firmwareVersion = property.value
+          radio.firmwareVersion = property.value
           
         case .fpcMac:
-          discoveredRadio.fpcMac = property.value
+          radio.fpcMac = property.value
           
         case .guiClientHandles:
-          discoveredRadio.guiClientHandles = property.value.valuesArray()
-
+          radio.guiClientHandles = property.value
+          
         case .guiClientHosts:
-          discoveredRadio.guiClientHosts = property.value.valuesArray()
+          radio.guiClientHosts = property.value
           
         case .guiClientIps:
-          discoveredRadio.guiClientIps = property.value.valuesArray()
+          radio.guiClientIps = property.value
           
         case .guiClientPrograms:
-          discoveredRadio.guiClientPrograms = property.value.valuesArray()
-          
+          radio.guiClientPrograms = property.value
+
         case .guiClientStations:
-          discoveredRadio.guiClientStations = property.value.valuesArray()
+          radio.guiClientStations = property.value
           
         case .inUseHost:
-          discoveredRadio.inUseHost = property.value
+          radio.inUseHost = property.value
           
         case .inUseIp:
-          discoveredRadio.inUseIp = property.value
-          
+          radio.inUseIp = property.value
+        
         case .licensedClients:
-          discoveredRadio.licensedClients = property.value.iValue
+          radio.licensedClients = property.value.iValue
           
         case .maxLicensedVersion:
-          discoveredRadio.maxLicensedVersion = property.value
+          radio.maxLicensedVersion = property.value
           
         case .maxPanadapters:
-          discoveredRadio.maxPanadapters = property.value.iValue
+          radio.maxPanadapters = property.value.iValue
 
         case .maxSlices:
-          discoveredRadio.maxSlices = property.value.iValue
+          radio.maxSlices = property.value.iValue
 
         case .model:
-          discoveredRadio.model = property.value
+          radio.model = property.value
           
         case .nickname:
-          discoveredRadio.nickname = property.value
+          radio.nickname = property.value
           
         case .port:
-          discoveredRadio.port = property.value.iValue
+          radio.port = property.value.iValue
           
         case .publicIp:
-          discoveredRadio.publicIp = property.value
+          radio.publicIp = property.value
           
         case .radioLicenseId:
-          discoveredRadio.radioLicenseId = property.value
+          radio.radioLicenseId = property.value
           
         case .requiresAdditionalLicense:
-          discoveredRadio.requiresAdditionalLicense = property.value.bValue
+          radio.requiresAdditionalLicense = property.value.bValue
           
         case .serialNumber:
-          discoveredRadio.serialNumber = property.value
+          radio.serialNumber = property.value
           
         case .status:
-          discoveredRadio.status = property.value
+          radio.status = property.value
           
         case .wanConnected:
-          discoveredRadio.wanConnected = property.value.bValue
+          radio.wanConnected = property.value.bValue
           
         // satisfy the switch statement, not a real token
         case .lastSeen:
@@ -420,9 +423,9 @@ public class Vita {
         }
       }
       // is it a valid Discovery packet?
-      if discoveredRadio.publicIp != "" && discoveredRadio.port != 0 && discoveredRadio.model != "" && discoveredRadio.serialNumber != "" {
-        // YES
-        return discoveredRadio
+      if radio.publicIp != "" && radio.port != 0 && radio.model != "" && radio.serialNumber != "" {
+        // YES, return the Discovered radio data
+        return radio
       }
     }
     // Not a Discovery packet
@@ -506,27 +509,34 @@ public class Vita {
     
     let timeStamp = (tsiType == .utc ? dateFormatter.string(from: date) : String(format: "%d", integerTimestamp))
     
-    return
-      "packetType           = \(packetType.description())\n" +
-      "classIdPresent       = \(classIdPresent)\n" +
-      "trailerPresent       = \(trailerPresent)\n" +
-      "tsi type             = \(tsiType.description())\n" +
-      "tsf type             = \(tsfType.description())\n" +
-      "sequence             = \(sequence)\n" +
-      "streamId             = \(streamId.hex)\n" +
-      "oui                  = \(oui == Vita.kFlexOui ? "Flex Radio" : "Unknown")\n" +
-      "informationClassCode = \(informationClassCode == Vita.kFlexInformationClassCode ? "Flex Radio" : "Unknown")\n" +
-      "classCode            = \(classCode.description())\n" +
-      "integerTimeStamp     = \(timeStamp)\n" +
-      "fracTimeStampMsb     = \(fracTimeStampMsb)\n" +
-      "fracTimeStampLsb     = \(fracTimeStampLsb)\n" +
-      "trailer              = \(trailerPresent ? trailer.hex : "None")\n" +
-      "payload:\n\(payloadString)\n" +
-      "----------------------------------------------\n" +
-      "headerSize           = \(headerSize) (bytes),  \(headerSize / 4) (UInt32)\n" +
-      "payloadSize          = \(payloadSize) (bytes), \(payloadSize / 4) (UInt32)\n" +
-      "packetSize           = \(packetSize) (bytes), \(adjustedPacketSize) (UInt32)\n" +
-      "\n\(warning)\n\n"
+    return """
+    packetType           = \(packetType.description())
+    classIdPresent       = \(classIdPresent)
+    trailerPresent       = \(trailerPresent)
+    tsi type             = \(tsiType.description())
+    tsf type             = \(tsfType.description())
+    sequence             = \(sequence)
+    streamId             = \(streamId.hex)
+    oui                  = \(oui == Vita.kFlexOui ? "Flex Radio" : "Unknown")
+    informationClassCode = \(informationClassCode == Vita.kFlexInformationClassCode ? "Flex Radio" : "Unknown")
+    classCode            = \(classCode.description())
+    integerTimeStamp     = \(timeStamp)
+    fracTimeStampMsb     = \(fracTimeStampMsb)
+    fracTimeStampLsb     = \(fracTimeStampLsb)
+    trailer              = \(trailerPresent ? trailer.hex : "None")
+    
+    payload:
+    
+    \(payloadString)
+    ----------------------------------------------
+    
+      headerSize           = \(headerSize) (bytes),  \(headerSize / 4) (UInt32)
+      payloadSize          = \(payloadSize) (bytes), \(payloadSize / 4) (UInt32)
+      packetSize           = \(packetSize) (bytes), \(adjustedPacketSize) (UInt32)
+    
+      \(warning)
+    
+    """
   }
 }
 

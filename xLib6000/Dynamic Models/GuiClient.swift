@@ -31,15 +31,18 @@ public final class GuiClient                : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "BandSetting")
+  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "GuiClient")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
+  private var __host                        = ""                            // Host of a GUI CLient
   private var __id                          : UUID?                         // UUID that identifies a GUI CLient
-  private var __localPtt                    = false                         // Local PTT
+  private var __ip                          = ""                            // Ip Address of a GUI CLient
+  private var __isAvailable                 = true                          //
+  private var __localPttEnabled             = false                         // Local PTT enabled
   private var __program                     = ""                            // Name that describes a Gui Client program
   private var __station                     = ""                            // Name that describes a Gui Client
   //
@@ -67,23 +70,63 @@ public final class GuiClient                : NSObject, DynamicModel {
       // is it connected?
       if keyValues[1].key == GuiClient.kConnected {
         // YES, does the Client Handle exist?
-        if radio.guiClients[handle] == nil {
+        if Api.sharedInstance.guiClients[handle] == nil {
           
           // NO, create a new GuiClient & add it to the guiClients collection
-          radio.guiClients[handle] = GuiClient(handle: handle, queue: queue)
+          Api.sharedInstance.guiClients[handle] = GuiClient(handle: handle, queue: queue)
         }
         // pass the remaining key values to the guiClient for parsing
-        radio.guiClients[handle]!.parseProperties( Array(keyValues.dropFirst(2)) )
+        Api.sharedInstance.guiClients[handle]!.parseProperties( Array(keyValues.dropFirst(2)) )
         
       } else {
         // NO, notify all observers
-        NC.post(.guiClientWillBeRemoved, object: radio.guiClients[handle] as Any?)
+        NC.post(.guiClientWillBeRemoved, object: Api.sharedInstance.guiClients[handle] as Any?)
         
         // remove it
-        radio.guiClients[handle] = nil
+        Api.sharedInstance.guiClients[handle] = nil
       }
     }
   }
+  /// Parse a Discovery message
+  ///
+  /// - Parameters:
+  ///   - radio:            the Discovered radio
+  ///   - api:              a reference to the Api object
+  ///
+  class func parseDiscoveryClients(_ radio: DiscoveredRadio, api: Api = Api.sharedInstance) {
+    
+    // separate the values
+    let handles   = radio.guiClientHandles.valuesArray(delimiter: ",")
+    let hosts     = radio.guiClientHosts.valuesArray(delimiter: ",")
+    let ips       = radio.guiClientIps.valuesArray(delimiter: ",")
+    let programs  = radio.guiClientPrograms.valuesArray(delimiter: ",")
+    let stations  = radio.guiClientStations.valuesArray(delimiter: ",")
+    
+    // are all the entries present?
+    if programs.count == handles.count && stations.count == handles.count && hosts.count == handles.count && ips.count == handles.count {
+      
+      // YES, for each client
+      for (i, handleString) in handles.enumerated() {
+        
+        // convert the String to a ClientHandle
+        let handle = handleString.handle!
+        
+        // does the handle exist?
+        if api.guiClients[handle] == nil {
+          // NO, create a new GuiClient
+          Api.sharedInstance.guiClients[handle] = GuiClient(handle: handle)
+        
+        }
+        // save the values
+        api.guiClients[handle]!._host = hosts[i]
+        api.guiClients[handle]!._ip = ips[i]
+        api.guiClients[handle]!._station = stations[i]
+        api.guiClients[handle]!._program = programs[i]
+        api.guiClients[handle]!._station = stations[i]
+      }
+    }
+  }
+  
   
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
@@ -95,7 +138,7 @@ public final class GuiClient                : NSObject, DynamicModel {
   ///   - isGui:              whether Client is a Gui Client
   ///   - queue:              Concurrent queue
   ///
-  public init(handle: UInt32, queue: DispatchQueue) {
+  public init(handle: UInt32, queue: DispatchQueue = Api.sharedInstance.objectQ) {
     
     self.handle = handle
     _q = queue
@@ -117,7 +160,7 @@ public final class GuiClient                : NSObject, DynamicModel {
     for property in properties {
       
       // check for unknown Keys
-      guard let token = Token(rawValue: property.key) else {
+      guard let token = ClientToken(rawValue: property.key) else {
         // log it and ignore this Key
         os_log("Unknown GuiClient token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
         continue
@@ -125,15 +168,25 @@ public final class GuiClient                : NSObject, DynamicModel {
       // Known keys, in alphabetical order
       switch token {
         
+      case .host:
+        willChangeValue(for: \.host)
+        _host = property.value
+        didChangeValue(for: \.host)
+        
       case .id:
         willChangeValue(for: \.id)
         _id = UUID(uuidString: property.value)
         didChangeValue(for: \.id)
         
-      case .localPtt:
-        willChangeValue(for: \.localPtt)
-        _localPtt = property.value.bValue
-        didChangeValue(for: \.localPtt)
+      case .ip:
+        willChangeValue(for: \.ip)
+        _ip = property.value
+        didChangeValue(for: \.ip)
+        
+      case .localPttEnabled:
+        willChangeValue(for: \.localPttEnabled)
+        _localPttEnabled = property.value.bValue
+        didChangeValue(for: \.localPttEnabled)
 
       case .program:
         willChangeValue(for: \.program)
@@ -147,7 +200,7 @@ public final class GuiClient                : NSObject, DynamicModel {
       }
     }
     // is the Gui Client initialized?
-    if !_initialized {
+    if !_initialized && _program != "" && _station != "" {
       
       // YES
       _initialized = true
@@ -155,28 +208,6 @@ public final class GuiClient                : NSObject, DynamicModel {
       // notify all observers
       NC.post(.guiClientHasBeenAdded, object: self as Any?)
     }
-
-  //    guard keyValues.count >= 2 else {
-  //
-  //      os_log("Invalid client status", log: _log, type: .default)
-  //      return
-  //    }
-  //
-  //    // what is the message?
-  //    if keyValues[1].key == "connected" {
-  //
-  //      let properties = keyValues.dropFirst(2)
-
-  
-//
-//    } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
-//      // FIXME: Handle the disconnect?
-//      // Disconnected
-//      os_log("Disconnect, forced = %{public}@", log: _log, type: .info, keyValues[2].value)
-//
-//    } else {
-//      // Unrecognized
-//      os_log("Unprocessed Client message, %{public}@", log: _log, type: .default, keyValues[0].key)
   }
 }
 
@@ -185,13 +216,21 @@ extension GuiClient {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
+  internal var _host: String {
+    get { return _q.sync { __host } }
+    set { _q.sync(flags: .barrier) {__host = newValue } } }
+  
   internal var _id: UUID? {
     get { return _q.sync { __id } }
     set { _q.sync(flags: .barrier) {__id = newValue } } }
   
-  internal var _localPtt: Bool {
-    get { return _q.sync { __localPtt } }
-    set { _q.sync(flags: .barrier) {__localPtt = newValue } } }
+  internal var _ip: String {
+    get { return _q.sync { __ip } }
+    set { _q.sync(flags: .barrier) {__ip = newValue } } }
+  
+  internal var _localPttEnabled: Bool {
+    get { return _q.sync { __localPttEnabled } }
+    set { _q.sync(flags: .barrier) {__localPttEnabled = newValue } } }
   
   internal var _program: String {
     get { return _q.sync { __program } }
@@ -204,11 +243,17 @@ extension GuiClient {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
   
+  @objc dynamic public var host: String {
+    return _host }
+  
   @objc dynamic public var id: UUID? {
     return _id }
 
-  @objc dynamic public var localPtt: Bool {
-    return _localPtt }
+  @objc dynamic public var ip: String {
+    return _ip }
+  
+  @objc dynamic public var localPttEnabled: Bool {
+    return _localPttEnabled }
   
   @objc dynamic public var program: String {
     return _program }
@@ -219,11 +264,13 @@ extension GuiClient {
   // ----------------------------------------------------------------------------
   // MARK: - Tokens
   
-  /// Properties acc_txreq_enable
+  /// Properties
   ///
-  internal enum Token : String {
+  internal enum ClientToken : String {
+    case host
     case id                             = "client_id"
-    case localPtt                       = "local_ptt"
+    case ip
+    case localPttEnabled                = "local_ptt"
     case program
     case station
   }

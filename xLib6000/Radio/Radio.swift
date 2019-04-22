@@ -72,7 +72,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var _audioStreams                 = [DaxStreamId: AudioStream]()  // Dictionary of Audio streams
   private var _bandSettings                 = [BandId: BandSetting]()       // Dictionary of Band Settings
   private var _equalizers                   = [Equalizer.EqType: Equalizer]() // Dictionary of Equalizers
-  private var _guiClients                   = [UInt32: GuiClient]()         // Dictionary of Gui Clients
+//  private var _guiClients                   = [UInt32: GuiClient]()         // Dictionary of Gui Clients
   private var _iqStreams                    = [DaxStreamId: IqStream]()     // Dictionary of Dax Iq streams
   private var _memories                     = [MemoryId: Memory]()          // Dictionary of Memories
   private var _meters                       = [MeterNumber: Meter]()        // Dictionary of Meters
@@ -468,7 +468,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
       // is my Client initialized now?
       if let handle = keyValues[0].key.handle {
-        if guiClients[handle] != nil && !_clientInitialized {
+        if _api.guiClients[handle] != nil && !_clientInitialized {
           // YES
           _clientInitialized = true
           
@@ -612,83 +612,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       Xvtr.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
     }
   }
-//  /// Parse a Client status message
-//  ///
-//  ///   executed on the parseQ
-//  ///     client <handle> <client_id=UUID> <program=Program> <station=Station> <local_ptt=0/1>
-//  ///
-//  /// - Parameters:
-//  ///   - keyValues:      a KeyValuesArray
-//  ///   - radio:          the current Radio class
-//  ///   - queue:          a parse Queue for the object
-//  ///   - inUse:          false = "to be deleted"
-//  ///
-//  private func parseClient(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-//    
-//    guard keyValues.count >= 2 else {
-//      
-//      os_log("Invalid client status", log: _log, type: .default)
-//      return
-//    }
-//    
-//    // guard that the message has my API Handle
-//    guard ("0x" + _api.connectionHandle == keyValues[0].key) else { return }
-//    
-//    // what is the message?
-//    if keyValues[1].key == "connected" {
-//
-//      let properties = keyValues.dropFirst(2)
-//      for property in properties {
-//        
-//        // check for unknown Keys
-//        guard let token = ClientToken(rawValue: property.key) else {
-//          // log it and ignore this Key
-//          os_log("Unknown Client token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
-//          continue
-//        }
-//        // Known keys, in alphabetical order
-//        switch token {
-//          
-//        case .clientId:
-//          willChangeValue(for: \.clientId)
-//          _clientId = property.value
-//          didChangeValue(for: \.clientId)
-//
-//        case .program:
-//          willChangeValue(for: \.program)
-//          _program = property.value
-//          didChangeValue(for: \.program)
-//
-//        case .station:
-//          willChangeValue(for: \.station)
-//          _station = property.value
-//          didChangeValue(for: \.station)
-//
-//        case .localPtt:
-//          willChangeValue(for: \.localPtt)
-//          _localPtt = property.value.bValue
-//          didChangeValue(for: \.localPtt)
-//        }
-//      }
-//      // is the Client initialized now?
-//      if !_clientInitialized {
-//        // YES
-//        _clientInitialized = true
-//        
-//        // Finish the UDP initialization & set the API state
-//        _api.clientConnected()
-//      }
-//      
-//    } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
-//      // FIXME: Handle the disconnect?
-//      // Disconnected
-//      os_log("Disconnect, forced = %{public}@", log: _log, type: .info, keyValues[2].value)
-//
-//    } else {
-//      // Unrecognized
-//      os_log("Unprocessed Client message, %{public}@", log: _log, type: .default, keyValues[0].key)
-//    }
-//  }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
   ///
   ///   executed on the parseQ
@@ -1955,10 +1878,6 @@ extension Radio {
     get { return _q.sync { _equalizers } }
     set { _q.sync(flags: .barrier) { _equalizers = newValue } } }
   
-  public var guiClients: [UInt32: GuiClient] {
-    get { return _q.sync { _guiClients } }
-    set { _q.sync(flags: .barrier) { _guiClients = newValue } } }
-  
   public var iqStreams: [DaxStreamId: IqStream] {
     get { return _q.sync { _iqStreams } }
     set { _q.sync(flags: .barrier) { _iqStreams = newValue } } }
@@ -2018,6 +1937,16 @@ extension Radio {
   // ----------------------------------------------------------------------------
   // MARK: - Tokens
   
+  /// Clients
+  ///
+  internal enum ClientToken : String {
+    case host
+    case id                             = "client_id"
+    case ip
+    case localPttEnabled                = "local_ptt"
+    case program
+    case station
+  }
   /// Types
   ///
   internal enum DisplayToken: String {
@@ -2030,14 +1959,6 @@ extension Radio {
     case gain
     case mode
     case qFactor
-  }
-  /// Client properties
-  ///
-  internal enum ClientToken: String {
-    case clientId                           = "client_id"
-    case program
-    case station
-    case localPtt                           = "local_ptt"
   }
   /// Info properties
   ///

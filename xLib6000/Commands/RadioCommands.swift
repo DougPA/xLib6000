@@ -291,9 +291,9 @@ extension Radio {
     get {  return _lineoutMute }
     set { if _lineoutMute != newValue { _lineoutMute = newValue ; mixerCmd( "lineout mute", newValue.as1or0) } } }
   
-  @objc dynamic public var localPtt: Bool {
+  @objc dynamic public var localPttEnabled: Bool {
     get {  return _localPtt }
-    set { if _localPtt != newValue { _localPtt = newValue ; clientSetCmd(.localPtt, newValue.as1or0) } } }
+    set { if _localPtt != newValue { _localPtt = newValue ; clientSetCmd(.localPttEnabled, newValue.as1or0) } } }
   
   @objc dynamic public var mox: Bool {
     get { return _mox }

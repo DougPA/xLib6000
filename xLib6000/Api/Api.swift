@@ -39,16 +39,19 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   @objc dynamic public var radio            : Radio?                        // current Radio class
 
-  public var availableRadios                : [RadioParameters] {           // Radios discovered
-    return _radioFactory.availableRadios }
+  public var discoveredRadios               : [DiscoveredRadio] {           // Radios discovered
+    return _radioFactory.discoveredRadios }
   public var delegate                       : ApiDelegate?                  // API delegate
   public var testerModeEnabled              = false                         // Library being used by xAPITester
   public var testerDelegate                 : ApiDelegate?                  // API delegate for xAPITester
-  public var activeRadio                    : RadioParameters?              // Radio params
+  public var activeRadio                    : DiscoveredRadio?              // Radio params
   public var pingerEnabled                  = true                          // Pinger enable
   public var isWan                          = false                         // Remote connection
   public var wanConnectionHandle            = ""                            // Wan connection handle
   public var connectionHandle               : UInt32?                       // Status messages handle
+
+  // GCD Concurrent Queue
+  public let objectQ                        = DispatchQueue(label: Api.kId + ".objectQ", attributes: [.concurrent])
 
   public private(set) var apiVersionMajor   = 0                             // numeric versions of Api firmware version
   public private(set) var apiVersionMinor   = 0
@@ -74,9 +77,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private var _secondaryCommands            = [CommandTuple]()              // Secondary commands to be sent
   private var _subscriptionCommands         = [CommandTuple]()              // Subscription commands to be sent
   private let _clientIpSemaphore            = DispatchSemaphore(value: 0)   // semaphore to signal that we have got the client ip
-
-  // GCD Concurrent Queue
-  private let _objectQ                      = DispatchQueue(label: Api.kId + ".objectQ", attributes: [.concurrent])
+  
 
   // GCD Serial Queues
   private let _tcpReceiveQ                  = DispatchQueue(label: Api.kId + ".tcpReceiveQ", qos: .userInitiated)
@@ -99,6 +100,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   //
   private var _localIP                      = "0.0.0.0"                     // client IP for radio
   private var _localUDPPort                 : UInt16 = 0                    // bound UDP port
+  private var _guiClients                   = [ClientHandle:GuiClient]()    // Dictionary of Gui Clients
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
 
@@ -126,11 +128,16 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   
   // ----------------------------------------------------------------------------
   // MARK: - Public methods
-  
+
+//  public func log(msg: String, file: String, function: String) {
+//    
+//    Swift.print("msg in \(file), function \(function)")
+//  }
+
   /// Connect to a Radio
   ///
   /// - Parameters:
-  ///     - selectedRadio:        a RadioParameters struct for the desired Radio
+  ///     - selectedRadio:        a DiscoveredRadio class for the desired Radio
   ///     - clientName:           the name of the Client using this library
   ///     - clientId:             a UUID String (if any)
   ///     - isGui:                whether this is a GUI connection
@@ -141,7 +148,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///     - subscriptionCmdTypes: array of "subscription" commandtypes (defaults to .all)
   /// - Returns:                  Success / Failure
   ///
-  public func connect(_ selectedRadio: RadioParameters,
+  public func connect(_ selectedRadio: DiscoveredRadio,
                       clientName: String,
                       clientId: String? = nil,
                       isGui: Bool = true,
@@ -162,7 +169,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     wanConnectionHandle = wanHandle
     
     // Create a Radio class
-    radio = Radio(api: self, queue: _objectQ)
+    radio = Radio(api: self, queue: objectQ)
     
     activeRadio = selectedRadio
     
@@ -446,40 +453,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // signal completion of the "client ip" command
     _clientIpSemaphore.signal()
   }
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Notification methods
-  
-  /// Add Notifications
-  ///
-  private func addNotifications() {
-    
-    // Pinging Started
-    NC.makeObserver(self, with: #selector(tcpPingStarted(_:)), of: .tcpPingStarted, object: nil)
-    
-    // Ping Timeout
-    NC.makeObserver(self, with: #selector(tcpPingTimeout(_:)), of: .tcpPingTimeout, object: nil)
-  }
-  /// Process .tcpPingStarted Notification
-  ///
-  /// - Parameters:
-  ///   - note:       a Notification instance
-  ///
-  @objc private func tcpPingStarted(_ note: Notification) {
-    
-    os_log("Pinger started", log: _log, type: .info)
-  }
-  /// Process .tcpPingTimeout Notification
-  ///
-  /// - Parameters:
-  ///   - note:       a Notification instance
-  ///
-  @objc private func tcpPingTimeout(_ note: Notification) {
-    
-    os_log("Pinger timeout", log: _log, type: .error)
-    
-    // FIXME: Should this close the Radio?
-  }
   
   // ----------------------------------------------------------------------------
   // MARK: - TcpManagerDelegate methods
@@ -662,13 +635,17 @@ extension Api {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
   
+  public var guiClients: [ClientHandle:GuiClient] {
+    get { return objectQ.sync { _guiClients } }
+    set { objectQ.sync(flags: .barrier) { _guiClients = newValue } } }
+  
   public var localIP: String {
-    get { return _objectQ.sync { _localIP } }
-    set { _objectQ.sync(flags: .barrier) { _localIP = newValue } } }
+    get { return objectQ.sync { _localIP } }
+    set { objectQ.sync(flags: .barrier) { _localIP = newValue } } }
   
   public var localUDPPort: UInt16 {
-    get { return _objectQ.sync { _localUDPPort } }
-    set { _objectQ.sync(flags: .barrier) { _localUDPPort = newValue } } }
+    get { return objectQ.sync { _localUDPPort } }
+    set { objectQ.sync(flags: .barrier) { _localUDPPort = newValue } } }
 
   // ----------------------------------------------------------------------------
   // MARK: - Enums
