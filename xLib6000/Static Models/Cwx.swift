@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 /// Cwx Class implementation
 ///
@@ -46,7 +45,6 @@ public final class Cwx                      : NSObject, StaticModel {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
-  private let _log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "Cwx")
   private let _q                            : DispatchQueue                 // Q for object synchronization
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
@@ -117,8 +115,9 @@ public final class Cwx                      : NSObject, StaticModel {
     
     // zero or anything greater than 2 is an error, log it and ignore the Reply
     guard components == 1 || components == 2 else {
-      os_log("%{public}@,  Invalid Cwx reply", log: _log, type: .default, command)
-      
+//      os_log("%{public}@,  Invalid Cwx reply", log: _log, type: .default, command)
+      _api.log.msg( "\(command), Invalid Cwx reply", level: .info, function: #function, file: #file, line: #line)
+
       return
     }
     // get the character position
@@ -127,8 +126,8 @@ public final class Cwx                      : NSObject, StaticModel {
     // not an integer, log it and ignore the Reply
     guard charPos != nil else {
       
-      os_log("%{public}@,  Invalid Cwx character position", log: _log, type: .default, command)
-      
+//      os_log("%{public}@,  Invalid Cwx character position", log: _log, type: .default, command)
+      _api.log.msg( "\(command), Invalid Cwx character position", level: .info, function: #function, file: #file, line: #line)
       return
     }
     
@@ -147,8 +146,9 @@ public final class Cwx                      : NSObject, StaticModel {
       // not an integer, log it and ignore the Reply
       guard block != nil else {
         
-        os_log("%{public}@,  Invalid Cwx block", log: _log, type: .default, command)
-        
+//        os_log("%{public}@,  Invalid Cwx block", log: _log, type: .default, command)
+        _api.log.msg( "\(command), Invalid Cwx block", level: .info, function: #function, file: #file, line: #line)
+
         return
       }
       // inform the Event Handler (if any)
@@ -190,8 +190,8 @@ public final class Cwx                      : NSObject, StaticModel {
         guard let token = Token(rawValue: property.key) else {
           
           // unknown token, log it and ignore the token
-          os_log("Unknown Cwx token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
-          
+          _api.log.msg( "Unknown Cwx token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+
           continue
         }
         // Known tokens, in alphabetical order

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 /// Atu Class implementation
 ///
@@ -29,8 +28,7 @@ public final class Atu                      : NSObject, StaticModel {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
-  private let _log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "Atu")
-  private let _q                            : DispatchQueue                 // Q for object synchronization
+   private let _q                            : DispatchQueue                 // Q for object synchronization
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
@@ -74,8 +72,8 @@ public final class Atu                      : NSObject, StaticModel {
       guard let token = Token(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-        os_log("Unknown Atu token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
-        
+        _api.log.msg( "Unknown Atu token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+
         continue
       }
       // Known tokens, in alphabetical order

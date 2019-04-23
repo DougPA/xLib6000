@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 /// GuiClient Class implementation
 ///
@@ -31,7 +30,6 @@ public final class GuiClient                : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "GuiClient")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -162,7 +160,7 @@ public final class GuiClient                : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = ClientToken(rawValue: property.key) else {
         // log it and ignore this Key
-        os_log("Unknown GuiClient token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
+        _api.log.msg( "Unknown GuiClient token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order

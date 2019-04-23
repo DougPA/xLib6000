@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 public typealias DaxStreamId = UInt32
 public typealias DaxChannel = Int
@@ -40,7 +39,6 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "AudioStream")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue!                // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -217,8 +215,8 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        os_log("Unknown AudioStream token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
-        
+        _api.log.msg( "Unknown AudioSTream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+
         continue
       }
       // known keys, in alphabetical order
@@ -326,8 +324,9 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      os_log("Missing AudioStream packet(s), rcvdSeq: %d,  != expectedSeq: %d", log: _log, type: .default, vita.sequence, expectedSequenceNumber)
-      
+//      os_log("Missing AudioStream packet(s), rcvdSeq: %d,  != expectedSeq: %d", log: _log, type: .default, vita.sequence, expectedSequenceNumber)
+      _api.log.msg( "Missing AudioStream packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", level: .info, function: #function, file: #file, line: #line)
+
       _rxSeq = nil
       rxLostPacketCount += 1
     } else {

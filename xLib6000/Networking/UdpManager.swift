@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 ///  UDP Manager Class implementation
 ///
@@ -24,7 +23,6 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   // MARK: - Private properties
   
   private weak var _delegate                : UdpManagerDelegate?           // class to receive UDP data
-  private let _log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "UdpManager")
   private var _udpReceiveQ                  : DispatchQueue!                // serial GCD Queue for inbound UDP traffic
   private var _udpRegisterQ                 : DispatchQueue!                // serial GCD Queue for registration
   private var _udpSocket                    : GCDAsyncUdpSocket!            // socket for Vita UDP data
@@ -139,8 +137,8 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       } catch {
         
         // We didn't get the port we wanted
-        os_log("Unable to bind to UDP port %{public}d", log: _log, type: .info, tmpPort)
-        
+//        os_log("Unable to bind to UDP port %{public}d", log: _log, type: .info, tmpPort)
+        Api.sharedInstance.log.msg("Unable to bind to UDP port \(tmpPort)", level: .info, function: #function, file: #file, line: #line)
         // try the next Port Number
         tmpPort += 1
       }
@@ -161,8 +159,8 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       
       _udpBound = true
       
-      os_log("UDP: Receive port = %{public}d, Send port = %{public}d", log: _log, type: .info, _udpRcvPort, _udpSendPort)
-
+//      os_log("UDP: Receive port = %{public}d, Send port = %{public}d", log: _log, type: .info, _udpRcvPort, _udpSendPort)
+      Api.sharedInstance.log.msg("UDP: Receive port = \(_udpRcvPort), Send port = \(_udpSendPort)", level: .error, function: #function, file: #file, line: #line)
       // if a Wan connection, register
       if isWan { register(clientHandle: clientHandle) }
     }
@@ -178,7 +176,8 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       
     } catch let error {
       // read error
-      os_log("beginReceiving error - %{public}@", log: _log, type: .error, error.localizedDescription)
+//      os_log("beginReceiving error - %{public}@", log: _log, type: .error, error.localizedDescription)
+      Api.sharedInstance.log.msg("beginReceiving error - \(error.localizedDescription)", level: .error, function: #function, file: #file, line: #line)
     }
   }
   /// Unbind from the UDP port
@@ -202,8 +201,9 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
     
     guard clientHandle != nil else {
       // should not happen
-      os_log("No client handle in register UDP", log: _log, type: .error)
-      
+//      os_log("No client handle in register UDP", log: _log, type: .error)
+      Api.sharedInstance.log.msg("No client handle in register UDP", level: .error, function: #function, file: #file, line: #line)
+
       return
     }
     // register & keep open the router (on a background queue)
@@ -218,8 +218,8 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
         // pause
         usleep(self.kRegistrationDelay)
       }
-      os_log("SmartLink - register UDP successful", log: self._log, type: .info)
-
+//      os_log("SmartLink - register UDP successful", log: self._log, type: .info)
+      Api.sharedInstance.log.msg("SmartLink - register UDP successful", level: .error, function: #function, file: #file, line: #line)
 //      // as long as connected after Registration
 //      while self._udpSocket != nil && self._udpBound {
 //
@@ -272,13 +272,14 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       case .ifData, .extData, .ifContext, .extContext:
         
         // error, pass it to the delegate
-        os_log("Unexpected packetType - %{public}@", log: _log, type: .default, vita.packetType.rawValue)
+//        os_log("Unexpected packetType - %{public}@", log: _log, type: .default, vita.packetType.rawValue)
+        Api.sharedInstance.log.msg("Unexpected packetType - \(vita.packetType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
       }
-      
     } else {
       
       // pass the error to the delegate
-      os_log("Unable to decode received packet", log: _log, type: .default)
+//      os_log("Unable to decode received packet", log: _log, type: .default)
+      Api.sharedInstance.log.msg("Unable to decode received packet", level: .warning, function: #function, file: #file, line: #line)
     }
   }
 }

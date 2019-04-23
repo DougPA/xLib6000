@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 public typealias UsbCableId = String
 
@@ -36,7 +35,6 @@ public final class UsbCable                 : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "UsbCable")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -100,9 +98,10 @@ public final class UsbCable                 : NSObject, DynamicModel {
       } else {
         
         // NO, log the error and ignore it
-        let log = OSLog(subsystem:Api.kBundleIdentifier, category: "UsbCable")
-        os_log("Invalid UsbCable Type, %{public}@", log: log, type: .default, keyValues[1].value)
-        
+//        let log = OSLog(subsystem:Api.kBundleIdentifier, category: "UsbCable")
+//        os_log("Invalid UsbCable Type, %{public}@", log: log, type: .default, keyValues[1].value)
+        Api.sharedInstance.log.msg( "Invalid UsbCable Type, \(keyValues[1].value)", level: .info, function: #function, file: #file, line: #line)
+
         return
       }
     }
@@ -160,8 +159,8 @@ public final class UsbCable                 : NSObject, DynamicModel {
         guard let token = Token(rawValue: property.key) else {
           
           // unknown Key, log it and ignore the Key
-          os_log("Unknown UsbCable token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
-          
+          _api.log.msg( "Unknown UsbCable token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+
           continue
         }
         // Known keys, in alphabetical order
@@ -267,8 +266,8 @@ public final class UsbCable                 : NSObject, DynamicModel {
     } else {
       
       // NO, log the error
-      os_log("Status type (%{public}@) != Cable type (%{public}@)", log: _log, type: .default, properties[0].key, cableType.rawValue)
-      
+//      os_log("Status type: (%{public}@) != Cable type (%{public}@)", log: _log, type: .default, properties[0].key, cableType.rawValue)
+      _api.log.msg( "Status type: \(properties[0].key) != Cable type \(cableType.rawValue)", level: .info, function: #function, file: #file, line: #line)
     }
     
     // is the waterfall initialized?

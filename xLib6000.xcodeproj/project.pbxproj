@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		913ECFE7226BF87E00804D69 /* DiscoveredClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913ECFE6226BF87E00804D69 /* DiscoveredClient.swift */; };
+		913ECFE9226F543000804D69 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913ECFE8226F543000804D69 /* Log.swift */; };
 		913EF05A20669DA700AF99BE /* Xvtr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01220669DA700AF99BE /* Xvtr.swift */; };
 		913EF05B20669DA700AF99BE /* UsbCable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01320669DA700AF99BE /* UsbCable.swift */; };
 		913EF05C20669DA700AF99BE /* Tnf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01420669DA700AF99BE /* Tnf.swift */; };
@@ -83,6 +84,7 @@
 
 /* Begin PBXFileReference section */
 		913ECFE6226BF87E00804D69 /* DiscoveredClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveredClient.swift; sourceTree = "<group>"; };
+		913ECFE8226F543000804D69 /* Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		913EF00620669D6400AF99BE /* xLib6000.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = xLib6000.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		913EF01220669DA700AF99BE /* Xvtr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Xvtr.swift; sourceTree = "<group>"; };
 		913EF01320669DA700AF99BE /* UsbCable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UsbCable.swift; sourceTree = "<group>"; };
@@ -287,6 +289,7 @@
 		913EF04720669DA700AF99BE /* Misc */ = {
 			isa = PBXGroup;
 			children = (
+				913ECFE8226F543000804D69 /* Log.swift */,
 				913EF04B20669DA700AF99BE /* FlexErrors.swift */,
 				913EF04A20669DA700AF99BE /* Notifications.swift */,
 				91A9000520B264B900BFDCF9 /* Protocols.swift */,
@@ -428,6 +431,7 @@
 			files = (
 				913EF06220669DA700AF99BE /* Waterfall.swift in Sources */,
 				913EF09620669DA700AF99BE /* GCDAsyncUdpSocket.m in Sources */,
+				913ECFE9226F543000804D69 /* Log.swift in Sources */,
 				913EF05F20669DA700AF99BE /* MicAudioStream.swift in Sources */,
 				913EF09520669DA700AF99BE /* Api.swift in Sources */,
 				9148A1D42258E2C500020663 /* BandSetting.swift in Sources */,

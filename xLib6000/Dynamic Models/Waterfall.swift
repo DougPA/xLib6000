@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 public typealias WaterfallId = UInt32
 
@@ -34,7 +33,6 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Waterfall")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -156,8 +154,8 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-        os_log("Unknown Waterfall token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
-        
+        _api.log.msg( "Unknown Waterfall token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+
         continue
       }
       // Known keys, in alphabetical order

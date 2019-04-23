@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 public typealias OpusId = UInt32
 
@@ -45,7 +44,6 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Opus")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -174,8 +172,8 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-        os_log("Unknown Opus token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
-        
+        _api.log.msg( "Unknown Opus token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+
         continue
       }
       // known Keys, in alphabetical order
@@ -243,13 +241,15 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       if vita.sequence > _rxSeq! {
         
         // MISSING, frame(s) has been skipped, ignore the skipped frame(s)
-        os_log("Missing Frame(s): expected = %{public}d, received = %{public}d", log: _log, type: .default, _rxSeq!, vita.sequence)
+//        os_log("Missing Frame(s): expected = %{public}d, received = %{public}d", log: _log, type: .default, _rxSeq!, vita.sequence)
+        _api.log.msg( "Missing Frame(s): expected = \(_rxSeq!), received = \(vita.sequence)", level: .info, function: #function, file: #file, line: #line)
         _rxSeq = vita.sequence
         
       } else {
         
         // OUT-OF-SEQUENCE, a frame is either duplicated or out of order, ignore it
-        os_log("Out of sequence Frame(s) were ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, _rxSeq!, vita.sequence)
+//        os_log("Out of sequence Frame(s) were ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, _rxSeq!, vita.sequence)
+        _api.log.msg( "Out of sequence Frame(s) were ignored: expected = \(_rxSeq!), received = \(vita.sequence)", level: .info, function: #function, file: #file, line: #line)
         return
       }
     }

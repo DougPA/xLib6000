@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import os.log
+
 import simd
 
 public typealias PanadapterId = UInt32
@@ -46,7 +46,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Panadapter")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
@@ -223,8 +222,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     
     guard responseValue == Api.kNoError else {
       // Anything other than 0 is an error, log it and ignore the Reply
-      os_log("%{public}@,  non-zero reply - %{public}@, %{public}@", log: _log, type: .default, command, responseValue, flexErrorString(errorCode: responseValue))
-      
+//      os_log("%{public}@,  non-zero reply - %{public}@, %{public}@", log: _log, type: .default, command, responseValue, flexErrorString(errorCode: responseValue))
+      _api.log.msg( "\(command),  non-zero reply - \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .info, function: #function, file: #file, line: #line)
+
       return
     }
     // parse out the values
@@ -251,8 +251,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        os_log("Unknown Panadapter token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
-        
+        _api.log.msg( "Unknown Panadapter token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+
         continue
       }
       // Known keys, in alphabetical order

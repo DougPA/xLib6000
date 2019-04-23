@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 public typealias MemoryId = String
 
@@ -36,7 +35,6 @@ public final class Memory                   : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Memory")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -220,8 +218,8 @@ public final class Memory                   : NSObject, DynamicModel {
       // Check for Unknown token
       guard let token = Token(rawValue: property.key) else {
         // unknown token, log it and ignore the token
-        os_log("Unknown Memory token - %{public}@", log: _log, type: .default, property.key, property.value)
-        
+        _api.log.msg( "Unknown Memory token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+
         continue
       }
       // Known tokens, in alphabetical order

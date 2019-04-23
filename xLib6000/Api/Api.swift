@@ -6,8 +6,6 @@
 //  Copyright © 2018 Douglas Adams & Mario Illgen. All rights reserved.
 //
 
-import os.log
-
 /// API Class implementation
 ///
 ///      manages the connections to the Radio (hardware), responsible for the
@@ -18,6 +16,14 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
+  
+  public enum Level : String {
+    case debug        = "Debug"
+    case info         = "Info"
+    case warning      = "Warning"
+    case error        = "Error"
+  }
+
   
   public static let kId                     = "xLib6000"                    // API Name
   public static let kDomainId               = "net.k3tzr"                   // Domain name
@@ -49,6 +55,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var isWan                          = false                         // Remote connection
   public var wanConnectionHandle            = ""                            // Wan connection handle
   public var connectionHandle               : UInt32?                       // Status messages handle
+  public var log                            = Log.sharedInstance            // Logger
 
   // GCD Concurrent Queue
   public let objectQ                        = DispatchQueue(label: Api.kId + ".objectQ", attributes: [.concurrent])
@@ -63,10 +70,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem: kBundleIdentifier, category: "Api")
   private var _apiState                     : Api.State! {
-    didSet { os_log("Api state == %{public}@", log: _log, type: .info, _apiState.rawValue) }
-  }
+    didSet { log.msg( "Api state = \(_apiState.rawValue)", level: .info, function: #function, file: #file, line: #line)}}
   private var _tcp                          : TcpManager!                   // TCP connection class (commands)
   private var _udp                          : UdpManager!                   // UDP connection class (streams)
   private var _primaryCmdTypes              = [Api.Command]()               // Primary command types to be sent
@@ -128,11 +133,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   
   // ----------------------------------------------------------------------------
   // MARK: - Public methods
-
-//  public func log(msg: String, file: String, function: String) {
-//    
-//    Swift.print("msg in \(file), function \(function)")
-//  }
 
   /// Connect to a Radio
   ///
@@ -205,7 +205,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     if _pinger != nil {
       _pinger = nil
       
-      os_log("Pinger stopped", log: _log, type: .info)
+//      os_log("Pinger stopped", log: _log, type: .info)
+      log.msg("Pinger stopped", level: .info, function: #function, file: #file, line: #line)
     }
     // the radio (if any) will be removed, inform observers
     if activeRadio != nil { NC.post(.radioWillBeRemoved, object: radio as Any?) }
@@ -318,8 +319,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         
         let wanStatus = isWan ? "REMOTE" : "LOCAL"
         let p = (isWan ? activeRadio!.publicTlsPort : activeRadio!.port)
-        os_log("Started pinging: %{public}@ @ %{public}@, port %{public}d (%{public}@)", log: _log, type: .info, activeRadio!.nickname, activeRadio!.publicIp, p, wanStatus)
-        
+//        os_log("Started pinging: %{public}@ @ %{public}@, port %{public}d (%{public}@)", log: _log, type: .info, activeRadio!.nickname, activeRadio!.publicIp, p, wanStatus)
+        log.msg( "Started pinging: \(activeRadio!.nickname) @ \(activeRadio!.publicIp), port \(p) (\(wanStatus))", level: .info, function: #function, file: #file, line: #line)
+
         _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ)
       }
       // TCP & UDP connections established, inform observers
@@ -345,8 +347,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // compare the versions
     if apiVersionParts[0] != radioVersionParts[0] || apiVersionParts[1] != radioVersionParts[1] || apiVersionParts[2] != radioVersionParts[2] {
     
-      os_log("Update needed, Radio version = %{public}@, API supports version = %{public}@", log: _log, type: .default, activeRadio!.firmwareVersion, kApiFirmwareSupport)
-      
+//      os_log("Update needed, Radio version = %{public}@, API supports version = %{public}@", log: _log, type: .default, activeRadio!.firmwareVersion, kApiFirmwareSupport)
+      log.msg( "Update needed, Radio version = \(activeRadio!.firmwareVersion), API supports version = \(kApiFirmwareSupport)", level: .debug, function: #function, file: #file, line: #line)
+
       NC.post(.updateRequired, object: kApiFirmwareSupport + "," + activeRadio!.firmwareVersion)
     }
     // set integer numbers for major and minor for fast comparision
@@ -510,9 +513,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // log it
       let wanStatus = isWan ? "REMOTE" : "LOCAL"
       let guiStatus = _isGui ? "(GUI) " : ""
-      os_log("TCP connected to %{public}@ @ %{public}@, port %{public}d %{public}@(%{public}@), Radio version = %{public}@", log: _log, type: .info, activeRadio!.nickname, host, port,
-             guiStatus, wanStatus, activeRadio!.firmwareVersion)
-      
+//      os_log("TCP connected to %{public}@ @ %{public}@, port %{public}d %{public}@(%{public}@), Radio version = %{public}@", log: _log, type: .info, activeRadio!.nickname, host, port,
+//             guiStatus, wanStatus, activeRadio!.firmwareVersion)
+      log.msg( "TCP connected to \(activeRadio!.nickname) @ \(host), port \(port) \(guiStatus)(\(wanStatus)), radio version = \(activeRadio!.firmwareVersion)", level: .info, function: #function, file: #file, line: #line)
+
       // YES, set state
       _apiState = .tcpConnected
       
@@ -525,8 +529,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         let cmd = "wan validate handle=" + wanConnectionHandle // TODO: + "\n"
         send(cmd, replyTo: nil)
         
-        os_log("Wan validate handle: %{public}@", log: _log, type: .info, wanConnectionHandle)
-        
+//        os_log("Wan validate handle: %{public}@", log: _log, type: .info, wanConnectionHandle)
+        log.msg( "Wan validate handle: \(wanConnectionHandle)", level: .info, function: #function, file: #file, line: #line)
+
       } else {
         // insure that a UDP port was bound (for the Data Streams)
         guard _udp.bind(radioParameters: activeRadio!, isWan: isWan) else {
@@ -544,7 +549,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       if activeRadio!.status == "In_Use" && _isGui {
         
         send("client disconnect")
-        os_log("\"client disconnect\" sent", log: _log, type: .info)
+//        os_log("\"client disconnect\" sent", log: _log, type: .info)
+        log.msg( "\"client disconnect\" sent", level: .info, function: #function, file: #file, line: #line)
         sleep(1)
       }
 
@@ -556,8 +562,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         // the tcp connection was disconnected, inform observers
         NC.post(.tcpDidDisconnect, object: DisconnectReason.normal)
 
-        os_log("Tcp Disconnected", log: _log, type: .info)
-        
+//        os_log("Tcp Disconnected", log: _log, type: .info)
+        log.msg( "Tcp Disconnected", level: .info, function: #function, file: #file, line: #line)
+
       } else {
         
         // YES, disconnect with error (don't keep the UDP port open as it won't be reused with a new connection)
@@ -567,7 +574,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         // the tcp connection was disconnected, inform observers
         NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: error))
 
-        os_log("Tcp Disconnected with message = %{public}@", log: _log, type: .info, error)
+//        os_log("Tcp Disconnected with message = %{public}@", log: _log, type: .info, error)
+       log.msg( "Tcp Disconnected with message = \(error)", level: .info, function: #function, file: #file, line: #line)
       }
 
       _apiState = .disconnected
@@ -593,8 +601,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // YES, UDP (streams) connection established
       
-      os_log("UDP bound to Port %{public}d", log: _log, type: .info, port)
-      
+//      os_log("UDP bound to Port %{public}d", log: _log, type: .info, port)
+      log.msg( "UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
+
       _apiState = .udpBound
       
       localUDPPort = port

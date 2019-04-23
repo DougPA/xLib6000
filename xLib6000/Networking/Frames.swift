@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 /// Class containing Panadapter Stream data
 ///
@@ -27,8 +26,6 @@ public class PanadapterFrame {
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
-  
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "PanadapterFrame")
   
   private struct PayloadHeaderOld {                                        // struct to mimic payload layout
     var startingBinIndex                    : UInt32
@@ -107,13 +104,15 @@ public class PanadapterFrame {
     
     if frameIndex < expectedIndex {
       // log it
-      os_log("Out of sequence Frame ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, expectedIndex, frameIndex)
+//      os_log("Out of sequence Frame ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, expectedIndex, frameIndex)
+      Api.sharedInstance.log.msg("Out of sequence Frame ignored: expected = \(expectedIndex), received = \(frameIndex)", level: .error, function: #function, file: #file, line: #line)
       return false
     }
     
     if frameIndex > expectedIndex {
       // log it
-      os_log("%{public}d Frame(s) skipped: expected = %{public}d, received = %{public}d", log: _log, type: .default, frameIndex - expectedIndex, expectedIndex, frameIndex)
+//      os_log("%{public}d Frame(s) skipped: expected = %{public}d, received = %{public}d", log: _log, type: .default, frameIndex - expectedIndex, expectedIndex, frameIndex)
+      Api.sharedInstance.log.msg("\(frameIndex - expectedIndex) Frame(s) skipped: expected = \(expectedIndex), received = \(frameIndex)", level: .error, function: #function, file: #file, line: #line)
       // restart bin processing
       _binsProcessed = 0
       expectedIndex = frameIndex
@@ -164,7 +163,6 @@ public class WaterfallFrame {
   
   private var _binsProcessed                = 0
   private var _byteOffsetToBins             = 0
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "WaterfallFrame")
   
   private struct PayloadHeaderOld {                                         // struct to mimic payload layout
     var firstBinFreq                        : UInt64                        // 8 bytes
@@ -258,13 +256,15 @@ public class WaterfallFrame {
     
     if timeCode < expectedIndex {
       // log it
-      os_log("Out of sequence Frame ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, expectedIndex, timeCode)
+//      os_log("Out of sequence Frame ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, expectedIndex, timeCode)
+      Api.sharedInstance.log.msg("Out of sequence Frame ignored: expected = \(expectedIndex), received = \(timeCode)", level: .warning, function: #function, file: #file, line: #line)
       return false
     }
     
     if timeCode > expectedIndex {
       // log it
-      os_log("%{public}d Frame(s) skipped: expected = %{public}d, received = %{public}d", log: _log, type: .default, timeCode - expectedIndex, expectedIndex, timeCode)
+//      os_log("%{public}d Frame(s) skipped: expected = %{public}d, received = %{public}d", log: _log, type: .default, timeCode - expectedIndex, expectedIndex, timeCode)
+      Api.sharedInstance.log.msg("\(timeCode - expectedIndex) Frame(s) skipped: expected = \(expectedIndex), received = \(timeCode)", level: .warning, function: #function, file: #file, line: #line)
       // restart bin processing
       _binsProcessed = 0
       expectedIndex = timeCode

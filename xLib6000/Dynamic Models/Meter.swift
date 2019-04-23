@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 public typealias MeterNumber = String
 public typealias MeterName = String
@@ -30,7 +29,6 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Meter")
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
@@ -233,8 +231,8 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       guard let token = Token(rawValue: key) else {
         
         // unknown Key, log it and ignore the Key
-        os_log("Unknown Meter token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
-        
+        _api.log.msg( "Unknown Meter token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+
         continue
       }
       
@@ -291,8 +289,9 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
     guard let token = Units(rawValue: units) else {
       
       // unknown Units, log it and ignore it
-      os_log("Meter, Unknown units - %{public}@", log: _log, type: .default, units)
-      
+//      os_log("Meter, Unknown units - %{public}@", log: _log, type: .default, units)
+      _api.log.msg( "Meter, Unknown units - \(units)", level: .info, function: #function, file: #file, line: #line)
+
       return
     }
     var adjNewValue: Float = 0.0

@@ -11,6 +11,17 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
+/// Logging protocol
+///
+///   Allows this library to pass log messages to the Client
+///   The Client can use its preferred method for logging
+///
+public protocol LogHandler
+{
+  // method to process Log entries
+  func msg(_ msg: String, level: Api.Level, function: String, file: String, line: Int , source: String) -> Void
+}
+
 /// Models for which there will only be one instance
 ///
 ///   Static Model objects are created / destroyed in the Radio class.
@@ -179,6 +190,5 @@ public protocol WanServerDelegate           : class {
   ///
   func wanTestConnectionResultsReceived(results: WanTestConnectionResults)
 }
-
 
 

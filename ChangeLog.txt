@@ -1,5 +1,11 @@
 xLib6000 Change Log
 
+v3.0.3 23-Apr-2019
+
+Removed all use of Unified Logging, restored previous logging approach
+Restore Log.swift file and usage throughout the lib
+
+
 v3.0.2 22-Apr-2019
 
 Api.swift - changed "private var _objectQ" to "public var objectQ"

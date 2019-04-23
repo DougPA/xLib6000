@@ -8,17 +8,6 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - LogHandler protocol
-//
-// --------------------------------------------------------------------------------
-
-public protocol LogHandler
-{
-  // method to process Log entries
-  func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int ) -> Void
-}
-
 // ----------------------------------------------------------------------------
 // MARK: - Log implementation
 //
@@ -58,10 +47,10 @@ public final class Log {
   ///   - file:       the file where the message originated
   ///   - line:       the line where the message originated
   ///
-  public func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int ) {
+  public func msg(_ msg: String, level: Api.Level, function: String, file: String, line: Int ) {
     
     // pass the entry to the delegate (if any)
-    delegate?.msg(msg, level: level, function: function, file: file, line: line )
+    delegate?.msg(msg, level: level, function: function, file: file, line: line, source: Api.kId )
   }
 }
 
