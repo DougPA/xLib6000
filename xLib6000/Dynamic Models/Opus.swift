@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias OpusId = UInt32
+public typealias OpusId = StreamId
 
 /// Opus Class implementation
 ///
@@ -242,14 +242,14 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
         
         // MISSING, frame(s) has been skipped, ignore the skipped frame(s)
 //        os_log("Missing Frame(s): expected = %{public}d, received = %{public}d", log: _log, type: .default, _rxSeq!, vita.sequence)
-        _api.log.msg( "Missing Frame(s): expected = \(_rxSeq!), received = \(vita.sequence)", level: .info, function: #function, file: #file, line: #line)
+        _api.log.msg( "Missing Frame(s): expected = \(_rxSeq!), received = \(vita.sequence)", level: .warning, function: #function, file: #file, line: #line)
         _rxSeq = vita.sequence
         
       } else {
         
         // OUT-OF-SEQUENCE, a frame is either duplicated or out of order, ignore it
 //        os_log("Out of sequence Frame(s) were ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, _rxSeq!, vita.sequence)
-        _api.log.msg( "Out of sequence Frame(s) were ignored: expected = \(_rxSeq!), received = \(vita.sequence)", level: .info, function: #function, file: #file, line: #line)
+        _api.log.msg( "Out of sequence Frame(s) were ignored: expected = \(_rxSeq!), received = \(vita.sequence)", level: .warning, function: #function, file: #file, line: #line)
         return
       }
     }

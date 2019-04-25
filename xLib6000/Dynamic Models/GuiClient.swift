@@ -63,26 +63,25 @@ public final class GuiClient                : NSObject, DynamicModel {
     // Format:  <client_handle, > <connected, > <"client_id", clientId> <"program", program> <"station", station> <"local_ptt", 0/1>
     
     // get the Client Handle
-    if let handle = keyValues[0].key.handle {
-      
-      // is it connected?
-      if keyValues[1].key == GuiClient.kConnected {
-        // YES, does the Client Handle exist?
-        if Api.sharedInstance.guiClients[handle] == nil {
-          
-          // NO, create a new GuiClient & add it to the guiClients collection
-          Api.sharedInstance.guiClients[handle] = GuiClient(handle: handle, queue: queue)
-        }
-        // pass the remaining key values to the guiClient for parsing
-        Api.sharedInstance.guiClients[handle]!.parseProperties( Array(keyValues.dropFirst(2)) )
+    let handle = keyValues[0].key.handle
+    
+    // is it connected?
+    if keyValues[1].key == GuiClient.kConnected {
+      // YES, does the Client Handle exist?
+      if Api.sharedInstance.guiClients[handle] == nil {
         
-      } else {
-        // NO, notify all observers
-        NC.post(.guiClientWillBeRemoved, object: Api.sharedInstance.guiClients[handle] as Any?)
-        
-        // remove it
-        Api.sharedInstance.guiClients[handle] = nil
+        // NO, create a new GuiClient & add it to the guiClients collection
+        Api.sharedInstance.guiClients[handle] = GuiClient(handle: handle, queue: queue)
       }
+      // pass the remaining key values to the guiClient for parsing
+      Api.sharedInstance.guiClients[handle]!.parseProperties( Array(keyValues.dropFirst(2)) )
+      
+    } else {
+      // NO, notify all observers
+      NC.post(.guiClientWillBeRemoved, object: Api.sharedInstance.guiClients[handle] as Any?)
+      
+      // remove it
+      Api.sharedInstance.guiClients[handle] = nil
     }
   }
   /// Parse a Discovery message
@@ -107,7 +106,7 @@ public final class GuiClient                : NSObject, DynamicModel {
       for (i, handleString) in handles.enumerated() {
         
         // convert the String to a ClientHandle
-        let handle = handleString.handle!
+        let handle = handleString.handle
         
         // does the handle exist?
         if api.guiClients[handle] == nil {

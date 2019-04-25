@@ -17,11 +17,20 @@ public enum NotificationType : String {
   case amplifierHasBeenAdded
   case amplifierWillBeRemoved
   
-  case audioStreamHasBeenAdded
-  case audioStreamWillBeRemoved
-  
   case clientDidConnect
   case clientDidDisconnect
+  
+  case daxMicAudioStreamHasBeenAdded
+  case daxMicAudioStreamWillBeRemoved
+  
+  case daxIqStreamHasBeenAdded
+  case daxIqStreamWillBeRemoved
+  
+  case daxRxAudioStreamHasBeenAdded
+  case daxRxAudioStreamWillBeRemoved
+  
+  case daxTxAudioStreamHasBeenAdded
+  case daxTxAudioStreamWillBeRemoved
   
   case equalizerHasBeenAdded
   
@@ -33,18 +42,12 @@ public enum NotificationType : String {
   case guiClientHasBeenAdded
   case guiClientWillBeRemoved
   
-  case iqStreamHasBeenAdded
-  case iqStreamWillBeRemoved
-  
   case memoryHasBeenAdded
   case memoryWillBeRemoved
   
   case meterHasBeenAdded
   case meterWillBeRemoved
   case meterUpdated
-  
-  case micAudioStreamHasBeenAdded
-  case micAudioStreamWillBeRemoved
   
   case opusRxHasBeenAdded
   case opusRxWillBeRemoved
@@ -83,9 +86,6 @@ public enum NotificationType : String {
   
   case transmitHasBeenAdded
 
-  case txAudioStreamHasBeenAdded
-  case txAudioStreamWillBeRemoved
-  
   case udpDidBind
   
   case usbCableHasBeenAdded

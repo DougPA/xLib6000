@@ -27,7 +27,7 @@ public final class Xvtr                     : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
 
-   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
   

@@ -150,7 +150,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
 //      os_log("sendConnectMessageForRadio, Not connected", log: _log, type: .default)
-      _api.log.msg("sendConnectMessageForRadio, Not connected", level: .error, function: #function, file: #file, line: #line)
+      _api.log.msg("sendConnectMessageForRadio, Not connected", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // send a command to SmartLink to request a connection to the specified Radio
@@ -166,7 +166,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
 //      os_log("sendDisconnectUsersMessageToServer, Not connected", log: _log, type: .default)
-      _api.log.msg("sendDisconnectUsersMessageToServer, Not connected", level: .error, function: #function, file: #file, line: #line)
+      _api.log.msg("sendDisconnectUsersMessageToServer, Not connected", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // send a command to SmartLink to request disconnection from the specified Radio
@@ -181,7 +181,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // insure that the WanServer is connected to SmartLink
     guard _isConnected else {
 //      os_log("sendTestConnection, Not connected", log: _log, type: .default)
-      _api.log.msg("sendTestConnection, Not connected", level: .error, function: #function, file: #file, line: #line)
+      _api.log.msg("sendTestConnection, Not connected", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // send a command to SmartLink to test the connection for the specified Radio
@@ -214,7 +214,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       
       // unknown Message Type, log it and ignore the message
 //      os_log("Unknown message token: %{public}@", log: _log, type: .default, msg)
-      _api.log.msg("Unknown message token: \(msg)", level: .error, function: #function, file: #file, line: #line)
+      _api.log.msg("Unknown message token: \(msg)", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // which primary message type?
@@ -474,7 +474,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
           
           guard let date = dateFormatter.date(from: property.value.lowercased()) else {
 //            os_log("LastSeen date mismatched format: %{public}@", log: _log, type: .error, property.value)
-            _api.log.msg("LastSeen date mismatched format: \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+            _api.log.msg("LastSeen date mismatched format: \(property.value)", level: .error, function: #function, file: #file, line: #line)
 
             break
           }
@@ -617,7 +617,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     _pingTimer?.cancel();
 
 //    os_log("Stopped pinging SmartLink Server: %{public}@, port %{public}d", log: _log, type: .info, _currentHost, _currentPort)
-    _api.log.msg("Stopped pinging SmartLink Server:  \(_currentHost), port \(_currentPort)", level: .warning, function: #function, file: #file, line: #line)
+    _api.log.msg("Stopped pinging SmartLink Server:  \(_currentHost), port \(_currentPort)", level: .info, function: #function, file: #file, line: #line)
   }
   /// Send a command to the server
   ///
@@ -647,7 +647,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // Disconnected from the SmartLInk server
     let error = (err == nil ? "" : " with error = " + err!.localizedDescription)
 //    os_log("Disconnected from SmartLink server: %{public}@, port %{public}@%{public}@", log: _log, type: .info, _currentHost, _currentPort, error)
-    _api.log.msg("Disconnected from SmartLink Server:  \(_currentHost), port \(_currentPort) \(error)", level: .warning, function: #function, file: #file, line: #line)
+    _api.log.msg("Disconnected from SmartLink Server:  \(_currentHost), port \(_currentPort) \(error)", level: .info, function: #function, file: #file, line: #line)
 
     _isConnected = false
     _currentHost = ""
@@ -667,7 +667,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     _currentPort = sock.connectedPort
     
 //    os_log("Connected to SmartLink server: %{public}@, port %{public}d", log: _log, type: .info, _currentHost, _currentPort)
-    _api.log.msg("Connected to SmartLink Server:  \(_currentHost), port \(_currentPort)", level: .warning, function: #function, file: #file, line: #line)
+    _api.log.msg("Connected to SmartLink Server:  \(_currentHost), port \(_currentPort)", level: .info, function: #function, file: #file, line: #line)
 
     // start a secure (TLS) connection to the SmartLink server
     var tlsSettings = [String : NSObject]()
@@ -714,7 +714,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     let command = kAppRegisterCmd + "=\(_appName) " + kPlatform + "=\(_platform) " + kToken + "=\(_token)"
     
 //    os_log("TLS connection to SmartLink server \"Did Secure\"", log: _log, type: .info)
-    _api.log.msg("TLS connection to SmartLink server \"Did Secure\"", level: .warning, function: #function, file: #file, line: #line)
+    _api.log.msg("TLS connection to SmartLink server \"Did Secure\"", level: .info, function: #function, file: #file, line: #line)
 
     // register the Application / token pair with the SmartLink server
     sendCommand(command)

@@ -105,7 +105,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   //
   private var _localIP                      = "0.0.0.0"                     // client IP for radio
   private var _localUDPPort                 : UInt16 = 0                    // bound UDP port
-  private var _guiClients                   = [ClientHandle:GuiClient]()    // Dictionary of Gui Clients
+  private var _guiClients                   = [Handle:GuiClient]()          // Dictionary of Gui Clients
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
 
@@ -348,7 +348,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     if apiVersionParts[0] != radioVersionParts[0] || apiVersionParts[1] != radioVersionParts[1] || apiVersionParts[2] != radioVersionParts[2] {
     
 //      os_log("Update needed, Radio version = %{public}@, API supports version = %{public}@", log: _log, type: .default, activeRadio!.firmwareVersion, kApiFirmwareSupport)
-      log.msg( "Update needed, Radio version = \(activeRadio!.firmwareVersion), API supports version = \(kApiFirmwareSupport)", level: .debug, function: #function, file: #file, line: #line)
+      log.msg( "Update needed, Radio version = \(activeRadio!.firmwareVersion), API supports version = \(kApiFirmwareSupport)", level: .warning, function: #function, file: #file, line: #line)
 
       NC.post(.updateRequired, object: kApiFirmwareSupport + "," + activeRadio!.firmwareVersion)
     }
@@ -644,7 +644,7 @@ extension Api {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
   
-  public var guiClients: [ClientHandle:GuiClient] {
+  public var guiClients: [Handle:GuiClient] {
     get { return objectQ.sync { _guiClients } }
     set { objectQ.sync(flags: .barrier) { _guiClients = newValue } } }
   

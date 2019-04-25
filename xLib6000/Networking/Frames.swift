@@ -105,14 +105,14 @@ public class PanadapterFrame {
     if frameIndex < expectedIndex {
       // log it
 //      os_log("Out of sequence Frame ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, expectedIndex, frameIndex)
-      Api.sharedInstance.log.msg("Out of sequence Frame ignored: expected = \(expectedIndex), received = \(frameIndex)", level: .error, function: #function, file: #file, line: #line)
+      Api.sharedInstance.log.msg("Out of sequence Frame ignored: expected = \(expectedIndex), received = \(frameIndex)", level: .warning, function: #function, file: #file, line: #line)
       return false
     }
     
     if frameIndex > expectedIndex {
       // log it
 //      os_log("%{public}d Frame(s) skipped: expected = %{public}d, received = %{public}d", log: _log, type: .default, frameIndex - expectedIndex, expectedIndex, frameIndex)
-      Api.sharedInstance.log.msg("\(frameIndex - expectedIndex) Frame(s) skipped: expected = \(expectedIndex), received = \(frameIndex)", level: .error, function: #function, file: #file, line: #line)
+      Api.sharedInstance.log.msg("\(frameIndex - expectedIndex) Frame(s) skipped: expected = \(expectedIndex), received = \(frameIndex)", level: .warning, function: #function, file: #file, line: #line)
       // restart bin processing
       _binsProcessed = 0
       expectedIndex = frameIndex

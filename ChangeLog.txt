@@ -1,5 +1,12 @@
 xLib6000 Change Log
 
+v3.0.4
+
+renamed all Stream for v3, incorporated new logic
+
+
+
+
 v3.0.3 23-Apr-2019
 
 Removed all use of Unified Logging, restored previous logging approach

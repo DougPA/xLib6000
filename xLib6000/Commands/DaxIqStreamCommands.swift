@@ -1,5 +1,5 @@
 //
-//  IqStreamCommands.swift
+//  DaxIqStreamCommands.swift
 //  xLib6000
 //
 //  Created by Douglas Adams on 7/20/17.
@@ -11,7 +11,7 @@ import Foundation
 // ----------------------------------------------------------------------------
 // MARK: - Command extension
 
-extension IqStream {
+extension DaxIqStream {
 
   // ----------------------------------------------------------------------------
   // MARK: - Class methods that send Commands
@@ -23,10 +23,10 @@ extension IqStream {
   ///   - callback:           ReplyHandler (optional)
   /// - Returns:              Success / Failure
   ///
-  public class func create(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
-    
-    return Api.sharedInstance.sendWithCheck(kStreamCreateCmd + "daxiq" + "=\(channel)", replyTo: callback)
-  }
+//  public class func create(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
+//
+//    return Api.sharedInstance.sendWithCheck(kStreamCreateCmd + "daxiq" + "=\(channel)", replyTo: callback)
+//  }
   /// Create an IQ Stream
   ///
   /// - Parameters:
@@ -36,10 +36,10 @@ extension IqStream {
   ///   - callback:           ReplyHandler (optional)
   /// - Returns:              Success / Failure
   ///
-  public class func create(_ channel: String, ip: String, port: Int, callback: ReplyHandler? = nil) -> Bool {
+  public class func create(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
     
     // tell the Radio to create the Stream
-    return Api.sharedInstance.sendWithCheck(IqStream.kStreamCreateCmd + "daxiq" + "=\(channel) " + "ip" + "=\(ip) " + "port" + "=\(port)", replyTo: callback)
+    return Api.sharedInstance.sendWithCheck("stream create type=dax_iq daxiq_channel=\(channel)", replyTo: callback)
   }
   
   // ----------------------------------------------------------------------------
@@ -54,23 +54,19 @@ extension IqStream {
   public func remove(callback: ReplyHandler? = nil) {
 
     // tell the Radio to remove the Stream
-    Api.sharedInstance.send(IqStream.kStreamRemoveCmd + "\(id.hex)", replyTo: callback)
+    Api.sharedInstance.send("stream remove \(streamId.hex)", replyTo: callback)
   }
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Private methods - Command helper methods
-  
-  /// Set an IQ Stream property on the Radio
+  /// Get error ???
   ///
   /// - Parameters:
-  ///   - token:      the parse token
-  ///   - value:      the new value
+  ///   - id:                 IQ Stream Id
+  ///   - callback:           ReplyHandler (optional)
   ///
-  private func iqCmd(_ token: Token, _ value: Any) {
+  public func getError(callback: ReplyHandler? = nil) {
     
-    Api.sharedInstance.send(IqStream.kCmd + "\(_daxIqChannel) " + token.rawValue + "=\(value)")
+    // tell the Radio to ???
+    Api.sharedInstance.send("stream get_error \(streamId.hex)", replyTo: callback)
   }
-  
   // ----------------------------------------------------------------------------
   // MARK: - Properties (KVO compliant) that send Commands
   
@@ -80,7 +76,7 @@ extension IqStream {
       if _rate != newValue {
         if newValue == 24000 || newValue == 48000 || newValue == 96000 || newValue == 192000 {
           _rate = newValue
-          iqCmd( .rate, newValue)
+          Api.sharedInstance.send("stream set \(streamId.hex) daxiq_rate=\(_rate)")
         }
       }
     }

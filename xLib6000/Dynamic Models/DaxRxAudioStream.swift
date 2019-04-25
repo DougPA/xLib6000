@@ -1,5 +1,5 @@
 //
-//  AudioStream.swift
+//  DaxRxAudioStream.swift
 //  xLib6000
 //
 //  Created by Douglas Adams on 2/24/17.
@@ -8,31 +8,23 @@
 
 import Foundation
 
-public typealias DaxStreamId = UInt32
 public typealias DaxChannel = Int
 public typealias DaxIqChannel = Int
 
-/// AudioStream Class implementation
+/// DaxRxAudioStream Class implementation
 ///
-///      creates an AudioStream instance to be used by a Client to support the
-///      processing of a stream of Audio from the Radio to the client. AudioStream
-///      objects are added / removed by the incoming TCP messages. AudioStream
+///      creates a DaxRxAudioStream instance to be used by a Client to support the
+///      processing of a stream of Audio from the Radio to the client. DaxRxAudioStream
+///      objects are added / removed by the incoming TCP messages. DaxRxAudioStream
 ///      objects periodically receive Audio in a UDP stream. They are collected
-///      in the audioStreams collection on the Radio object.
+///      in the daxRxAudioStreams collection on the Radio object.
 ///
-public final class AudioStream              : NSObject, DynamicModelWithStream {
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kCmd                           = "audio stream "               // Command prefixes
-  static let kStreamCreateCmd               = "stream create "
-  static let kStreamRemoveCmd               = "stream remove "
+public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var id                : DaxStreamId = 0               // The Audio stream id
+  public private(set) var streamId          : StreamId = 0                  // The Audio stream id
 
   public private(set) var rxLostPacketCount = 0                             // Rx lost packet count
 
@@ -47,11 +39,9 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
+  private var __clientHandle                : Handle = 0                    // Client for this DaxRxAudioStream
   private var __daxChannel                  = 0                             // Channel in use (1 - 8)
   private var __daxClients                  = 0                             // Number of clients
-  private var __inUse                       = false                         // true = in use
-  private var __ip                          = ""                            // Ip Address
-  private var __port                        = 0                             // Port number
   private var __rxGain                      = 50                            // rx gain of stream
   private var __slice                       : xLib6000.Slice?               // Source Slice
   //
@@ -73,39 +63,22 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format:  <streamId, > <"dax", channel> <"in_use", 1|0> <"slice", number> <"ip", ip> <"port", port>
+    // Format:  <streamId, > <"type", type> <"dax_channel", channel> <"slice", number> <"dax_clients", number> <"client_handle", handle>
     
-    //get the AudioStreamId (remove the "0x" prefix)
-    if let streamId =  UInt32(String(keyValues[0].key.dropFirst(2)), radix: 16) {
+    //get the StreamId
+    let streamId =  keyValues[0].key.streamId
+    
+    // does the Stream exist?
+    if radio.daxRxAudioStreams[streamId] == nil {
       
-      // is the AudioStream in use?
-      if inUse {
-        
-        // YES, does the AudioStream exist?
-        if radio.audioStreams[streamId] == nil {
-          
-          // NO, is this stream for this client?
-          if !AudioStream.isStatusForThisClient(keyValues) { return }
-          
-          // create a new AudioStream & add it to the AudioStreams collection
-          radio.audioStreams[streamId] = AudioStream(id: streamId, queue: queue)
-        }
-        // pass the remaining key values to the AudioStream for parsing
-        radio.audioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-        
-      } else {
-        
-        // does the stream exist?
-        if let stream = radio.audioStreams[streamId] {
-          
-          // notify all observers
-          NC.post(.audioStreamWillBeRemoved, object: stream as Any?)
-          
-          // remove the stream object
-          radio.audioStreams[streamId] = nil
-        }
-      }
+//      // NO, is this stream for this client?
+//      if !DaxRxAudioStream.isStatusForThisClient(keyValues) { return }
+      
+      // create a new Stream & add it to the collection
+      radio.daxRxAudioStreams[streamId] = DaxRxAudioStream(streamId: streamId, queue: queue)
     }
+    // pass the remaining key values to parsing
+    radio.daxRxAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(2)) )
   }
   
   // ------------------------------------------------------------------------------
@@ -169,12 +142,12 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   /// Find an AudioStream by DAX Channel
   ///
   /// - Parameter channel:    Dax channel number
-  /// - Returns:              an AudioStream (if any)
+  /// - Returns:              a DaxRxAudioStream (if any)
   ///
-  public class func find(with channel: DaxChannel) -> AudioStream? {
+  public class func find(with channel: DaxChannel) -> DaxRxAudioStream? {
     
-    // find the AudioStream with the specified Channel (if any)
-    let streams = Api.sharedInstance.radio!.audioStreams.values.filter { $0.daxChannel == channel }
+    // find the DaxRxAudioStream with the specified Channel (if any)
+    let streams = Api.sharedInstance.radio!.daxRxAudioStreams.values.filter { $0.daxChannel == channel }
     guard streams.count >= 1 else { return nil }
     
     // return the first one
@@ -190,9 +163,9 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   ///   - id:                 the Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(id: DaxStreamId, queue: DispatchQueue) {
+  init(streamId: StreamId, queue: DispatchQueue) {
     
-    self.id = id
+    self.streamId = streamId
     _q = queue
     
     super.init()
@@ -215,12 +188,17 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _api.log.msg( "Unknown AudioSTream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _api.log.msg( "Unknown DaxRxAudioStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
         continue
       }
       // known keys, in alphabetical order
       switch token {
+        
+      case .clientHandle:
+        willChangeValue(for: \.clientHandle)
+        _clientHandle = property.value.handle
+        didChangeValue(for: \.clientHandle)
         
       case .daxChannel:
         willChangeValue(for: \.daxChannel)
@@ -231,21 +209,6 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
         willChangeValue(for: \.daxClients)
         _daxClients = property.value.iValue
         didChangeValue(for: \.daxClients)
-
-      case .inUse:
-        willChangeValue(for: \.inUse)
-        _inUse = property.value.bValue
-        didChangeValue(for: \.inUse)
-
-      case .ip:
-        willChangeValue(for: \.ip)
-        _ip = property.value
-        didChangeValue(for: \.ip)
-
-      case .port:
-        willChangeValue(for: \.port)
-        _port = property.value.iValue
-        didChangeValue(for: \.port)
 
       case .slice:
         willChangeValue(for: \.slice)
@@ -258,13 +221,13 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
       }
     }    
     // if this is not yet initialized and inUse becomes true
-    if !_initialized && _inUse && _ip != "" {
+    if !_initialized && _clientHandle != 0 {
       
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
       // notify all observers
-      NC.post(.audioStreamHasBeenAdded, object: self as Any?)
+      NC.post(.daxRxAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
   /// Process the AudioStream Vita struct
@@ -324,8 +287,7 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-//      os_log("Missing AudioStream packet(s), rcvdSeq: %d,  != expectedSeq: %d", log: _log, type: .default, vita.sequence, expectedSequenceNumber)
-      _api.log.msg( "Missing AudioStream packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", level: .info, function: #function, file: #file, line: #line)
+      _api.log.msg( "Missing AudioStream packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
 
       _rxSeq = nil
       rxLostPacketCount += 1
@@ -336,11 +298,15 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   }
 }
 
-extension AudioStream {
+extension DaxRxAudioStream {
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
+  internal var _clientHandle: Handle {
+    get { return _q.sync { __clientHandle } }
+    set { _q.sync(flags: .barrier) { __clientHandle = newValue } } }
+
   internal var _daxChannel: Int {
     get { return _q.sync { __daxChannel } }
     set { _q.sync(flags: .barrier) { __daxChannel = newValue } } }
@@ -348,18 +314,6 @@ extension AudioStream {
   internal var _daxClients: Int {
     get { return _q.sync { __daxClients } }
     set { _q.sync(flags: .barrier) { __daxClients = newValue } } }
-  
-  internal var _inUse: Bool {
-    get { return _q.sync { __inUse } }
-    set { _q.sync(flags: .barrier) { __inUse = newValue } } }
-  
-  internal var _ip: String {
-    get { return _q.sync { __ip } }
-    set { _q.sync(flags: .barrier) { __ip = newValue } } }
-  
-  internal var _port: Int {
-    get { return _q.sync { __port } }
-    set { _q.sync(flags: .barrier) { __port = newValue } } }
   
   internal var _rxGain: Int {
     get { return _q.sync { __rxGain } }
@@ -371,6 +325,10 @@ extension AudioStream {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
+  
+  @objc dynamic public var clientHandle: Handle {
+    get { return _clientHandle  }
+    set { if _clientHandle != newValue { _clientHandle = newValue } } }
   
   @objc dynamic public var daxChannel: Int {
     get { return _daxChannel }
@@ -387,17 +345,6 @@ extension AudioStream {
   @objc dynamic public var daxClients: Int {
     get { return _daxClients  }
     set { if _daxClients != newValue { _daxClients = newValue } } }
-  
-  @objc dynamic public var inUse: Bool {
-    return _inUse }
-  
-  @objc dynamic public var ip: String {
-    get { return _ip }
-    set { if _ip != newValue { _ip = newValue } } }
-  
-  @objc dynamic public var port: Int {
-    get { return _port  }
-    set { if _port != newValue { _port = newValue } } }
   
   @objc dynamic public var slice: xLib6000.Slice? {
     get { return _slice }
@@ -416,11 +363,9 @@ extension AudioStream {
   /// Properties
   ///
   internal enum Token: String {
-    case daxChannel                         = "dax"
+    case clientHandle                       = "client_handle"
+    case daxChannel                         = "dax_channel"
     case daxClients                         = "dax_clients"
-    case inUse                              = "in_use"
-    case ip
-    case port
     case slice
   }
 }

@@ -10,8 +10,7 @@ import Foundation
 
 import simd
 
-public typealias PanadapterId = UInt32
-public typealias ClientHandle = UInt32
+public typealias PanadapterId = StreamId
 
 /// Panadapter implementation
 ///
@@ -62,7 +61,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private var __bandwidth                   = 0                             // Bandwidth in Hz
   private var __bandZoomEnabled             = false                         //
   private var __center                      = 0                             // Center in Hz
-  private var __clientHandle                : ClientHandle = 0              // Client owning this Panadapter
+  private var __clientHandle                : Handle = 0                    // Client owning this Panadapter
   private var __daxIqChannel                = 0                             // DAX IQ channel number (0=none)
   private var __fps                         = 0                             // Refresh rate (frames/second)
   private var __loopAEnabled                = false                         // Enable LOOPA for RXA
@@ -113,42 +112,41 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format: <"pan", ""> <id, ""> <"client_handle", ClientHandle> <"wnb", 1|0> <"wnb_level", value> <"wnb_updating", 1|0> <"x_pixels", value> <"y_pixels", value>
+    // Format: <"pan", ""> <streamId, ""> <"client_handle", ClientHandle> <"wnb", 1|0> <"wnb_level", value> <"wnb_updating", 1|0> <"x_pixels", value> <"y_pixels", value>
     //          <"center", value>, <"bandwidth", value> <"min_dbm", value> <"max_dbm", value> <"fps", value> <"average", value>
     //          <"weighted_average", 1|0> <"rfgain", value> <"rxant", value> <"wide", 1|0> <"loopa", 1|0> <"loopb", 1|0>
     //          <"band", value> <"daxiq", 1|0> <"daxiq_rate", value> <"capacity", value> <"available", value> <"waterfall", streamId>
     //          <"min_bw", value> <"max_bw", value> <"xvtr", value> <"pre", value> <"ant_list", value>
     //      OR
-    // Format: <"pan", ""> <id, ""> <"center", value> <"xvtr", value>
+    // Format: <"pan", ""> <streamId, ""> <"center", value> <"xvtr", value>
     //      OR
-    // Format: <"pan", ""> <id, ""> <"rxant", value> <"loopa", 1|0> <"loopb", 1|0> <"ant_list", value>
+    // Format: <"pan", ""> <streamId, ""> <"rxant", value> <"loopa", 1|0> <"loopb", 1|0> <"ant_list", value>
     //      OR
-    // Format: <"pan", ""> <id, ""> <"rfgain", value> <"pre", value>
+    // Format: <"pan", ""> <streamId, ""> <"rfgain", value> <"pre", value>
     //
-    // Format: <"pan", ""> <id, ""> <"wnb", 1|0> <"wnb_level", value> <"wnb_updating", 1|0>
+    // Format: <"pan", ""> <streamId, ""> <"wnb", 1|0> <"wnb_level", value> <"wnb_updating", 1|0>
     //      OR
-    // Format: <"pan", ""> <id, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
+    // Format: <"pan", ""> <streamId, ""> <"daxiq_channel", value>
     
     // get the streamId (remove the "0x" prefix)
-    if let streamId = keyValues[1].key.handle {
+    let streamId = keyValues[1].key.handle
+    
+    // is the Panadapter in use?
+    if inUse {
       
-      // is the Panadapter in use?
-      if inUse {
+      // YES, does it exist?
+      if radio.panadapters[streamId] == nil {
         
-        // YES, does it exist?
-        if radio.panadapters[streamId] == nil {
-          
-          // NO, Create a Panadapter & add it to the Panadapters collection
-          radio.panadapters[streamId] = Panadapter(id: streamId, queue: queue)
-        }
-        // pass the key values to the Panadapter for parsing (dropping the Type and Id)
-        radio.panadapters[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
-        
-      } else {
-        
-        // NO, notify all observers
-        NC.post(.panadapterWillBeRemoved, object: radio.panadapters[streamId] as Any?)
+        // NO, Create a Panadapter & add it to the Panadapters collection
+        radio.panadapters[streamId] = Panadapter(id: streamId, queue: queue)
       }
+      // pass the key values to the Panadapter for parsing (dropping the Type and Id)
+      radio.panadapters[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
+      
+    } else {
+      
+      // NO, notify all observers
+      NC.post(.panadapterWillBeRemoved, object: radio.panadapters[streamId] as Any?)
     }
   }
 
@@ -223,7 +221,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     guard responseValue == Api.kNoError else {
       // Anything other than 0 is an error, log it and ignore the Reply
 //      os_log("%{public}@,  non-zero reply - %{public}@, %{public}@", log: _log, type: .default, command, responseValue, flexErrorString(errorCode: responseValue))
-      _api.log.msg( "\(command),  non-zero reply - \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .info, function: #function, file: #file, line: #line)
+      _api.log.msg( "\(command),  non-zero reply - \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .warning, function: #function, file: #file, line: #line)
 
       return
     }
@@ -290,7 +288,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
 
       case .clientHandle:
         willChangeValue(for: \.clientHandle)
-        _clientHandle = property.value.handle ?? 0
+        _clientHandle = property.value.handle
         didChangeValue(for: \.clientHandle)
         
       case .daxIqChannel:
@@ -355,7 +353,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
 
       case .waterfallId:
          willChangeValue(for: \.waterfallId)
-        _waterfallId = property.value.handle ?? 0
+        _waterfallId = property.value.handle
         didChangeValue(for: \.waterfallId)
 
       case .wide:
@@ -473,7 +471,7 @@ extension Panadapter {
     get { return _q.sync { __center } }
     set { _q.sync(flags: .barrier) { __center = newValue } } }
   
-  internal var _clientHandle: ClientHandle {
+  internal var _clientHandle: Handle {
     get { return _q.sync { __clientHandle } }
     set { _q.sync(flags: .barrier) { __clientHandle = newValue } } }
   

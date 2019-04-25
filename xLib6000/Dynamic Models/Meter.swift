@@ -290,7 +290,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       
       // unknown Units, log it and ignore it
 //      os_log("Meter, Unknown units - %{public}@", log: _log, type: .default, units)
-      _api.log.msg( "Meter, Unknown units - \(units)", level: .info, function: #function, file: #file, line: #line)
+      _api.log.msg( "Meter, Unknown units - \(units)", level: .warning, function: #function, file: #file, line: #line)
 
       return
     }

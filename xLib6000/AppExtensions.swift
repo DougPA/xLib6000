@@ -8,6 +8,14 @@
 
 import Foundation
 
+public typealias KeyValuesArray = [(key:String, value:String)]
+public typealias ValuesArray = [String]
+
+
+public typealias StreamId = UInt32
+public typealias Handle = UInt32
+
+
 public extension Date {
   
   /// Create a Date/Time in the local time zone
@@ -101,19 +109,22 @@ public extension Sequence {
   }
 }
 
-public typealias KeyValuesArray = [(key:String, value:String)]
-public typealias ValuesArray = [String]
-
 public extension String {
   
-  /// Convert a Handle string to a UInt32
+  /// Convert a String to a UInt32
   ///
   /// - Returns:      the UInt32 equivalent or nil
   ///
-  var handle: UInt32? {
-    return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16)
+  var handle: Handle {
+    return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) ?? 0 : UInt32(self, radix: 16) ?? 0
   }
-  
+  /// Convert a String to a UInt32
+  ///
+  /// - Returns:      the UInt32 equivalent or nil
+  ///
+  var streamId: StreamId {
+    return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) ?? 0 : UInt32(self, radix: 16) ?? 0
+  }
   /// Convert a Mhz string to an Hz Int
   ///
   /// - Returns:      the Int equivalent

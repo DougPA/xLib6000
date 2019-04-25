@@ -16,6 +16,20 @@ extension Waterfall {
   static let kSetCmd                        = "display panafall set "       // Command prefixes
   
   // ----------------------------------------------------------------------------
+  // MARK: - Class methods that send Commands
+  
+  /// Set the DaxIq channel number for a Waterfall
+  ///
+  /// - Parameters:
+  ///   - streamId:         a Waterfall StreamId
+  ///   - channel:          a DaxIq channel number
+  ///
+  public class func waterfallIqChannel(_ streamId: WaterfallId, channel: Int) {
+    
+    Api.sharedInstance.send("display waterfall set \(streamId) daxiq_channel=\(channel)", replyTo: nil)
+  }
+
+  // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   
   /// Set a Waterfall property on the Radio

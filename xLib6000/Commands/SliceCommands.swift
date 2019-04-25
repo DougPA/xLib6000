@@ -200,7 +200,7 @@ extension xLib6000.Slice {
     set { if _audioLevel != newValue { if newValue.within(Api.kControlMin, Api.kControlMax) { _audioLevel = newValue ; sliceCmd(.audioLevel, newValue) } } } }
   
   // FIXME: Command ???
-  @objc dynamic public var clientHandle: ClientHandle {
+  @objc dynamic public var clientHandle: Handle {
     get { return _clientHandle }
     set { if _clientHandle != newValue { _clientHandle = newValue  } } }
   

@@ -8,8 +8,6 @@
 
 import Foundation
 
-public typealias Handle = UInt32
-
 /// Interlock Class implementation
 ///
 ///      creates an Interlock instance to be used by a Client to support the

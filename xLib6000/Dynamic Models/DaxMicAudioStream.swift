@@ -1,5 +1,5 @@
 //
-//  MicAudioStream.swift
+//  DaxMicAudioStream.swift
 //  xLib6000
 //
 //  Created by Mario Illgen on 27.03.17.
@@ -8,20 +8,20 @@
 
 import Cocoa
 
-/// MicAudioStream Class implementation
+/// DaxMicAudioStream Class implementation
 ///
-///      creates a MicAudioStream instance to be used by a Client to support the
-///      processing of a stream of Mic Audio from the Radio to the client. MicAudioStream
-///      objects are added / removed by the incoming TCP messages. MicAudioStream
+///      creates a DaxMicAudioStream instance to be used by a Client to support the
+///      processing of a stream of Mic Audio from the Radio to the client. DaxMicAudioStream
+///      objects are added / removed by the incoming TCP messages. DaxMicAudioStream
 ///      objects periodically receive Mic Audio in a UDP stream. They are collected
-///      in the micAudioStreams collection on the Radio object.
+///      in the daxMicAudioStreams collection on the Radio object.
 ///
-public final class MicAudioStream           : NSObject, DynamicModelWithStream {
+public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var id                : DaxStreamId = 0               // The Mic Audio stream id
+  public private(set) var streamId          : StreamId = 0                  // The Mic Audio stream id
   public var rxLostPacketCount              = 0                             // Rx lost packet count
 
   // ------------------------------------------------------------------------------
@@ -35,9 +35,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
-  private var __inUse                       = false                         // true = in use
-  private var __ip                          = ""                            // Ip Address
-  private var __port                        = 0                             // Port number
+  private var __clientHandle                : Handle = 0                    // Client for this DaxMicAudioStream
   private var __micGain                     = 50                            // rx gain of stream
   private var __micGainScalar               : Float = 1.0                   // scalar gain value for multiplying
   //
@@ -61,37 +59,20 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     // Format:  <streamId, > <"in_use", 1|0> <"ip", ip> <"port", port>
     
-    //get the MicAudioStreamId (remove the "0x" prefix)
-    if let streamId =  UInt32(String(keyValues[0].key.dropFirst(2)), radix: 16) {
+    // get the StreamId
+    let streamId = keyValues[0].key.streamId
+    
+    // does the Stream exist?
+    if radio.daxMicAudioStreams[streamId] == nil {
       
-      // is the Stream in use?
-      if inUse {
-        
-        // YES, does the MicAudioStream exist?
-        if radio.micAudioStreams[streamId] == nil {
-          
-          // NO, is this stream for this client?
-          if !AudioStream.isStatusForThisClient(keyValues) { return }
-          
-          // create a new MicAudioStream & add it to the MicAudioStreams collection
-          radio.micAudioStreams[streamId] = MicAudioStream(id: streamId, queue: queue)
-        }
-        // pass the remaining key values to the MicAudioStream for parsing (dropping the Id)
-        radio.micAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-        
-      } else {
-        
-        // does the stream exist?
-        if let stream = radio.micAudioStreams[streamId] {
-          
-          // notify all observers
-          NC.post(.micAudioStreamWillBeRemoved, object: stream as Any?)
-          
-          // remove the stream object
-          radio.micAudioStreams[streamId] = nil
-        }
-      }
+//      // NO, is this stream for this client?
+//      if !DaxRxAudioStream.isStatusForThisClient(keyValues) { return }
+      
+      // create a new Stream & add it to the collection
+      radio.daxMicAudioStreams[streamId] = DaxMicAudioStream(streamId: streamId, queue: queue)
     }
+    // pass the remaining key values to parsing
+    radio.daxMicAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
   }
   
   // ----------------------------------------------------------------------------
@@ -103,9 +84,9 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   ///   - id:                 a Dax Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(id: DaxStreamId, queue: DispatchQueue) {
+  init(streamId: StreamId, queue: DispatchQueue) {
     
-    self.id = id
+    self.streamId = streamId
     _q = queue
     
     super.init()
@@ -135,31 +116,20 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       // known keys, in alphabetical order
       switch token {
         
-      case .inUse:
-        willChangeValue(for: \.inUse)
-        _inUse = property.value.bValue
-        didChangeValue(for: \.inUse)
-
-      case .ip:
-        willChangeValue(for: \.ip)
-        _ip = property.value
-        didChangeValue(for: \.ip)
-
-      case .port:
-        willChangeValue(for: \.port)
-        _port = property.value.iValue
-        didChangeValue(for: \.port)
-
+      case .clientHandle:
+        willChangeValue(for: \.clientHandle)
+        _clientHandle = property.value.handle
+        didChangeValue(for: \.clientHandle)
       }
     }
     // is the AudioStream acknowledged by the radio?
-    if !_initialized && _inUse && _ip != "" {
+    if !_initialized && _clientHandle != 0 {
       
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
       // notify all observers
-      NC.post(.micAudioStreamHasBeenAdded, object: self as Any?)
+      NC.post(.daxMicAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
   /// Process the Mic Audio Stream Vita struct
@@ -226,7 +196,7 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
       
       // NO, log the issue
 //      os_log("Missing MicAudioStream packet(s), rcvdSeq: %d,  != expectedSeq: %d", log: _log, type: .default, vita.sequence, expectedSequenceNumber)
-      _api.log.msg( "Missing MicAudioStream packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", level: .info, function: #function, file: #file, line: #line)
+      _api.log.msg( "Missing MicAudioStream packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
 
       _rxSeq = nil
       rxLostPacketCount += 1
@@ -237,23 +207,14 @@ public final class MicAudioStream           : NSObject, DynamicModelWithStream {
   }
 }
 
-extension MicAudioStream {
+extension DaxMicAudioStream {
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
-  
-  // listed in alphabetical order
-  internal var _inUse: Bool {
-    get { return _q.sync { __inUse } }
-    set { _q.sync(flags: .barrier) { __inUse = newValue } } }
-  
-  internal var _ip: String {
-    get { return _q.sync { __ip } }
-    set { _q.sync(flags: .barrier) { __ip = newValue } } }
-  
-  internal var _port: Int {
-    get { return _q.sync { __port } }
-    set { _q.sync(flags: .barrier) { __port = newValue } } }
+    
+  internal var _clientHandle: Handle {
+    get { return _q.sync { __clientHandle } }
+    set { _q.sync(flags: .barrier) { __clientHandle = newValue } } }
   
   internal var _micGain: Int {
     get { return _q.sync { __micGain } }
@@ -266,16 +227,9 @@ extension MicAudioStream {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
   
-  @objc dynamic public var inUse: Bool {
-    return _inUse }
-  
-  @objc dynamic public var ip: String {
-    get { return _ip }
-    set { if _ip != newValue { _ip = newValue } } }
-  
-  @objc dynamic public var port: Int {
-    get { return _port  }
-    set { if _port != newValue { _port = newValue } } }
+  @objc dynamic public var clientHandle: Handle {
+    get { return _clientHandle  }
+    set { if _clientHandle != newValue { _clientHandle = newValue } } }
   
   @objc dynamic public var micGain: Int {
     get { return _micGain  }
@@ -310,8 +264,6 @@ extension MicAudioStream {
   /// Properties
   ///
   internal enum Token: String {
-    case inUse      = "in_use"
-    case ip
-    case port
+    case clientHandle      = "client_handle"
   }
 }

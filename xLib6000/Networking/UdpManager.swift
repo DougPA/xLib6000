@@ -160,7 +160,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       _udpBound = true
       
 //      os_log("UDP: Receive port = %{public}d, Send port = %{public}d", log: _log, type: .info, _udpRcvPort, _udpSendPort)
-      Api.sharedInstance.log.msg("UDP: Receive port = \(_udpRcvPort), Send port = \(_udpSendPort)", level: .error, function: #function, file: #file, line: #line)
+      Api.sharedInstance.log.msg("UDP: Receive port = \(_udpRcvPort), Send port = \(_udpSendPort)", level: .info, function: #function, file: #file, line: #line)
       // if a Wan connection, register
       if isWan { register(clientHandle: clientHandle) }
     }
@@ -219,7 +219,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
         usleep(self.kRegistrationDelay)
       }
 //      os_log("SmartLink - register UDP successful", log: self._log, type: .info)
-      Api.sharedInstance.log.msg("SmartLink - register UDP successful", level: .error, function: #function, file: #file, line: #line)
+      Api.sharedInstance.log.msg("SmartLink - register UDP successful", level: .info, function: #function, file: #file, line: #line)
 //      // as long as connected after Registration
 //      while self._udpSocket != nil && self._udpBound {
 //

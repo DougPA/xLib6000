@@ -1,5 +1,5 @@
 //
-//  TxAudioStream.swift
+//  DaxTxAudioStream.swift
 //  xLib6000
 //
 //  Created by Mario Illgen on 27.03.17.
@@ -8,20 +8,20 @@
 
 import Cocoa
 
-/// TxAudioStream Class implementation
+/// DaxTxAudioStream Class implementation
 ///
-///      creates a TxAudioStream instance to be used by a Client to support the
-///      processing of a stream of Audio from the client to the Radio. TxAudioStream
-///      objects are added / removed by the incoming TCP messages. TxAudioStream
+///      creates a DaxTxAudioStream instance to be used by a Client to support the
+///      processing of a stream of Audio from the client to the Radio. DaxTxAudioStream
+///      objects are added / removed by the incoming TCP messages. DaxTxAudioStream
 ///      objects periodically send Tx Audio in a UDP stream. They are collected in
-///      the txAudioStreams collection on the Radio object.
+///      the DaxTxAudioStreams collection on the Radio object.
 ///
-public final class TxAudioStream            : NSObject, DynamicModel {
+public final class DaxTxAudioStream         : NSObject, DynamicModel {
   
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var id                : DaxStreamId = 0               // Stream Id
+  public private(set) var streamId          : StreamId = 0                  // Stream Id
 
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
@@ -34,10 +34,8 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //                                                                                                  
-  private var __inUse                       = false                         // true = in use
-  private var __ip                          = ""                            // Ip Address
-  private var __port                        = 0                             // Port number
-  private var __transmit                    = false                         // dax transmitting
+  private var __clientHandle                : Handle = 0                    // Client for this DaxTxAudioStream
+  private var __isTransmitChannel           = false                         // dax transmitting
   private var __txGain                      = 50                            // tx gain of stream
   private var __txGainScalar                : Float = 1.0                   // scalar gain value for multiplying
   //
@@ -57,39 +55,22 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format:  <streamId, > <"dax_tx", channel> <"in_use", 1|0> <"ip", ip> <"port", port>
+    // Format:  <streamId, > <"type", type> <"client_handle", handle> <"dax_tx", 1/0>
     
-    //get the AudioStreamId (remove the "0x" prefix)
-    if let streamId =  UInt32(String(keyValues[0].key.dropFirst(2)), radix: 16) {
+    //get the StreamId
+    let streamId = keyValues[0].key.streamId
+    
+    // YES, does the Stream exist?
+    if radio.daxTxAudioStreams[streamId] == nil {
       
-      // is the TX Audio Stream in use?
-      if inUse {
-        
-        // YES, does the AudioStream exist?
-        if radio.txAudioStreams[streamId] == nil {
-          
-          // NO, is this stream for this client?
-          if !AudioStream.isStatusForThisClient(keyValues) { return }
-          
-          // create a new AudioStream & add it to the AudioStreams collection
-          radio.txAudioStreams[streamId] = TxAudioStream(id: streamId, queue: queue)
-        }
-        // pass the remaining key values to the AudioStream for parsing (dropping the Id)
-        radio.txAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-        
-      } else {
-        
-        // does the stream exist?
-        if let stream = radio.txAudioStreams[streamId] {
-          
-          // notify all observers
-          NC.post(.txAudioStreamWillBeRemoved, object: stream as Any?)
-          
-          // remove the stream object
-          radio.txAudioStreams[streamId] = nil
-        }
-      }
+      //        // NO, is this stream for this client?
+      //        if !DaxRxAudioStream.isStatusForThisClient(keyValues) { return }
+      
+      // create a new Stream & add it to the collection
+      radio.daxTxAudioStreams[streamId] = DaxTxAudioStream(streamId: streamId, queue: queue)
     }
+    // pass the remaining key values to parsing
+    radio.daxTxAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
   }
   
   // ----------------------------------------------------------------------------
@@ -101,9 +82,9 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   ///   - id:                 Dax stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(id: DaxStreamId, queue: DispatchQueue) {
+  init(streamId: StreamId, queue: DispatchQueue) {
     
-    self.id = id
+    self.streamId = streamId
     _q = queue
     
     super.init()
@@ -124,10 +105,10 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   public func sendTXAudio(left: [Float], right: [Float], samples: Int) -> Bool {
     
     // skip this if we are not the DAX TX Client
-    if !_transmit { return false }
+    if !_isTransmitChannel { return false }
     
     // get a TxAudio Vita
-    if _vita == nil { _vita = Vita(type: .txAudio, streamId: id) }
+    if _vita == nil { _vita = Vita(type: .txAudio, streamId: streamId) }
     
     let kMaxSamplesToSend = 128     // maximum packet samples (per channel)
     let kNumberOfChannels = 2       // 2 channels
@@ -206,67 +187,48 @@ public final class TxAudioStream            : NSObject, DynamicModel {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _api.log.msg( "Unknown TxAudioStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _api.log.msg( "Unknown DaxTxAudioStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
         continue
       }
       // known keys, in alphabetical order
       switch token {
         
-      case .daxTx:
-        willChangeValue(for: \.transmit)
-        _transmit = property.value.bValue
-        didChangeValue(for: \.transmit)
-
-      case .inUse:
-        willChangeValue(for: \.inUse)
-        _inUse = property.value.bValue
-        didChangeValue(for: \.inUse)
-
-      case .ip:
-        willChangeValue(for: \.ip)
-        _ip = property.value
-        didChangeValue(for: \.ip)
-
-      case .port:
-        willChangeValue(for: \.port)
-        _port = property.value.iValue
-        didChangeValue(for: \.port)
+      case .clientHandle:
+        willChangeValue(for: \.clientHandle)
+        _clientHandle = property.value.handle
+        didChangeValue(for: \.clientHandle)
+        
+      case .isTransmitChannel:
+        willChangeValue(for: \.isTransmitChannel)
+        _isTransmitChannel = property.value.bValue
+        didChangeValue(for: \.isTransmitChannel)
       }
     }
     // is the AudioStream acknowledged by the radio?
-    if !_initialized && _inUse && _ip != "" {
+    if !_initialized && _clientHandle != 0 {
       
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true
       
       // notify all observers
-      NC.post(.txAudioStreamHasBeenAdded, object: self as Any?)
+      NC.post(.daxTxAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
 }
 
-extension TxAudioStream {
+extension DaxTxAudioStream {
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  // listed in alphabetical order
-  internal var _inUse: Bool {
-    get { return _q.sync { __inUse } }
-    set { _q.sync(flags: .barrier) { __inUse = newValue } } }
+  internal var _clientHandle: Handle {
+    get { return _q.sync { __clientHandle } }
+    set { _q.sync(flags: .barrier) { __clientHandle = newValue } } }
   
-  internal var _ip: String {
-    get { return _q.sync { __ip } }
-    set { _q.sync(flags: .barrier) { __ip = newValue } } }
-  
-  internal var _port: Int {
-    get { return _q.sync { __port } }
-    set { _q.sync(flags: .barrier) { __port = newValue } } }
-  
-  internal var _transmit: Bool {
-    get { return _q.sync { __transmit } }
-    set { _q.sync(flags: .barrier) { __transmit = newValue } } }
+  internal var _isTransmitChannel: Bool {
+    get { return _q.sync { __isTransmitChannel } }
+    set { _q.sync(flags: .barrier) { __isTransmitChannel = newValue } } }
   
   internal var _txGain: Int {
     get { return _q.sync { __txGain } }
@@ -278,17 +240,6 @@ extension TxAudioStream {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
-  
-  @objc dynamic public var inUse: Bool {
-    return _inUse }
-  
-  @objc dynamic public var ip: String {
-    get { return _ip }
-    set { if _ip != newValue { _ip = newValue } } }
-  
-  @objc dynamic public var port: Int {
-    get { return _port  }
-    set { if _port != newValue { _port = newValue } } }
   
   @objc dynamic public var txGain: Int {
     get { return _txGain  }
@@ -309,6 +260,9 @@ extension TxAudioStream {
       }
     }
   }
+  @objc dynamic public var clientHandle: Handle {
+    get { return _clientHandle  }
+    set { if _clientHandle != newValue { _clientHandle = newValue} } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Tokens
@@ -316,10 +270,8 @@ extension TxAudioStream {
   /// Properties
   ///
   internal enum Token: String {
-    case daxTx      = "dax_tx"
-    case inUse      = "in_use"
-    case ip
-    case port
+    case clientHandle         = "client_handle"
+    case isTransmitChannel    = "dax_tx"
   }
 }
 

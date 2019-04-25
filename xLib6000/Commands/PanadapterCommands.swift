@@ -26,7 +26,7 @@ extension Panadapter {
     
     // tell the Radio to create a Panafall (if any available)
     if Api.sharedInstance.radio!.availablePanadapters > 0 {
-      Api.sharedInstance.send(Panadapter.kCmd + "create x=\(dimensions.width) y=\(dimensions.height)", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+      Api.sharedInstance.send("display pan create x=\(dimensions.width) y=\(dimensions.height)", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
     }
   }
   /// Create a Panafall
@@ -42,13 +42,23 @@ extension Panadapter {
     // tell the Radio to create a Panafall (if any available)
     if Api.sharedInstance.radio!.availablePanadapters > 0 {
       
-      var cmd = Panadapter.kCreateCmd + "freq" + "=\(frequency.hzToMhz)"
+      var cmd = "display pan create freq" + "=\(frequency.hzToMhz)"
       if antenna != nil { cmd += " ant=" + "\(antenna!)" }
       if dimensions != nil { cmd += " x" + "=\(dimensions!.width)" + " y" + "=\(dimensions!.height)" }
       Api.sharedInstance.send(cmd, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
     }
   }
-  
+  /// Set the DaxIq channel number for a Panafall
+  ///
+  /// - Parameters:
+  ///   - streamId:         a Panadapter StreamId
+  ///   - channel:          a DaxIq channel number
+  ///
+  public class func panIqChannel(_ streamId: PanadapterId, channel: Int) {
+    
+    Api.sharedInstance.send("display pan set \(streamId) daxiq_channel=\(channel)", replyTo: nil)
+  }
+
   // ----------------------------------------------------------------------------
   // MARK: - Instance methods that send Commands
 
@@ -60,7 +70,7 @@ extension Panadapter {
   public func remove(callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove a Panafall
-    Api.sharedInstance.send(Panadapter.kRemoveCmd + "\(id.hex)", replyTo: callback)
+    Api.sharedInstance.send("display pan remove \(id.hex)", replyTo: callback)
   }
   /// Request Click Tune
   ///

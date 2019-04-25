@@ -38,7 +38,6 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS -----
   //
   private var _discoveredRadios              = [DiscoveredRadio]()          // Array of Discovered Radios
-  private var _discoveredClients             = [DiscoveredClient]()         // Array of Discovered Clients
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS -----
 
@@ -260,14 +259,11 @@ public class DiscoveredRadio : Equatable {
   public var discoveryVersion               = ""                            // e.g. 2.0.0.1
   public var firmwareVersion                = ""                            // Radio firmware version (e.g. 2.0.1.17)
   public var fpcMac                         = ""                            // ??
-  public var guiClients                     = [DiscoveredClient]()
-
   public var guiClientHandles               = ""
   public var guiClientHosts                 = ""
   public var guiClientIps                   = ""
   public var guiClientPrograms              = ""
   public var guiClientStations              = ""
-
   public var inUseHost                      = ""                            // -- Deprecated --
   public var inUseIp                        = ""                            // -- Deprecated --
   public var isPortForwardOn                = false

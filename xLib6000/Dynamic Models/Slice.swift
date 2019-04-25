@@ -72,7 +72,7 @@ public final class Slice                    : NSObject, DynamicModel {
   private var __audioMute                   = false                         // State of slice audio MUTE
   private var __audioPan                    = 50                            // Slice audio pan (0 - 100)
   private var __autoPan                     = false                         // panadapter frequency follows slice
-  private var __clientHandle                : ClientHandle = 0              //
+  private var __clientHandle                : Handle = 0                    //
   private var __daxChannel                  = 0                             // DAX channel for this slice (1-8)
   private var __daxTxEnabled                = false                         // DAX for transmit
   private var __detached                    = false                         //
@@ -526,13 +526,13 @@ public final class Slice                    : NSObject, DynamicModel {
 
       case .clientHandle:
         willChangeValue(for: \.clientHandle)
-        _clientHandle = property.value.handle ?? 0
+        _clientHandle = property.value.handle
         didChangeValue(for: \.clientHandle)
 
       case .daxChannel:
         if _daxChannel != 0 && property.value.iValue == 0 {
           // remove this slice from the AudioStream it was using
-          if let audioStream = AudioStream.find(with: _daxChannel) {
+          if let audioStream = DaxRxAudioStream.find(with: _daxChannel) {
             audioStream.slice = nil
           }
         }
@@ -629,7 +629,7 @@ public final class Slice                    : NSObject, DynamicModel {
       case .ghost:
         // FIXME: Is this needed?
 //        os_log("Unprocessed Slice property - %{public}@.%{public}@", log: _log, type: .default, property.key, property.value)
-        _api.log.msg( "Unprocessed Slice property - \(property.key).\(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _api.log.msg( "Unprocessed Slice property - \(property.key).\(property.value)", level: .warning, function: #function, file: #file, line: #line)
 
       case .inUse:
         willChangeValue(for: \.inUse)
@@ -691,9 +691,9 @@ public final class Slice                    : NSObject, DynamicModel {
         _owner = property.value.iValue
         didChangeValue(for: \.owner)
 
-      case .panadapterId:     // does have leading "0x"
+      case .panadapterId:
         willChangeValue(for: \.panadapterId)
-        _panadapterId = property.value.handle ?? 0
+        _panadapterId = property.value.handle
         didChangeValue(for: \.panadapterId)
 
       case .playbackEnabled:
@@ -910,7 +910,7 @@ extension xLib6000.Slice {
     get { return _q.sync { __autoPan } }
     set { _q.sync(flags: .barrier) { __autoPan = newValue } } }
   
-  internal var _clientHandle: ClientHandle {
+  internal var _clientHandle: Handle {
     get { return _q.sync { __clientHandle } }
     set { _q.sync(flags: .barrier) { __clientHandle = newValue } } }
   

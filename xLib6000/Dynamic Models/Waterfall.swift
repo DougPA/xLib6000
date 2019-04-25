@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias WaterfallId = UInt32
+public typealias WaterfallId = StreamId
 
 /// Waterfall Class implementation
 ///
@@ -45,7 +45,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   private var __autoBlackEnabled            = false                         // State of auto black
   private var __autoBlackLevel              : UInt32 = 0                    // Radio generated black level
   private var __blackLevel                  = 0                             // Setting of black level (1 -> 100)
-  private var __clientHandle                : ClientHandle = 0              // Client owning this Waterfall
+  private var __clientHandle                : Handle = 0                    // Client owning this Waterfall
   private var __colorGain                   = 0                             // Setting of color gain (1 -> 100)
   private var __daxIqChannel                = 0                             // DAX IQ channel number (0=none)
   private var __gradientIndex               = 0                             // Index of selected color gradient
@@ -81,34 +81,33 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
     //      OR
     // Format: <"waterfall", ""> <id, ""> <"rfgain", value>
     //      OR
-    // Format: <"waterfall", ""> <id, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
+    // Format: <"waterfall", ""> <id, ""> <"daxiq_channel", value>
     
     // get the streamId (remove the "0x" prefix)
-    if let streamId = keyValues[1].key.handle {
+    let streamId = keyValues[1].key.handle
+    
+    // is the Waterfall in use?
+    if inUse {
       
-      // is the Waterfall in use?
-      if inUse {
+      // YES, does it exist?
+      if radio.waterfalls[streamId] == nil {
         
-        // YES, does it exist?
-        if radio.waterfalls[streamId] == nil {
-          
-          // NO, Create a Waterfall & add it to the Waterfalls collection
-          radio.waterfalls[streamId] = Waterfall(id: streamId, queue: queue)
-        }
-        // pass the key values to the Waterfall for parsing (dropping the Type and Id)
-        radio.waterfalls[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
-        
-      } else {
-        
-        // notify all observers
-        NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[streamId] as Any?)
-        
-        // remove the associated Panadapter
-        radio.panadapters[radio.waterfalls[streamId]!.panadapterId] = nil
-        
-        // remove the Waterfall
-        radio.waterfalls[streamId] = nil
+        // NO, Create a Waterfall & add it to the Waterfalls collection
+        radio.waterfalls[streamId] = Waterfall(id: streamId, queue: queue)
       }
+      // pass the key values to the Waterfall for parsing (dropping the Type and Id)
+      radio.waterfalls[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
+      
+    } else {
+      
+      // notify all observers
+      NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[streamId] as Any?)
+      
+      // remove the associated Panadapter
+      radio.panadapters[radio.waterfalls[streamId]!.panadapterId] = nil
+      
+      // remove the Waterfall
+      radio.waterfalls[streamId] = nil
     }
   }
   
@@ -173,7 +172,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
 
       case .clientHandle:
         willChangeValue(for: \.clientHandle)
-        _clientHandle = property.value.handle ?? 0
+        _clientHandle = property.value.handle
         didChangeValue(for: \.clientHandle)
         
       case .colorGain:
@@ -198,7 +197,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
 
       case .panadapterId:
         willChangeValue(for: \.panadapterId)
-        _panadapterId = property.value.handle ?? 0
+        _panadapterId = property.value.handle
         didChangeValue(for: \.panadapterId)
 
       case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqRate,
@@ -262,7 +261,7 @@ extension Waterfall {
     get { return _q.sync { __blackLevel } }
     set { _q.sync(flags: .barrier) {__blackLevel = newValue } } }
   
-  internal var _clientHandle: ClientHandle {
+  internal var _clientHandle: Handle {
     get { return _q.sync { __clientHandle } }
     set { _q.sync(flags: .barrier) { __clientHandle = newValue } } }
   
@@ -292,7 +291,7 @@ extension Waterfall {
   @objc dynamic public var autoBlackLevel: UInt32 {
     return _autoBlackLevel }
   
-  @objc dynamic public var clientHandle: ClientHandle {
+  @objc dynamic public var clientHandle: Handle {
     return _clientHandle }
   
   @objc dynamic public var panadapterId: PanadapterId {

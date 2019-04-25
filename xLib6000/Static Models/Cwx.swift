@@ -116,7 +116,7 @@ public final class Cwx                      : NSObject, StaticModel {
     // zero or anything greater than 2 is an error, log it and ignore the Reply
     guard components == 1 || components == 2 else {
 //      os_log("%{public}@,  Invalid Cwx reply", log: _log, type: .default, command)
-      _api.log.msg( "\(command), Invalid Cwx reply", level: .info, function: #function, file: #file, line: #line)
+      _api.log.msg( "\(command), Invalid Cwx reply", level: .warning, function: #function, file: #file, line: #line)
 
       return
     }
@@ -127,7 +127,7 @@ public final class Cwx                      : NSObject, StaticModel {
     guard charPos != nil else {
       
 //      os_log("%{public}@,  Invalid Cwx character position", log: _log, type: .default, command)
-      _api.log.msg( "\(command), Invalid Cwx character position", level: .info, function: #function, file: #file, line: #line)
+      _api.log.msg( "\(command), Invalid Cwx character position", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     
@@ -147,7 +147,7 @@ public final class Cwx                      : NSObject, StaticModel {
       guard block != nil else {
         
 //        os_log("%{public}@,  Invalid Cwx block", log: _log, type: .default, command)
-        _api.log.msg( "\(command), Invalid Cwx block", level: .info, function: #function, file: #file, line: #line)
+        _api.log.msg( "\(command), Invalid Cwx block", level: .warning, function: #function, file: #file, line: #line)
 
         return
       }

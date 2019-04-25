@@ -66,25 +66,24 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
   // object collections
-  private var _amplifiers                   = [AmplifierId: Amplifier]()    // Dictionary of Amplifiers
-  private var _audioStreams                 = [DaxStreamId: AudioStream]()  // Dictionary of Audio streams
-  private var _bandSettings                 = [BandId: BandSetting]()       // Dictionary of Band Settings
+  private var _amplifiers                   = [AmplifierId: Amplifier]()      // Dictionary of Amplifiers
+  private var _bandSettings                 = [BandId: BandSetting]()         // Dictionary of Band Settings
   private var _equalizers                   = [Equalizer.EqType: Equalizer]() // Dictionary of Equalizers
-//  private var _guiClients                   = [UInt32: GuiClient]()         // Dictionary of Gui Clients
-  private var _iqStreams                    = [DaxStreamId: IqStream]()     // Dictionary of Dax Iq streams
-  private var _memories                     = [MemoryId: Memory]()          // Dictionary of Memories
-  private var _meters                       = [MeterNumber: Meter]()        // Dictionary of Meters
-  private var _micAudioStreams              = [DaxStreamId: MicAudioStream]() // Dictionary of MicAudio streams
-  private var _opusStreams                  = [OpusId: Opus]()              // Dictionary of Opus Streams
-  private var _panadapters                  = [PanadapterId: Panadapter]()  // Dictionary of Panadapters
-  private var _profiles                     = [ProfileId: Profile]()        // Dictionary of Profiles
-  private var _replyHandlers                = [SequenceId: ReplyTuple]()    // Dictionary of pending replies
-  private var _slices                       = [SliceId: Slice]()            // Dictionary of Slices
-  private var _tnfs                         = [TnfId: Tnf]()                // Dictionary of Tnfs
-  private var _txAudioStreams               = [DaxStreamId: TxAudioStream]()// Dictionary of Tx Audio streams
-  private var _usbCables                    = [UsbCableId: UsbCable]()      // Dictionary of UsbCables
-  private var _waterfalls                   = [WaterfallId: Waterfall]()    // Dictionary of Waterfalls
-  private var _xvtrs                        = [XvtrId: Xvtr]()              // Dictionary of Xvtrs
+  private var _daxIqStreams                 = [StreamId: DaxIqStream]()       // Dictionary of Dax Iq streams
+  private var _daxMicAudioStreams           = [StreamId: DaxMicAudioStream]() // Dictionary of MicAudio streams
+  private var _daxRxAudioStreams            = [StreamId: DaxRxAudioStream]()  // Dictionary of Audio streams
+  private var _daxTxAudioStreams            = [StreamId: DaxTxAudioStream]()  // Dictionary of Tx Audio streams
+  private var _memories                     = [MemoryId: Memory]()            // Dictionary of Memories
+  private var _meters                       = [MeterNumber: Meter]()          // Dictionary of Meters
+  private var _opusStreams                  = [OpusId: Opus]()                // Dictionary of Opus Streams
+  private var _panadapters                  = [PanadapterId: Panadapter]()    // Dictionary of Panadapters
+  private var _profiles                     = [ProfileId: Profile]()          // Dictionary of Profiles
+  private var _replyHandlers                = [SequenceId: ReplyTuple]()      // Dictionary of pending replies
+  private var _slices                       = [SliceId: Slice]()              // Dictionary of Slices
+  private var _tnfs                         = [TnfId: Tnf]()                  // Dictionary of Tnfs
+  private var _usbCables                    = [UsbCableId: UsbCable]()        // Dictionary of UsbCables
+  private var _waterfalls                   = [WaterfallId: Waterfall]()      // Dictionary of Waterfalls
+  private var _xvtrs                        = [XvtrId: Xvtr]()                // Dictionary of Xvtrs
   
   private var _gpsPresent                   = false
   private var _atuPresent                   = false
@@ -221,17 +220,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     //      NOTE: order is important
     
     // notify all observers, then remove
-    audioStreams.forEach( { NC.post(.audioStreamWillBeRemoved, object: $0.value as Any?) } )
-    audioStreams.removeAll()
+    daxIqStreams.forEach( { NC.post(.daxIqStreamWillBeRemoved, object: $0.value as Any?) } )
+    daxIqStreams.removeAll()
     
-    iqStreams.forEach( { NC.post(.iqStreamWillBeRemoved, object: $0.value as Any?) } )
-    iqStreams.removeAll()
+    daxMicAudioStreams.forEach( {NC.post(.daxMicAudioStreamWillBeRemoved, object: $0.value as Any?)} )
+    daxMicAudioStreams.removeAll()
     
-    micAudioStreams.forEach( {NC.post(.micAudioStreamWillBeRemoved, object: $0.value as Any?)} )
-    micAudioStreams.removeAll()
-    
-    txAudioStreams.forEach( { NC.post(.txAudioStreamWillBeRemoved, object: $0.value as Any?) } )
-    txAudioStreams.removeAll()
+    daxRxAudioStreams.forEach( { NC.post(.daxRxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    daxRxAudioStreams.removeAll()
+
+    daxTxAudioStreams.forEach( { NC.post(.daxTxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    daxTxAudioStreams.removeAll()
     
     opusStreams.forEach( { NC.post(.opusRxWillBeRemoved, object: $0.value as Any?) } )
     opusStreams.removeAll()
@@ -451,9 +450,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // FIXME: Need format(s)
       Amplifier.parseStatus(remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       
-    case .audioStream:
-      //      format: <AudioStreamId> <key=value> <key=value> ...<key=value>
-      AudioStream.parseStatus(remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
+//    case .audioStream:
+//      //      format: <AudioStreamId> <key=value> <key=value> ...<key=value>
+//      DaxRxAudioStream.parseStatus(remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
       
     case .atu:
       //      format: <key=value> <key=value> ...<key=value>
@@ -470,8 +469,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       GuiClient.parseStatus(keyValues, radio: self, queue: _q)
 
       // is my Client initialized now?
-      if let handle = keyValues[0].key.handle {
-        if _api.guiClients[handle] != nil && !_clientInitialized {
+      if keyValues[0].key.handle != 0 {
+        
+        if _api.guiClients[keyValues[0].key.handle] != nil && !_clientInitialized {
           // YES
           _clientInitialized = true
           
@@ -544,9 +544,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       //     format: <meterNumber.key=value>#<meterNumber.key=value>#...<meterNumber.key=value>
       Meter.parseStatus( remainder.keyValuesArray(delimiter: "#"), radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       
-    case .micAudioStream:
-      //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
-      MicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
+//    case .micAudioStream:
+//      //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
+//      DaxMicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
       
     case .mixer:
 //      os_log("Unprocessed %{public}@, %{public}@", log: _log, type: .default, msgType, remainder)
@@ -574,8 +574,29 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       xLib6000.Slice.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
       
     case .stream:
-      //     format: <streamId> <key=value> <key=value> ...<key=value>
-      IqStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
+      //     format: <streamId, > <key=value> <key=value> ...<key=value>
+      //     format: <streamId, > <"removed",>
+      var keyValues = remainder.keyValuesArray()
+      
+      // ignore the removed status message
+      if keyValues[2].key == "removed" { return }
+      
+      switch keyValues[1].value {
+      case "dax_iq":
+        //     format: <streamId, > <"type"=value> <"dax_channel"=value> <"pan"=value> <"daxiq_rate"=value> <"client_handle"=value> <"active"=1/0>
+        DaxIqStream.parseStatus( keyValues, radio: self, queue: _q)
+      case "dax_mic":
+        //     format: <streamId, > <"type"=value> <"client_handle"=value>
+        DaxMicAudioStream.parseStatus( keyValues, radio: self, queue: _q)
+      case "dax_rx":
+        //     format: <streamId, > <"type"=value> <"dax_channel"=value> <"slice"=value> <"dax_clients"=value> <"client_handle"=value>
+        DaxRxAudioStream.parseStatus( keyValues, radio: self, queue: _q)
+      case "dax_tx":
+        //     format: <streamId, > <"type"=value> <"client_handle"=value> <"dax_tx"=value>
+        DaxTxAudioStream.parseStatus( keyValues, radio: self, queue: _q)
+      default:
+        fatalError()
+      }
       
     case .tnf:
       //     format: <tnfId> <key=value> <key=value> ...<key=value>
@@ -599,9 +620,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 //      os_log("Unprocessed %{public}@, %{public}@", log: _log, type: .default, msgType, remainder)
       _api.log.msg( "Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
 
-    case .txAudioStream:
-      //      format: <TxAudioStreamId> <key=value> <key=value> ...<key=value>
-      TxAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
+//    case .txAudioStream:
+//      //      format: <TxAudioStreamId> <key=value> <key=value> ...<key=value>
+//      DaxTxAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
       
     case .usbCable:
       //      format:
@@ -1394,26 +1415,26 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           _api.radio?.tnfs[components[2]] = nil
         }
         
-      } else if command.hasPrefix(AudioStream.kStreamCreateCmd + "dax=") {
-        
-        // TODO: add code
-        break
-        
-      } else if command.hasPrefix(AudioStream.kStreamCreateCmd + "daxmic") {
-        
-        // TODO: add code
-        break
-        
-      } else if command.hasPrefix(AudioStream.kStreamCreateCmd + "daxtx") {
-        
-        // TODO: add code
-        break
-        
-      } else if command.hasPrefix(IqStream.kStreamCreateCmd + "daxiq") {
-        
-        // TODO: add code
-        break
-        
+//      } else if command.hasPrefix(DaxRxAudioStream.kStreamCreateCmd + "dax=") {
+//
+//        // TODO: add code
+//        break
+//
+//      } else if command.hasPrefix(DaxRxAudioStream.kStreamCreateCmd + "daxmic") {
+//
+//        // TODO: add code
+//        break
+//
+//      } else if command.hasPrefix(DaxRxAudioStream.kStreamCreateCmd + "daxtx") {
+//
+//        // TODO: add code
+//        break
+//
+//      } else if command.hasPrefix(DaxIqStream.kStreamCreateCmd + "daxiq") {
+//
+//        // TODO: add code
+//        break
+//
       } else if command.hasPrefix(xLib6000.Slice.kCmd + "get_error"){
         
         // save the errors, format: <rx_error_value>,<tx_error_value>
@@ -1436,17 +1457,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
       case .daxAudio:
         // Dax Microphone Audio
-        if let daxAudio = self.audioStreams[vitaPacket.streamId] {
+        if let daxAudio = self.daxRxAudioStreams[vitaPacket.streamId] {
           daxAudio.vitaProcessor(vitaPacket)
         }
         // Dax Slice Audio
-        if let daxMicAudio = self.micAudioStreams[vitaPacket.streamId] {
+        if let daxMicAudio = self.daxMicAudioStreams[vitaPacket.streamId] {
           daxMicAudio.vitaProcessor(vitaPacket)
         }
 
       case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
         // Dax IQ
-        if let daxIq = self.iqStreams[vitaPacket.streamId] {
+        if let daxIq = self.daxIqStreams[vitaPacket.streamId] {
 
           daxIq.vitaProcessor(vitaPacket)
         }
@@ -1464,7 +1485,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
             opus.isStreaming = true
             // log the start of the stream
 //            os_log("Opus Stream started: ID = %{public}@ ", log: self._log, type: .info, vitaPacket.streamId.hex)
-            self._api.log.msg( "Opus Stream started: ID = \(vitaPacket.streamId.hex)", level: .warning, function: #function, file: #file, line: #line)
+            self._api.log.msg( "Opus Stream started: ID = \(vitaPacket.streamId.hex)", level: .info, function: #function, file: #file, line: #line)
           }
           opus.vitaProcessor( vitaPacket )
         }
@@ -1477,7 +1498,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
             panadapter.isStreaming = true
             // log the start of the stream
 //            os_log("Panadapter Stream started: ID = %{public}@ ", log: self._log, type: .info, vitaPacket.streamId.hex)
-            self._api.log.msg( "Panadapter Stream started: ID = \(vitaPacket.streamId.hex)", level: .warning, function: #function, file: #file, line: #line)
+            self._api.log.msg( "Panadapter Stream started: ID = \(vitaPacket.streamId.hex)", level: .info, function: #function, file: #file, line: #line)
           }
           panadapter.vitaProcessor(vitaPacket)
         }
@@ -1490,7 +1511,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
             waterfall.isStreaming = true
             // log the start of the stream
 //            os_log("Waterfall Stream started: ID = %{public}@ ", log: self._log, type: .info, vitaPacket.streamId.hex)
-            self._api.log.msg( "Waterfall Stream started: ID = \(vitaPacket.streamId.hex)", level: .warning, function: #function, file: #file, line: #line)
+            self._api.log.msg( "Waterfall Stream started: ID = \(vitaPacket.streamId.hex)", level: .info, function: #function, file: #file, line: #line)
           }
           waterfall.vitaProcessor(vitaPacket)
         }
@@ -1885,9 +1906,21 @@ extension Radio {
     get { return _q.sync { _amplifiers } }
     set { _q.sync(flags: .barrier) { _amplifiers = newValue } } }
   
-  public var audioStreams: [DaxStreamId: AudioStream] {
-    get { return _q.sync { _audioStreams } }
-    set { _q.sync(flags: .barrier) { _audioStreams = newValue } } }
+  public var daxIqStreams: [StreamId: DaxIqStream] {
+    get { return _q.sync { _daxIqStreams } }
+    set { _q.sync(flags: .barrier) { _daxIqStreams = newValue } } }
+  
+  public var daxMicAudioStreams: [StreamId: DaxMicAudioStream] {
+    get { return _q.sync { _daxMicAudioStreams } }
+    set { _q.sync(flags: .barrier) { _daxMicAudioStreams = newValue } } }
+  
+  public var daxRxAudioStreams: [StreamId: DaxRxAudioStream] {
+    get { return _q.sync { _daxRxAudioStreams } }
+    set { _q.sync(flags: .barrier) { _daxRxAudioStreams = newValue } } }
+  
+  public var daxTxAudioStreams: [StreamId: DaxTxAudioStream] {
+    get { return _q.sync { _daxTxAudioStreams } }
+    set { _q.sync(flags: .barrier) { _daxTxAudioStreams = newValue } } }
   
   public var bandSettings: [BandId: BandSetting] {
     get { return _q.sync { _bandSettings } }
@@ -1897,10 +1930,6 @@ extension Radio {
     get { return _q.sync { _equalizers } }
     set { _q.sync(flags: .barrier) { _equalizers = newValue } } }
   
-  public var iqStreams: [DaxStreamId: IqStream] {
-    get { return _q.sync { _iqStreams } }
-    set { _q.sync(flags: .barrier) { _iqStreams = newValue } } }
-  
   public var memories: [MemoryId: Memory] {
     get { return _q.sync { _memories } }
     set { _q.sync(flags: .barrier) { _memories = newValue } } }
@@ -1908,10 +1937,6 @@ extension Radio {
   public var meters: [MeterNumber: Meter] {
     get { return _q.sync { _meters } }
     set { _q.sync(flags: .barrier) { _meters = newValue } } }
-  
-  public var micAudioStreams: [DaxStreamId: MicAudioStream] {
-    get { return _q.sync { _micAudioStreams } }
-    set { _q.sync(flags: .barrier) { _micAudioStreams = newValue } } }
   
   public var opusStreams: [OpusId: Opus] {
     get { return _q.sync { _opusStreams } }
@@ -1936,10 +1961,6 @@ extension Radio {
   public var tnfs: [TnfId: Tnf] {
     get { return _q.sync { _tnfs } }
     set { _q.sync(flags: .barrier) { _tnfs = newValue } } }
-  
-  public var txAudioStreams: [DaxStreamId: TxAudioStream] {
-    get { return _q.sync { _txAudioStreams } }
-    set { _q.sync(flags: .barrier) { _txAudioStreams = newValue } } }
   
   public var waterfalls: [WaterfallId: Waterfall] {
     get { return _q.sync { _waterfalls } }
@@ -2069,7 +2090,7 @@ extension Radio {
   ///
   internal enum StatusToken : String {
     case amplifier
-    case audioStream                        = "audio_stream"
+//    case audioStream                        = "audio_stream"
     case atu
     case client
     case cwx
@@ -2081,7 +2102,7 @@ extension Radio {
     case interlock
     case memory
     case meter
-    case micAudioStream                     = "mic_audio_stream"
+//    case micAudioStream                     = "mic_audio_stream"
     case mixer
     case opusStream                         = "opus_stream"
     case profile
@@ -2091,7 +2112,7 @@ extension Radio {
     case tnf
     case transmit
     case turf
-    case txAudioStream                      = "tx_audio_stream"
+//    case txAudioStream                      = "tx_audio_stream"
     case usbCable                           = "usb_cable"
     case wan
     case waveform

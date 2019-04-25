@@ -94,7 +94,7 @@ public final class Equalizer                : NSObject, DynamicModel {
       // unknown type, log & ignore it
 //      let log = OSLog(subsystem:Api.kBundleIdentifier, category: "Equalizer")
 //      os_log("Unknown EQ - %{public}@", log: log, type: .default, type)
-      Api.sharedInstance.log.msg( "Unknown EQ - \(type)", level: .info, function: #function, file: #file, line: #line)
+      Api.sharedInstance.log.msg( "Unknown EQ - \(type)", level: .warning, function: #function, file: #file, line: #line)
 
     }
     // if an equalizer was found

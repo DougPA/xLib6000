@@ -1,5 +1,5 @@
 //
-//  AudioStreamCommands.swift
+//  DaxRxAudioStreamCommands.swift
 //  xLib6000
 //
 //  Created by Douglas Adams on 7/20/17.
@@ -11,7 +11,7 @@ import Foundation
 // ----------------------------------------------------------------------------
 // MARK: - Command extension
 
-extension AudioStream {
+extension DaxRxAudioStream {
 
   // ----------------------------------------------------------------------------
   // MARK: - Class methods that send Commands
@@ -26,7 +26,7 @@ extension AudioStream {
   public class func create(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
     
     // tell the Radio to create a Stream
-    return Api.sharedInstance.sendWithCheck(kStreamCreateCmd + "dax" + "=\(channel)", replyTo: callback)
+    return Api.sharedInstance.sendWithCheck("stream create type=dax_rx dax_channel=\(channel)", replyTo: callback)
   }
   
   // ----------------------------------------------------------------------------
@@ -40,8 +40,18 @@ extension AudioStream {
   ///
   public func remove(callback: ReplyHandler? = nil) -> Bool {
     
-    // tell the Radio to remove a Stream
-    return Api.sharedInstance.sendWithCheck(AudioStream.kStreamRemoveCmd + "\(id.hex)", replyTo: callback)
+    // tell the Radio to remove this Stream
+    if Api.sharedInstance.sendWithCheck("stream remove \(streamId.hex)", replyTo: callback) {
+      
+      // notify all observers
+      NC.post(.daxRxAudioStreamWillBeRemoved, object: self as Any?)
+      
+      // remove the stream object
+      Api.sharedInstance.radio?.daxRxAudioStreams[streamId] = nil
+      
+      return true
+    }
+    return false
   }
 
   // ----------------------------------------------------------------------------
@@ -55,7 +65,7 @@ extension AudioStream {
   ///
   private func audioStreamCmd(_ token: String, _ value: Any) {
     
-    Api.sharedInstance.send(AudioStream.kCmd + "\(id.hex) slice \(_slice!.id) " + token + " \(value)")
+    Api.sharedInstance.send("audio stream \(streamId.hex) slice \(_slice!.id) " + token + " \(value)")
   }
   
   // ----------------------------------------------------------------------------
