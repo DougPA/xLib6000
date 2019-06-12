@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 public typealias AmplifierId = String
 
@@ -34,7 +33,7 @@ public final class Amplifier                : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Amplifier")
+  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -127,11 +126,9 @@ public final class Amplifier                : NSObject, DynamicModel {
     for property in properties {
       
       // check for unknown keys
-      guard let token = Token(rawValue: property.key) else {
-        
+      guard let token = Token(rawValue: property.key) else {        
         // log it and ignore the Key
-        os_log("Unknown Amplifier token - %{public}@", log: _log, type: .default, property.key)
-
+        _log.msg("Unknown Amplifier token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order

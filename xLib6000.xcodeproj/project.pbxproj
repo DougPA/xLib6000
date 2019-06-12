@@ -76,6 +76,7 @@
 		91A0ABF2209769B3008FDB3D /* Commands.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 91A0ABF1209769B2008FDB3D /* Commands.rtf */; };
 		91A2D8D7206944A000676728 /* ChangeLog.txt in Resources */ = {isa = PBXBuildFile; fileRef = 91A2D8D6206944A000676728 /* ChangeLog.txt */; };
 		91A9000620B264B900BFDCF9 /* Protocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A9000520B264B900BFDCF9 /* Protocols.swift */; };
+		91F6D985229323F500676FBB /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91F6D984229323F500676FBB /* Log.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -150,6 +151,7 @@
 		91A0ABF1209769B2008FDB3D /* Commands.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Commands.rtf; sourceTree = "<group>"; };
 		91A2D8D6206944A000676728 /* ChangeLog.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ChangeLog.txt; sourceTree = "<group>"; };
 		91A9000520B264B900BFDCF9 /* Protocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Protocols.swift; sourceTree = "<group>"; };
+		91F6D984229323F500676FBB /* Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -278,6 +280,7 @@
 		913EF04720669DA700AF99BE /* Misc */ = {
 			isa = PBXGroup;
 			children = (
+				91F6D984229323F500676FBB /* Log.swift */,
 				913EF04B20669DA700AF99BE /* FlexErrors.swift */,
 				913EF04A20669DA700AF99BE /* Notifications.swift */,
 				91A9000520B264B900BFDCF9 /* Protocols.swift */,
@@ -475,6 +478,7 @@
 				913EF07620669DA700AF99BE /* UsbCableCommands.swift in Sources */,
 				913EF07520669DA700AF99BE /* Atu.swift in Sources */,
 				913EF07020669DA700AF99BE /* Gps.swift in Sources */,
+				91F6D985229323F500676FBB /* Log.swift in Sources */,
 				913EF08A20669DA700AF99BE /* PanadapterCommands.swift in Sources */,
 				913EF07920669DA700AF99BE /* WaterfallCommands.swift in Sources */,
 				913EF06C20669DA700AF99BE /* AppExtensions.swift in Sources */,
@@ -604,10 +608,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = EE5B8TYXGA;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -632,6 +637,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = EE5B8TYXGA;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 import simd
 
 public typealias PanadapterId = UInt32
@@ -36,7 +35,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   public var isStreaming                    = false
 
   public private(set) var id                : PanadapterId = 0              // Panadapter Id (StreamId)
-  public private(set) var expectedIndex     = -1                            // Frame index of next Vita payload
+  public private(set) var packetFrame        = -1                           // Packet frame
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
   
   @objc dynamic public let daxIqChoices     = Api.daxIqChannels
@@ -44,7 +43,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Panadapter")
+  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
@@ -220,8 +219,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     
     guard responseValue == Api.kNoError else {
       // Anything other than 0 is an error, log it and ignore the Reply
-      os_log("%{public}@,  non-zero reply - %{public}@, %{public}@", log: _log, type: .default, command, responseValue, flexErrorString(errorCode: responseValue))
-      
+      _log.msg("\(command),  non-zero reply - \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .warning, function: #function, file: #file, line: #line)
+
       return
     }
     // parse out the values
@@ -247,9 +246,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
-        // unknown Key, log it and ignore the Key
-        os_log("Unknown Panadapter token - %{public}@", log: _log, type: .default, property.key)
-        
+        // log it and ignore the Key
+        _log.msg("Unknown Panadapter token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -425,11 +423,11 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   func vitaProcessor(_ vita: Vita) {
     
     // convert the Vita struct to a PanadapterFrame
-    if _panadapterframes[_index].accumulate(vita: vita, expectedIndex: &expectedIndex) {
+    if _panadapterframes[_index].accumulate(vita: vita, expectedFrame: &packetFrame) {
       
       // Pass the data frame to this Panadapter's delegate
       delegate?.streamHandler(_panadapterframes[_index])
-      
+
       // use the next dataframe
       _index = (_index + 1) % _numberOfPanadapterFrames
     }

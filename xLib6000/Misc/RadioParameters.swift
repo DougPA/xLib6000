@@ -195,10 +195,8 @@ public final class RadioParameters          : Equatable {
     
     // check for unknown keys
     guard let token = Param(rawValue: propertyName) else {
-      
       // log it and ignore the Key
-      os_log("Unknown Radio Param token - %{public}@", log: _log, type: .default, propertyName)
-      
+      Log.sharedInstance.msg("Unknown token - \(propertyName)", level: .debug, function: #function, file: #file, line: #line)
       return ""
     }
 

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 import Accelerate
 
 /// IqStream Class implementation
@@ -35,7 +34,7 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "IqStream")
+  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -161,9 +160,8 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
     for property in properties {
       
       guard let token = Token(rawValue: property.key) else {
-        // unknown Key, log it and ignore the Key
-        os_log("Unknown IqStream token - %{public}@", log: _log, type: .default, property.key)
-        
+        // log it and ignore the Key
+        _log.msg("Unknown IqStream token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
         continue
       }
       // known keys, in alphabetical order
@@ -276,8 +274,8 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      os_log("Missing IqStream packet(s), rcvdSeq: %d, != expectedSeq: %d", log: _log, type: .default, vita.sequence, expectedSequenceNumber)
-      
+      _log.msg("Missing IqStream packet(s), rcvdSeq: \(vita.sequence), != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
+
       _rxSeq = nil
       rxLostPacketCount += 1
     } else {

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 /// Interlock Class implementation
 ///
@@ -26,7 +25,7 @@ public final class Interlock                : NSObject, StaticModel {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
-  private let _log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "Interlock")
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -88,10 +87,8 @@ public final class Interlock                : NSObject, StaticModel {
       
       // Check for Unknown token
       guard let token = Token(rawValue: property.key)  else {
-        
-        // unknown Token, log it and ignore this token
-        os_log("Unknown Interlock token = %{public}@", log: _log, type: .default, property.key)
-        
+        // log it and ignore the Key
+        _log.msg("Unknown Interlock token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -108,9 +105,9 @@ public final class Interlock                : NSObject, StaticModel {
         didChangeValue(for: \.accTxDelay)
 
       case .accTxReqEnabled:
-          willChangeValue(for: \.accTxReqEnabled)
-         _accTxReqEnabled = property.value.bValue
-         didChangeValue(for: \.accTxReqEnabled)
+        willChangeValue(for: \.accTxReqEnabled)
+        _accTxReqEnabled = property.value.bValue
+        didChangeValue(for: \.accTxReqEnabled)
 
       case .accTxReqPolarity:
        willChangeValue(for: \.accTxReqPolarity)
@@ -128,9 +125,9 @@ public final class Interlock                : NSObject, StaticModel {
         didChangeValue(for: \.rcaTxReqEnabled)
 
       case .rcaTxReqPolarity:
-         willChangeValue(for: \.rcaTxReqPolarity)
-         _rcaTxReqPolarity = property.value.bValue
-         didChangeValue(for: \.rcaTxReqPolarity)
+        willChangeValue(for: \.rcaTxReqPolarity)
+        _rcaTxReqPolarity = property.value.bValue
+        didChangeValue(for: \.rcaTxReqPolarity)
 
       case .reason:
         willChangeValue(for: \.reason)

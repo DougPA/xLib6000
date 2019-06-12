@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 public typealias UsbCableId = String
 
@@ -35,7 +34,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "UsbCable")
+  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -99,9 +98,8 @@ public final class UsbCable                 : NSObject, DynamicModel {
       } else {
         
         // NO, log the error and ignore it
-        let log = OSLog(subsystem:Api.kBundleIdentifier, category: "UsbCable")
-        os_log("Invalid UsbCable Type, %{public}@", log: log, type: .default, keyValues[1].value)
-        
+        Log.sharedInstance.msg("Invalid UsbCable Type, \(keyValues[1].value)", level: .warning, function: #function, file: #file, line: #line)
+
         return
       }
     }
@@ -157,10 +155,8 @@ public final class UsbCable                 : NSObject, DynamicModel {
         
         // check for unknown keys
         guard let token = Token(rawValue: property.key) else {
-          
-          // unknown Key, log it and ignore the Key
-          os_log("Unknown UsbCable token - %{public}@", log: _log, type: .default, property.key)
-          
+          // log it and ignore the Key
+          _log.msg("Unknown UsbCable token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
           continue
         }
         // Known keys, in alphabetical order
@@ -266,8 +262,8 @@ public final class UsbCable                 : NSObject, DynamicModel {
     } else {
       
       // NO, log the error
-      os_log("Status type (%{public}@) != Cable type (%{public}@)", log: _log, type: .default, properties[0].key, cableType.rawValue)
-      
+      _log.msg("Status type \(properties[0].key) != Cable type \(cableType.rawValue)", level: .debug, function: #function, file: #file, line: #line)
+
     }
     
     // is the waterfall initialized?

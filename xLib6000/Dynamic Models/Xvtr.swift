@@ -9,7 +9,6 @@
 public typealias XvtrId = String
 
 import Foundation
-import os.log
 
 /// Xvtr Class implementation
 ///
@@ -27,7 +26,7 @@ public final class Xvtr                     : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
 
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Xvtr")
+  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -127,10 +126,8 @@ public final class Xvtr                     : NSObject, DynamicModel {
       
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
-        
-        // unknown Key, log it and ignore the Key
-        os_log("Unknown Xvtr token - %{public}@", log: _log, type: .default, property.key)
-        
+        // log it and ignore the Key
+        _log.msg("Unknown Xvtr token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order

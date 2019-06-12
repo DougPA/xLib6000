@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 /// Class containing Panadapter Stream data
 ///
@@ -18,29 +17,29 @@ public class PanadapterFrame {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var startingBinIndex  = 0                             // Index of first bin
+  public private(set) var startingBin       = 0                             // Index of first bin
   public private(set) var numberOfBins      = 0                             // Number of bins
   public private(set) var binSize           = 0                             // Bin size in bytes
-  public private(set) var totalBinsInFrame  = 0                             // number of bins in the complete frame
-  public private(set) var frameIndex        = 0                             // Frame index
+  public private(set) var totalBins         = 0                             // number of bins in the complete frame
+  public private(set) var receivedFrame     = 0                             // Frame number
   public var bins                           = [UInt16]()                    // Array of bin values
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "PanadapterFrame")
+  private var _log                          = Log.sharedInstance
   
   private struct PayloadHeaderOld {                                        // struct to mimic payload layout
-    var startingBinIndex                    : UInt32
+    var startingBin                         : UInt32
     var numberOfBins                        : UInt32
     var binSize                             : UInt32
     var frameIndex                          : UInt32
   }
   private struct PayloadHeader {                                            // struct to mimic payload layout
-    var startingBinIndex                    : UInt16
+    var startingBin                         : UInt16
     var numberOfBins                        : UInt16
     var binSize                             : UInt16
-    var totalBinsInFrame                    : UInt16
+    var totalBins                           : UInt16
     var frameIndex                          : UInt32
   }
   private var _expectedIndex                = 0
@@ -68,7 +67,7 @@ public class PanadapterFrame {
   /// - Parameter vita:         incoming Vita object
   /// - Returns:                true if entire frame processed
   ///
-  public func accumulate(vita: Vita, expectedIndex: inout Int) -> Bool {
+  public func accumulate(vita: Vita, expectedFrame: inout Int) -> Bool {
     
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
@@ -81,11 +80,11 @@ public class PanadapterFrame {
       let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
       
       // byte swap and convert each payload component
-      startingBinIndex = Int(CFSwapInt16BigToHost(p.pointee.startingBinIndex))
+      startingBin = Int(CFSwapInt16BigToHost(p.pointee.startingBin))
       numberOfBins = Int(CFSwapInt16BigToHost(p.pointee.numberOfBins))
       binSize = Int(CFSwapInt16BigToHost(p.pointee.binSize))
-      totalBinsInFrame = Int(CFSwapInt16BigToHost(p.pointee.totalBinsInFrame))
-      frameIndex = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
+      totalBins = Int(CFSwapInt16BigToHost(p.pointee.totalBins))
+      receivedFrame = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
       
     } else {
       // pre 2.3.x
@@ -96,46 +95,57 @@ public class PanadapterFrame {
       let p = payloadPtr.bindMemory(to: PayloadHeaderOld.self, capacity: 1)
       
       // byte swap and convert each payload component
-      startingBinIndex = Int(CFSwapInt32BigToHost(p.pointee.startingBinIndex))
+      startingBin = Int(CFSwapInt32BigToHost(p.pointee.startingBin))
       numberOfBins = Int(CFSwapInt32BigToHost(p.pointee.numberOfBins))
       binSize = Int(CFSwapInt32BigToHost(p.pointee.binSize))
-      totalBinsInFrame = numberOfBins
-      frameIndex = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
+      totalBins = numberOfBins
+      receivedFrame = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
     }
-    // is this the first frame?
-    if expectedIndex == -1 { expectedIndex = frameIndex }
+    // initial frame?
+    if expectedFrame == -1 { expectedFrame = receivedFrame }
     
-    if frameIndex < expectedIndex {
-      // log it
-      os_log("Out of sequence Frame ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, expectedIndex, frameIndex)
-      return false
-    }
-    
-    if frameIndex > expectedIndex {
-      // log it
-      os_log("%{public}d Frame(s) skipped: expected = %{public}d, received = %{public}d", log: _log, type: .default, frameIndex - expectedIndex, expectedIndex, frameIndex)
-      // restart bin processing
-      _binsProcessed = 0
-      expectedIndex = frameIndex
-    }
-    
-    if frameIndex == expectedIndex {
+    switch (expectedFrame, receivedFrame) {
       
+    case (let expected, let received) where received < expected:
+      // from a previous group, ignore it
+      _log.msg("Out of sequence Frame ignored: expected = \(expected), received = \(received), startBin = \(startingBin)", level: .warning, function: #function, file: #file, line: #line)
+      return false
+    
+    case (let expected, let received) where received > expected:
+      // from a later group, jump forward
+      // make sure it's the beginning of a frame
+      guard startingBin == 0 else {
+        // it's not, wait for the beginning of the next frame
+        _log.msg("\(received - expected) Frame(s) skipped: expected = \(expected), received = \(received), startBin = \(startingBin)", level: .warning, function: #function, file: #file, line: #line)
+        _binsProcessed = 0
+        expectedFrame = received + 1
+        return false
+      }
+      // begin processing it
+      _binsProcessed = 0
+      expectedFrame = received
+      fallthrough
+      
+    default:
+      // received == expected
       // get a pointer to the Bins in the payload
       let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
       
       // Swap the byte ordering of the data & place it in the bins
       for i in 0..<numberOfBins {
-        bins[i+startingBinIndex] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
+        bins[i + startingBin] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
       }
       // update the count of bins processed
       _binsProcessed += numberOfBins
       
-      // reset the count if the entire frame has been accumulated
-      if _binsProcessed == totalBinsInFrame { _binsProcessed = 0 ; expectedIndex += 1}
+      // reset the count if the entire frame has been accumulatedY
+      if _binsProcessed == totalBins {
+        _binsProcessed = 0
+        expectedFrame += 1
+      }
+      // return true if the entire frame has been accumulated
+      return _binsProcessed == 0
     }
-    // return true if the entire frame has been accumulated
-    return _binsProcessed == 0
   }
 }
 
@@ -153,10 +163,10 @@ public class WaterfallFrame {
   public private(set) var lineDuration      = 0                             // Duration of this line (ms)
   public private(set) var numberOfBins      = 0                             // Number of bins
   public private(set) var height            = 0                             // Height of frame (pixels)
-  public private(set) var timeCode          = 0                             // Time code
+  public private(set) var receivedFrame     = 0                             // Time code
   public private(set) var autoBlackLevel    : UInt32 = 0                    // Auto black level
-  public private(set) var totalBinsInFrame  = 0                             //
-  public private(set) var startingBinIndex  = 0                             //
+  public private(set) var totalBins         = 0                             //
+  public private(set) var startingBin       = 0                             //
   public var bins                           = [UInt16]()                    // Array of bin values
   
   // ----------------------------------------------------------------------------
@@ -164,7 +174,7 @@ public class WaterfallFrame {
   
   private var _binsProcessed                = 0
   private var _byteOffsetToBins             = 0
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "WaterfallFrame")
+  private var _log                          = Log.sharedInstance
   
   private struct PayloadHeaderOld {                                         // struct to mimic payload layout
     var firstBinFreq                        : UInt64                        // 8 bytes
@@ -172,7 +182,7 @@ public class WaterfallFrame {
     var lineDuration                        : UInt32                        // 4 bytes
     var numberOfBins                        : UInt16                        // 2 bytes
     var lineHeight                          : UInt16                        // 2 bytes
-    var timeCode                            : UInt32                        // 4 bytes
+    var receivedFrame                       : UInt32                        // 4 bytes
     var autoBlackLevel                      : UInt32                        // 4 bytes
   }
   
@@ -182,10 +192,10 @@ public class WaterfallFrame {
     var lineDuration                        : UInt32                        // 4 bytes
     var numberOfBins                        : UInt16                        // 2 bytes
     var height                              : UInt16                        // 2 bytes
-    var timeCode                            : UInt32                        // 4 bytes
+    var receivedFrame                       : UInt32                        // 4 bytes
     var autoBlackLevel                      : UInt32                        // 4 bytes
-    var totalBinsInFrame                    : UInt16                        // 2 bytes
-    var firstBinIndex                       : UInt16                        // 2 bytes
+    var totalBins                           : UInt16                        // 2 bytes
+    var firstBin                            : UInt16                        // 2 bytes
   }
   
   // ----------------------------------------------------------------------------
@@ -209,7 +219,7 @@ public class WaterfallFrame {
   /// - Parameter vita:         incoming Vita object
   /// - Returns:                true if entire frame processed
   ///
-  public func accumulate(vita: Vita, expectedIndex: inout Int) -> Bool {
+  public func accumulate(vita: Vita, expectedFrame: inout Int) -> Bool {
     
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
@@ -228,10 +238,10 @@ public class WaterfallFrame {
       lineDuration = Int( CFSwapInt32BigToHost(p.pointee.lineDuration) )
       numberOfBins = Int( CFSwapInt16BigToHost(p.pointee.numberOfBins) )
       height = Int( CFSwapInt16BigToHost(p.pointee.height) )
-      timeCode = Int( CFSwapInt32BigToHost(p.pointee.timeCode) )
+      receivedFrame = Int( CFSwapInt32BigToHost(p.pointee.receivedFrame) )
       autoBlackLevel = CFSwapInt32BigToHost(p.pointee.autoBlackLevel)
-      totalBinsInFrame = Int( CFSwapInt16BigToHost(p.pointee.totalBinsInFrame) )
-      startingBinIndex = Int( CFSwapInt16BigToHost(p.pointee.firstBinIndex) )
+      totalBins = Int( CFSwapInt16BigToHost(p.pointee.totalBins) )
+      startingBin = Int( CFSwapInt16BigToHost(p.pointee.firstBin) )
       
     } else {
       // pre 2.3.x
@@ -248,44 +258,51 @@ public class WaterfallFrame {
       lineDuration = Int( CFSwapInt32BigToHost(p.pointee.lineDuration) )
       numberOfBins = Int( CFSwapInt16BigToHost(p.pointee.numberOfBins) )
       height = Int( CFSwapInt16BigToHost(p.pointee.lineHeight) )
-      timeCode = Int( CFSwapInt32BigToHost(p.pointee.timeCode) )
+      receivedFrame = Int( CFSwapInt32BigToHost(p.pointee.receivedFrame) )
       autoBlackLevel = CFSwapInt32BigToHost(p.pointee.autoBlackLevel)
-      totalBinsInFrame = numberOfBins
-      startingBinIndex = 0
+      totalBins = numberOfBins
+      startingBin = 0
     }
-    // is this the first frame?
-    if expectedIndex == -1 { expectedIndex = timeCode }
+    // initial frame?
+    if expectedFrame == -1 { expectedFrame = receivedFrame }
     
-    if timeCode < expectedIndex {
-      // log it
-      os_log("Out of sequence Frame ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, expectedIndex, timeCode)
-      return false
-    }
-    
-    if timeCode > expectedIndex {
-      // log it
-      os_log("%{public}d Frame(s) skipped: expected = %{public}d, received = %{public}d", log: _log, type: .default, timeCode - expectedIndex, expectedIndex, timeCode)
-      // restart bin processing
-      _binsProcessed = 0
-      expectedIndex = timeCode
-    }
-    
-    if timeCode == expectedIndex {
+    switch (expectedFrame, receivedFrame) {
       
+    case (let expected, let received) where received < expected:
+      // from a previous group, ignore it
+      _log.msg("Out of sequence Frame ignored: expected = \(expected), received = \(received), startBin = \(startingBin)", level: .warning, function: #function, file: #file, line: #line)
+      return false
+      
+    case (let expected, let received) where received > expected:
+      // from a later group, jump forward
+      // make sure it's the beginning of a frame
+      guard startingBin == 0 else {
+        // it's not, wait for the beginning of the next frame
+        _log.msg("\(received - expected) Frame(s) skipped: expected = \(expected), received = \(received), startBin = \(startingBin)", level: .warning, function: #function, file: #file, line: #line)
+        _binsProcessed = 0
+        expectedFrame = received + 1
+        return false
+      }
+      // begin processing it
+      _binsProcessed = 0
+      expectedFrame = received
+      fallthrough
+      
+    default:
+      // received == expected
       // get a pointer to the Bins in the payload
       let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
       
       // Swap the byte ordering of the data & place it in the bins
       for i in 0..<numberOfBins {
-        bins[i+startingBinIndex] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
+        bins[i+startingBin] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
       }
       // update the count of bins processed
       _binsProcessed += numberOfBins
       
       // reset the count if the entire frame has been accumulated
-      if _binsProcessed == totalBinsInFrame { _binsProcessed = 0 }
+      if _binsProcessed == totalBins { numberOfBins = _binsProcessed ; _binsProcessed = 0 ; expectedFrame += 1 }
     }
-    
     // return true if the entire frame has been accumulated
     return _binsProcessed == 0
   }

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 /// Transmit Class implementation
 ///
@@ -35,7 +34,7 @@ public final class Transmit                 : NSObject, StaticModel {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
-  private let _log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "Transmit")
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -118,10 +117,8 @@ public final class Transmit                 : NSObject, StaticModel {
       
       // Check for Unknown token
       guard let token = Token(rawValue: property.key)  else {
-        
-        // unknown Token, log it and ignore this token
-        os_log("Unknown Transmit token = %{public}@", log: _log, type: .default, property.key)
-        
+        // log it and ignore the Key
+        _log.msg("Unknown Transmit token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order

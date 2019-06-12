@@ -7,9 +7,8 @@
 //
 
 import Foundation
-import os.log
 
-public typealias ProfileId                  = String
+public typealias ProfileId                   = String
 public typealias ProfileName                 = String
 
 /// Profile Class implementation
@@ -36,7 +35,7 @@ public final class Profile                  : NSObject, StaticModel {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
-  private let _log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "Profile")
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
 
@@ -117,9 +116,8 @@ public final class Profile                  : NSObject, StaticModel {
 
     // check for unknown keys
     guard let token = Token(rawValue: properties[0].key) else {
-      // unknown Key, log it and ignore the Key
-      os_log("Unknown %{public}@ Profile token - %{public}@", log: _log, type: .default, id, properties[0].key)
-      
+      // log it and ignore the Key
+      _log.msg("Unknown Profile token - \(properties[0].key)", level: .debug, function: #function, file: #file, line: #line)
       return
     }
     // Known keys, in alphabetical order

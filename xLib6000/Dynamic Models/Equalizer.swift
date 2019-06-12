@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 public typealias EqualizerId = String
 
@@ -35,7 +34,7 @@ public final class Equalizer                : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Equalizer")
+  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -93,8 +92,8 @@ public final class Equalizer                : NSObject, DynamicModel {
       
     default:
       // unknown type, log & ignore it
-      let log = OSLog(subsystem:Api.kBundleIdentifier, category: "Equalizer")
-      os_log("Unknown EQ - %{public}@", log: log, type: .default, type)
+      Log.sharedInstance.msg("Unknown Equalizer type - \(type)", level: .warning, function: #function, file: #file, line: #line)
+      break
       
     }
     // if an equalizer was found
@@ -138,10 +137,8 @@ public final class Equalizer                : NSObject, DynamicModel {
       
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
-        
-        // unknown Key, log it and ignore the Key
-        os_log("Unknown Equalizer token - %{public}@", log: _log, type: .default, property.key)
-        
+        // log it and ignore the Key
+        _log.msg("Unknown Equalizer token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
         continue
       }
       // known Keys, in alphabetical order

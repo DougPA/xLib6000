@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 public typealias OpusId = UInt32
 
@@ -44,7 +43,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Opus")
+  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -171,10 +170,8 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
-        
-        // unknown Key, log it and ignore the Key
-        os_log("Unknown Opus token - %{public}@", log: _log, type: .default, property.key)
-        
+        // log it and ignore the Key
+        _log.msg("Unknown Opus token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -242,13 +239,13 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       if vita.sequence > _rxSeq! {
         
         // MISSING, frame(s) has been skipped, ignore the skipped frame(s)
-        os_log("Missing Frame(s): expected = %{public}d, received = %{public}d", log: _log, type: .default, _rxSeq!, vita.sequence)
+        _log.msg("Missing Opus packet(s), received: \(vita.sequence) != expected: \(_rxSeq!)", level: .warning, function: #function, file: #file, line: #line)
         _rxSeq = vita.sequence
         
       } else {
         
         // OUT-OF-SEQUENCE, a frame is either duplicated or out of order, ignore it
-        os_log("Out of sequence Frame(s) were ignored: expected = %{public}d, received = %{public}d", log: _log, type: .default, _rxSeq!, vita.sequence)
+        _log.msg("Out of sequence Opus packet(s), received: \(vita.sequence) != expected: \(_rxSeq!)", level: .warning, function: #function, file: #file, line: #line)
         return
       }
     }

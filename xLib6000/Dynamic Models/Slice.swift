@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 public typealias SliceId = String
 
@@ -44,7 +43,7 @@ public final class Slice                    : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Slice")
+  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
@@ -374,8 +373,8 @@ public final class Slice                    : NSObject, DynamicModel {
       switch modeType {
         
       case .FM, .NFM:
-        os_log("Cannot change Filter width in FM mode", log: _log, type: .info)
-        
+        _log.msg("Cannot change Filter width in FM mode", level: .info, function: #function, file: #file, line: #line)
+
         newValue = value
         
       case .CW:
@@ -412,8 +411,8 @@ public final class Slice                    : NSObject, DynamicModel {
       switch modeType {
         
       case .FM, .NFM:
-        os_log("Cannot change Filter width in FM mode", log: _log, type: .info)
-        
+        _log.msg("Cannot change Filter width in FM mode", level: .info, function: #function, file: #file, line: #line)
+
         newValue = value
         
       case .CW:
@@ -453,9 +452,8 @@ public final class Slice                    : NSObject, DynamicModel {
       
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
-        // unknown Key, log it and ignore the Key
-        os_log("Unknown Slice token - %{public}@", log: _log, type: .default, property.key)
-        
+        // log it and ignore the Key
+        _log.msg("Unknown Slice token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -615,7 +613,8 @@ public final class Slice                    : NSObject, DynamicModel {
 
       case .ghost:
         // FIXME: Is this needed?
-        os_log("Unprocessed Slice property - %{public}@.%{public}@", log: _log, type: .default, property.key, property.value)
+        _log.msg("Unprocessed Slice property - \( property.key).\(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        break
         
       case .inUse:
         willChangeValue(for: \.inUse)

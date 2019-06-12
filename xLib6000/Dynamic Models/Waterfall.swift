@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 public typealias WaterfallId = UInt32
 
@@ -26,14 +25,13 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   public var isStreaming                    = false
   
   public private(set) var id                : WaterfallId   = 0             // Waterfall Id (StreamId)
-//  public private(set) var lastTimecode      = -1                            // Time code of last frame received
-  public private(set) var expectedIndex     = -1                            // Frame index of next Vita payload
+  public private(set) var packetFrame       = -1                            // Frame index of next Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "Waterfall")
+  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
@@ -151,10 +149,8 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
-        
-        // unknown Key, log it and ignore the Key
-        os_log("Unknown Waterfall token - %{public}@", log: _log, type: .default, property.key)
-        
+        // log it and ignore the Key
+        _log.msg("Unknown Waterfall token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -218,10 +214,8 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   func vitaProcessor(_ vita: Vita) {
     
     // convert the Vita struct and accumulate a WaterfallFrame
-    if _waterfallframes[_index].accumulate(vita: vita, expectedIndex: &expectedIndex) {
+    if _waterfallframes[_index].accumulate(vita: vita, expectedFrame: &packetFrame) {
       
-      expectedIndex += 1
-
       // save the auto black level
       _autoBlackLevel = _waterfallframes[_index].autoBlackLevel
       
