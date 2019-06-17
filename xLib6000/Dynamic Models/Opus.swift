@@ -53,7 +53,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   private var _port                         = 0                             // port number used by Opus
   private var _vita                         : Vita?                         // a Vita class
   private var _rxLostPacketCount            = 0                             // Rx lost packet count
-  private var _rxSeq                        : Int?                          // Rx sequence number
+  private var _expectedFrame                : Int?                          // Rx sequence number
   private var _txSeq                        = 0                             // Tx sequence number
   private var _txSampleCount                = 0                             // Tx sample count
   
@@ -230,30 +230,33 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   func vitaProcessor(_ vita: Vita) {
     
     // is this the first packet?
-    if _rxSeq == nil { _rxSeq = vita.sequence ; _rxLostPacketCount = 0}
+    if _expectedFrame == nil { _expectedFrame = vita.sequence ; _rxLostPacketCount = 0 }
 
-    // is the received Sequence Number correct?
-    if vita.sequence != _rxSeq {
-      
-      // NO, missing or out-of-sequence?
-      if vita.sequence > _rxSeq! {
-        
-        // MISSING, frame(s) has been skipped, ignore the skipped frame(s)
-        _log.msg("Missing Opus packet(s), received: \(vita.sequence) != expected: \(_rxSeq!)", level: .warning, function: #function, file: #file, line: #line)
-        _rxSeq = vita.sequence
-        
-      } else {
-        
-        // OUT-OF-SEQUENCE, a frame is either duplicated or out of order, ignore it
-        _log.msg("Out of sequence Opus packet(s), received: \(vita.sequence) != expected: \(_rxSeq!)", level: .warning, function: #function, file: #file, line: #line)
-        return
-      }
-    }
-    // calculate the next Sequence Number
-    _rxSeq = (_rxSeq! + 1) % 16
+    switch (_expectedFrame!, vita.sequence) {
     
-    // Pass the data frame to the Opus delegate
-    delegate?.streamHandler( OpusFrame(payload: vita.payloadData, numberOfSamples: vita.payloadSize) )
+//    case (let expected, let received) where received < expected:
+//      // from a previous group, ignore it
+//      _log.msg("Delayed frame(s): expected \(expected), received \(received)", level: .warning, function: #function, file: #file, line: #line)
+//      return
+      
+    case (let expected, let received) where received > expected:
+      // from a later group, jump forward
+      _log.msg("Missing frame(s): expected \(expected), received \(received) ", level: .warning, function: #function, file: #file, line: #line)
+
+//      // Pass an empty data frame to the Opus delegate
+//      delegate?.streamHandler( OpusFrame(payload: vita.payloadData, numberOfSamples: 0) )
+//
+      _expectedFrame = received
+      fallthrough
+
+    default:
+      // received == expected
+      // calculate the next Sequence Number
+      _expectedFrame = (_expectedFrame! + 1) % 16
+    
+      // Pass the data frame to the Opus delegate
+      delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: vita.payloadSize) )
+    }
   }
 }
 

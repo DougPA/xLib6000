@@ -53,6 +53,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public private(set) var radioVersionMajor = 0                             // numeric versions of Radio firmware version
   public private(set) var radioVersionMinor = 0
 
+  public private(set) var apiVersion        = Version()
+  public private(set) var radioVersion      = Version()
+
   public let kApiFirmwareSupport            = "2.4.9.x"                     // The Radio Firmware version supported by this API
   
   // ----------------------------------------------------------------------------
@@ -79,7 +82,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // GCD Serial Queues
   private let _tcpReceiveQ                  = DispatchQueue(label: Api.kId + ".tcpReceiveQ")
   private let _tcpSendQ                     = DispatchQueue(label: Api.kId + ".tcpSendQ")
-  private let _udpReceiveQ                  = DispatchQueue(label: Api.kId + ".udpReceiveQ")
+  private let _udpReceiveQ                  = DispatchQueue(label: Api.kId + ".udpReceiveQ", qos: .userInteractive)
   private let _udpRegisterQ                 = DispatchQueue(label: Api.kId + ".udpRegisterQ")
   private let _pingQ                        = DispatchQueue(label: Api.kId + ".pingQ")
   private let _parseQ                       = DispatchQueue(label: Api.kId + ".parseQ")
@@ -354,21 +357,20 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   private func checkFirmware() {
     
-    // separate the parts of each version
-    let apiVersionParts = kApiFirmwareSupport.components(separatedBy: ".")
-    let radioVersionParts = activeRadio!.firmwareVersion.components(separatedBy: ".")
+    // create the Version structs
+    apiVersion = Version(kApiFirmwareSupport)
+    radioVersion = Version(activeRadio!.firmwareVersion)
+    // make sure they are valid
+    // compare them
+    if radioVersion < apiVersion {
+      // Radio may need update
+      _log.msg("Radio firmware may need to be upgraded: Radio version = \(radioVersion.string), API supports version = \(apiVersion.string)", level: .warning, function: #function, file: #file, line: #line)
     
-    // compare the versions
-    if apiVersionParts[0] != radioVersionParts[0] || apiVersionParts[1] != radioVersionParts[1] || apiVersionParts[2] != radioVersionParts[2] {
-      // version mismatch
-      _log.msg("Update needed, Radio version = \(activeRadio!.firmwareVersion), API supports version = \(kApiFirmwareSupport)", level: .warning, function: #function, file: #file, line: #line)
-      NC.post(.updateRequired, object: kApiFirmwareSupport + "," + activeRadio!.firmwareVersion)
+    } else if apiVersion < radioVersion {
+      // Radio may need downgrade
+      _log.msg("Radio firmware must be downgraded: Radio version = \(radioVersion.string), API supports version = \(apiVersion.string)", level: .warning, function: #function, file: #file, line: #line)
+      NC.post(.radioFirmwareDowngradeRequired, object: apiVersion.string + "," + radioVersion.string)
     }
-    // set integer numbers for major and minor for fast comparision
-    apiVersionMajor = Int(apiVersionParts[0]) ?? 0
-    apiVersionMinor = Int(apiVersionParts[1]) ?? 0
-    radioVersionMajor = Int(radioVersionParts[0]) ?? 0
-    radioVersionMinor = Int(radioVersionParts[1]) ?? 0
   }
   /// Send a command list to the Radio
   ///

@@ -108,7 +108,7 @@ public class PanadapterFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log.msg("Out of sequence Frame ignored: expected = \(expected), received = \(received), startBin = \(startingBin)", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg("Panadapter frame(s) ignored: expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
       return false
     
     case (let expected, let received) where received > expected:
@@ -116,7 +116,7 @@ public class PanadapterFrame {
       // make sure it's the beginning of a frame
       guard startingBin == 0 else {
         // it's not, wait for the beginning of the next frame
-        _log.msg("\(received - expected) Frame(s) skipped: expected = \(expected), received = \(received), startBin = \(startingBin)", level: .warning, function: #function, file: #file, line: #line)
+        _log.msg("Panadapter frame(s) skipped: expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
         _binsProcessed = 0
         expectedFrame = received + 1
         return false
@@ -270,7 +270,7 @@ public class WaterfallFrame {
       
     case (let expected, let received) where received < expected:
       // from a previous group, ignore it
-      _log.msg("Out of sequence Frame ignored: expected = \(expected), received = \(received), startBin = \(startingBin)", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg("Waterfall, frame(s) ignored: expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
       return false
       
     case (let expected, let received) where received > expected:
@@ -278,7 +278,7 @@ public class WaterfallFrame {
       // make sure it's the beginning of a frame
       guard startingBin == 0 else {
         // it's not, wait for the beginning of the next frame
-        _log.msg("\(received - expected) Frame(s) skipped: expected = \(expected), received = \(received), startBin = \(startingBin)", level: .warning, function: #function, file: #file, line: #line)
+        _log.msg("Waterfall frame(s) skipped: expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
         _binsProcessed = 0
         expectedFrame = received + 1
         return false
@@ -395,11 +395,8 @@ public struct OpusFrame {
   
   public var samples: [UInt8]                     // array of samples
   public var numberOfSamples: Int                 // number of samples
-  
-  /*
-   public var duration: Float                     // frame duration (ms)
-   public var channels: Int                       // number of channels (1 or 2)
-   */
+  public var duration: Float                     // frame duration (ms)
+  public var channels: Int                       // number of channels (1 or 2)
   
   /// Initialize an OpusFrame
   ///
@@ -407,39 +404,40 @@ public struct OpusFrame {
   ///   - payload:            pointer to the Vita packet payload
   ///   - numberOfSamples:    number of Samples in the payload
   ///
-  public init(payload: UnsafeRawPointer, numberOfSamples: Int) {
+  public init(payload: [UInt8], sampleCount: Int) {
+    
+    numberOfSamples = sampleCount
+
+    
+//    Swift.print("\(hexDump(data: payload, len: sampleCount))\n")
+    
     
     // allocate the samples array
-    samples = [UInt8](repeating: 0, count: numberOfSamples)
+    samples = [UInt8](repeating: 0, count: sampleCount)
     
     // save the count and copy the data
-    self.numberOfSamples = numberOfSamples
-    memcpy(&samples, payload, numberOfSamples)
+    memcpy(&samples, payload, sampleCount)
     
-    /*
-     // MARK: This code unneeded at this time
-     
-     // Flex 6000 series uses:
-     //     duration = 10 ms
-     //     channels = 2 (stereo)
-     
-     // determine the frame duration
-     let durationCode = (samples[0] & 0xF8)
-     switch durationCode {
-     case 0xC0:
-     duration = 2.5
-     case 0xC8:
-     duration = 5.0
-     case 0xD0:
-     duration = 10.0
-     case 0xD8:
-     duration = 20.0
-     default:
-     duration = 0
-     }
-     // determine the number of channels (mono = 1, stereo = 2)
-     channels = (samples[0] & 0x04) == 0x04 ? 2 : 1
-     */
+    // Flex 6000 series uses:
+    //     duration = 10 ms
+    //     channels = 2 (stereo)
+    
+    // determine the frame duration
+    let durationCode = (samples[0] & 0xF8)
+    switch durationCode {
+    case 0xC0:
+      duration = 2.5
+    case 0xC8:
+      duration = 5.0
+    case 0xD0:
+      duration = 10.0
+    case 0xD8:
+      duration = 20.0
+    default:
+      duration = 0
+    }
+    // determine the number of channels (mono = 1, stereo = 2)
+    channels = (samples[0] & 0x04) == 0x04 ? 2 : 1
   }
 }
 

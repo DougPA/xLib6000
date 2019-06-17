@@ -458,12 +458,13 @@ public class Vita {
 
     let date = Date(timeIntervalSinceReferenceDate: Double(integerTimestamp) )
 
-    var payloadString = ""
-    for i in 1...payloadSize {
-      payloadString += String(format: "%02X", payloadData[i-1]) + " "
-      if (i % 8) == 0 { payloadString += "  " }
-      if (i % 16) == 0 { payloadString += "\n" }
-    }
+//    var payloadString = ""
+//    for i in 1...payloadSize {
+//      payloadString += String(format: "%02X", payloadData[i-1]) + " "
+//      if (i % 8) == 0 { payloadString += "  " }
+//      if (i % 16) == 0 { payloadString += "\n" }
+//    }
+    let payloadString = hexDump(data: payloadData, len: payloadSize)
 
     let adjustedPacketSize = Int( (Float(packetSize) / 4.0).rounded(.up))
     let warning = ( (headerSize / 4) + (payloadSize / 4) !=  adjustedPacketSize ? "WARNING: **** Payload size (bytes) not a multiple of 4 ****" : "")

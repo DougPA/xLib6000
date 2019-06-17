@@ -39,7 +39,8 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   private let kRegistrationDelay            : UInt32 = 50_000
 
   private let _objectQ                      = DispatchQueue(label: Api.kId + ".udpObjects")
-  
+  private let _streamQ                      = DispatchQueue(label: Api.kId + ".streamQ", qos: .userInteractive)
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
   //
   private var __udpSuccessfulRegistration   = false
@@ -252,31 +253,76 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   ///
   @objc func udpSocket(_ sock: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext filterContext: Any?) {
     
-    if let vita = Vita.decodeFrom(data: data) {
-      
-      // TODO: Packet statistics - received, dropped
-      
+    _streamQ.async { [weak self] in
+
+      let vitaHeader : VitaHeader
+
+      // map the packet to a VitaHeader struct
+      vitaHeader = (data as NSData).bytes.bindMemory(to: VitaHeader.self, capacity: 1).pointee
+
       // ensure the packet has our OUI
-      guard vita.oui == Vita.kFlexOui  else { return }
+      guard CFSwapInt32BigToHost(vitaHeader.oui) == Vita.kFlexOui else { return }
 
       // we got a VITA packet which means registration was successful
-      _udpSuccessfulRegistration = true
+      self?._udpSuccessfulRegistration = true
 
-      switch vita.packetType {
-        
-      case .ifDataWithStream, .extDataWithStream:
-        
-        // stream of data, pass it to the delegate
-        _delegate?.udpStreamHandler(vita)
+      let packetType = (vitaHeader.packetDesc & 0xf0) >> 4
 
-      case .ifData, .extData, .ifContext, .extContext:
-        // error, pass it to the delegate
-        _log.msg("UDP: Unexpected packetType - \(vita.packetType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
+      if packetType == Vita.PacketType.ifDataWithStream.rawValue || packetType == Vita.PacketType.extDataWithStream.rawValue {
+        // enqueue the data
+
+        let classCode = Vita.PacketClassCode( rawValue: UInt16(CFSwapInt32BigToHost(vitaHeader.classCodes) & 0xffff))
+
+        if classCode == Vita.PacketClassCode.panadapter || classCode == Vita.PacketClassCode.waterfall || classCode == Vita.PacketClassCode.meter {
+
+          if let vita = Vita.decodeFrom(data: data) {
+            self?._delegate?.udpStreamHandler(vita)
+          }
+
+        } else if classCode == Vita.PacketClassCode.opus {
+
+          if let vita = Vita.decodeFrom(data: data) {
+            
+//            Swift.print("\(vita.desc())")
+
+            self?._delegate?.udpStreamHandler(vita)
+          }
+        }
+
+      } else {
+        // log the error
+        self?._log.msg("Invalid packetType - \(packetType)", level: .warning, function: #function, file: #file, line: #line)
       }
-      
-    } else {      
-      // pass the error to the delegate
-      _log.msg("UDP: Unable to decode received packet", level: .warning, function: #function, file: #file, line: #line)
     }
+
+//    if let vita = Vita.decodeFrom(data: data) {
+//
+//      _streamQ.async { [weak self] in
+//        // TODO: Packet statistics - received, dropped
+//
+//        // ensure the packet has our OUI
+//        guard vita.oui == Vita.kFlexOui  else { return }
+//
+//        // we got a VITA packet which means registration was successful
+//        self?._udpSuccessfulRegistration = true
+//
+//        switch vita.packetType {
+//
+//        case .ifDataWithStream, .extDataWithStream:
+//
+//          // stream of data, pass it to the delegate
+//          self?._delegate?.udpStreamHandler(vita)
+//
+//        case .ifData, .extData, .ifContext, .extContext:
+//          // log the error
+//          self?._log.msg("UDP: Unexpected packetType - \(vita.packetType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
+//        }
+//      }
+//
+//    } else {
+//      // log the error
+//      _log.msg("UDP: Unable to decode received packet", level: .warning, function: #function, file: #file, line: #line)
+//    }
   }
 }
+

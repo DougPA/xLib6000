@@ -1398,6 +1398,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
             _log.msg("Opus Stream started: Stream Id = \(vitaPacket.streamId.hex)", level: .info, function: #function, file: #file, line: #line)
           }
           opus.vitaProcessor( vitaPacket )
+          
+//          Swift.print("\(vitaPacket.desc())")
         }
         
       case .panadapter:

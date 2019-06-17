@@ -424,3 +424,67 @@ public extension CGFloat {
   }
 }
 
+/// Struct to hold a Version number
+///
+public struct Version {
+  var major     : Int = 1
+  var minor     : Int = 0
+  var build     : Int = 0
+  var revision  : String = "x"
+  
+  init(_ versionString: String = "1.0.0.x") {
+    
+    let components = versionString.components(separatedBy: ".")
+    if components.count == 4 {
+      major = Int(components[0]) ?? 0
+      minor = Int(components[1]) ?? 0
+      build = Int(components[2]) ?? 0
+      revision = components[3]
+    } else if components.count == 3 {
+      major = Int(components[0]) ?? 0
+      minor = Int(components[1]) ?? 0
+      build = Int(components[2]) ?? 0
+      revision = "x"
+    }
+  }
+  
+  var string : String {
+    return "\(major).\(minor).\(build).\(revision)"
+  }
+  
+  var shortString : String {
+    return "\(major).\(minor).\(build)"
+  }
+  
+  static func ==(lhs: Version, rhs: Version) -> Bool {
+    return lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.build == rhs.build
+  }
+  
+  static func <(lhs: Version, rhs: Version) -> Bool {
+    
+    switch (lhs, rhs) {
+      
+    case (let l, let r) where l == r:
+      return false
+    case (let l, let r) where l.major < r.major:
+      return true
+    case (let l, let r) where l.major == r.major && l.minor < r.minor:
+      return true
+    case (let l, let r) where l.major == r.major && l.minor == r.minor && l.build < r.build:
+      return true
+    default:
+      return false
+    }
+  }
+}
+
+public func hexDump(data: [UInt8], len: Int) -> String {
+  var string = ""
+  for i in 1...len {
+    string += String(format: "%02X", data[i-1]) + " "
+    if (i % 8) == 0 { string += "  " }
+    if (i % 16) == 0 { string += "\n" }
+  }
+  return string
+}
+
