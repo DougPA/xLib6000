@@ -35,7 +35,13 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
+  public private(set) var apiVersion        = Version("2.4.9.20190617" )
+
   @objc dynamic public var radio            : Radio?                        // current Radio class
+  public var apiState                       : Api.State!
+  {
+    didSet { _log.msg("Api state == \(apiState.rawValue)", level: .info, function: #function, file: #file, line: #line) }
+  }
 
   public var availableRadios                : [RadioParameters] {           // Radios discovered
     return _radioFactory.availableRadios }
@@ -48,23 +54,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var wanConnectionHandle            = ""                            // Wan connection handle
   public var connectionHandle               = ""                            // Status messages handle
 
-  public private(set) var apiVersionMajor   = 0                             // numeric versions of Api firmware version
-  public private(set) var apiVersionMinor   = 0
-  public private(set) var radioVersionMajor = 0                             // numeric versions of Radio firmware version
-  public private(set) var radioVersionMinor = 0
-
-  public private(set) var apiVersion        = Version()
   public private(set) var radioVersion      = Version()
-
-  public let kApiFirmwareSupport            = "2.4.9.x"                     // The Radio Firmware version supported by this API
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _apiState                     : Api.State!
-  {
-    didSet { _log.msg("Api state == \(_apiState.rawValue)", level: .info, function: #function, file: #file, line: #line) }
-  }
   private var _tcp                          : TcpManager!                   // TCP connection class (commands)
   private var _udp                          : UdpManager!                   // UDP connection class (streams)
   private var _primaryCmdTypes              = [Api.Command]()               // Primary command types to be sent
@@ -122,7 +116,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     _udp = UdpManager(udpReceiveQ: _udpReceiveQ, udpRegisterQ: _udpRegisterQ, delegate: self)
     
     // set the initial State
-    _apiState = .disconnected
+    apiState = .disconnected
   }
   
   // ----------------------------------------------------------------------------
@@ -148,7 +142,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) -> Bool {
 
     // must be in the Ready state to connect
-    guard _apiState == .disconnected else { return false }
+    guard apiState == .disconnected else { return false }
     
     _clientName = clientName
     _isGui = isGui
@@ -194,7 +188,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // the radio (if any) will be removed, inform observers
     if activeRadio != nil { NC.post(.radioWillBeRemoved, object: radio as Any?) }
     
-    if _apiState != .disconnected {
+    if apiState != .disconnected {
       // disconnect TCP
       _tcp.disconnect()
       
@@ -314,11 +308,11 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // TCP & UDP connections established, inform observers
       NC.post(.clientDidConnect, object: activeRadio as Any?)
       
-      _apiState = .clientConnected
+      apiState = .clientConnected
     }
 
     // could this be a remote connection?
-    if apiVersionMajor >= 2 {
+    if apiVersion.major >= 2 {
       
       // YES, when connecting to a WAN radio, the public IP address of the connected
       // client must be obtained from the radio.  This value is used to determine
@@ -358,7 +352,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private func checkFirmware() {
     
     // create the Version structs
-    apiVersion = Version(kApiFirmwareSupport)
     radioVersion = Version(activeRadio!.firmwareVersion)
     // make sure they are valid
     // compare them
@@ -419,7 +412,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         switch command {
           
         case .setMtu:
-          if radioVersionMajor == 2 && radioVersionMinor >= 3 {
+          if radioVersion.major == 2 && radioVersion.minor >= 3 {
             // the MTU command is only used for radio firmware versions >= 2.3.x
             array.append( (command.rawValue, false, nil) )
           }
@@ -576,7 +569,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _log.msg("TCP connected to \(activeRadio!.nickname) @ \(host), port \(port) \(guiStatus)(\(wanStatus))", level: .info, function: #function, file: #file, line: #line)
 
       // YES, set state
-      _apiState = .tcpConnected
+      apiState = .tcpConnected
       
       // a tcp connection has been established, inform observers
       NC.post(.tcpDidConnect, object: nil)
@@ -631,7 +624,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         _log.msg("Tcp Disconnected with message = \(error)", level: .info, function: #function, file: #file, line: #line)
       }
 
-      _apiState = .disconnected
+      apiState = .disconnected
     }
   }
 
@@ -656,7 +649,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       _log.msg("UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
 
-      _apiState = .udpBound
+      apiState = .udpBound
       
       localUDPPort = port
       
@@ -669,7 +662,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // if WAN connection reset the state to .clientConnected as the true connection state
       if isWan {
         
-        _apiState = .clientConnected
+        apiState = .clientConnected
       }
     } else {
     

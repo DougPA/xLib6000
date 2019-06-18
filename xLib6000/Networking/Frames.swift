@@ -71,7 +71,7 @@ public class PanadapterFrame {
     
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
-    if Api.sharedInstance.radioVersionMajor == 2 && Api.sharedInstance.radioVersionMinor >= 3 {
+    if Api.sharedInstance.radioVersion.major == 2 && Api.sharedInstance.radioVersion.minor >= 3 {
       // 2.3.x or greater
       // Bins are just beyond the payload
       _byteOffsetToBins = MemoryLayout<PayloadHeader>.size
@@ -223,7 +223,7 @@ public class WaterfallFrame {
     
     let payloadPtr = UnsafeRawPointer(vita.payloadData)
     
-    if Api.sharedInstance.radioVersionMajor == 2 && Api.sharedInstance.radioVersionMinor >= 3 {
+    if Api.sharedInstance.radioVersion.major == 2 && Api.sharedInstance.radioVersion.minor >= 3 {
       // 2.3.x or greater
       // map the payload to the New Payload struct
       let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
