@@ -432,7 +432,7 @@ public struct Version {
   var build     : Int = 0
   var revision  : String = "x"
   
-  init(_ versionString: String = "1.0.0.x") {
+  public init(_ versionString: String = "1.0.0.x") {
     
     let components = versionString.components(separatedBy: ".")
     if components.count == 4 {
@@ -448,11 +448,11 @@ public struct Version {
     }
   }
   
-  var string : String {
+  public var string : String {
     return "\(major).\(minor).\(build).\(revision)"
   }
   
-  var shortString : String {
+  public var shortString : String {
     return "\(major).\(minor).\(build)"
   }
   
