@@ -67,6 +67,8 @@ public enum NotificationType : String {
   
   case radiosAvailable
   
+  case radioFirmwareDowngradeRequired
+  
   case sliceBecameActive
   case sliceHasBeenAdded
   case sliceWillBeRemoved
@@ -93,8 +95,6 @@ public enum NotificationType : String {
   
   case waterfallHasBeenAdded
   case waterfallWillBeRemoved
-  
-  case updateRequired
   
   case xvtrHasBeenAdded
   case xvtrWillBeRemoved

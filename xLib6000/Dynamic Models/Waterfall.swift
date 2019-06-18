@@ -27,7 +27,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   
   public private(set) var id                : WaterfallId   = 0             // Waterfall Id (StreamId)
 //  public private(set) var lastTimecode      = -1                            // Time code of last frame received
-  public private(set) var expectedIndex     = -1                            // Frame index of next Vita payload
+  public private(set) var packetFrame       = -1                            // Frame index of next Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
 
   // ----------------------------------------------------------------------------
@@ -228,9 +228,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   func vitaProcessor(_ vita: Vita) {
     
     // convert the Vita struct and accumulate a WaterfallFrame
-    if _waterfallframes[_index].accumulate(vita: vita, expectedIndex: &expectedIndex) {
-      
-      expectedIndex += 1
+    if _waterfallframes[_index].accumulate(vita: vita, expectedFrame: &packetFrame) {
 
       // save the auto black level
       _autoBlackLevel = _waterfallframes[_index].autoBlackLevel

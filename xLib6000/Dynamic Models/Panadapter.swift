@@ -37,7 +37,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   public var isStreaming                    = false
 
   public private(set) var id                : PanadapterId = 0              // Panadapter Id (StreamId)
-  public private(set) var expectedIndex     = -1                            // Frame index of next Vita payload
+  public private(set) var packetFrame       = -1                            // Frame index of next Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
   
   @objc dynamic public let daxIqChoices     = Api.daxIqChannels
@@ -431,7 +431,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   func vitaProcessor(_ vita: Vita) {
     
     // convert the Vita struct to a PanadapterFrame
-    if _panadapterframes[_index].accumulate(vita: vita, expectedIndex: &expectedIndex) {
+    if _panadapterframes[_index].accumulate(vita: vita, expectedFrame: &packetFrame) {
       
       // Pass the data frame to this Panadapter's delegate
       delegate?.streamHandler(_panadapterframes[_index])

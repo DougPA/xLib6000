@@ -44,6 +44,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // MARK: - Public properties
 
   @objc dynamic public var radio            : Radio?                        // current Radio class
+  public var apiState                       : Api.State! {
+    didSet { log.msg( "Api state = \(apiState.rawValue)", level: .info, function: #function, file: #file, line: #line)}}
 
   public var discoveredRadios               : [DiscoveredRadio] {           // Radios discovered
     return _radioFactory.discoveredRadios }
@@ -60,18 +62,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // GCD Concurrent Queue
   public let objectQ                        = DispatchQueue(label: Api.kId + ".objectQ", attributes: [.concurrent])
 
-  public private(set) var apiVersionMajor   = 0                             // numeric versions of Api firmware version
-  public private(set) var apiVersionMinor   = 0
-  public private(set) var radioVersionMajor = 0                             // numeric versions of Radio firmware version
-  public private(set) var radioVersionMinor = 0
+  public private(set) var apiVersion        = Version("2.5.1.x")            // Api firmware version
+  public private(set) var radioVersion      = Version()                     // Radio firmware version
 
-  public let kApiFirmwareSupport            = "3.0.19.x"                    // The highest Radio Firmware version supported by this API
-  
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _apiState                     : Api.State! {
-    didSet { log.msg( "Api state = \(_apiState.rawValue)", level: .info, function: #function, file: #file, line: #line)}}
   private var _tcp                          : TcpManager!                   // TCP connection class (commands)
   private var _udp                          : UdpManager!                   // UDP connection class (streams)
   private var _primaryCmdTypes              = [Api.Command]()               // Primary command types to be sent
@@ -85,10 +81,10 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   
 
   // GCD Serial Queues
-  private let _tcpReceiveQ                  = DispatchQueue(label: Api.kId + ".tcpReceiveQ", qos: .userInitiated)
+  private let _tcpReceiveQ                  = DispatchQueue(label: Api.kId + ".tcpReceiveQ")
   private let _tcpSendQ                     = DispatchQueue(label: Api.kId + ".tcpSendQ")
-  private let _udpReceiveQ                  = DispatchQueue(label: Api.kId + ".udpReceiveQ", qos: .userInitiated)
-  private let _udpRegisterQ                 = DispatchQueue(label: Api.kId + ".udpRegisterQ", qos: .background)
+  private let _udpReceiveQ                  = DispatchQueue(label: Api.kId + ".udpReceiveQ", qos: .userInteractive)
+  private let _udpRegisterQ                 = DispatchQueue(label: Api.kId + ".udpRegisterQ")
   private let _pingQ                        = DispatchQueue(label: Api.kId + ".pingQ")
   private let _parseQ                       = DispatchQueue(label: Api.kId + ".parseQ", qos: .userInteractive)
   private let _workerQ                      = DispatchQueue(label: Api.kId + ".workerQ")
@@ -128,7 +124,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     _udp = UdpManager(udpReceiveQ: _udpReceiveQ, udpRegisterQ: _udpRegisterQ, delegate: self)
     
     // set the initial State
-    _apiState = .disconnected
+    apiState = .disconnected
   }
   
   // ----------------------------------------------------------------------------
@@ -159,7 +155,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
                       subscriptionCmdTypes: [Api.Command] = [.allSubscription] ) -> Bool {
 
     // must be in the Disconnected state to connect
-    guard _apiState == .disconnected else { return false }
+    guard apiState == .disconnected else { return false }
     
     _clientName = clientName
     _clientId = clientId
@@ -211,7 +207,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // the radio (if any) will be removed, inform observers
     if activeRadio != nil { NC.post(.radioWillBeRemoved, object: radio as Any?) }
     
-    if _apiState != .disconnected {
+    if apiState != .disconnected {
       // disconnect TCP
       _tcp.disconnect()
       
@@ -327,7 +323,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // TCP & UDP connections established, inform observers
       NC.post(.clientDidConnect, object: activeRadio as Any?)
       
-      _apiState = .clientConnected
+      apiState = .clientConnected
   }
   
   // ----------------------------------------------------------------------------
@@ -340,23 +336,19 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   private func checkFirmware() {
     
-    // separate the parts of each version
-    let apiVersionParts = kApiFirmwareSupport.components(separatedBy: ".")
-    let radioVersionParts = activeRadio!.firmwareVersion.components(separatedBy: ".")
-    
-    // compare the versions
-    if apiVersionParts[0] != radioVersionParts[0] || apiVersionParts[1] != radioVersionParts[1] || apiVersionParts[2] != radioVersionParts[2] {
-    
-//      os_log("Update needed, Radio version = %{public}@, API supports version = %{public}@", log: _log, type: .default, activeRadio!.firmwareVersion, kApiFirmwareSupport)
-      log.msg( "Update needed, Radio version = \(activeRadio!.firmwareVersion), API supports version = \(kApiFirmwareSupport)", level: .warning, function: #function, file: #file, line: #line)
-
-      NC.post(.updateRequired, object: kApiFirmwareSupport + "," + activeRadio!.firmwareVersion)
+    // create the Version structs
+    radioVersion = Version(activeRadio!.firmwareVersion)
+    // make sure they are valid
+    // compare them
+    if radioVersion < apiVersion {
+      // Radio may need update
+      log.msg("Radio firmware may need to be upgraded: Radio version = \(radioVersion.string), API supports version = \(apiVersion.string)", level: .warning, function: #function, file: #file, line: #line)
+      
+    } else if apiVersion < radioVersion {
+      // Radio may need downgrade
+      log.msg("Radio firmware must be downgraded: Radio version = \(radioVersion.string), API supports version = \(apiVersion.string)", level: .warning, function: #function, file: #file, line: #line)
+      NC.post(.radioFirmwareDowngradeRequired, object: apiVersion.string + "," + radioVersion.string)
     }
-    // set integer numbers for major and minor for fast comparision
-    apiVersionMajor = Int(apiVersionParts[0]) ?? 0
-    apiVersionMinor = Int(apiVersionParts[1]) ?? 0
-    radioVersionMajor = Int(radioVersionParts[0]) ?? 0
-    radioVersionMinor = Int(radioVersionParts[1]) ?? 0
   }
   /// Send a command list to the Radio
   ///
@@ -400,7 +392,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         
         // Conditionally send the following
         case .setMtu:
-          if radioVersionMajor == 2 && radioVersionMinor >= 3 {
+          if radioVersion.major == 2 && radioVersion.minor >= 3 {
             // the MTU command is only used for radio firmware versions >= 2.3.x
             array.append( (command.rawValue, false, nil) )
           }
@@ -518,7 +510,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       log.msg( "TCP connected to \(activeRadio!.nickname) @ \(host), port \(port) \(guiStatus)(\(wanStatus)), radio version = \(activeRadio!.firmwareVersion)", level: .info, function: #function, file: #file, line: #line)
 
       // YES, set state
-      _apiState = .tcpConnected
+      apiState = .tcpConnected
       
       // a tcp connection has been established, inform observers
       NC.post(.tcpDidConnect, object: nil)
@@ -578,7 +570,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
        log.msg( "Tcp Disconnected with message = \(error)", level: .info, function: #function, file: #file, line: #line)
       }
 
-      _apiState = .disconnected
+      apiState = .disconnected
     }
   }
 
@@ -604,7 +596,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 //      os_log("UDP bound to Port %{public}d", log: _log, type: .info, port)
       log.msg( "UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
 
-      _apiState = .udpBound
+      apiState = .udpBound
       
       localUDPPort = port
       
@@ -617,7 +609,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // if WAN connection reset the state to .clientConnected as the true connection state
       if isWan {
         
-        _apiState = .clientConnected
+        apiState = .clientConnected
       }
     } else {
     

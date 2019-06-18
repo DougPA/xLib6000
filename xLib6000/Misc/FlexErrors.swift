@@ -16,28 +16,26 @@ import Foundation
 /// - Parameter errorCode:      error code from reply
 /// - Returns:                  error level
 ///
-public func flexErrorLevel(errorCode: String) -> String {
-  var errorLevel = ""
+public func flexErrorLevel(errorCode: String) -> MessageLevel {
+  var errorLevel = MessageLevel.info
   
   let number = UInt32(errorCode, radix: 16) ?? 0
   
   switch number {
-  case 0:
-    errorLevel = "None"
   case 0x10000001...0x10000003:
-    errorLevel = "Info"
+    errorLevel = .info
   case 0x31000001...0x31000009:
-    errorLevel = "Warning"
+    errorLevel = .warning
   case 0x50000001...0x500000A3:
-    errorLevel = "Error"
+    errorLevel = .error
   case 0x50001000...0x50001017:
-    errorLevel = "Error"
+    errorLevel = .error
   case 0xE2000000:
-    errorLevel = "Error"
+    errorLevel = .error
   case 0xF3000001...0xF3000004:
-    errorLevel = "Fatal error"
+    errorLevel = .error
   default:
-    errorLevel = "Unknown error"
+    errorLevel = .info
   }
   return errorLevel
 }
