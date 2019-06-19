@@ -36,6 +36,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
+  private let _log                          = Log.sharedInstance
 
   private var _waterfallframes                   = [WaterfallFrame]()
   private var _index               = 0
@@ -153,7 +154,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-        _api.log.msg( "Unknown Waterfall token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg( "Unknown Waterfall token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
         continue
       }

@@ -30,7 +30,8 @@ public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  
+  private let _log                          = Log.sharedInstance
+
   private var _rxSeq                        : Int?                          // Rx sequence number
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
@@ -109,7 +110,7 @@ public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _api.log.msg( "Unknown MicAudioStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg( "Unknown MicAudioStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
         continue
       }
@@ -195,8 +196,7 @@ public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-//      os_log("Missing MicAudioStream packet(s), rcvdSeq: %d,  != expectedSeq: %d", log: _log, type: .default, vita.sequence, expectedSequenceNumber)
-      _api.log.msg( "Missing MicAudioStream packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg( "Missing MicAudioStream packet(s), rcvdSeq: \(vita.sequence),  != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
 
       _rxSeq = nil
       rxLostPacketCount += 1

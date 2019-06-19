@@ -34,6 +34,7 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue!                // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
+  private let _log                          = Log.sharedInstance
 
   private var _rxSeq                        : Int?                          // Rx sequence number
   
@@ -188,7 +189,7 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _api.log.msg( "Unknown DaxRxAudioStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg( "Unknown DaxRxAudioStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
         continue
       }
@@ -287,7 +288,7 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-      _api.log.msg( "Missing AudioStream packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg( "Missing AudioStream packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
 
       _rxSeq = nil
       rxLostPacketCount += 1

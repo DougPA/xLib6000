@@ -30,7 +30,8 @@ public final class Xvtr                     : NSObject, DynamicModel {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  
+  private let _log                          = Log.sharedInstance
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //                                                                                              
   private var __name                        = ""                            // Xvtr Name
@@ -128,7 +129,7 @@ public final class Xvtr                     : NSObject, DynamicModel {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-        _api.log.msg( "Unknown Xvtr token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg( "Unknown Xvtr token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
         continue
       }

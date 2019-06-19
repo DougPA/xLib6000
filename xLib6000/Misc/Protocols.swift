@@ -11,15 +11,19 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
-/// Logging protocol
-///
-///   Allows this library to pass log messages to the Client
-///   The Client can use its preferred method for logging
-///
-public protocol LogHandler
-{
-  // method to process Log entries
-  func msg(_ msg: String, level: Api.Level, function: String, file: String, line: Int , source: String) -> Void
+/// Logging is deferred to the hosting application
+////
+public protocol LogHandler {
+  /// Method to process Log entries
+  ///
+  /// - Parameters:
+  ///   - msg:                  the message
+  ///   - level:                a message severity level
+  ///   - function:             name of the function posting the message
+  ///   - file:                 file containing the function posting the message
+  ///   - line:                 line number of the function posting the message
+  ///
+  func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int )
 }
 
 /// Models for which there will only be one instance

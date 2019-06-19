@@ -38,6 +38,7 @@ public final class Profile                  : NSObject, StaticModel {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
+  private let _log                          = Log.sharedInstance
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
@@ -117,7 +118,7 @@ public final class Profile                  : NSObject, StaticModel {
     // check for unknown keys
     guard let token = Token(rawValue: properties[0].key) else {
       // unknown Key, log it and ignore the Key
-      _api.log.msg( "Unknown Profile token - \(properties[0].key) = \(properties[0].value)", level: .info, function: #function, file: #file, line: #line)
+      _log.msg( "Unknown Profile token - \(properties[0].key) = \(properties[0].value)", level: .info, function: #function, file: #file, line: #line)
 
       return
     }

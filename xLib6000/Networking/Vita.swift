@@ -327,8 +327,6 @@ public class Vita {
         guard let token = DiscoveryToken(rawValue: property.key) else {
           
           // unknown Key, log it and ignore the Key          
-//          let log                          = OSLog(subsystem: Api.kBundleIdentifier, category: "Vita")
-//          os_log("Unknown Discovery token - %{public}@ = %{public}@", log: log, type: .default, property.key, property.value)
           Api.sharedInstance.log.msg("Unknown Discovery token - \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }

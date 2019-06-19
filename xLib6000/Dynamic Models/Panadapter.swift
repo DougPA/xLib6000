@@ -48,6 +48,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
+  private let _log                          = Log.sharedInstance
 
   private var _panadapterframes             = [PanadapterFrame]()
   private var _index                        = 0
@@ -220,8 +221,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     
     guard responseValue == Api.kNoError else {
       // Anything other than 0 is an error, log it and ignore the Reply
-//      os_log("%{public}@,  non-zero reply - %{public}@, %{public}@", log: _log, type: .default, command, responseValue, flexErrorString(errorCode: responseValue))
-      _api.log.msg( "\(command),  non-zero reply - \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg( "\(command),  non-zero reply - \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .warning, function: #function, file: #file, line: #line)
 
       return
     }
@@ -249,7 +249,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _api.log.msg( "Unknown Panadapter token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg( "Unknown Panadapter token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
         continue
       }

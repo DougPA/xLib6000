@@ -173,7 +173,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       guard let token = Token(rawValue: property.key) else {
         
         // unknown Key, log it and ignore the Key
-        _api.log.msg( "Unknown Opus token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg( "Unknown Opus token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
         continue
       }

@@ -28,7 +28,8 @@ public final class Atu                      : NSObject, StaticModel {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
-   private let _q                            : DispatchQueue                 // Q for object synchronization
+  private let _q                            : DispatchQueue                 // Q for object synchronization
+  private let _log                          = Log.sharedInstance
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
@@ -72,7 +73,7 @@ public final class Atu                      : NSObject, StaticModel {
       guard let token = Token(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-        _api.log.msg( "Unknown Atu token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg( "Unknown Atu token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
         continue
       }

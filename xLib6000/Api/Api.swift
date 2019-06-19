@@ -91,7 +91,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   private var _radioFactory                 = RadioFactory()                // Radio Factory class
   private var _pinger                       : Pinger?                       // Pinger class
-  private var _clientId                     : String?                       //
+  private var _clientId                     : UUID?                         //
   private var _clientName                   = ""                            //
   private var _clientStation                = ""                            //
   private var _isGui                        = true                          // GUI enable
@@ -145,8 +145,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Returns:                  Success / Failure
   ///
   public func connect(_ selectedRadio: DiscoveredRadio,
+                      clientStation: String,
                       clientName: String,
-                      clientId: String? = nil,
+                      clientId: UUID?,
                       isGui: Bool = true,
                       isWan: Bool = false,
                       wanHandle: String = "",
@@ -159,7 +160,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     _clientName = clientName
     _clientId = clientId
-    _clientStation = (Host.current().localizedName ?? "Mac").replacingSpaces(with: "_")
+    _clientStation = clientStation
     _isGui = isGui
     self.isWan = isWan
     wanConnectionHandle = wanHandle
@@ -201,7 +202,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     if _pinger != nil {
       _pinger = nil
       
-//      os_log("Pinger stopped", log: _log, type: .info)
       log.msg("Pinger stopped", level: .info, function: #function, file: #file, line: #line)
     }
     // the radio (if any) will be removed, inform observers
@@ -315,7 +315,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         
         let wanStatus = isWan ? "REMOTE" : "LOCAL"
         let p = (isWan ? activeRadio!.publicTlsPort : activeRadio!.port)
-//        os_log("Started pinging: %{public}@ @ %{public}@, port %{public}d (%{public}@)", log: _log, type: .info, activeRadio!.nickname, activeRadio!.publicIp, p, wanStatus)
         log.msg( "Started pinging: \(activeRadio!.nickname) @ \(activeRadio!.publicIp), port \(p) (\(wanStatus))", level: .info, function: #function, file: #file, line: #line)
 
         _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ)
@@ -342,12 +341,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // compare them
     if radioVersion < apiVersion {
       // Radio may need update
-      log.msg("Radio firmware may need to be upgraded: Radio version = \(radioVersion.string), API supports version = \(apiVersion.string)", level: .warning, function: #function, file: #file, line: #line)
+      log.msg("Radio firmware may need to be upgraded: Radio version = \(radioVersion.string), API supports version = \(apiVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
       
     } else if apiVersion < radioVersion {
       // Radio may need downgrade
-      log.msg("Radio firmware must be downgraded: Radio version = \(radioVersion.string), API supports version = \(apiVersion.string)", level: .warning, function: #function, file: #file, line: #line)
-      NC.post(.radioFirmwareDowngradeRequired, object: apiVersion.string + "," + radioVersion.string)
+      log.msg("Radio firmware must be downgraded: Radio version = \(radioVersion.string), API supports version = \(apiVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+      NC.post(.radioFirmwareDowngradeRequired, object: [apiVersion, radioVersion])
     }
   }
   /// Send a command list to the Radio
@@ -389,21 +388,20 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       for command in adjustedCommands {
         
         switch command {
-        
+          
         // Conditionally send the following
         case .setMtu:
           if radioVersion.major == 2 && radioVersion.minor >= 3 {
             // the MTU command is only used for radio firmware versions >= 2.3.x
             array.append( (command.rawValue, false, nil) )
           }
-        
-        // Add parameters to the following
-        case .clientProgram:  array.append( (command.rawValue + _clientName, false, nil) )
-        // FIXME: Get name of computer
-        case .clientStation:  array.append( (command.rawValue + _clientStation, false, nil) )
           
-//        case .clientLowBW:
-//          if _lowBW { array.append( (command.rawValue, false, nil) ) }
+        // Add parameters to the following
+        case .clientProgram:  if _isGui { array.append( (command.rawValue + _clientName, false, nil) ) }
+        case .clientStation:  if _isGui { array.append( (command.rawValue + _clientStation, false, nil) ) }
+          
+        //        case .clientLowBW:
+        //          if _lowBW { array.append( (command.rawValue, false, nil) ) }
           
         // Capture the replies from the following
         case .meterList:    array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
@@ -411,12 +409,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         case .version:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .antList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .micList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-        case .clientGui:    if _isGui { array.append( (command.rawValue + " " + (_clientId ?? ""), false, delegate?.defaultReplyHandler) ) }
-        case .clientBind:   if !_isGui {array.append( (command.rawValue + " " + (_clientId ?? ""), false, nil) ) }
-         
+        case .clientGui:    if _isGui { array.append( (command.rawValue + " " + (_clientId?.uuidString ?? ""), false, delegate?.defaultReplyHandler) ) }
+        case .clientBind:   if !_isGui && _clientId != nil { array.append( (command.rawValue + " " + _clientId!.uuidString, false, nil) ) }
+          
         // Ignore the following
         case .none, .allPrimary, .allSecondary, .allSubscription: break
-        
+          
         // All others
         default: array.append( (command.rawValue, false, nil) )
         }
@@ -505,8 +503,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // log it
       let wanStatus = isWan ? "REMOTE" : "LOCAL"
       let guiStatus = _isGui ? "(GUI) " : ""
-//      os_log("TCP connected to %{public}@ @ %{public}@, port %{public}d %{public}@(%{public}@), Radio version = %{public}@", log: _log, type: .info, activeRadio!.nickname, host, port,
-//             guiStatus, wanStatus, activeRadio!.firmwareVersion)
       log.msg( "TCP connected to \(activeRadio!.nickname) @ \(host), port \(port) \(guiStatus)(\(wanStatus)), radio version = \(activeRadio!.firmwareVersion)", level: .info, function: #function, file: #file, line: #line)
 
       // YES, set state
@@ -521,7 +517,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         let cmd = "wan validate handle=" + wanConnectionHandle // TODO: + "\n"
         send(cmd, replyTo: nil)
         
-//        os_log("Wan validate handle: %{public}@", log: _log, type: .info, wanConnectionHandle)
         log.msg( "Wan validate handle: \(wanConnectionHandle)", level: .info, function: #function, file: #file, line: #line)
 
       } else {
@@ -541,7 +536,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       if activeRadio!.status == "In_Use" && _isGui {
         
         send("client disconnect")
-//        os_log("\"client disconnect\" sent", log: _log, type: .info)
         log.msg( "\"client disconnect\" sent", level: .info, function: #function, file: #file, line: #line)
         sleep(1)
       }
@@ -554,7 +548,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         // the tcp connection was disconnected, inform observers
         NC.post(.tcpDidDisconnect, object: DisconnectReason.normal)
 
-//        os_log("Tcp Disconnected", log: _log, type: .info)
         log.msg( "Tcp Disconnected", level: .info, function: #function, file: #file, line: #line)
 
       } else {
@@ -566,7 +559,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         // the tcp connection was disconnected, inform observers
         NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: error))
 
-//        os_log("Tcp Disconnected with message = %{public}@", log: _log, type: .info, error)
        log.msg( "Tcp Disconnected with message = \(error)", level: .info, function: #function, file: #file, line: #line)
       }
 
@@ -593,7 +585,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // YES, UDP (streams) connection established
       
-//      os_log("UDP bound to Port %{public}d", log: _log, type: .info, port)
       log.msg( "UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
 
       apiState = .udpBound
@@ -711,7 +702,7 @@ extension Api {
     // Note: Do not include GROUP A values in these return vales
     
     static func allPrimaryCommands() -> [Command] {
-      return [.clientIp, .clientProgram, .clientGui, .clientBind, .info, .version, .antList, .micList, .profileGlobal, .profileTx, .profileMic, .profileDisplay]
+      return [.clientIp, .clientGui, .clientProgram, .clientStation, .clientBind, .info, .version, .antList, .micList, .profileGlobal, .profileTx, .profileMic, .profileDisplay]
     }
     static func allSubscriptionCommands() -> [Command] {
       return [.subClient, .subTx, .subAtu, .subAmplifier, .subMeter, .subPan, .subSlice, .subGps,

@@ -37,7 +37,8 @@ public final class Amplifier                : NSObject, DynamicModel {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  
+  private let _log                          = Log.sharedInstance
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
   private var __ant                         = ""                            // Antenna list
@@ -129,8 +130,7 @@ public final class Amplifier                : NSObject, DynamicModel {
       guard let token = Token(rawValue: property.key) else {
         
         // log it and ignore the Key
-//        os_log("Unknown Amplifier token - %{public}@ = %{public}@", log: _log, type: .default, property.key, property.value)
-        _api.log.msg( "Unknown Amplifier token - \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log.msg( "Unknown Amplifier token - \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order

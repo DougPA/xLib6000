@@ -38,7 +38,8 @@ public final class UsbCable                 : NSObject, DynamicModel {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  
+  private let _log                          = Log.sharedInstance
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
   private var __autoReport                  = false                         //
@@ -98,8 +99,6 @@ public final class UsbCable                 : NSObject, DynamicModel {
       } else {
         
         // NO, log the error and ignore it
-//        let log = OSLog(subsystem:Api.kBundleIdentifier, category: "UsbCable")
-//        os_log("Invalid UsbCable Type, %{public}@", log: log, type: .default, keyValues[1].value)
         Api.sharedInstance.log.msg( "Invalid UsbCable Type, \(keyValues[1].value)", level: .warning, function: #function, file: #file, line: #line)
 
         return
@@ -159,7 +158,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
         guard let token = Token(rawValue: property.key) else {
           
           // unknown Key, log it and ignore the Key
-          _api.log.msg( "Unknown UsbCable token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+          _log.msg( "Unknown UsbCable token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
           continue
         }
@@ -266,8 +265,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
     } else {
       
       // NO, log the error
-//      os_log("Status type: (%{public}@) != Cable type (%{public}@)", log: _log, type: .default, properties[0].key, cableType.rawValue)
-      _api.log.msg( "Status type: \(properties[0].key) != Cable type \(cableType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg( "Status type: \(properties[0].key) != Cable type \(cableType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
     }
     
     // is the waterfall initialized?

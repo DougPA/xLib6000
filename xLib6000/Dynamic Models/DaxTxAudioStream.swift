@@ -29,6 +29,7 @@ public final class DaxTxAudioStream         : NSObject, DynamicModel {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
+  private let _log                          = Log.sharedInstance
 
   private var _txSeq                        = 0                             // Tx sequence number (modulo 16)
   
@@ -187,7 +188,7 @@ public final class DaxTxAudioStream         : NSObject, DynamicModel {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _api.log.msg( "Unknown DaxTxAudioStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg( "Unknown DaxTxAudioStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
         continue
       }

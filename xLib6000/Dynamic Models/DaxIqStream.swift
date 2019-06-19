@@ -38,6 +38,7 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
+  private let _log                          = Log.sharedInstance
 
   private var _rxSeq                        : Int?                          // Rx sequence number
 
@@ -141,7 +142,7 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
       
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _api.log.msg( "Unknown IqStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg( "Unknown IqStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
         continue
       }
@@ -235,8 +236,7 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
     if vita.sequence != expectedSequenceNumber {
       
       // NO, log the issue
-//      os_log("Missing IqStream packet(s), rcvdSeq: %d, != expectedSeq: %d", log: _log, type: .default, vita.sequence, expectedSequenceNumber)
-      _api.log.msg( "Missing IqStream packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg( "Missing IqStream packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
       _rxSeq = nil
       rxLostPacketCount += 1
     } else {

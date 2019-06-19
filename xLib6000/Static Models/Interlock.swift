@@ -26,7 +26,8 @@ public final class Interlock                : NSObject, StaticModel {
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
-  
+  private let _log                          = Log.sharedInstance
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
   private var __accTxEnabled                = false                         //
@@ -89,7 +90,7 @@ public final class Interlock                : NSObject, StaticModel {
       guard let token = Token(rawValue: property.key)  else {
         
         // unknown Token, log it and ignore this token
-        _api.log.msg( "Unknown Interlock token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg( "Unknown Interlock token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
 
         continue
       }

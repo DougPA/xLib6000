@@ -33,7 +33,8 @@ public final class GuiClient                : NSObject, DynamicModel {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  
+  private let _log                          = Log.sharedInstance
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
   private var __host                        = ""                            // Host of a GUI CLient
@@ -159,7 +160,7 @@ public final class GuiClient                : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = ClientToken(rawValue: property.key) else {
         // log it and ignore this Key
-        _api.log.msg( "Unknown GuiClient token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg( "Unknown GuiClient token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order
