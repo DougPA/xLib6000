@@ -62,7 +62,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // GCD Concurrent Queue
   public let objectQ                        = DispatchQueue(label: Api.kId + ".objectQ", attributes: [.concurrent])
 
-  public private(set) var apiVersion        = Version("2.5.1.x")            // Api firmware version
+  public private(set) var apiVersion        = Version("2.5.1.20190618")     // Api firmware version
   public private(set) var radioVersion      = Version()                     // Radio firmware version
 
   // ----------------------------------------------------------------------------
