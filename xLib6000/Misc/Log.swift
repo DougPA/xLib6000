@@ -8,17 +8,6 @@
 
 import Foundation
 
-// --------------------------------------------------------------------------------
-// MARK: - LogHandler protocol
-//
-// --------------------------------------------------------------------------------
-
-public protocol LogHandler
-{
-  // method to process Log entries
-  func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int ) -> Void
-}
-
 // ----------------------------------------------------------------------------
 // MARK: - Log implementation
 //
@@ -33,7 +22,7 @@ public final class Log {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public var delegate: LogHandler?
+  public var delegate: LogHandler? 
   
   // ----------------------------------------------------------------------------
   // MARK: - Singleton

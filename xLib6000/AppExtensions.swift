@@ -453,7 +453,7 @@ public struct Version {
   }
   
   public var shortString : String {
-    return "\(major).\(minor).\(build)"
+    return "\(major).\(minor).\(build).x"
   }
   
   static func ==(lhs: Version, rhs: Version) -> Bool {

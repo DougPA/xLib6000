@@ -38,8 +38,8 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   private let kRegisterCmd                  = "client udp_register handle"
   private let kRegistrationDelay            : UInt32 = 50_000
 
-  private let _objectQ                      = DispatchQueue(label: Api.kId + ".udpObjects")
-  private let _streamQ                      = DispatchQueue(label: Api.kId + ".streamQ", qos: .userInteractive)
+  private let _objectQ                      = DispatchQueue(label: Api.kName + ".udpObjects")
+  private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ", qos: .userInteractive)
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
   //

@@ -67,9 +67,9 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   private var _tlsSocket                    : GCDAsyncSocket!
   private var _token                        = ""
 
-  private let _objectQ                      = DispatchQueue(label: Api.kId + ".WanServer.objectQ")
-  private let _pingQ                        = DispatchQueue(label: Api.kId + ".WanServer.pingQ")
-  private let _socketQ                      = DispatchQueue(label: Api.kId + ".WanServer.socketQ")
+  private let _objectQ                      = DispatchQueue(label: Api.kName + ".WanServer.objectQ")
+  private let _pingQ                        = DispatchQueue(label: Api.kName + ".WanServer.pingQ")
+  private let _socketQ                      = DispatchQueue(label: Api.kName + ".WanServer.socketQ")
 
   private let kAppConnectCmd                = "application connect serial"
   private let kAppRegisterCmd               = "application register name"

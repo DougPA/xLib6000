@@ -59,7 +59,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
   // GCD Queue
   private let _q                            : DispatchQueue
-  private let _streamQ                      = DispatchQueue(label: Api.kId + ".streamQ")
+  private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ")
   private let _log                          = Log.sharedInstance
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----

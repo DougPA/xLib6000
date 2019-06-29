@@ -11,6 +11,23 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
+
+/// Logging is deferred to the hosting application
+////
+public protocol LogHandler
+{
+  /// Method to process Log entries
+  ///
+  /// - Parameters:
+  ///   - msg:                  the message
+  ///   - level:                a message severity level
+  ///   - function:             name of the function posting the message
+  ///   - file:                 file containing the function posting the message
+  ///   - line:                 line number of the function posting the message
+  ///
+  func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int )
+}
+
 /// Models for which there will only be one instance
 ///
 ///   Static Model objects are created / destroyed in the Radio class.

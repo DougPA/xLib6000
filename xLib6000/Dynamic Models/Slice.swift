@@ -38,7 +38,7 @@ public final class Slice                    : NSObject, DynamicModel {
   
   public private(set) var id                : SliceId = ""                  // Id that uniquely identifies this Slice
   @objc dynamic public var agcNames         = AgcMode.names()               // Names of AGC modes
-  @objc dynamic public let daxChoices       = Api.daxChannels               // Names of DAX channels
+  @objc dynamic public let daxChoices       = Api.kDaxChannels               // Names of DAX channels
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
