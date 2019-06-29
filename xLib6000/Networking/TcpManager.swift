@@ -33,7 +33,7 @@ final class TcpManager                      : NSObject, GCDAsyncSocketDelegate {
   private var _tcpSocket                    : GCDAsyncSocket!               // GCDAsync TCP socket object
   private var _timeout                      = 0.0                           // timeout in seconds
 
-  private let _objectQ                      = DispatchQueue(label: Api.kId + ".tcpObjects")
+  private let _objectQ                      = DispatchQueue(label: Api.kName + ".tcpObjects")
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
   //

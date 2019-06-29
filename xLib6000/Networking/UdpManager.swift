@@ -37,8 +37,9 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   private let kRegisterCmd                  = "client udp_register handle"
   private let kRegistrationDelay            : UInt32 = 50_000
 
-  private let _objectQ                      = DispatchQueue(label: Api.kId + ".udpObjects")
-  
+  private let _objectQ                      = DispatchQueue(label: Api.kName + ".udpObjects")
+  private let _log                          = Log.sharedInstance
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
   //
   private var __udpSuccessfulRegistration   = false
@@ -137,7 +138,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       } catch {
         
         // We didn't get the port we wanted
-        Api.sharedInstance.log.msg("Unable to bind to UDP port \(tmpPort)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg("Unable to bind to UDP port \(tmpPort)", level: .info, function: #function, file: #file, line: #line)
         // try the next Port Number
         tmpPort += 1
       }
@@ -158,7 +159,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       
       _udpBound = true
       
-      Api.sharedInstance.log.msg("UDP: Receive port = \(_udpRcvPort), Send port = \(_udpSendPort)", level: .info, function: #function, file: #file, line: #line)
+      _log.msg("UDP: Receive port = \(_udpRcvPort), Send port = \(_udpSendPort)", level: .info, function: #function, file: #file, line: #line)
       // if a Wan connection, register
       if isWan { register(clientHandle: clientHandle) }
     }
@@ -174,7 +175,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       
     } catch let error {
       // read error
-      Api.sharedInstance.log.msg("beginReceiving error - \(error.localizedDescription)", level: .error, function: #function, file: #file, line: #line)
+      _log.msg("beginReceiving error - \(error.localizedDescription)", level: .error, function: #function, file: #file, line: #line)
     }
   }
   /// Unbind from the UDP port
@@ -198,7 +199,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
     
     guard clientHandle != nil else {
       // should not happen
-      Api.sharedInstance.log.msg("No client handle in register UDP", level: .error, function: #function, file: #file, line: #line)
+      _log.msg("No client handle in register UDP", level: .error, function: #function, file: #file, line: #line)
 
       return
     }
@@ -214,7 +215,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
         // pause
         usleep(self.kRegistrationDelay)
       }
-      Api.sharedInstance.log.msg("SmartLink - register UDP successful", level: .info, function: #function, file: #file, line: #line)
+      self._log.msg("SmartLink - register UDP successful", level: .info, function: #function, file: #file, line: #line)
 //      // as long as connected after Registration
 //      while self._udpSocket != nil && self._udpBound {
 //
@@ -267,12 +268,12 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       case .ifData, .extData, .ifContext, .extContext:
         
         // error, pass it to the delegate
-        Api.sharedInstance.log.msg("Unexpected packetType - \(vita.packetType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
+        _log.msg("Unexpected packetType - \(vita.packetType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
       }
     } else {
       
       // pass the error to the delegate
-      Api.sharedInstance.log.msg("Unable to decode received packet", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg("Unable to decode received packet", level: .warning, function: #function, file: #file, line: #line)
     }
   }
 }

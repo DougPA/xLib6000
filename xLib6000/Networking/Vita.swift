@@ -327,7 +327,7 @@ public class Vita {
         guard let token = DiscoveryToken(rawValue: property.key) else {
           
           // unknown Key, log it and ignore the Key          
-          Api.sharedInstance.log.msg("Unknown Discovery token - \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+          Log.sharedInstance.msg("Unknown Discovery token - \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }
         

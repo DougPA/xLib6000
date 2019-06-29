@@ -118,7 +118,7 @@ public class PanadapterFrame {
         // it's not, wait for the beginning of the next frame
         _log.msg("Panadapter frame(s) skipped: expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
         _binsProcessed = 0
-        expectedFrame = received + 1
+//        expectedFrame = received
         return false
       }
       // begin processing it

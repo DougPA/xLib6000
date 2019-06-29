@@ -203,7 +203,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
     // FIXME:
     
     // set voltage/amperage denominator for older API versions (before 1.11)
-    if Api.sharedInstance.apiVersion.major == 1 && Api.sharedInstance.apiVersion.minor <= 10 {
+    if Api.kVersion.major == 1 && Api.kVersion.minor <= 10 {
       _voltsAmpsDenom = 1024.0
     }
   }

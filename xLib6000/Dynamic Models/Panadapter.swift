@@ -40,7 +40,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   public private(set) var packetFrame       = -1                            // Frame index of next Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
   
-  @objc dynamic public let daxIqChoices     = Api.daxIqChannels
+  @objc dynamic public let daxIqChoices     = Api.kDaxIqChannels
   
   // ----------------------------------------------------------------------------
   // MARK: - Private properties

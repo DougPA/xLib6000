@@ -218,7 +218,7 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
       
       // NO, add it to discoveredRadios
       discoveredRadios.append(discoveredRadio)
-      GuiClient.parseDiscoveryClients(discoveredRadio)
+      GuiClient.parseDiscoveryClients(discoveredRadio, queue: _radiosQ)
       
       // send the updated array of Discovered Radios to all observers
       NC.post(.radiosAvailable, object: discoveredRadios as Any?)
@@ -234,7 +234,7 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
             
             // YES, update the existing entry
             discoveredRadios[i] = discoveredRadio
-            GuiClient.parseDiscoveryClients(discoveredRadio)
+            GuiClient.parseDiscoveryClients(discoveredRadio, queue: _radiosQ)
             
             // YES, send the updated array of Discovered Radios to all observers
             NC.post(.radiosAvailable, object: discoveredRadios as Any?)

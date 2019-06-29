@@ -17,19 +17,13 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public enum Level : String {
-    case debug        = "Debug"
-    case info         = "Info"
-    case warning      = "Warning"
-    case error        = "Error"
-  }
+  public static let kVersion                = Version("2.5.1.2019_06_20")
+  public static let kName                   = "xLib6000"
 
-  
-  public static let kId                     = "xLib6000"                    // API Name
-  public static let kDomainId               = "net.k3tzr"                   // Domain name
-  public static let kBundleIdentifier       = Api.kDomainId + "." + Api.kId
-  public static let daxChannels             = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
-  public static let daxIqChannels           = ["None", "1", "2", "3", "4"]
+  public static let kDomainName             = "net.k3tzr"
+  public static let kBundleIdentifier       = Api.kDomainName + "." + Api.kName
+  public static let kDaxChannels            = ["None", "1", "2", "3", "4", "5", "6", "7", "8"]
+  public static let kDaxIqChannels          = ["None", "1", "2", "3", "4"]
   public static let kNoError                = "0"
 
   static let kTcpTimeout                    = 0.5                           // seconds
@@ -43,12 +37,15 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
 
+  public private(set) var radioVersion      = Version()
+
   @objc dynamic public var radio            : Radio?                        // current Radio class
   public var apiState                       : Api.State! {
-    didSet { log.msg( "Api state = \(apiState.rawValue)", level: .info, function: #function, file: #file, line: #line)}}
+    didSet { _log.msg( "Api state = \(apiState.rawValue)", level: .info, function: #function, file: #file, line: #line)}}
 
   public var discoveredRadios               : [DiscoveredRadio] {           // Radios discovered
     return _radioFactory.discoveredRadios }
+
   public var delegate                       : ApiDelegate?                  // API delegate
   public var testerModeEnabled              = false                         // Library being used by xAPITester
   public var testerDelegate                 : ApiDelegate?                  // API delegate for xAPITester
@@ -57,13 +54,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var isWan                          = false                         // Remote connection
   public var wanConnectionHandle            = ""                            // Wan connection handle
   public var connectionHandle               : UInt32?                       // Status messages handle
-  public var log                            = Log.sharedInstance            // Logger
-
-  // GCD Concurrent Queue
-  public let objectQ                        = DispatchQueue(label: Api.kId + ".objectQ", attributes: [.concurrent])
-
-  public private(set) var apiVersion        = Version("2.5.1.20190618")     // Api firmware version
-  public private(set) var radioVersion      = Version()                     // Radio firmware version
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -78,16 +68,18 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private var _secondaryCommands            = [CommandTuple]()              // Secondary commands to be sent
   private var _subscriptionCommands         = [CommandTuple]()              // Subscription commands to be sent
   private let _clientIpSemaphore            = DispatchSemaphore(value: 0)   // semaphore to signal that we have got the client ip
-  
+
+  // GCD Concurrent Queue
+  private let _objectQ                      = DispatchQueue(label: Api.kName + ".objectQ", attributes: [.concurrent])
 
   // GCD Serial Queues
-  private let _tcpReceiveQ                  = DispatchQueue(label: Api.kId + ".tcpReceiveQ")
-  private let _tcpSendQ                     = DispatchQueue(label: Api.kId + ".tcpSendQ")
-  private let _udpReceiveQ                  = DispatchQueue(label: Api.kId + ".udpReceiveQ", qos: .userInteractive)
-  private let _udpRegisterQ                 = DispatchQueue(label: Api.kId + ".udpRegisterQ")
-  private let _pingQ                        = DispatchQueue(label: Api.kId + ".pingQ")
-  private let _parseQ                       = DispatchQueue(label: Api.kId + ".parseQ", qos: .userInteractive)
-  private let _workerQ                      = DispatchQueue(label: Api.kId + ".workerQ")
+  private let _tcpReceiveQ                  = DispatchQueue(label: Api.kName + ".tcpReceiveQ")
+  private let _tcpSendQ                     = DispatchQueue(label: Api.kName + ".tcpSendQ")
+  private let _udpReceiveQ                  = DispatchQueue(label: Api.kName + ".udpReceiveQ", qos: .userInteractive)
+  private let _udpRegisterQ                 = DispatchQueue(label: Api.kName + ".udpRegisterQ")
+  private let _pingQ                        = DispatchQueue(label: Api.kName + ".pingQ")
+  private let _parseQ                       = DispatchQueue(label: Api.kName + ".parseQ", qos: .userInteractive)
+  private let _workerQ                      = DispatchQueue(label: Api.kName + ".workerQ")
 
   private var _radioFactory                 = RadioFactory()                // Radio Factory class
   private var _pinger                       : Pinger?                       // Pinger class
@@ -96,6 +88,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private var _clientStation                = ""                            //
   private var _isGui                        = true                          // GUI enable
   private var _lowBW                        = false                         // low bandwidth connect
+
+  private var _log                          = Log.sharedInstance            // Logger
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
@@ -126,7 +120,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     // set the initial State
     apiState = .disconnected
   }
-  
+
   // ----------------------------------------------------------------------------
   // MARK: - Public methods
 
@@ -166,7 +160,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     wanConnectionHandle = wanHandle
     
     // Create a Radio class
-    radio = Radio(api: self, queue: objectQ)
+    radio = Radio(api: self, queue: _objectQ)
     
     activeRadio = selectedRadio
     
@@ -202,7 +196,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     if _pinger != nil {
       _pinger = nil
       
-      log.msg("Pinger stopped", level: .info, function: #function, file: #file, line: #line)
+      _log.msg("Pinger stopped", level: .info, function: #function, file: #file, line: #line)
     }
     // the radio (if any) will be removed, inform observers
     if activeRadio != nil { NC.post(.radioWillBeRemoved, object: radio as Any?) }
@@ -300,7 +294,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// A Client has been connected
   ///
   func clientConnected() {
-    
+
       // set the streaming UDP port
       if isWan {
         // Wan, establish a UDP port for the Data Streams
@@ -315,8 +309,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         
         let wanStatus = isWan ? "REMOTE" : "LOCAL"
         let p = (isWan ? activeRadio!.publicTlsPort : activeRadio!.port)
-        log.msg( "Started pinging: \(activeRadio!.nickname) @ \(activeRadio!.publicIp), port \(p) (\(wanStatus))", level: .info, function: #function, file: #file, line: #line)
-
+        _log.msg("Pinger started: \(activeRadio!.nickname) @ \(activeRadio!.publicIp), port \(p) \(wanStatus)", level: .info, function: #function, file: #file, line: #line)
         _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ)
       }
       // TCP & UDP connections established, inform observers
@@ -339,14 +332,14 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     radioVersion = Version(activeRadio!.firmwareVersion)
     // make sure they are valid
     // compare them
-    if radioVersion < apiVersion {
+    if radioVersion < Api.kVersion {
       // Radio may need update
-      log.msg("Radio firmware may need to be upgraded: Radio version = \(radioVersion.string), API supports version = \(apiVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
-      
-    } else if apiVersion < radioVersion {
+      _log.msg("Radio firmware may need to be upgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+
+    } else if Api.kVersion < radioVersion {
       // Radio may need downgrade
-      log.msg("Radio firmware must be downgraded: Radio version = \(radioVersion.string), API supports version = \(apiVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
-      NC.post(.radioFirmwareDowngradeRequired, object: [apiVersion, radioVersion])
+      _log.msg("Radio firmware must be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+      NC.post(.radioFirmwareDowngradeRequired, object: [Api.kVersion, radioVersion])
     }
   }
   /// Send a command list to the Radio
@@ -383,25 +376,24 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       case [.allSubscription]:  adjustedCommands = Api.Command.allSubscriptionCommands()
       default:                  adjustedCommands = commands
       }
-      
+
       // add all the specified commands
       for command in adjustedCommands {
         
         switch command {
-          
-        // Conditionally send the following
+
+        // conditionally send the following
         case .setMtu:
           if radioVersion.major == 2 && radioVersion.minor >= 3 {
             // the MTU command is only used for radio firmware versions >= 2.3.x
             array.append( (command.rawValue, false, nil) )
           }
-          
-        // Add parameters to the following
+
+        // add parameters to the following
         case .clientProgram:  if _isGui { array.append( (command.rawValue + _clientName, false, nil) ) }
         case .clientStation:  if _isGui { array.append( (command.rawValue + _clientStation, false, nil) ) }
           
-        //        case .clientLowBW:
-        //          if _lowBW { array.append( (command.rawValue, false, nil) ) }
+        // case .clientLowBW:  if _lowBW { array.append( (command.rawValue, false, nil) ) }
           
         // Capture the replies from the following
         case .meterList:    array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
@@ -411,12 +403,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         case .micList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .clientGui:    if _isGui { array.append( (command.rawValue + " " + (_clientId?.uuidString ?? ""), false, delegate?.defaultReplyHandler) ) }
         case .clientBind:   if !_isGui && _clientId != nil { array.append( (command.rawValue + " " + _clientId!.uuidString, false, nil) ) }
-          
-        // Ignore the following
+
+        // ignore the following
         case .none, .allPrimary, .allSecondary, .allSubscription: break
-          
-        // All others
-        default: array.append( (command.rawValue, false, nil) )
+
+        // all others
+        default:  array.append( (command.rawValue, false, nil) )
         }
       }
     }
@@ -503,7 +495,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // log it
       let wanStatus = isWan ? "REMOTE" : "LOCAL"
       let guiStatus = _isGui ? "(GUI) " : ""
-      log.msg( "TCP connected to \(activeRadio!.nickname) @ \(host), port \(port) \(guiStatus)(\(wanStatus)), radio version = \(activeRadio!.firmwareVersion)", level: .info, function: #function, file: #file, line: #line)
+      _log.msg("TCP connected to \(activeRadio!.nickname) @ \(host), port \(port) \(guiStatus)(\(wanStatus)), radio version = \(activeRadio!.firmwareVersion)", level: .info, function: #function, file: #file, line: #line)
 
       // YES, set state
       apiState = .tcpConnected
@@ -517,7 +509,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         let cmd = "wan validate handle=" + wanConnectionHandle // TODO: + "\n"
         send(cmd, replyTo: nil)
         
-        log.msg( "Wan validate handle: \(wanConnectionHandle)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg("Wan validate handle: \(wanConnectionHandle)", level: .info, function: #function, file: #file, line: #line)
 
       } else {
         // insure that a UDP port was bound (for the Data Streams)
@@ -536,7 +528,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       if activeRadio!.status == "In_Use" && _isGui {
         
         send("client disconnect")
-        log.msg( "\"client disconnect\" sent", level: .info, function: #function, file: #file, line: #line)
+        _log.msg("\"client disconnect\" sent", level: .info, function: #function, file: #file, line: #line)
         sleep(1)
       }
 
@@ -548,7 +540,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         // the tcp connection was disconnected, inform observers
         NC.post(.tcpDidDisconnect, object: DisconnectReason.normal)
 
-        log.msg( "Tcp Disconnected", level: .info, function: #function, file: #file, line: #line)
+        _log.msg("Tcp Disconnected", level: .info, function: #function, file: #file, line: #line)
 
       } else {
         
@@ -559,7 +551,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         // the tcp connection was disconnected, inform observers
         NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: error))
 
-       log.msg( "Tcp Disconnected with message = \(error)", level: .info, function: #function, file: #file, line: #line)
+       _log.msg("Tcp Disconnected with message = \(error)", level: .info, function: #function, file: #file, line: #line)
       }
 
       apiState = .disconnected
@@ -585,7 +577,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // YES, UDP (streams) connection established
       
-      log.msg( "UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
+      _log.msg("UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
 
       apiState = .udpBound
       
@@ -628,16 +620,16 @@ extension Api {
   // MARK: - Public properties (KVO compliant)
   
   public var guiClients: [Handle:GuiClient] {
-    get { return objectQ.sync { _guiClients } }
-    set { objectQ.sync(flags: .barrier) { _guiClients = newValue } } }
+    get { return _objectQ.sync { _guiClients } }
+    set { _objectQ.sync(flags: .barrier) { _guiClients = newValue } } }
   
   public var localIP: String {
-    get { return objectQ.sync { _localIP } }
-    set { objectQ.sync(flags: .barrier) { _localIP = newValue } } }
+    get { return _objectQ.sync { _localIP } }
+    set { _objectQ.sync(flags: .barrier) { _localIP = newValue } } }
   
   public var localUDPPort: UInt16 {
-    get { return objectQ.sync { _localUDPPort } }
-    set { objectQ.sync(flags: .barrier) { _localUDPPort = newValue } } }
+    get { return _objectQ.sync { _localUDPPort } }
+    set { _objectQ.sync(flags: .barrier) { _localUDPPort = newValue } } }
 
   // ----------------------------------------------------------------------------
   // MARK: - Enums
@@ -655,7 +647,7 @@ extension Api {
     case allSecondary
     case allSubscription
     case clientUdpPort                      = "client udpport "
-    case keepAliveEnabled                   = "keepalive enable"
+    case keepAliveEnabled                   = "keepalive_enable"
     
     // GROUP B: members of this group can be included in the command sets
     case antList                            = "ant list"

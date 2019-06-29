@@ -99,7 +99,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
       } else {
         
         // NO, log the error and ignore it
-        Api.sharedInstance.log.msg( "Invalid UsbCable Type, \(keyValues[1].value)", level: .warning, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg( "Invalid UsbCable Type, \(keyValues[1].value)", level: .warning, function: #function, file: #file, line: #line)
 
         return
       }

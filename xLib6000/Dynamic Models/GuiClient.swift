@@ -91,7 +91,9 @@ public final class GuiClient                : NSObject, DynamicModel {
   ///   - radio:            the Discovered radio
   ///   - api:              a reference to the Api object
   ///
-  class func parseDiscoveryClients(_ radio: DiscoveredRadio, api: Api = Api.sharedInstance) {
+  class func parseDiscoveryClients(_ radio: DiscoveredRadio, queue: DispatchQueue) {
+    
+    let _api = Api.sharedInstance
     
     // separate the values
     let handles   = radio.guiClientHandles.valuesArray(delimiter: ",")
@@ -110,17 +112,17 @@ public final class GuiClient                : NSObject, DynamicModel {
         let handle = handleString.handle
         
         // does the handle exist?
-        if api.guiClients[handle] == nil {
+        if _api.guiClients[handle] == nil {
           // NO, create a new GuiClient
-          Api.sharedInstance.guiClients[handle] = GuiClient(handle: handle)
+          Api.sharedInstance.guiClients[handle] = GuiClient(handle: handle, queue: queue)
         
         }
         // save the values
-        api.guiClients[handle]!._host = hosts[i]
-        api.guiClients[handle]!._ip = ips[i]
-        api.guiClients[handle]!._station = stations[i]
-        api.guiClients[handle]!._program = programs[i]
-        api.guiClients[handle]!._station = stations[i]
+        _api.guiClients[handle]!._host = hosts[i]
+        _api.guiClients[handle]!._ip = ips[i]
+        _api.guiClients[handle]!._station = stations[i]
+        _api.guiClients[handle]!._program = programs[i]
+        _api.guiClients[handle]!._station = stations[i]
       }
     }
   }
@@ -129,14 +131,13 @@ public final class GuiClient                : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Initialization
   
-  /// Initialize a BandSetting
+  /// Initialize a GuiClient
   ///
   /// - Parameters:
   ///   - handle:             a Client Handle
-  ///   - isGui:              whether Client is a Gui Client
   ///   - queue:              Concurrent queue
   ///
-  public init(handle: UInt32, queue: DispatchQueue = Api.sharedInstance.objectQ) {
+  public init(handle: UInt32, queue: DispatchQueue) {
     
     self.handle = handle
     _q = queue

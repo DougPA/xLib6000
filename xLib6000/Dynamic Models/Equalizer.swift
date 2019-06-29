@@ -93,7 +93,7 @@ public final class Equalizer                : NSObject, DynamicModel {
       
     default:
       // unknown type, log & ignore it
-      Api.sharedInstance.log.msg( "Unknown EQ - \(type)", level: .warning, function: #function, file: #file, line: #line)
+      Log.sharedInstance.msg( "Unknown EQ - \(type)", level: .warning, function: #function, file: #file, line: #line)
 
     }
     // if an equalizer was found
