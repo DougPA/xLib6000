@@ -32,9 +32,9 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue!                // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  private let _log                          = Log.sharedInstance
 
   private var _rxSeq                        : Int?                          // Rx sequence number
   
@@ -67,19 +67,20 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
     // Format:  <streamId, > <"type", type> <"dax_channel", channel> <"slice", number> <"dax_clients", number> <"client_handle", handle>
     
     //get the StreamId
-    let streamId =  keyValues[0].key.streamId
-    
-    // does the Stream exist?
-    if radio.daxRxAudioStreams[streamId] == nil {
+    if let streamId =  keyValues[0].key.streamId {
       
-//      // NO, is this stream for this client?
-//      if !DaxRxAudioStream.isStatusForThisClient(keyValues) { return }
-      
-      // create a new Stream & add it to the collection
-      radio.daxRxAudioStreams[streamId] = DaxRxAudioStream(streamId: streamId, queue: queue)
+      // does the Stream exist?
+      if radio.daxRxAudioStreams[streamId] == nil {
+        
+        //      // NO, is this stream for this client?
+        //      if !DaxRxAudioStream.isStatusForThisClient(keyValues) { return }
+        
+        // create a new Stream & add it to the collection
+        radio.daxRxAudioStreams[streamId] = DaxRxAudioStream(streamId: streamId, queue: queue)
+      }
+      // pass the remaining key values to parsing
+      radio.daxRxAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(2)) )
     }
-    // pass the remaining key values to parsing
-    radio.daxRxAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(2)) )
   }
   
   // ------------------------------------------------------------------------------
@@ -189,8 +190,7 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg( "Unknown DaxRxAudioStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
-
+        _log.msg("Unknown DaxRxAudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known keys, in alphabetical order
@@ -198,7 +198,7 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
         
       case .clientHandle:
         willChangeValue(for: \.clientHandle)
-        _clientHandle = property.value.handle
+        _clientHandle = property.value.handle ?? 0
         didChangeValue(for: \.clientHandle)
         
       case .daxChannel:

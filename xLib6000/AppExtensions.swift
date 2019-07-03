@@ -10,8 +10,6 @@ import Foundation
 
 public typealias KeyValuesArray = [(key:String, value:String)]
 public typealias ValuesArray = [String]
-
-
 public typealias StreamId = UInt32
 public typealias Handle = UInt32
 
@@ -115,15 +113,15 @@ public extension String {
   ///
   /// - Returns:      the UInt32 equivalent or nil
   ///
-  var handle: Handle {
-    return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) ?? 0 : UInt32(self, radix: 16) ?? 0
+  var handle: Handle? {
+    return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16)
   }
   /// Convert a String to a UInt32
   ///
   /// - Returns:      the UInt32 equivalent or nil
   ///
-  var streamId: StreamId {
-    return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) ?? 0 : UInt32(self, radix: 16) ?? 0
+  var streamId: StreamId? {
+    return self.hasPrefix("0x") ? UInt32(String(self.dropFirst(2)), radix: 16) : UInt32(self, radix: 16)
   }
   /// Convert a Mhz string to an Hz Int
   ///
@@ -444,6 +442,9 @@ public extension CGFloat {
     return String(format: "%\(width).\(precision)f", self / divisor)
   }
 }
+
+// ----------------------------------------------------------------------------
+
 /// Struct to hold a Version number
 ///
 public struct Version {
@@ -498,6 +499,15 @@ public struct Version {
   }
 }
 
+// ----------------------------------------------------------------------------
+
+/// Create a String representing a Hex Dump of a UInt8 array
+///
+/// - Parameters:
+///   - data:           an array of UInt8
+///   - len:            the number of elements to be processed
+/// - Returns:          a String
+///
 public func hexDump(data: [UInt8], len: Int) -> String {
   var string = ""
   for i in 1...len {

@@ -17,7 +17,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("2.5.1.2019_06_20")
+  public static let kVersion                = Version("2.5.1.2019_07_03")
   public static let kName                   = "xLib6000"
 
   public static let kDomainName             = "net.k3tzr"
@@ -41,7 +41,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   @objc dynamic public var radio            : Radio?                        // current Radio class
   public var apiState                       : Api.State! {
-    didSet { _log.msg( "Api state = \(apiState.rawValue)", level: .info, function: #function, file: #file, line: #line)}}
+    didSet { _log.msg( "Api state = \(apiState.rawValue)", level: .debug, function: #function, file: #file, line: #line)}}
 
   public var discoveredRadios               : [DiscoveredRadio] {           // Radios discovered
     return _radioFactory.discoveredRadios }
@@ -53,7 +53,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var pingerEnabled                  = true                          // Pinger enable
   public var isWan                          = false                         // Remote connection
   public var wanConnectionHandle            = ""                            // Wan connection handle
-  public var connectionHandle               : UInt32?                       // Status messages handle
+  public var connectionHandle               : Handle?                       // Status messages handle
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -89,7 +89,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private var _isGui                        = true                          // GUI enable
   private var _lowBW                        = false                         // low bandwidth connect
 
-  private var _log                          = Log.sharedInstance            // Logger
+  private let _log                          = Log.sharedInstance
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
@@ -528,7 +528,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       if activeRadio!.status == "In_Use" && _isGui {
         
         send("client disconnect")
-        _log.msg("\"client disconnect\" sent", level: .info, function: #function, file: #file, line: #line)
+        _log.msg("client disconnect sent", level: .info, function: #function, file: #file, line: #line)
         sleep(1)
       }
 
@@ -551,7 +551,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         // the tcp connection was disconnected, inform observers
         NC.post(.tcpDidDisconnect, object: DisconnectReason.error(errorMessage: error))
 
-       _log.msg("Tcp Disconnected with message = \(error)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg("Tcp Disconnected with message = \(error)", level: .info, function: #function, file: #file, line: #line)
       }
 
       apiState = .disconnected
@@ -577,7 +577,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // YES, UDP (streams) connection established
       
-      _log.msg("UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
+      _log.msg("UDP bound to Port: \(port)", level: .debug, function: #function, file: #file, line: #line)
 
       apiState = .udpBound
       

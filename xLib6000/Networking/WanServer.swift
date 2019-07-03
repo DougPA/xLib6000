@@ -28,14 +28,15 @@ public struct WanTestConnectionResults {
   public var radioSerial                = ""
 
   public func string() -> String {
-    return
-      "UPnP Ports:\n" +
-      "\tTCP:\t\t\(upnpTcpPortWorking.asPassFail)\n" +
-      "\tUDP:\t\(upnpUdpPortWorking.asPassFail)\n" +
-      "Forwarded Ports:\n" +
-      "\tTCP:\t\t\(forwardTcpPortWorking.asPassFail)\n" +
-      "\tUDP:\t\(forwardUdpPortWorking.asPassFail)\n" +
-      "Hole Punch Supported:\t\(natSupportsHolePunch.asYesNo)"
+    return """
+    UPnP Ports:
+    \tTCP:\t\t\(upnpTcpPortWorking.asPassFail)
+    \tUDP:\t\(upnpUdpPortWorking.asPassFail)
+    Forwarded Ports:
+    \tTCP:\t\t\(forwardTcpPortWorking.asPassFail)
+    \tUDP:\t\(forwardUdpPortWorking.asPassFail)
+    Hole Punch Supported:\t\(natSupportsHolePunch.asYesNo)
+    """
   }
 }
 
@@ -209,19 +210,15 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     
     // Check for unknown Message Types
     guard let token = Token(rawValue: msgType)  else {
-      
-      // unknown Message Type, log it and ignore the message
-      _log.msg("Unknown message token: \(msg)", level: .warning, function: #function, file: #file, line: #line)
+      // log it and ignore the message
+      _log.msg("Unknown WanServer Message token: \(msg)", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // which primary message type?
     switch token {
     
-    case .application:
-      parseApplication(remainder)
-   
-    case .radio:
-      parseRadio(remainder)
+    case .application:        parseApplication(remainder)
+    case .radio:              parseRadio(remainder)
     }
   }
   /// Parse a received "application" message
@@ -240,23 +237,16 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     
     // Check for unknown Message Types
     guard let token = ApplicationToken(rawValue: msgType)  else {
-      
-      // unknown Message Type, log it and ignore the message
-      _log.msg("Unknown Application token: \(msg)", level: .warning, function: #function, file: #file, line: #line)
-
+      // log it and ignore the message
+      _log.msg("Unknown WanServer Application token: \(msg)", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // which secondary message type?
     switch token {
     
-    case .info:
-      parseApplicationInfo(remainder.keyValuesArray())
-    
-    case .registrationInvalid:
-      parseRegistrationInvalid(remainder)
-    
-    case .userSettings:
-      parseUserSettings(remainder.keyValuesArray())
+    case .info:                   parseApplicationInfo(remainder.keyValuesArray())
+    case .registrationInvalid:    parseRegistrationInvalid(remainder)
+    case .userSettings:           parseUserSettings(remainder.keyValuesArray())
     }
   }
   /// Parse a received "radio" message
@@ -280,23 +270,16 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     
     // Check for unknown Message Types
     guard let token = RadioToken(rawValue: msgType)  else {
-      
-      // unknown Message Type, log it and ignore the message
-      _log.msg("Unknown Radio token: \(msg)", level: .warning, function: #function, file: #file, line: #line)
-
+      // log it and ignore the message
+      _log.msg("Unknown WanServer Radio token: \(msg)", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // which secondary message type?
     switch token {
     
-    case .connectReady:
-      parseRadioConnectReady(remainder.keyValuesArray())
-    
-    case .list:
-      parseRadioList(remainder)
-    
-    case .testConnection:
-      parseTestConnectionResults(remainder.keyValuesArray())
+    case .connectReady:       parseRadioConnectReady(remainder.keyValuesArray())
+    case .list:               parseRadioList(remainder)
+    case .testConnection:     parseTestConnectionResults(remainder.keyValuesArray())
     }
   }
   /// Parse Application properties
@@ -308,12 +291,10 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // Check for Unknown token
+      // Check for Unknown Keys
       guard let token = ApplicationInfoToken(rawValue: property.key)  else {
-        
-        // unknown Token, log it and ignore this token
-        _log.msg("Unknown Info token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-
+        // log it and ignore the Key
+        _log.msg("Unknown WanServer Info token: \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -332,8 +313,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
   ///
   private func parseRegistrationInvalid(_ msg: String) {
     
-    _log.msg("\(msg)", level: .warning, function: #function, file: #file, line: #line)
-
+    _log.msg("WanServer: \(msg)", level: .warning, function: #function, file: #file, line: #line)
   }
   /// Parse User properties
   ///
@@ -348,25 +328,18 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // Check for Unknown token
+      // Check for Unknown Keys
       guard let token = ApplicationUserSettingsToken(rawValue: property.key)  else {
-        
-        // unknown Token, log it and ignore this token
-        _log.msg("Unknown UserSettings token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-
+        // log it and ignore the Key
+        _log.msg("Unknown WanServer User Setting token: \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
       switch token {
       
-      case .callsign:
-        callsign = property.value
-      
-      case .firstName:
-        firstName = property.value
-      
-      case .lastName:
-        lastName = property.value
+      case .callsign:       callsign = property.value
+      case .firstName:      firstName = property.value
+      case .lastName:       lastName = property.value
       }
     }
     
@@ -387,22 +360,17 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // Check for Unknown token
+      // Check for Unknown Keys
       guard let token = RadioConnectReadyToken(rawValue: property.key)  else {
-        
-        // unknown Token, log it and ignore this token
-        _log.msg("Unknown Radio Connect token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-
+        // log it and ignore the Key
+        _log.msg("Unknown WanServer Radio Connect token: \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
       switch token {
       
-      case .handle:
-        handle = property.value
-      
-      case .serial:
-        serial = property.value
+      case .handle:         handle = property.value
+      case .serial:         serial = property.value
       }
     }
     
@@ -441,62 +409,44 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
       // process each key/value pair, <key=value>
       for property in properties {
         
-        // Check for Unknown token
+        // Check for Unknown Keys
         guard let token = RadioListToken(rawValue: property.key)  else {
-          // unknown Token, log it and ignore this token
-          _log.msg("Unknown Radio :ist token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-
+          // log it and ignore the Key
+          _log.msg("Unknown WanServer Radio List token: \(property.key)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }
         
         // Known tokens, in alphabetical order
         switch token {
-        case .callsign:
-          radio.callsign = property.value
-        case .inUseIp:
-          radio.inUseIp = property.value
-        case .inUseHost:
-          radio.inUseHost = property.value
+          
+        case .callsign:                   radio.callsign = property.value
+        case .inUseIp:                    radio.inUseIp = property.value
+        case .inUseHost:                  radio.inUseHost = property.value
         case .lastSeen:
           let dateFormatter = DateFormatter()
           // date format is like: 2/6/2018_5:20:16_AM
           dateFormatter.dateFormat = "M/d/yyy_H:mm:ss_a"
           
           guard let date = dateFormatter.date(from: property.value.lowercased()) else {
-            _log.msg("LastSeen date mismatched format: \(property.value)", level: .error, function: #function, file: #file, line: #line)
-
+            _log.msg("WanServer LastSeen date mismatched format: \(property.value)", level: .error, function: #function, file: #file, line: #line)
             break
           }
           // use date constant here
           radio.lastSeen = date
-        case .maxLicensedVersion:
-          radio.maxLicensedVersion = property.value
-        case .model:
-          radio.model = property.value
-        case .nickName:
-          radio.nickname = property.value
-        case .publicIp:
-          radio.publicIp = property.value
-        case .publicTlsPort:
-          publicTlsPort = property.value.iValue
-        case .publicUdpPort:
-          publicUdpPort = property.value.iValue
-        case .publicUpnpTlsPort:
-          publicUpnpTlsPort = property.value.iValue
-        case .publicUpnpUdpPort:
-          publicUpnpUdpPort = property.value.iValue
-        case .requiresAdditionalLicense:
-          radio.requiresAdditionalLicense = property.value.bValue
-        case .radioLicenseId:
-          radio.radioLicenseId = property.value
-        case .serialNumber:
-          radio.serialNumber = property.value
-        case .status:
-          radio.status = property.value
-        case .upnpSupported:
-          radio.upnpSupported = property.value.bValue
-        case .firmwareVersion:
-          radio.firmwareVersion = property.value
+        case .maxLicensedVersion:         radio.maxLicensedVersion = property.value
+        case .model:                      radio.model = property.value
+        case .nickName:                   radio.nickname = property.value
+        case .publicIp:                   radio.publicIp = property.value
+        case .publicTlsPort:              publicTlsPort = property.value.iValue
+        case .publicUdpPort:              publicUdpPort = property.value.iValue
+        case .publicUpnpTlsPort:          publicUpnpTlsPort = property.value.iValue
+        case .publicUpnpUdpPort:          publicUpnpUdpPort = property.value.iValue
+        case .requiresAdditionalLicense:  radio.requiresAdditionalLicense = property.value.bValue
+        case .radioLicenseId:             radio.radioLicenseId = property.value
+        case .serialNumber:               radio.serialNumber = property.value
+        case .status:                     radio.status = property.value
+        case .upnpSupported:              radio.upnpSupported = property.value.bValue
+        case .firmwareVersion:            radio.firmwareVersion = property.value
         }
       }
       // now continue to fill the radio parameters
@@ -541,29 +491,22 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // Check for Unknown token
+      // Check for Unknown Keys
       guard let token = RadioTestConnectionResultsToken(rawValue: property.key)  else {
-        
-        // unknown Token, log it and ignore this token
-        _log.msg("Unknown TestConnection token - \(property.key)", level: .warning, function: #function, file: #file, line: #line)
-
+        // log it and ignore the Key
+        _log.msg("Unknown WanServer TestConnection token: \(property.key)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       
       // Known tokens, in alphabetical order
       switch token {
-      case .forwardTcpPortWorking:
-        results.forwardTcpPortWorking = property.value.tValue
-      case .forwardUdpPortWorking:
-        results.forwardUdpPortWorking = property.value.tValue
-      case .natSupportsHolePunch:
-        results.natSupportsHolePunch = property.value.tValue
-      case .radioSerial:
-        results.radioSerial = property.value
-      case .upnpTcpPortWorking:
-        results.upnpTcpPortWorking = property.value.tValue
-      case .upnpUdpPortWorking:
-        results.upnpUdpPortWorking = property.value.tValue
+        
+      case .forwardTcpPortWorking:      results.forwardTcpPortWorking = property.value.tValue
+      case .forwardUdpPortWorking:      results.forwardUdpPortWorking = property.value.tValue
+      case .natSupportsHolePunch:       results.natSupportsHolePunch = property.value.tValue
+      case .radioSerial:                results.radioSerial = property.value
+      case .upnpTcpPortWorking:         results.upnpTcpPortWorking = property.value.tValue
+      case .upnpUdpPortWorking:         results.upnpUdpPortWorking = property.value.tValue
       }
     }
     // call delegate
@@ -594,7 +537,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // start the timer
     _pingTimer?.resume()
 
-    _log.msg("Started pinging SmartLink Server:  \(_currentHost), port \(_currentPort)", level: .warning, function: #function, file: #file, line: #line)
+    _log.msg("Started pinging SmartLink Server: \(_currentHost), port \(_currentPort)", level: .info, function: #function, file: #file, line: #line)
   }
   /// Stop pinging the server
   ///
@@ -603,7 +546,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     // stop the Timer (if any)
     _pingTimer?.cancel();
 
-    _log.msg("Stopped pinging SmartLink Server:  \(_currentHost), port \(_currentPort)", level: .info, function: #function, file: #file, line: #line)
+    _log.msg("Stopped pinging SmartLink Server: \(_currentHost), port \(_currentPort)", level: .info, function: #function, file: #file, line: #line)
   }
   /// Send a command to the server
   ///
@@ -632,7 +575,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
 
     // Disconnected from the SmartLInk server
     let error = (err == nil ? "" : " with error = " + err!.localizedDescription)
-    _log.msg("Disconnected from SmartLink Server:  \(_currentHost), port \(_currentPort) \(error)", level: .info, function: #function, file: #file, line: #line)
+    _log.msg("Disconnected from SmartLink Server: \(_currentHost), port \(_currentPort) \(error)", level: .info, function: #function, file: #file, line: #line)
 
     _isConnected = false
     _currentHost = ""
@@ -651,7 +594,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     _currentHost = sock.connectedHost ?? ""
     _currentPort = sock.connectedPort
     
-    _log.msg("Connected to SmartLink Server:  \(_currentHost), port \(_currentPort)", level: .info, function: #function, file: #file, line: #line)
+    _log.msg("Connected to SmartLink Server: \(_currentHost), port \(_currentPort)", level: .info, function: #function, file: #file, line: #line)
 
     // start a secure (TLS) connection to the SmartLink server
     var tlsSettings = [String : NSObject]()

@@ -36,9 +36,9 @@ public final class UsbCable                 : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  private let _log                          = Log.sharedInstance
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
@@ -99,7 +99,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
       } else {
         
         // NO, log the error and ignore it
-        Log.sharedInstance.msg( "Invalid UsbCable Type, \(keyValues[1].value)", level: .warning, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Invalid UsbCable Type: \(keyValues[1].value)", level: .warning, function: #function, file: #file, line: #line)
 
         return
       }
@@ -154,12 +154,10 @@ public final class UsbCable                 : NSObject, DynamicModel {
       // process each key/value pair, <key=value>
       for property in properties {
         
-        // check for unknown keys
+        // check for unknown Keys
         guard let token = Token(rawValue: property.key) else {
-          
-          // unknown Key, log it and ignore the Key
-          _log.msg( "Unknown UsbCable token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
-
+          // log it and ignore the Key
+          _log.msg("Unknown UsbCable token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }
         // Known keys, in alphabetical order
@@ -265,7 +263,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
     } else {
       
       // NO, log the error
-      _log.msg( "Status type: \(properties[0].key) != Cable type \(cableType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg("Status type: \(properties[0].key) != Cable type: \(cableType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
     }
     
     // is the waterfall initialized?

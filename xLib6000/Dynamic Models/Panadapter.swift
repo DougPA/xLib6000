@@ -7,7 +7,6 @@
 //
 
 import Foundation
-
 import simd
 
 public typealias PanadapterId = StreamId
@@ -36,7 +35,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   
   public var isStreaming                    = false
 
-  public private(set) var id                : PanadapterId = 0              // Panadapter Id (StreamId)
+  public private(set) var streamId          : PanadapterId = 0              // Panadapter StreamId
   public private(set) var packetFrame       = -1                            // Frame index of next Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
   
@@ -46,9 +45,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
-  private let _log                          = Log.sharedInstance
 
   private var _panadapterframes             = [PanadapterFrame]()
   private var _index                        = 0
@@ -129,25 +128,26 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     //      OR
     // Format: <"pan", ""> <streamId, ""> <"daxiq_channel", value>
     
-    // get the streamId (remove the "0x" prefix)
-    let streamId = keyValues[1].key.handle
-    
-    // is the Panadapter in use?
-    if inUse {
+    // get the streamId
+    if let streamId = keyValues[1].key.streamId {
       
-      // YES, does it exist?
-      if radio.panadapters[streamId] == nil {
+      // is the Panadapter in use?
+      if inUse {
         
-        // NO, Create a Panadapter & add it to the Panadapters collection
-        radio.panadapters[streamId] = Panadapter(id: streamId, queue: queue)
+        // YES, does it exist?
+        if radio.panadapters[streamId] == nil {
+          
+          // NO, Create a Panadapter & add it to the Panadapters collection
+          radio.panadapters[streamId] = Panadapter(streamId: streamId, queue: queue)
+        }
+        // pass the key values to the Panadapter for parsing (dropping the Type and Id)
+        radio.panadapters[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
+        
+      } else {
+        
+        // NO, notify all observers
+        NC.post(.panadapterWillBeRemoved, object: radio.panadapters[streamId] as Any?)
       }
-      // pass the key values to the Panadapter for parsing (dropping the Type and Id)
-      radio.panadapters[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
-      
-    } else {
-      
-      // NO, notify all observers
-      NC.post(.panadapterWillBeRemoved, object: radio.panadapters[streamId] as Any?)
     }
   }
 
@@ -161,7 +161,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   public class func findActive() -> Panadapter? {
 
     // find the Panadapters with an active Slice (if any)
-    let panadapters = Api.sharedInstance.radio!.panadapters.values.filter { Slice.findActive(with: $0.id) != nil }
+    let panadapters = Api.sharedInstance.radio!.panadapters.values.filter { Slice.findActive(with: $0.streamId) != nil }
     guard panadapters.count >= 1 else { return nil }
 
     // return the first one
@@ -192,9 +192,9 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - streamId:           a Panadapter Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(id: PanadapterId, queue: DispatchQueue) {
+  init(streamId: PanadapterId, queue: DispatchQueue) {
     
-    self.id = id
+    self.streamId = streamId
     _q = queue
 
     // allocate dataframes
@@ -218,11 +218,11 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   ///   - reply:          the reply
   ///
   func replyHandler(_ command: String, seqNum: String, responseValue: String, reply: String) {
-    
-    guard responseValue == Api.kNoError else {
-      // Anything other than 0 is an error, log it and ignore the Reply
-      _log.msg( "\(command),  non-zero reply - \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .warning, function: #function, file: #file, line: #line)
 
+    // Anything other than 0 is an error
+    guard responseValue == Api.kNoError else {
+      // log it and ignore the Reply
+      _log.msg("\(command), non-zero reply: \(responseValue), \(flexErrorString(errorCode: responseValue))", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // parse out the values
@@ -246,11 +246,10 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // check for unknown keys
+      // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
-        // unknown Key, log it and ignore the Key
-        _log.msg( "Unknown Panadapter token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
-
+        // log it and ignore the Key
+        _log.msg("Unknown Panadapter token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -288,7 +287,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
 
       case .clientHandle:
         willChangeValue(for: \.clientHandle)
-        _clientHandle = property.value.handle
+        _clientHandle = property.value.handle ?? 0
         didChangeValue(for: \.clientHandle)
         
       case .daxIqChannel:
@@ -352,8 +351,8 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
         didChangeValue(for: \.segmentZoomEnabled)
 
       case .waterfallId:
-         willChangeValue(for: \.waterfallId)
-        _waterfallId = property.value.handle
+        willChangeValue(for: \.waterfallId)
+        _waterfallId = property.value.streamId ?? 0
         didChangeValue(for: \.waterfallId)
 
       case .wide:
@@ -435,7 +434,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       
       // Pass the data frame to this Panadapter's delegate
       delegate?.streamHandler(_panadapterframes[_index])
-      
+
       // use the next dataframe
       _index = (_index + 1) % _numberOfPanadapterFrames
     }
@@ -590,7 +589,7 @@ extension Panadapter {
   internal var _yPixels: CGFloat {
     get { return _q.sync { __yPixels } }
     set { _q.sync(flags: .barrier) { __yPixels = newValue } } }
-    
+
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
   

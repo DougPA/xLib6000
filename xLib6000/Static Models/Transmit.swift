@@ -34,9 +34,9 @@ public final class Transmit                 : NSObject, StaticModel {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  private let _log                          = Log.sharedInstance
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
@@ -117,12 +117,10 @@ public final class Transmit                 : NSObject, StaticModel {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // Check for Unknown token
+      // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
-        
-        // unknown Token, log it and ignore this token
-        _log.msg( "Unknown Transmit token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
-
+        // log it and ignore the Key
+        _log.msg("Unknown Transmit token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order

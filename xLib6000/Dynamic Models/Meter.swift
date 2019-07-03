@@ -30,9 +30,9 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
-  private let _log                          = Log.sharedInstance
 
   private var _voltsAmpsDenom               : Float = 256.0                 // denominator for voltage/amperage depends on API version
 
@@ -230,10 +230,8 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       
       // check for unknown Keys
       guard let token = Token(rawValue: key) else {
-        
-        // unknown Key, log it and ignore the Key
-        _log.msg( "Unknown Meter token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
-
+        // log it and ignore the Key
+        _log.msg("Unknown Meter token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       
@@ -288,10 +286,8 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
     
     // check for unknown Units
     guard let token = Units(rawValue: units) else {
-      
-      // unknown Units, log it and ignore it
-      _log.msg( "Meter, Unknown units - \(units)", level: .warning, function: #function, file: #file, line: #line)
-
+      // log it and ignore it
+      _log.msg("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     var adjNewValue: Float = 0.0

@@ -40,7 +40,7 @@ extension xLib6000.Slice {
   public class func create(panadapter: Panadapter, frequency: Int = 0, callback: ReplyHandler? = nil) {
     if Api.sharedInstance.radio!.availableSlices > 0 {
       // tell the Radio to create a Slice
-      Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "pan" + "=\(panadapter.id.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz)")", replyTo: callback)
+      Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "pan" + "=\(panadapter.streamId.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz)")", replyTo: callback)
     }
   }
   /// Remove the specified Slice
@@ -150,6 +150,7 @@ extension xLib6000.Slice {
   // ----------------------------------------------------------------------------
   // MARK: - Properties (KVO compliant) that send Commands
   
+  // listed in alphabetical order
   @objc dynamic public var active: Bool {
     get { return _active }
     set { if _active != newValue { _active = newValue ; sliceCmd( .active, newValue.as1or0) } } }

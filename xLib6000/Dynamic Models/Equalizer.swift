@@ -36,9 +36,9 @@ public final class Equalizer                : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  private let _log                          = Log.sharedInstance
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
@@ -93,8 +93,7 @@ public final class Equalizer                : NSObject, DynamicModel {
       
     default:
       // unknown type, log & ignore it
-      Log.sharedInstance.msg( "Unknown EQ - \(type)", level: .warning, function: #function, file: #file, line: #line)
-
+      Log.sharedInstance.msg("Unknown Equalizer type: \(type)", level: .warning, function: #function, file: #file, line: #line)
     }
     // if an equalizer was found
     if let equalizer = equalizer {
@@ -137,10 +136,8 @@ public final class Equalizer                : NSObject, DynamicModel {
       
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
-        
-        // unknown Key, log it and ignore the Key
-        _log.msg( "Unknown Equalizer token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
-
+        // log it and ignore the Key
+        _log.msg("Unknown Equalizer token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known Keys, in alphabetical order

@@ -28,9 +28,9 @@ public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  private let _log                          = Log.sharedInstance
 
   private var _rxSeq                        : Int?                          // Rx sequence number
   
@@ -61,19 +61,20 @@ public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
     // Format:  <streamId, > <"in_use", 1|0> <"ip", ip> <"port", port>
     
     // get the StreamId
-    let streamId = keyValues[0].key.streamId
-    
-    // does the Stream exist?
-    if radio.daxMicAudioStreams[streamId] == nil {
+    if let streamId = keyValues[0].key.streamId {
       
-//      // NO, is this stream for this client?
-//      if !DaxRxAudioStream.isStatusForThisClient(keyValues) { return }
-      
-      // create a new Stream & add it to the collection
-      radio.daxMicAudioStreams[streamId] = DaxMicAudioStream(streamId: streamId, queue: queue)
+      // does the Stream exist?
+      if radio.daxMicAudioStreams[streamId] == nil {
+        
+        //      // NO, is this stream for this client?
+        //      if !DaxRxAudioStream.isStatusForThisClient(keyValues) { return }
+        
+        // create a new Stream & add it to the collection
+        radio.daxMicAudioStreams[streamId] = DaxMicAudioStream(streamId: streamId, queue: queue)
+      }
+      // pass the remaining key values to parsing
+      radio.daxMicAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
     }
-    // pass the remaining key values to parsing
-    radio.daxMicAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
   }
   
   // ----------------------------------------------------------------------------
@@ -110,8 +111,7 @@ public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
       // check for unknown keys
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _log.msg( "Unknown MicAudioStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
-
+        _log.msg("Unknown MicAudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known keys, in alphabetical order
@@ -119,7 +119,7 @@ public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
         
       case .clientHandle:
         willChangeValue(for: \.clientHandle)
-        _clientHandle = property.value.handle
+        _clientHandle = property.value.handle ?? 0
         didChangeValue(for: \.clientHandle)
       }
     }

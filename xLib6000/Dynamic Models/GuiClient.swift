@@ -31,9 +31,9 @@ public final class GuiClient                : NSObject, DynamicModel {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  private let _log                          = Log.sharedInstance
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
@@ -64,25 +64,26 @@ public final class GuiClient                : NSObject, DynamicModel {
     // Format:  <client_handle, > <connected, > <"client_id", clientId> <"program", program> <"station", station> <"local_ptt", 0/1>
     
     // get the Client Handle
-    let handle = keyValues[0].key.handle
-    
-    // is it connected?
-    if keyValues[1].key == GuiClient.kConnected {
-      // YES, does the Client Handle exist?
-      if Api.sharedInstance.guiClients[handle] == nil {
+    if let handle = keyValues[0].key.handle {
+      
+      // is it connected?
+      if keyValues[1].key == GuiClient.kConnected {
+        // YES, does the Client Handle exist?
+        if Api.sharedInstance.guiClients[handle] == nil {
+          
+          // NO, create a new GuiClient & add it to the guiClients collection
+          Api.sharedInstance.guiClients[handle] = GuiClient(handle: handle, queue: queue)
+        }
+        // pass the remaining key values to the guiClient for parsing
+        Api.sharedInstance.guiClients[handle]!.parseProperties( Array(keyValues.dropFirst(2)) )
         
-        // NO, create a new GuiClient & add it to the guiClients collection
-        Api.sharedInstance.guiClients[handle] = GuiClient(handle: handle, queue: queue)
+      } else {
+        // NO, notify all observers
+        NC.post(.guiClientWillBeRemoved, object: Api.sharedInstance.guiClients[handle] as Any?)
+        
+        // remove it
+        Api.sharedInstance.guiClients[handle] = nil
       }
-      // pass the remaining key values to the guiClient for parsing
-      Api.sharedInstance.guiClients[handle]!.parseProperties( Array(keyValues.dropFirst(2)) )
-      
-    } else {
-      // NO, notify all observers
-      NC.post(.guiClientWillBeRemoved, object: Api.sharedInstance.guiClients[handle] as Any?)
-      
-      // remove it
-      Api.sharedInstance.guiClients[handle] = nil
     }
   }
   /// Parse a Discovery message
@@ -109,20 +110,21 @@ public final class GuiClient                : NSObject, DynamicModel {
       for (i, handleString) in handles.enumerated() {
         
         // convert the String to a ClientHandle
-        let handle = handleString.handle
-        
-        // does the handle exist?
-        if _api.guiClients[handle] == nil {
-          // NO, create a new GuiClient
-          Api.sharedInstance.guiClients[handle] = GuiClient(handle: handle, queue: queue)
-        
+        if let handle = handleString.handle {
+          
+          // does the handle exist?
+          if _api.guiClients[handle] == nil {
+            // NO, create a new GuiClient
+            Api.sharedInstance.guiClients[handle] = GuiClient(handle: handle, queue: queue)
+            
+          }
+          // save the values
+          _api.guiClients[handle]!._host = hosts[i]
+          _api.guiClients[handle]!._ip = ips[i]
+          _api.guiClients[handle]!._station = stations[i]
+          _api.guiClients[handle]!._program = programs[i]
+          _api.guiClients[handle]!._station = stations[i]
         }
-        // save the values
-        _api.guiClients[handle]!._host = hosts[i]
-        _api.guiClients[handle]!._ip = ips[i]
-        _api.guiClients[handle]!._station = stations[i]
-        _api.guiClients[handle]!._program = programs[i]
-        _api.guiClients[handle]!._station = stations[i]
       }
     }
   }
@@ -161,7 +163,7 @@ public final class GuiClient                : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = ClientToken(rawValue: property.key) else {
         // log it and ignore this Key
-        _log.msg( "Unknown GuiClient token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
+        _log.msg("Unknown GuiClient token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order

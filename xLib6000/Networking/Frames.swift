@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import AVFoundation
 
 /// Class containing Panadapter Stream data
 ///
@@ -60,7 +61,7 @@ public class PanadapterFrame {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Instance methods
+  // MARK: - Public methods
   
   /// Accumulate Vita object(s) into a PanadapterFrame
   ///
@@ -110,7 +111,7 @@ public class PanadapterFrame {
       // from a previous group, ignore it
       _log.msg("Panadapter frame(s) ignored: expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
       return false
-      
+
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
       // make sure it's the beginning of a frame
@@ -118,7 +119,7 @@ public class PanadapterFrame {
         // it's not, wait for the beginning of the next frame
         _log.msg("Panadapter frame(s) skipped: expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
         _binsProcessed = 0
-//        expectedFrame = received
+        expectedFrame = received + 1
         return false
       }
       // begin processing it
@@ -212,7 +213,7 @@ public class WaterfallFrame {
   }
   
   // ----------------------------------------------------------------------------
-  // MARK: - Instance methods
+  // MARK: - Public methods
   
   /// Accumulate Vita object(s) into a WaterfallFrame
   ///
@@ -314,10 +315,16 @@ public class WaterfallFrame {
 ///
 public struct AudioStreamFrame {
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
   public var daxChannel                     = -1
   public private(set) var samples           = 0                             // number of samples (L/R) in this frame
   public var leftAudio                      = [Float]()                     // Array of left audio samples
   public var rightAudio                     = [Float]()                     // Array of right audio samples
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
   
   /// Initialize an AudioStreamFrame
   ///
@@ -342,10 +349,16 @@ public struct AudioStreamFrame {
 ///
 public struct IqStreamFrame {
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
   public var daxIqChannel                   = -1
   public private(set) var samples           = 0                             // number of samples (L/R) in this frame
   public var realSamples                    = [Float]()                     // Array of real (I) samples
   public var imagSamples                    = [Float]()                     // Array of imag (Q) samples
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
   
   /// Initialize an IqtreamFrame
   ///
@@ -368,9 +381,15 @@ public struct IqStreamFrame {
 ///
 public struct MicAudioStreamFrame {
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
   public private(set) var samples           = 0                             // number of samples (L/R) in this frame
   public var leftAudio                      = [Float]()                     // Array of left audio samples
   public var rightAudio                     = [Float]()                     // Array of right audio samples
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
   
   /// Initialize a AudioStreamFrame
   ///
@@ -393,10 +412,16 @@ public struct MicAudioStreamFrame {
 ///
 public struct OpusFrame {
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
   public var samples: [UInt8]                     // array of samples
   public var numberOfSamples: Int                 // number of samples
-  public var duration: Float                     // frame duration (ms)
-  public var channels: Int                       // number of channels (1 or 2)
+//  public var duration: Float                     // frame duration (ms)
+//  public var channels: Int                       // number of channels (1 or 2)
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
   
   /// Initialize an OpusFrame
   ///
@@ -406,38 +431,33 @@ public struct OpusFrame {
   ///
   public init(payload: [UInt8], sampleCount: Int) {
     
-    numberOfSamples = sampleCount
-    
-    
-    //    Swift.print("\(hexDump(data: payload, len: sampleCount))\n")
-    
-    
     // allocate the samples array
     samples = [UInt8](repeating: 0, count: sampleCount)
     
     // save the count and copy the data
+    numberOfSamples = sampleCount
     memcpy(&samples, payload, sampleCount)
     
     // Flex 6000 series uses:
     //     duration = 10 ms
     //     channels = 2 (stereo)
     
-    // determine the frame duration
-    let durationCode = (samples[0] & 0xF8)
-    switch durationCode {
-    case 0xC0:
-      duration = 2.5
-    case 0xC8:
-      duration = 5.0
-    case 0xD0:
-      duration = 10.0
-    case 0xD8:
-      duration = 20.0
-    default:
-      duration = 0
-    }
-    // determine the number of channels (mono = 1, stereo = 2)
-    channels = (samples[0] & 0x04) == 0x04 ? 2 : 1
+//    // determine the frame duration
+//    let durationCode = (samples[0] & 0xF8)
+//    switch durationCode {
+//    case 0xC0:
+//      duration = 2.5
+//    case 0xC8:
+//      duration = 5.0
+//    case 0xD0:
+//      duration = 10.0
+//    case 0xD8:
+//      duration = 20.0
+//    default:
+//      duration = 0
+//    }
+//    // determine the number of channels (mono = 1, stereo = 2)
+//    channels = (samples[0] & 0x04) == 0x04 ? 2 : 1
   }
 }
 

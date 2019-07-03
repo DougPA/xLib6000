@@ -1,5 +1,12 @@
 xLib6000 Change Log
 
+v2.5.1.2019_07_03
+
+Corrections and edits throughout to make v2.4.9 & v2.5.1 as similar as possible
+
+
+
+
 v2.5.1.2019_06_20
 
 Api.swift - removed Level enum (it was unused)

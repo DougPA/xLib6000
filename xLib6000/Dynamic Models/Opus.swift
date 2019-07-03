@@ -26,6 +26,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   public static let sampleRate              : Double = 24_000
   public static let frameCount              = 240
   public static let channelCount            = 2
+  public static let elementSize             = MemoryLayout<Float>.size
   public static let isInterleaved           = true
   public static let application             = 2049
   public static let rxStreamId              : UInt32 = 0x4a000000
@@ -39,13 +40,13 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public var isStreaming                    = false
-  public private(set) var id                : OpusId                        // The Opus stream id
+  public private(set) var streamId          : OpusId                        // The Opus StreamId
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -53,6 +54,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   private var _ip                           = ""                            // IP Address of ???
   private var _port                         = 0                             // port number used by Opus
   private var _vita                         : Vita?                         // a Vita class
+  private var _rxPacketCount                = 0                             // Rx total packet count
   private var _rxLostPacketCount            = 0                             // Rx lost packet count
   private var _expectedFrame                : Int?                          // Rx sequence number
   private var _txSeq                        = 0                             // Tx sequence number
@@ -86,13 +88,13 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
     
     // get the Opus Id (without the "0x" prefix)
     //        let opusId = String(keyValues[0].key.characters.dropFirst(2))
-    if let streamId =  UInt32(String(keyValues[0].key.dropFirst(2)), radix: 16) {
+    if let streamId =  keyValues[0].key.streamId {
       
       // does the Opus exist?
       if  radio.opusStreams[streamId] == nil {
         
         // NO, create a new Opus & add it to the OpusStreams collection
-        radio.opusStreams[streamId] = Opus(id: streamId, queue: queue)
+        radio.opusStreams[streamId] = Opus(streamId: streamId, queue: queue)
       }
       // pass the key values to Opus for parsing  (dropping the Id)
       radio.opusStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
@@ -108,9 +110,9 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   ///   - id:                 an Opus Stream id
   ///   - queue:              Concurrent queue
   ///
-  init(id: OpusId, queue: DispatchQueue) {
+  init(streamId: OpusId, queue: DispatchQueue) {
     
-    self.id = id
+    self.streamId = streamId
     _q = queue
     
     super.init()
@@ -171,10 +173,8 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
-        
-        // unknown Key, log it and ignore the Key
-        _log.msg( "Unknown Opus token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
-
+        // log it and ignore the Key
+        _log.msg("Unknown Opus token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -233,30 +233,39 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   func vitaProcessor(_ vita: Vita) {
     
     // is this the first packet?
-    if _expectedFrame == nil { _expectedFrame = vita.sequence ; _rxLostPacketCount = 0 }
-    
+    if _expectedFrame == nil {
+      _expectedFrame = vita.sequence
+      _rxPacketCount = 1
+      _rxLostPacketCount = 0
+    } else {
+      _rxPacketCount += 1
+    }
+
     switch (_expectedFrame!, vita.sequence) {
-      
-      //    case (let expected, let received) where received < expected:
-      //      // from a previous group, ignore it
-      //      _log.msg("Delayed frame(s): expected \(expected), received \(received)", level: .warning, function: #function, file: #file, line: #line)
-      //      return
+
+//    case (let expected, let received) where received < expected:
+//      // from a previous group, ignore it
+//      _log.msg("Delayed frame(s): expected \(expected), received \(received)", level: .warning, function: #function, file: #file, line: #line)
+//      return
       
     case (let expected, let received) where received > expected:
-      // from a later group, jump forward
-      _log.msg("Missing frame(s): expected \(expected), received \(received) ", level: .warning, function: #function, file: #file, line: #line)
+      _rxLostPacketCount += 1
       
-      //      // Pass an empty data frame to the Opus delegate
-      //      delegate?.streamHandler( OpusFrame(payload: vita.payloadData, numberOfSamples: 0) )
-      //
+      // from a later group, jump forward
+      let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
+      _log.msg("Missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", level: .warning, function: #function, file: #file, line: #line)
+
+      // Pass an error frame (count == 0) to the Opus delegate
+      delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: 0) )
+
       _expectedFrame = received
       fallthrough
-      
+
     default:
       // received == expected
       // calculate the next Sequence Number
       _expectedFrame = (_expectedFrame! + 1) % 16
-      
+
       // Pass the data frame to the Opus delegate
       delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: vita.payloadSize) )
     }

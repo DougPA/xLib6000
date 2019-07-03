@@ -199,6 +199,7 @@ extension Radio {
   // ----------------------------------------------------------------------------
   // MARK: - Properties (KVO compliant) that send Commands
   
+  // listed in alphabetical order
   @objc dynamic public var apfEnabled: Bool {
     get {  return _apfEnabled }
     set { if _apfEnabled != newValue { _apfEnabled = newValue ; apfCmd( .mode, newValue.as1or0) } } }
@@ -211,6 +212,7 @@ extension Radio {
     get {  return _apfGain }
     set { if _apfGain != newValue { _apfGain = newValue.bound(Api.kControlMin, Api.kControlMax) ; apfCmd( .gain, newValue) } } }
   
+  // FIXME: command for backlight
   @objc dynamic public var backlight: Int {
     get {  return _backlight }
     set { if _backlight != newValue { _backlight = newValue  } } }

@@ -25,8 +25,8 @@ public final class Interlock                : NSObject, StaticModel {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
-  private let _q                            : DispatchQueue                 // Q for object synchronization
   private let _log                          = Log.sharedInstance
+  private let _q                            : DispatchQueue                 // Q for object synchronization
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
@@ -86,12 +86,10 @@ public final class Interlock                : NSObject, StaticModel {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // Check for Unknown token
+      // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
-        
-        // unknown Token, log it and ignore this token
-        _log.msg( "Unknown Interlock token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
-
+        // log it and ignore the Key
+        _log.msg("Unknown Interlock token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -108,14 +106,14 @@ public final class Interlock                : NSObject, StaticModel {
         didChangeValue(for: \.accTxDelay)
 
       case .accTxReqEnabled:
-          willChangeValue(for: \.accTxReqEnabled)
-         _accTxReqEnabled = property.value.bValue
-         didChangeValue(for: \.accTxReqEnabled)
+        willChangeValue(for: \.accTxReqEnabled)
+        _accTxReqEnabled = property.value.bValue
+        didChangeValue(for: \.accTxReqEnabled)
 
       case .accTxReqPolarity:
-       willChangeValue(for: \.accTxReqPolarity)
-       _accTxReqPolarity = property.value.bValue
-       didChangeValue(for: \.accTxReqPolarity)
+        willChangeValue(for: \.accTxReqPolarity)
+        _accTxReqPolarity = property.value.bValue
+        didChangeValue(for: \.accTxReqPolarity)
 
       case .amplifier:
         willChangeValue(for: \.amplifier)
@@ -128,9 +126,9 @@ public final class Interlock                : NSObject, StaticModel {
         didChangeValue(for: \.rcaTxReqEnabled)
 
       case .rcaTxReqPolarity:
-         willChangeValue(for: \.rcaTxReqPolarity)
-         _rcaTxReqPolarity = property.value.bValue
-         didChangeValue(for: \.rcaTxReqPolarity)
+        willChangeValue(for: \.rcaTxReqPolarity)
+        _rcaTxReqPolarity = property.value.bValue
+        didChangeValue(for: \.rcaTxReqPolarity)
 
       case .reason:
         willChangeValue(for: \.reason)

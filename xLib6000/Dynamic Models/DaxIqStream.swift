@@ -36,9 +36,9 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  private let _log                          = Log.sharedInstance
 
   private var _rxSeq                        : Int?                          // Rx sequence number
 
@@ -74,20 +74,20 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
     // Format: <streamId, > <"daxiq", value> <"pan", panStreamId> <"rate", value> <"ip", ip> <"port", port> <"streaming", 1|0> ,"capacity", value> <"available", value>
     
     //get the StreamId (remove the "0x" prefix)
-    let streamId =  keyValues[0].key.streamId
-    
-    // YES, does the Stream exist?
-    if radio.daxIqStreams[streamId] == nil {
+    if let streamId =  keyValues[0].key.streamId {
       
-//      // NO, is this stream for this client?
-//      if !DaxRxAudioStream.isStatusForThisClient(keyValues) { return }
-      
-      // create a new Stream & add it to the collection
-      radio.daxIqStreams[streamId] = DaxIqStream(streamId: streamId, queue: queue)
+      // YES, does the Stream exist?
+      if radio.daxIqStreams[streamId] == nil {
+        
+        //      // NO, is this stream for this client?
+        //      if !DaxRxAudioStream.isStatusForThisClient(keyValues) { return }
+        
+        // create a new Stream & add it to the collection
+        radio.daxIqStreams[streamId] = DaxIqStream(streamId: streamId, queue: queue)
+      }
+      // pass the remaining key values to parsing
+      radio.daxIqStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
     }
-    // pass the remaining key values to parsing
-    radio.daxIqStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
-    
   }
   
   // ------------------------------------------------------------------------------
@@ -142,8 +142,7 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
       
       guard let token = Token(rawValue: property.key) else {
         // unknown Key, log it and ignore the Key
-        _log.msg( "Unknown IqStream token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
-
+        _log.msg("Unknown IqStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known keys, in alphabetical order
@@ -151,7 +150,7 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
         
       case .clientHandle:
         willChangeValue(for: \.clientHandle)
-        _clientHandle = property.value.handle
+        _clientHandle = property.value.handle ?? 0
         didChangeValue(for: \.clientHandle)
         
       case .channel:
@@ -161,7 +160,7 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
 
       case .pan:
         willChangeValue(for: \.pan)
-        _pan = UInt32(property.value.dropFirst(2), radix: 16) ?? 0
+        _pan = property.value.streamId ?? 0
         didChangeValue(for: \.pan)
 
       case .rate:

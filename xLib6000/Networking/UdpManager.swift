@@ -23,6 +23,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   // MARK: - Private properties
   
   private weak var _delegate                : UdpManagerDelegate?           // class to receive UDP data
+  private let _log                          = Log.sharedInstance
   private var _udpReceiveQ                  : DispatchQueue!                // serial GCD Queue for inbound UDP traffic
   private var _udpRegisterQ                 : DispatchQueue!                // serial GCD Queue for registration
   private var _udpSocket                    : GCDAsyncUdpSocket!            // socket for Vita UDP data
@@ -38,7 +39,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   private let kRegistrationDelay            : UInt32 = 50_000
 
   private let _objectQ                      = DispatchQueue(label: Api.kName + ".udpObjects")
-  private let _log                          = Log.sharedInstance
+  private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ", qos: .userInteractive)
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY -----------------------------------
   //
@@ -139,6 +140,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
         
         // We didn't get the port we wanted
         _log.msg("Unable to bind to UDP port \(tmpPort)", level: .info, function: #function, file: #file, line: #line)
+
         // try the next Port Number
         tmpPort += 1
       }
@@ -160,6 +162,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       _udpBound = true
       
       _log.msg("UDP: Receive port = \(_udpRcvPort), Send port = \(_udpSendPort)", level: .info, function: #function, file: #file, line: #line)
+
       // if a Wan connection, register
       if isWan { register(clientHandle: clientHandle) }
     }
@@ -175,7 +178,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       
     } catch let error {
       // read error
-      _log.msg("beginReceiving error - \(error.localizedDescription)", level: .error, function: #function, file: #file, line: #line)
+      _log.msg("UDP: Begin receiving error - \(error.localizedDescription)", level: .error, function: #function, file: #file, line: #line)
     }
   }
   /// Unbind from the UDP port
@@ -199,7 +202,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
     
     guard clientHandle != nil else {
       // should not happen
-      _log.msg("No client handle in register UDP", level: .error, function: #function, file: #file, line: #line)
+      _log.msg("UDP: No client handle in register UDP", level: .error, function: #function, file: #file, line: #line)
 
       return
     }
@@ -216,6 +219,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
         usleep(self.kRegistrationDelay)
       }
       self._log.msg("SmartLink - register UDP successful", level: .info, function: #function, file: #file, line: #line)
+
 //      // as long as connected after Registration
 //      while self._udpSocket != nil && self._udpBound {
 //
@@ -230,15 +234,16 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
 //        sleep(self.kPingDelay)
 //      }
 //
-//        Api.sharedInstance.log.msg("SmartLink - pinging stopped", level: .info, function: #function, file: #file, line: #line)
+//      _log.msg("SmartLink - pinging stopped", level: .info, function: #function, file: #file, line: #line)
     }
   }
 
   // ----------------------------------------------------------------------------
   // MARK: - GCDAsyncUdpSocket Protocol methods methods
-  //            executes on the udpReceiveQ
   
   /// Called when data has been read from the UDP connection
+  ///
+  ///   executes on the udpReceiveQ
   ///
   /// - Parameters:
   ///   - sock:               the receiving socket
@@ -248,32 +253,44 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   ///
   @objc func udpSocket(_ sock: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext filterContext: Any?) {
     
-    if let vita = Vita.decodeFrom(data: data) {
-      
-      // TODO: Packet statistics - received, dropped
-      
+    _streamQ.async { [weak self] in
+
+      let vitaHeader : VitaHeader
+
+      // map the packet to a VitaHeader struct
+      vitaHeader = (data as NSData).bytes.bindMemory(to: VitaHeader.self, capacity: 1).pointee
+
       // ensure the packet has our OUI
-      guard vita.oui == Vita.kFlexOui  else { return }
+      guard CFSwapInt32BigToHost(vitaHeader.oui) == Vita.kFlexOui else { return }
 
       // we got a VITA packet which means registration was successful
-      _udpSuccessfulRegistration = true
+      self?._udpSuccessfulRegistration = true
 
-      switch vita.packetType {
-        
-      case .ifDataWithStream, .extDataWithStream:
-        
-        // stream of data, pass it to the delegate
-        _delegate?.udpStreamHandler(vita)
+      let packetType = (vitaHeader.packetDesc & 0xf0) >> 4
 
-      case .ifData, .extData, .ifContext, .extContext:
-        
-        // error, pass it to the delegate
-        _log.msg("Unexpected packetType - \(vita.packetType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
+      if packetType == Vita.PacketType.ifDataWithStream.rawValue || packetType == Vita.PacketType.extDataWithStream.rawValue {
+        // enqueue the data
+
+        let classCode = Vita.PacketClassCode( rawValue: UInt16(CFSwapInt32BigToHost(vitaHeader.classCodes) & 0xffff))
+
+        if classCode == Vita.PacketClassCode.panadapter || classCode == Vita.PacketClassCode.waterfall || classCode == Vita.PacketClassCode.meter {
+
+          if let vita = Vita.decodeFrom(data: data) {
+            self?._delegate?.udpStreamHandler(vita)
+          }
+
+        } else if classCode == Vita.PacketClassCode.opus {
+
+          if let vita = Vita.decodeFrom(data: data) {
+
+            self?._delegate?.udpStreamHandler(vita)
+          }
+        }
+
+      } else {
+        // log the error
+        self?._log.msg("Invalid packetType - \(packetType)", level: .warning, function: #function, file: #file, line: #line)
       }
-    } else {
-      
-      // pass the error to the delegate
-      _log.msg("Unable to decode received packet", level: .warning, function: #function, file: #file, line: #line)
     }
   }
 }

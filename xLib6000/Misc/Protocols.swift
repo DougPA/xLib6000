@@ -194,5 +194,3 @@ public protocol WanServerDelegate           : class {
   ///
   func wanTestConnectionResultsReceived(results: WanTestConnectionResults)
 }
-
-

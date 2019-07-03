@@ -25,8 +25,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   
   public var isStreaming                    = false
   
-  public private(set) var id                : WaterfallId   = 0             // Waterfall Id (StreamId)
-//  public private(set) var lastTimecode      = -1                            // Time code of last frame received
+  public private(set) var streamId          : WaterfallId = 0               // Waterfall StreamId
   public private(set) var packetFrame       = -1                            // Frame index of next Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
 
@@ -34,9 +33,9 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  private let _log                          = Log.sharedInstance
 
   private var _waterfallframes                   = [WaterfallFrame]()
   private var _index               = 0
@@ -73,42 +72,43 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format: <"waterfall", ""> <id, ""> <"client_handle", ClientHandle> <"x_pixels", value> <"center", value> <"bandwidth", value> <"line_duration", value>
+    // Format: <"waterfall", ""> <streamId, ""> <"client_handle", ClientHandle> <"x_pixels", value> <"center", value> <"bandwidth", value> <"line_duration", value>
     //          <"rfgain", value> <"rxant", value> <"wide", 1|0> <"loopa", 1|0> <"loopb", 1|0> <"band", value> <"daxiq", value>
     //          <"daxiq_rate", value> <"capacity", value> <"available", value> <"panadapter", streamId>=40000000 <"color_gain", value>
     //          <"auto_black", 1|0> <"black_level", value> <"gradient_index", value> <"xvtr", value>
     //      OR
-    // Format: <"waterfall", ""> <id, ""> <"rxant", value> <"loopa", 1|0> <"loopb", 1|0>
+    // Format: <"waterfall", ""> <streamId, ""> <"rxant", value> <"loopa", 1|0> <"loopb", 1|0>
     //      OR
-    // Format: <"waterfall", ""> <id, ""> <"rfgain", value>
+    // Format: <"waterfall", ""> <streamId, ""> <"rfgain", value>
     //      OR
-    // Format: <"waterfall", ""> <id, ""> <"daxiq_channel", value>
+    // Format: <"waterfall", ""> <streamId, ""> <"daxiq_channel", value>
     
-    // get the streamId (remove the "0x" prefix)
-    let streamId = keyValues[1].key.handle
-    
-    // is the Waterfall in use?
-    if inUse {
+    // get the streamId
+    if let streamId = keyValues[1].key.streamId {
       
-      // YES, does it exist?
-      if radio.waterfalls[streamId] == nil {
+      // is the Waterfall in use?
+      if inUse {
         
-        // NO, Create a Waterfall & add it to the Waterfalls collection
-        radio.waterfalls[streamId] = Waterfall(id: streamId, queue: queue)
+        // YES, does it exist?
+        if radio.waterfalls[streamId] == nil {
+          
+          // NO, Create a Waterfall & add it to the Waterfalls collection
+          radio.waterfalls[streamId] = Waterfall(streamId: streamId, queue: queue)
+        }
+        // pass the key values to the Waterfall for parsing (dropping the Type and Id)
+        radio.waterfalls[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
+        
+      } else {
+        
+        // notify all observers
+        NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[streamId] as Any?)
+        
+        // remove the associated Panadapter
+        radio.panadapters[radio.waterfalls[streamId]!.panadapterId] = nil
+        
+        // remove the Waterfall
+        radio.waterfalls[streamId] = nil
       }
-      // pass the key values to the Waterfall for parsing (dropping the Type and Id)
-      radio.waterfalls[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
-      
-    } else {
-      
-      // notify all observers
-      NC.post(.waterfallWillBeRemoved, object: radio.waterfalls[streamId] as Any?)
-      
-      // remove the associated Panadapter
-      radio.panadapters[radio.waterfalls[streamId]!.panadapterId] = nil
-      
-      // remove the Waterfall
-      radio.waterfalls[streamId] = nil
     }
   }
   
@@ -121,9 +121,9 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   ///   - streamId:           a Waterfall Id
   ///   - queue:              Concurrent queue
   ///
-  public init(id: WaterfallId, queue: DispatchQueue) {
+  public init(streamId: WaterfallId, queue: DispatchQueue) {
     
-    self.id = id
+    self.streamId = streamId
     _q = queue
     
     // allocate two dataframes
@@ -150,12 +150,10 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // check for unknown keys
+      // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
-        
-        // unknown Key, log it and ignore the Key
-        _log.msg( "Unknown Waterfall token - \(property.key) = \(property.value)", level: .info, function: #function, file: #file, line: #line)
-
+        // log it and ignore the Key
+        _log.msg("Unknown Waterfall token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -173,7 +171,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
 
       case .clientHandle:
         willChangeValue(for: \.clientHandle)
-        _clientHandle = property.value.handle
+        _clientHandle = property.value.handle ?? 0
         didChangeValue(for: \.clientHandle)
         
       case .colorGain:
@@ -198,7 +196,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
 
       case .panadapterId:
         willChangeValue(for: \.panadapterId)
-        _panadapterId = property.value.handle
+        _panadapterId = property.value.streamId ?? 0
         didChangeValue(for: \.panadapterId)
 
       case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqRate,

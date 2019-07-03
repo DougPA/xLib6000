@@ -323,100 +323,45 @@ public class Vita {
       // process each key/value pair, <key=value>
       for property in properties {
         
-        // check for unknown keys
+        // check for unknown Keys
         guard let token = DiscoveryToken(rawValue: property.key) else {
-          
-          // unknown Key, log it and ignore the Key          
+          // log it and ignore the Key          
           Log.sharedInstance.msg("Unknown Discovery token - \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }
         
         switch token {
           
-        case .availableClients:
-          radio.availableClients = property.value.iValue
-
-        case .availablePanadapters:
-          radio.availablePanadapters = property.value.iValue
-          
-        case .availableSlices:
-          radio.availableSlices = property.value.iValue
-          
-       case .callsign:
-          radio.callsign = property.value
-          
-        case .discoveryVersion:
-          radio.discoveryVersion = property.value
-          
-        case .firmwareVersion:
-          radio.firmwareVersion = property.value
-          
-        case .fpcMac:
-          radio.fpcMac = property.value
-          
-        case .guiClientHandles:
-          radio.guiClientHandles = property.value
-          
-        case .guiClientHosts:
-          radio.guiClientHosts = property.value
-          
-        case .guiClientIps:
-          radio.guiClientIps = property.value
-          
-        case .guiClientPrograms:
-          radio.guiClientPrograms = property.value
-
-        case .guiClientStations:
-          radio.guiClientStations = property.value
-          
-        case .inUseHost:
-          radio.inUseHost = property.value
-          
-        case .inUseIp:
-          radio.inUseIp = property.value
-        
-        case .licensedClients:
-          radio.licensedClients = property.value.iValue
-          
-        case .maxLicensedVersion:
-          radio.maxLicensedVersion = property.value
-          
-        case .maxPanadapters:
-          radio.maxPanadapters = property.value.iValue
-
-        case .maxSlices:
-          radio.maxSlices = property.value.iValue
-
-        case .model:
-          radio.model = property.value
-          
-        case .nickname:
-          radio.nickname = property.value
-          
-        case .port:
-          radio.port = property.value.iValue
-          
-        case .publicIp:
-          radio.publicIp = property.value
-          
-        case .radioLicenseId:
-          radio.radioLicenseId = property.value
-          
-        case .requiresAdditionalLicense:
-          radio.requiresAdditionalLicense = property.value.bValue
-          
-        case .serialNumber:
-          radio.serialNumber = property.value
-          
-        case .status:
-          radio.status = property.value
-          
-        case .wanConnected:
-          radio.wanConnected = property.value.bValue
+        case .availableClients:           radio.availableClients = property.value.iValue
+        case .availablePanadapters:       radio.availablePanadapters = property.value.iValue
+        case .availableSlices:            radio.availableSlices = property.value.iValue
+        case .callsign:                   radio.callsign = property.value
+        case .discoveryVersion:           radio.discoveryVersion = property.value
+        case .firmwareVersion:            radio.firmwareVersion = property.value
+        case .fpcMac:                     radio.fpcMac = property.value
+        case .guiClientHandles:           radio.guiClientHandles = property.value
+        case .guiClientHosts:             radio.guiClientHosts = property.value
+        case .guiClientIps:               radio.guiClientIps = property.value
+        case .guiClientPrograms:          radio.guiClientPrograms = property.value
+        case .guiClientStations:          radio.guiClientStations = property.value
+        case .inUseHost:                  radio.inUseHost = property.value
+        case .inUseIp:                    radio.inUseIp = property.value
+        case .licensedClients:            radio.licensedClients = property.value.iValue
+        case .maxLicensedVersion:         radio.maxLicensedVersion = property.value
+        case .maxPanadapters:             radio.maxPanadapters = property.value.iValue
+        case .maxSlices:                  radio.maxSlices = property.value.iValue
+        case .model:                      radio.model = property.value
+        case .nickname:                   radio.nickname = property.value
+        case .port:                       radio.port = property.value.iValue
+        case .publicIp:                   radio.publicIp = property.value
+        case .radioLicenseId:             radio.radioLicenseId = property.value
+        case .requiresAdditionalLicense:  radio.requiresAdditionalLicense = property.value.bValue
+        case .serialNumber:               radio.serialNumber = property.value
+        case .status:                     radio.status = property.value
+        case .wanConnected:               radio.wanConnected = property.value.bValue
           
         // satisfy the switch statement, not a real token
-        case .lastSeen:
-          break
+        case .lastSeen:                   break
         }
       }
       // is it a valid Discovery packet?
@@ -494,12 +439,7 @@ public class Vita {
 
     let date = Date(timeIntervalSinceReferenceDate: Double(integerTimestamp) )
 
-    var payloadString = ""
-    for i in 1...payloadSize {
-      payloadString += String(format: "%02X", payloadData[i-1]) + " "
-      if (i % 8) == 0 { payloadString += "  " }
-      if (i % 16) == 0 { payloadString += "\n" }
-    }
+    let payloadString = hexDump(data: payloadData, len: payloadSize)
 
     let adjustedPacketSize = Int( (Float(packetSize) / 4.0).rounded(.up))
     let warning = ( (headerSize / 4) + (payloadSize / 4) !=  adjustedPacketSize ? "WARNING: **** Payload size (bytes) not a multiple of 4 ****" : "")
@@ -527,11 +467,11 @@ public class Vita {
     \(payloadString)
     ----------------------------------------------
     
-      headerSize           = \(headerSize) (bytes),  \(headerSize / 4) (UInt32)
-      payloadSize          = \(payloadSize) (bytes), \(payloadSize / 4) (UInt32)
-      packetSize           = \(packetSize) (bytes), \(adjustedPacketSize) (UInt32)
+    headerSize           = \(headerSize) (bytes),  \(headerSize / 4) (UInt32)
+    payloadSize          = \(payloadSize) (bytes), \(payloadSize / 4) (UInt32)
+    packetSize           = \(packetSize) (bytes), \(adjustedPacketSize) (UInt32)
     
-      \(warning)
+    \(warning)
     
     """
   }
