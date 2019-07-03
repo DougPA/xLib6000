@@ -17,7 +17,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("2.4.9.2019_06_21")
+  public static let kVersion                = Version("2.4.9.2019_07_02")
   public static let kName                   = "xLib6000"
 
   public static let kDomainName             = "net.k3tzr"
@@ -41,7 +41,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   @objc dynamic public var radio            : Radio?                        // current Radio class
   public var apiState                       : Api.State! {
-    didSet { _log.msg( "Api state = \(apiState.rawValue)", level: .info, function: #function, file: #file, line: #line)}}
+    didSet { _log.msg( "Api state = \(apiState.rawValue)", level: .debug, function: #function, file: #file, line: #line)}}
 
   public var availableRadios                : [RadioParameters] {           // Radios discovered
     return _radioFactory.availableRadios }
@@ -596,7 +596,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // YES, UDP (streams) connection established
       
-      _log.msg("UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
+      _log.msg("UDP bound to Port \(port)", level: .debug, function: #function, file: #file, line: #line)
 
       apiState = .udpBound
       

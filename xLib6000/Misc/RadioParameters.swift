@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 ///  RadioParameters implementation
 ///
@@ -94,8 +93,6 @@ public final class RadioParameters          : Equatable {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = OSLog(subsystem:Api.kBundleIdentifier, category: "RadioParameters")
-
   private enum Param : String {
     case lastSeen
     

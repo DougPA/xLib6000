@@ -25,6 +25,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   public static let sampleRate              : Double = 24_000
   public static let frameCount              = 240
   public static let channelCount            = 2
+  public static let elementSize             = MemoryLayout<Float>.size
   public static let isInterleaved           = true
   public static let application             = 2049
   public static let rxStreamId              : UInt32 = 0x4a000000
@@ -52,6 +53,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   private var _ip                           = ""                            // IP Address of ???
   private var _port                         = 0                             // port number used by Opus
   private var _vita                         : Vita?                         // a Vita class
+  private var _rxPacketCount                = 0                             // Rx total packet count
   private var _rxLostPacketCount            = 0                             // Rx lost packet count
   private var _expectedFrame                : Int?                          // Rx sequence number
   private var _txSeq                        = 0                             // Tx sequence number
@@ -230,7 +232,13 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   func vitaProcessor(_ vita: Vita) {
     
     // is this the first packet?
-    if _expectedFrame == nil { _expectedFrame = vita.sequence ; _rxLostPacketCount = 0 }
+    if _expectedFrame == nil {
+      _expectedFrame = vita.sequence
+      _rxPacketCount = 1
+      _rxLostPacketCount = 0
+    } else {
+      _rxPacketCount += 1
+    }
 
     switch (_expectedFrame!, vita.sequence) {
     
@@ -240,12 +248,15 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
 //      return
       
     case (let expected, let received) where received > expected:
+      _rxLostPacketCount += 1
+      
       // from a later group, jump forward
-      _log.msg("Missing frame(s): expected \(expected), received \(received) ", level: .warning, function: #function, file: #file, line: #line)
+      let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
+      _log.msg("Missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", level: .warning, function: #function, file: #file, line: #line)
 
-//      // Pass an empty data frame to the Opus delegate
-//      delegate?.streamHandler( OpusFrame(payload: vita.payloadData, numberOfSamples: 0) )
-//
+      // Pass an error frame (count == 0) to the Opus delegate
+      delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: 0) )
+
       _expectedFrame = received
       fallthrough
 
