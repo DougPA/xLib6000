@@ -28,14 +28,14 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var id                : DaxStreamId = 0               // Stream Id
+  public private(set) var streamId          : DaxStreamId = 0               // Stream Id
   public private(set) var rxLostPacketCount = 0                             // Rx lost packet count
 
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private var _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -89,7 +89,7 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
           if !AudioStream.isStatusForThisClient(keyValues) { return }
           
           // create a new Stream & add it to the Streams collection
-          radio.iqStreams[streamId] = IqStream(id: streamId, queue: queue)
+          radio.iqStreams[streamId] = IqStream(streamId: streamId, queue: queue)
         }
         // pass the remaining key values to the IqStream for parsing (dropping the Id)
         radio.iqStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
@@ -137,9 +137,9 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
   ///   - id:                 the Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(id: DaxStreamId, queue: DispatchQueue) {
+  init(streamId: DaxStreamId, queue: DispatchQueue) {
     
-    self.id = id
+    self.streamId = streamId
     _q = queue
     
     super.init()
@@ -159,9 +159,10 @@ public final class IqStream                 : NSObject, DynamicModelWithStream {
     // process each key/value pair, <key=value>
     for property in properties {
       
+      // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown IqStream token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown IqStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known keys, in alphabetical order

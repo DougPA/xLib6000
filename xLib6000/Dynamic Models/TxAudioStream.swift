@@ -20,13 +20,13 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var id                : DaxStreamId = 0               // Stream Id
+  public private(set) var streamId         : DaxStreamId = 0                // TX Audio streamId
 
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private var _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -72,7 +72,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
           if !AudioStream.isStatusForThisClient(keyValues) { return }
           
           // create a new AudioStream & add it to the AudioStreams collection
-          radio.txAudioStreams[streamId] = TxAudioStream(id: streamId, queue: queue)
+          radio.txAudioStreams[streamId] = TxAudioStream(streamId: streamId, queue: queue)
         }
         // pass the remaining key values to the AudioStream for parsing (dropping the Id)
         radio.txAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
@@ -101,9 +101,9 @@ public final class TxAudioStream            : NSObject, DynamicModel {
   ///   - id:                 Dax stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(id: DaxStreamId, queue: DispatchQueue) {
+  init(streamId: DaxStreamId, queue: DispatchQueue) {
     
-    self.id = id
+    self.streamId = streamId
     _q = queue
     
     super.init()
@@ -127,7 +127,7 @@ public final class TxAudioStream            : NSObject, DynamicModel {
     if !_transmit { return false }
     
     // get a TxAudio Vita
-    if _vita == nil { _vita = Vita(type: .txAudio, streamId: id) }
+    if _vita == nil { _vita = Vita(type: .txAudio, streamId: streamId) }
     
     let kMaxSamplesToSend = 128     // maximum packet samples (per channel)
     let kNumberOfChannels = 2       // 2 channels
@@ -203,10 +203,10 @@ public final class TxAudioStream            : NSObject, DynamicModel {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // check for unknown keys
+      // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown TxAudioStream token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown TxAudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known keys, in alphabetical order

@@ -14,7 +14,8 @@ public typealias TnfId = String
 ///
 ///      creates a Tnf instance to be used by a Client to support the
 ///      rendering of a Tnf. Tnf objects are added, removed and
-///      updated by the incoming TCP messages.
+///      updated by the incoming TCP messages. They are collected in the
+///      tnfs collection on the Radio object.
 ///
 public final class Tnf                      : NSObject, DynamicModel {
   
@@ -36,11 +37,11 @@ public final class Tnf                      : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //                                                                                                  
   private var __depth                       = Tnf.Depth.normal.rawValue     // Depth (Normal, Deep, Very Deep)
@@ -125,7 +126,7 @@ public final class Tnf                      : NSObject, DynamicModel {
     if tnfFreq == 0 {
       
       // for each Slice on this Panadapter find the one within freqDiff and closesst to the center
-      for slice in Slice.findAll(with: panadapter.id) {
+      for slice in Slice.findAll(with: panadapter.streamId) {
         
         // how far is it from the center?
         let diff = abs(slice.frequency - panadapter.center)
@@ -228,10 +229,10 @@ public final class Tnf                      : NSObject, DynamicModel {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // check for unknown keys
+      // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Tnf token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Tnf token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known keys, in alphabetical order
@@ -310,4 +311,3 @@ extension Tnf {
     case veryDeep       = 3
   }
 }
-

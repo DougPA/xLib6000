@@ -111,7 +111,7 @@ public class PanadapterFrame {
       // from a previous group, ignore it
       _log.msg("Panadapter frame(s) ignored: expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
       return false
-    
+
     case (let expected, let received) where received > expected:
       // from a later group, jump forward
       // make sure it's the beginning of a frame
@@ -389,7 +389,7 @@ public struct MicAudioStreamFrame {
   public var rightAudio                     = [Float]()                     // Array of right audio samples
   
   // ----------------------------------------------------------------------------
-  // MARK: - Public methods
+  // MARK: - Initialization
   
   /// Initialize a AudioStreamFrame
   ///
@@ -412,10 +412,16 @@ public struct MicAudioStreamFrame {
 ///
 public struct OpusFrame {
   
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
   public var samples: [UInt8]                     // array of samples
   public var numberOfSamples: Int                 // number of samples
 //  public var duration: Float                     // frame duration (ms)
 //  public var channels: Int                       // number of channels (1 or 2)
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
   
   /// Initialize an OpusFrame
   ///
@@ -437,7 +443,7 @@ public struct OpusFrame {
     //     channels = 2 (stereo)
     
 //    // determine the frame duration
-//    let durationCode = (payload[0] & 0xF8)
+//    let durationCode = (samples[0] & 0xF8)
 //    switch durationCode {
 //    case 0xC0:
 //      duration = 2.5
@@ -451,7 +457,7 @@ public struct OpusFrame {
 //      duration = 0
 //    }
 //    // determine the number of channels (mono = 1, stereo = 2)
-//    channels = (payload[0] & 0x04) == 0x04 ? 2 : 1
+//    channels = (samples[0] & 0x04) == 0x04 ? 2 : 1
   }
 }
 

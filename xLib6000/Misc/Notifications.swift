@@ -61,7 +61,7 @@ public enum NotificationType : String {
   case radioWillBeRemoved
   case radioHasBeenRemoved
   
-  case radiosAvailable                      // Radios have appeared / disappeared
+  case radiosAvailable
   
   case radioFirmwareDowngradeRequired
   
@@ -75,7 +75,7 @@ public enum NotificationType : String {
   case tcpDidConnect
   case tcpDidDisconnect
   case tcpPingStarted
-  case tcpPingFirstResponse                 // the first ping reponse was received
+  case tcpPingFirstResponse
   case tcpPingTimeout
   case tcpWillDisconnect
   

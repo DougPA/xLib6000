@@ -15,7 +15,8 @@ public typealias ProfileName                 = String
 ///
 ///      creates a Profiles instance to be used by a Client to support the
 ///      processing of the profiles. Profile objects are added, removed and
-///      updated by the incoming TCP messages.
+///      updated by the incoming TCP messages. They are collected in the profiles
+///      collection on the Radio object.
 ///
 public final class Profile                  : NSObject, StaticModel {
 
@@ -114,10 +115,10 @@ public final class Profile                  : NSObject, StaticModel {
     //     format:  <mic list, "">        <value, "">^<value, "">^...<value, "">^
     //     format:  <mic current, "">     <value, "">
 
-    // check for unknown keys
+    // check for unknown Keys
     guard let token = Token(rawValue: properties[0].key) else {
       // log it and ignore the Key
-      _log.msg("Unknown Profile token - \(properties[0].key)", level: .debug, function: #function, file: #file, line: #line)
+      _log.msg("Unknown Profile token: \(properties[0].key) = \(properties[0].value)", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // Known keys, in alphabetical order

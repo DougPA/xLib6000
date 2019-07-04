@@ -14,7 +14,8 @@ public typealias UsbCableId = String
 ///
 ///      creates a USB Cable instance to be used by a Client to support the
 ///      processing of USB connections to the Radio (hardware). USB Cable objects
-///      are added, removed and updated by the incoming TCP messages.
+///      are added, removed and updated by the incoming TCP messages. They are
+///      collected in the usbCables collection on the Radio object.
 ///
 public final class UsbCable                 : NSObject, DynamicModel {
   
@@ -34,11 +35,11 @@ public final class UsbCable                 : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
   private var __autoReport                  = false                         //
@@ -98,7 +99,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
       } else {
         
         // NO, log the error and ignore it
-        Log.sharedInstance.msg("Invalid UsbCable Type, \(keyValues[1].value)", level: .warning, function: #function, file: #file, line: #line)
+        Log.sharedInstance.msg("Invalid UsbCable Type: \(keyValues[1].value)", level: .warning, function: #function, file: #file, line: #line)
 
         return
       }
@@ -153,10 +154,10 @@ public final class UsbCable                 : NSObject, DynamicModel {
       // process each key/value pair, <key=value>
       for property in properties {
         
-        // check for unknown keys
+        // check for unknown Keys
         guard let token = Token(rawValue: property.key) else {
           // log it and ignore the Key
-          _log.msg("Unknown UsbCable token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+          _log.msg("Unknown UsbCable token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }
         // Known keys, in alphabetical order
@@ -262,8 +263,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
     } else {
       
       // NO, log the error
-      _log.msg("Status type \(properties[0].key) != Cable type \(cableType.rawValue)", level: .debug, function: #function, file: #file, line: #line)
-
+      _log.msg("Status type: \(properties[0].key) != Cable type: \(cableType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
     }
     
     // is the waterfall initialized?

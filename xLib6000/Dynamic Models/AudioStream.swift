@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias DaxStreamId = UInt32
+public typealias DaxStreamId = StreamId
 public typealias DaxChannel = Int
 public typealias DaxIqChannel = Int
 
@@ -31,15 +31,14 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public private(set) var id                : DaxStreamId = 0               // The Audio stream id
-
+  public private(set) var streamId          : DaxStreamId = 0               // The Audio stream id
   public private(set) var rxLostPacketCount = 0                             // Rx lost packet count
 
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private var _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue!                // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -75,8 +74,8 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     // Format:  <streamId, > <"dax", channel> <"in_use", 1|0> <"slice", number> <"ip", ip> <"port", port>
     
-    //get the AudioStreamId (remove the "0x" prefix)
-    if let streamId =  UInt32(String(keyValues[0].key.dropFirst(2)), radix: 16) {
+    //get the AudioStreamId
+    if let streamId =  keyValues[0].key.streamId {
       
       // is the AudioStream in use?
       if inUse {
@@ -88,7 +87,7 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
           if !AudioStream.isStatusForThisClient(keyValues) { return }
           
           // create a new AudioStream & add it to the AudioStreams collection
-          radio.audioStreams[streamId] = AudioStream(id: streamId, queue: queue)
+          radio.audioStreams[streamId] = AudioStream(streamId: streamId, queue: queue)
         }
         // pass the remaining key values to the AudioStream for parsing
         radio.audioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
@@ -190,9 +189,9 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
   ///   - id:                 the Stream Id
   ///   - queue:              Concurrent queue
   ///
-  init(id: DaxStreamId, queue: DispatchQueue) {
+  init(streamId: DaxStreamId, queue: DispatchQueue) {
     
-    self.id = id
+    self.streamId = streamId
     _q = queue
     
     super.init()
@@ -212,11 +211,10 @@ public final class AudioStream              : NSObject, DynamicModelWithStream {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // check for unknown keys
+      // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown AudioStream token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
-
+        _log.msg("Unknown AudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known keys, in alphabetical order

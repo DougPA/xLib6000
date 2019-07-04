@@ -17,7 +17,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("2.4.9.2019_07_02")
+  public static let kVersion                = Version("2.4.9.2019_07_03")
   public static let kName                   = "xLib6000"
 
   public static let kDomainName             = "net.k3tzr"
@@ -53,8 +53,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var pingerEnabled                  = true                          // Pinger enable
   public var isWan                          = false                         // Remote connection
   public var wanConnectionHandle            = ""                            // Wan connection handle
-  public var connectionHandle               = ""                            // Status messages handle
-  
+  public var connectionHandle               : Handle?                       // Status messages handle
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -120,7 +120,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   // ----------------------------------------------------------------------------
   // MARK: - Public methods
-  
+
   /// Connect to a Radio
   ///
   /// - Parameters:
@@ -560,7 +560,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         NC.post(.tcpDidDisconnect, object: DisconnectReason.normal)
 
         _log.msg("Tcp Disconnected", level: .info, function: #function, file: #file, line: #line)
-      
+
       } else {
         
         // YES, disconnect with error (don't keep the UDP port open as it won't be reused with a new connection)
@@ -596,7 +596,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // YES, UDP (streams) connection established
       
-      _log.msg("UDP bound to Port \(port)", level: .debug, function: #function, file: #file, line: #line)
+      _log.msg("UDP bound to Port: \(port)", level: .debug, function: #function, file: #file, line: #line)
 
       apiState = .udpBound
       

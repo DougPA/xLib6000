@@ -54,7 +54,7 @@ extension IqStream {
   public func remove(callback: ReplyHandler? = nil) {
 
     // tell the Radio to remove the Stream
-    Api.sharedInstance.send(IqStream.kStreamRemoveCmd + "\(id.hex)", replyTo: callback)
+    Api.sharedInstance.send(IqStream.kStreamRemoveCmd + "\(streamId.hex)", replyTo: callback)
   }
 
   // ----------------------------------------------------------------------------

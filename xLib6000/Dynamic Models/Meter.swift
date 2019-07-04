@@ -16,7 +16,8 @@ public typealias MeterName = String
 ///      creates a Meter instance to be used by a Client to support the
 ///      rendering of a Meter. Meter objects are added / removed by the
 ///      incoming TCP messages. Meters are periodically updated by a UDP
-///      stream containing multiple Meters.
+///      stream containing multiple Meters. They are collected in the
+///      meters collection on the Radio object.
 ///
 public final class Meter                    : NSObject, DynamicModel, StreamHandler {
   
@@ -28,8 +29,8 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio (hardware)
 
@@ -230,7 +231,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       // check for unknown Keys
       guard let token = Token(rawValue: key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Meter token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Meter token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       
@@ -286,7 +287,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
     // check for unknown Units
     guard let token = Units(rawValue: units) else {
       // log it and ignore it
-      _log.msg("Meter \(desc) \(description) \(group) \(name) \(source), unknown units - \(units))", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     var adjNewValue: Float = 0.0

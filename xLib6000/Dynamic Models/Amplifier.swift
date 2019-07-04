@@ -14,7 +14,8 @@ public typealias AmplifierId = String
 ///
 ///      creates an Amplifier instance to be used by a Client to support the
 ///      control of an external Amplifier. Amplifier objects are added, removed and
-///      updated by the incoming TCP messages.
+///      updated by the incoming TCP messages. They are collected in the amplifiers
+///      collection on the Radio object.
 ///
 public final class Amplifier                : NSObject, DynamicModel {
   
@@ -33,11 +34,11 @@ public final class Amplifier                : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
   private var __ant                         = ""                            // Antenna list
@@ -125,10 +126,10 @@ public final class Amplifier                : NSObject, DynamicModel {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // check for unknown keys
-      guard let token = Token(rawValue: property.key) else {        
+      // check for unknown Keys
+      guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Amplifier token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Amplifier token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order

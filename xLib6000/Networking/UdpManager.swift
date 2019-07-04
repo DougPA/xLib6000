@@ -97,7 +97,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   ///   - isWan:              Wan enabled
   ///   - clientHandle:       handle
   ///
-  func bind(radioParameters: RadioParameters, isWan: Bool, clientHandle: String = "") -> Bool {
+  func bind(radioParameters: RadioParameters, isWan: Bool, clientHandle: Handle? = nil) -> Bool {
     
     var success               = false
     var tmpPort               : UInt16 = 0
@@ -198,9 +198,9 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
   /// - Parameters:
   ///   - clientHandle:       our client handle
   ///
-  private func register(clientHandle: String) {
+  private func register(clientHandle: Handle?) {
     
-    guard clientHandle != "" else {
+    guard clientHandle != nil else {
       // should not happen
       _log.msg("UDP: No client handle in register UDP", level: .error, function: #function, file: #file, line: #line)
 
@@ -212,7 +212,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
       while self._udpSocket != nil && !self._udpSuccessfulRegistration && self._udpBound {
         
         // send a Registration command
-        let cmd = self.kRegisterCmd + "=0x" + clientHandle
+        let cmd = self.kRegisterCmd + "=" + clientHandle!.hex
         self.sendData(cmd.data(using: String.Encoding.ascii, allowLossyConversion: false)!)
 
         // pause
@@ -282,8 +282,6 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
         } else if classCode == Vita.PacketClassCode.opus {
 
           if let vita = Vita.decodeFrom(data: data) {
-            
-//            Swift.print("\(vita.desc())")
 
             self?._delegate?.udpStreamHandler(vita)
           }
@@ -294,35 +292,5 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
         self?._log.msg("Invalid packetType - \(packetType)", level: .warning, function: #function, file: #file, line: #line)
       }
     }
-
-//    if let vita = Vita.decodeFrom(data: data) {
-//
-//      _streamQ.async { [weak self] in
-//        // TODO: Packet statistics - received, dropped
-//
-//        // ensure the packet has our OUI
-//        guard vita.oui == Vita.kFlexOui  else { return }
-//
-//        // we got a VITA packet which means registration was successful
-//        self?._udpSuccessfulRegistration = true
-//
-//        switch vita.packetType {
-//
-//        case .ifDataWithStream, .extDataWithStream:
-//
-//          // stream of data, pass it to the delegate
-//          self?._delegate?.udpStreamHandler(vita)
-//
-//        case .ifData, .extData, .ifContext, .extContext:
-//          // log the error
-//          self?._log.msg("UDP: Unexpected packetType - \(vita.packetType.rawValue)", level: .warning, function: #function, file: #file, line: #line)
-//        }
-//      }
-//
-//    } else {
-//      // log the error
-//      _log.msg("UDP: Unable to decode received packet", level: .warning, function: #function, file: #file, line: #line)
-//    }
   }
 }
-

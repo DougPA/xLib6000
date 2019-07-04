@@ -98,10 +98,10 @@ public final class Gps                      : NSObject, StaticModel {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // Check for Unknown token
+      // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log.msg("Unknown Gps token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Gps token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order

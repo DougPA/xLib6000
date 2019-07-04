@@ -50,6 +50,6 @@ extension MicAudioStream {
   public func remove(callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove the Stream
-    Api.sharedInstance.send(MicAudioStream.kStreamRemoveCmd + "\(id.hex)", replyTo: callback)
+    Api.sharedInstance.send(MicAudioStream.kStreamRemoveCmd + "\(streamId.hex)", replyTo: callback)
   }
 }

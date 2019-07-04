@@ -42,7 +42,7 @@ extension TxAudioStream {
   public func remove(callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove a Stream
-    Api.sharedInstance.send(TxAudioStream.kStreamRemoveCmd + "\(id.hex)", replyTo: callback)
+    Api.sharedInstance.send(TxAudioStream.kStreamRemoveCmd + "\(streamId.hex)", replyTo: callback)
   }
 
   // ----------------------------------------------------------------------------

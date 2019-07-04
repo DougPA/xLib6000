@@ -22,7 +22,7 @@ public final class Log {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
-  public var delegate: LogHandler? 
+  public var delegate: LogHandler?
   
   // ----------------------------------------------------------------------------
   // MARK: - Singleton
@@ -50,7 +50,7 @@ public final class Log {
   public func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int ) {
     
     // pass the entry to the delegate (if any)
-    delegate?.msg(msg, level: level, function: function, file: file, line: line )
+    delegate?.msg(msg, level: level, function: function, file: file, line: line)
   }
 }
 

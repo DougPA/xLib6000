@@ -14,7 +14,8 @@ import Foundation
 ///
 ///      creates an Xvtr instance to be used by a Client to support the
 ///      processing of an Xvtr. Xvtr objects are added, removed and updated by
-///      the incoming TCP messages.
+///      the incoming TCP messages. They are collected in the xvtrs
+///      collection on the Radio object.
 ///
 public final class Xvtr                     : NSObject, DynamicModel {
   
@@ -26,11 +27,11 @@ public final class Xvtr                     : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
 
-  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
-  
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //                                                                                              
   private var __name                        = ""                            // Xvtr Name
@@ -124,10 +125,10 @@ public final class Xvtr                     : NSObject, DynamicModel {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // check for unknown keys
+      // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Xvtr token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Xvtr token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order

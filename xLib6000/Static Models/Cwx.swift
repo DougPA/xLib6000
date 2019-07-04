@@ -47,7 +47,7 @@ public final class Cwx                      : NSObject, StaticModel {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
-  
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
   private var __breakInDelay                = 0                             // BreakIn delay
@@ -114,22 +114,20 @@ public final class Cwx                      : NSObject, StaticModel {
     
     let components = values.count
     
-    // zero or anything greater than 2 is an error, log it and ignore the Reply
+    // if zero or anything greater than 2 it's an error, log it and ignore the Reply
     guard components == 1 || components == 2 else {
-      // log it and ignore the Key
       _log.msg("\(command), Invalid Cwx reply", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // get the character position
     let charPos = Int(values[0])
     
-    // not an integer, log it and ignore the Reply
+    // if not an integer, log it and ignore the Reply
     guard charPos != nil else {
-      
       _log.msg("\(command), Invalid Cwx character position", level: .warning, function: #function, file: #file, line: #line)
       return
     }
-    
+
     if components == 1 {
       
       // 1 component - no block number
@@ -183,10 +181,10 @@ public final class Cwx                      : NSObject, StaticModel {
         
       } else {
         
-        // Check for Unknown token
+        // Check for Unknown Keys
         guard let token = Token(rawValue: property.key) else {
-          // log it and ignore the token
-          _log.msg("Unknown Cwx token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+          // log it and ignore the Key
+          _log.msg("Unknown Cwx token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }
         // Known tokens, in alphabetical order

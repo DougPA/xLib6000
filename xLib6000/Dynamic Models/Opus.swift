@@ -8,7 +8,7 @@
 
 import Foundation
 
-public typealias OpusId = UInt32
+public typealias OpusId = StreamId
 
 /// Opus Class implementation
 ///
@@ -16,6 +16,7 @@ public typealias OpusId = UInt32
 ///      processing of a stream of Audio to/from the Radio. Opus
 ///      objects are added / removed by the incoming TCP messages. Opus
 ///      objects periodically receive/send Opus Audio in a UDP stream.
+///      They are collected in the opusStreams collection on the Radio object.
 ///
 public final class Opus                     : NSObject, DynamicModelWithStream {
   
@@ -39,13 +40,13 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // MARK: - Public properties
   
   public var isStreaming                    = false
-  public private(set) var id                : OpusId                        // The Opus stream id
+  public private(set) var streamId          : OpusId                        // The Opus streamId
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -87,13 +88,13 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
     
     // get the Opus Id (without the "0x" prefix)
     //        let opusId = String(keyValues[0].key.characters.dropFirst(2))
-    if let streamId =  UInt32(String(keyValues[0].key.dropFirst(2)), radix: 16) {
+    if let streamId =  keyValues[0].key.streamId {
       
       // does the Opus exist?
       if  radio.opusStreams[streamId] == nil {
         
         // NO, create a new Opus & add it to the OpusStreams collection
-        radio.opusStreams[streamId] = Opus(id: streamId, queue: queue)
+        radio.opusStreams[streamId] = Opus(streamId: streamId, queue: queue)
       }
       // pass the key values to Opus for parsing  (dropping the Id)
       radio.opusStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
@@ -109,9 +110,9 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   ///   - id:                 an Opus Stream id
   ///   - queue:              Concurrent queue
   ///
-  init(id: OpusId, queue: DispatchQueue) {
+  init(streamId: OpusId, queue: DispatchQueue) {
     
-    self.id = id
+    self.streamId = streamId
     _q = queue
     
     super.init()
@@ -173,7 +174,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Opus token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Opus token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -241,7 +242,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
     }
 
     switch (_expectedFrame!, vita.sequence) {
-    
+
 //    case (let expected, let received) where received < expected:
 //      // from a previous group, ignore it
 //      _log.msg("Delayed frame(s): expected \(expected), received \(received)", level: .warning, function: #function, file: #file, line: #line)
@@ -264,7 +265,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       // received == expected
       // calculate the next Sequence Number
       _expectedFrame = (_expectedFrame! + 1) % 16
-    
+
       // Pass the data frame to the Opus delegate
       delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: vita.payloadSize) )
     }

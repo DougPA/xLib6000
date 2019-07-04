@@ -8,14 +8,15 @@
 
 import Foundation
 
-public typealias WaterfallId = UInt32
+public typealias WaterfallId = StreamId
 
 /// Waterfall Class implementation
 ///
 ///      creates a Waterfall instance to be used by a Client to support the
 ///      processing of a Waterfall. Waterfall objects are added / removed by the
 ///      incoming TCP messages. Waterfall objects periodically receive Waterfall
-///      data in a UDP stream.
+///      data in a UDP stream. They are collected in the waterfalls collection
+///      on the Radio object.
 ///
 public final class Waterfall                : NSObject, DynamicModelWithStream {
   
@@ -24,15 +25,15 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   
   public var isStreaming                    = false
   
-  public private(set) var id                : WaterfallId   = 0             // Waterfall Id (StreamId)
+  public private(set) var streamId          : WaterfallId = 0               // Waterfall StreamId
   public private(set) var packetFrame       = -1                            // Frame index of next Vita payload
   public private(set) var droppedPackets    = 0                             // Number of dropped (out of sequence) packets
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -69,19 +70,19 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format: <"waterfall", ""> <id, ""> <"x_pixels", value> <"center", value> <"bandwidth", value> <"line_duration", value>
+    // Format: <"waterfall", ""> <streamId, ""> <"x_pixels", value> <"center", value> <"bandwidth", value> <"line_duration", value>
     //          <"rfgain", value> <"rxant", value> <"wide", 1|0> <"loopa", 1|0> <"loopb", 1|0> <"band", value> <"daxiq", value>
     //          <"daxiq_rate", value> <"capacity", value> <"available", value> <"panadapter", streamId>=40000000 <"color_gain", value>
     //          <"auto_black", 1|0> <"black_level", value> <"gradient_index", value> <"xvtr", value>
     //      OR
-    // Format: <"waterfall", ""> <id, ""> <"rxant", value> <"loopa", 1|0> <"loopb", 1|0>
+    // Format: <"waterfall", ""> <streamId, ""> <"rxant", value> <"loopa", 1|0> <"loopb", 1|0>
     //      OR
-    // Format: <"waterfall", ""> <id, ""> <"rfgain", value>
+    // Format: <"waterfall", ""> <streamId, ""> <"rfgain", value>
     //      OR
-    // Format: <"waterfall", ""> <id, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
+    // Format: <"waterfall", ""> <streamId, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
     
-    // get the streamId (remove the "0x" prefix)
-    if let streamId = UInt32(String(keyValues[1].key.dropFirst(2)), radix: 16) {
+    // get the streamId
+    if let streamId = keyValues[1].key.streamId {
       
       // is the Waterfall in use?
       if inUse {
@@ -90,7 +91,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
         if radio.waterfalls[streamId] == nil {
           
           // NO, Create a Waterfall & add it to the Waterfalls collection
-          radio.waterfalls[streamId] = Waterfall(id: streamId, queue: queue)
+          radio.waterfalls[streamId] = Waterfall(streamId: streamId, queue: queue)
         }
         // pass the key values to the Waterfall for parsing (dropping the Type and Id)
         radio.waterfalls[streamId]!.parseProperties(Array(keyValues.dropFirst(2)))
@@ -118,9 +119,9 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   ///   - streamId:           a Waterfall Id
   ///   - queue:              Concurrent queue
   ///
-  public init(id: WaterfallId, queue: DispatchQueue) {
+  public init(streamId: WaterfallId, queue: DispatchQueue) {
     
-    self.id = id
+    self.streamId = streamId
     _q = queue
     
     // allocate two dataframes
@@ -147,10 +148,10 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // check for unknown keys
+      // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Waterfall token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Waterfall token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -181,9 +182,9 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
         _lineDuration = property.value.iValue
         didChangeValue(for: \.lineDuration)
 
-      case .panadapterId:     // does not have leading "0x"
+      case .panadapterId:
         willChangeValue(for: \.panadapterId)
-        _panadapterId = UInt32(property.value, radix: 16) ?? 0
+        _panadapterId = property.value.streamId ?? 0
         didChangeValue(for: \.panadapterId)
 
       case .available, .band, .bandwidth, .bandZoomEnabled, .capacity, .center, .daxIq, .daxIqRate,
@@ -215,7 +216,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
     
     // convert the Vita struct and accumulate a WaterfallFrame
     if _waterfallframes[_index].accumulate(vita: vita, expectedFrame: &packetFrame) {
-      
+
       // save the auto black level
       _autoBlackLevel = _waterfallframes[_index].autoBlackLevel
       

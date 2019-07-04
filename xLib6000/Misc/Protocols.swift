@@ -11,11 +11,9 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
-
 /// Logging is deferred to the hosting application
 ////
-public protocol LogHandler
-{
+public protocol LogHandler {
   /// Method to process Log entries
   ///
   /// - Parameters:
@@ -196,6 +194,3 @@ public protocol WanServerDelegate           : class {
   ///
   func wanTestConnectionResultsReceived(results: WanTestConnectionResults)
 }
-
-
-

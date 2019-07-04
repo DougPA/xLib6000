@@ -26,7 +26,7 @@ extension Panadapter {
     
     // tell the Radio to create a Panafall (if any available)
     if Api.sharedInstance.radio!.availablePanadapters > 0 {
-      Api.sharedInstance.send(Panadapter.kCmd + "create x=\(dimensions.width) y=\(dimensions.height)", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+      Api.sharedInstance.send("display pan create x=\(dimensions.width) y=\(dimensions.height)", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
     }
   }
   /// Create a Panafall
@@ -42,7 +42,7 @@ extension Panadapter {
     // tell the Radio to create a Panafall (if any available)
     if Api.sharedInstance.radio!.availablePanadapters > 0 {
       
-      var cmd = Panadapter.kCreateCmd + "freq" + "=\(frequency.hzToMhz)"
+      var cmd = "display pan create freq" + "=\(frequency.hzToMhz)"
       if antenna != nil { cmd += " ant=" + "\(antenna!)" }
       if dimensions != nil { cmd += " x" + "=\(dimensions!.width)" + " y" + "=\(dimensions!.height)" }
       Api.sharedInstance.send(cmd, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
@@ -60,7 +60,7 @@ extension Panadapter {
   public func remove(callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove a Panafall
-    Api.sharedInstance.send(Panadapter.kRemoveCmd + "\(id.hex)", replyTo: callback)
+    Api.sharedInstance.send("display pan remove \(streamId.hex)", replyTo: callback)
   }
   /// Request Click Tune
   ///
@@ -71,12 +71,12 @@ extension Panadapter {
   public func clickTune(_ frequency: Int, callback: ReplyHandler? = nil) {
     
     // FIXME: ???
-    Api.sharedInstance.send(xLib6000.Slice.kCmd + "m " + "\(frequency.hzToMhz)" + " pan=\(id.hex)", replyTo: callback)
+    Api.sharedInstance.send(xLib6000.Slice.kCmd + "m " + "\(frequency.hzToMhz)" + " pan=\(streamId.hex)", replyTo: callback)
   }
   /// Request Rf Gain values
   ///
   public func requestRfGainInfo() {
-    Api.sharedInstance.send(Panadapter.kCmd + "rf_gain_info " + "\(id.hex)", replyTo: replyHandler)
+    Api.sharedInstance.send(Panadapter.kCmd + "rf_gain_info " + "\(streamId.hex)", replyTo: replyHandler)
   }
 
   // ----------------------------------------------------------------------------
@@ -90,7 +90,7 @@ extension Panadapter {
   ///
   private func panadapterSet(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Panadapter.kSetCmd + "\(id.hex) " + token.rawValue + "=\(value)")
+    Api.sharedInstance.send(Panadapter.kSetCmd + "\(streamId.hex) " + token.rawValue + "=\(value)")
   }
   /// Set a Panadapter property on the Radio
   ///
@@ -101,7 +101,7 @@ extension Panadapter {
   private func panadapterSet(_ token: String, _ value: Any) {
     // NOTE: commands use this format when the Token received does not match the Token sent
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    Api.sharedInstance.send(Panadapter.kSetCmd + "\(id.hex) " + token + "=\(value)")
+    Api.sharedInstance.send(Panadapter.kSetCmd + "\(streamId.hex) " + token + "=\(value)")
   }
   
   // ----------------------------------------------------------------------------

@@ -14,7 +14,8 @@ public typealias EqualizerId = String
 ///
 ///      creates an Equalizer instance to be used by a Client to support the
 ///      rendering of an Equalizer. Equalizer objects are added, removed and
-///      updated by the incoming TCP messages.
+///      updated by the incoming TCP messages. They are collected in the equalizers
+///      collection on the Radio object.
 ///
 ///      Note: ignores the non-"sc" version of Equalizer messages
 ///            The "sc" version is the standard for API Version 1.4 and greater
@@ -34,8 +35,8 @@ public final class Equalizer                : NSObject, DynamicModel {
   // ------------------------------------------------------------------------------
   // MARK: - Private properties
   
-  private var _log                          = Log.sharedInstance
   private let _api                          = Api.sharedInstance            // reference to the API singleton
+  private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
@@ -92,9 +93,7 @@ public final class Equalizer                : NSObject, DynamicModel {
       
     default:
       // unknown type, log & ignore it
-      Log.sharedInstance.msg("Unknown Equalizer type - \(type)", level: .warning, function: #function, file: #file, line: #line)
-      break
-      
+      Log.sharedInstance.msg("Unknown Equalizer type: \(type)", level: .warning, function: #function, file: #file, line: #line)
     }
     // if an equalizer was found
     if let equalizer = equalizer {
@@ -138,7 +137,7 @@ public final class Equalizer                : NSObject, DynamicModel {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Equalizer token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Equalizer token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known Keys, in alphabetical order

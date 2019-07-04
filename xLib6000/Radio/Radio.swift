@@ -59,7 +59,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
   // GCD Queue
   private let _q                            : DispatchQueue
-  private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ")
+  private let _streamQ                      = DispatchQueue(label: Api.kName + ".streamQ", qos: .userInteractive)
   private let _log                          = Log.sharedInstance
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -327,7 +327,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // ignore incorrectly formatted messages
     if components.count < 2 {
-      _log.msg("Incomplete message, c\(commandSuffix)", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg("Incomplete message: c\(commandSuffix)", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     let msgText = components[1]
@@ -351,7 +351,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // ignore incorrectly formatted replies
     if components.count < 2 {
-      _log.msg("Incomplete reply, r\(replySuffix)", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg("Incomplete reply: r\(replySuffix)", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // is there an Object expecting to be notified?
@@ -378,8 +378,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
       // no Object is waiting for this reply, log it if it is a non-zero Reply (i.e a possible error)
       if components[1] != Api.kNoError {
-
-        _log.msg("Unhandled non-zero reply, c\(components[0]), r\(replySuffix), \(flexErrorString(errorCode: components[1]))", level: .warning, function: #function, file: #file, line: #line)
+        _log.msg("Unhandled non-zero reply: c\(components[0]), r\(replySuffix), \(flexErrorString(errorCode: components[1]))", level: .warning, function: #function, file: #file, line: #line)
       }
     }
   }
@@ -397,8 +396,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // ignore incorrectly formatted status
     guard components.count > 1 else {
-      
-      _log.msg("Incomplete status, c\(commandSuffix)", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg("Incomplete status: c\(commandSuffix)", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // find the space & get the msgType
@@ -411,10 +409,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     
     // Check for unknown Message Types
     guard let token = StatusToken(rawValue: msgType)  else {
-      
-      // unknown Message Type, log it and ignore the message
-      _log.msg("Unknown Status token - \(msgType)", level: .warning, function: #function, file: #file, line: #line)
-
+      // log it and ignore the message
+      _log.msg("Unknown Status token: \(msgType)", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     
@@ -467,8 +463,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
       default:
         // unknown Display Type, log it and ignore the message
-        _log.msg("Unknown Display type - \(keyValues[0].key)", level: .warning, function: #function, file: #file, line: #line)
-        break
+        _log.msg("Unknown Display type: \(keyValues[0].key)", level: .warning, function: #function, file: #file, line: #line)
       }
       
     case .eq:
@@ -477,9 +472,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       Equalizer.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q )
       
     case .file:
-      _log.msg("Unprocessed - \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
-      break
-      
+      _log.msg("Unprocessed \(msgType): \(remainder)", level: .warning, function: #function, file: #file, line: #line)
+
     case .gps:
       //     format: <key=value>#<key=value>#...<key=value>
       gps.parseProperties( remainder.keyValuesArray(delimiter: "#") )
@@ -495,15 +489,14 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .meter:
       //     format: <meterNumber.key=value>#<meterNumber.key=value>#...<meterNumber.key=value>
       Meter.parseStatus( remainder.keyValuesArray(delimiter: "#"), radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
-      
+
     case .micAudioStream:
       //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
       MicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
       
     case .mixer:
-      _log.msg("Unprocessed - \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
-      break
-      
+      _log.msg("Unprocessed \(msgType): \(remainder)", level: .warning, function: #function, file: #file, line: #line)
+
     case .opusStream:
       //     format: <opusId> <key=value> <key=value> ...<key=value>
       Opus.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q)
@@ -538,8 +531,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       transmit.parseProperties( remainder.keyValuesArray())
       
     case .turf:
-      _log.msg("Unprocessed - \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
-      break
+      _log.msg("Unprocessed \(msgType): \(remainder)", level: .warning, function: #function, file: #file, line: #line)
       
     case .txAudioStream:
       //      format: <TxAudioStreamId> <key=value> <key=value> ...<key=value>
@@ -574,12 +566,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private func parseClient(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     
     guard keyValues.count >= 2 else {
-      
       _log.msg("Invalid client status", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     // guard that the message has my API Handle
-    guard ("0x" + _api.connectionHandle == keyValues[0].key) else { return }
+    guard _api.connectionHandle! == keyValues[0].key.handle else { return }
     
     // what is the message?
     if keyValues[1].key == "connected" {
@@ -593,7 +584,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
     } else {
       // Unrecognized
-      _log.msg("Unprocessed Client message, \(keyValues[0].key)", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg("Unprocessed Client message: \(keyValues[0].key)", level: .warning, function: #function, file: #file, line: #line)
     }
   }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
@@ -611,7 +602,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // check for unknown Keys
       guard let token = InfoToken(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Info token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Info token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known keys, in alphabetical order
@@ -786,10 +777,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // check for unknown Tokens
+      // check for unknown Keys
       guard let token = VersionToken(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Version token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Version token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -860,10 +851,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // process each key/value pair, <key=value>
       for property in properties {
         
-        // Check for Unknown token
+        // Check for Unknown Keys
         guard let token = RadioToken(rawValue: property.key)  else {
           // log it and ignore the Key
-          _log.msg("Unknown Radio token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+          _log.msg("Unknown Radio token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }
         // Known tokens, in alphabetical order
@@ -1006,10 +997,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // Check for Unknown token
+      // Check for Unknown Keys
       guard let token = RadioFilterSharpness(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log.msg("Unknown Filter token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Filter token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1075,10 +1066,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // Check for Unknown token
+      // Check for Unknown Keys
       guard let token = RadioStaticNet(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log.msg("Unknown Static token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Static token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -1113,10 +1104,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // process each key/value pair, <key=value>
       for property in properties {
         
-        // Check for Unknown token
+        // Check for Unknown Keys
         guard let token = RadioOscillator(rawValue: property.key)  else {
           // log it and ignore the Key
-          _log.msg("Unknown Oscillator token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+          _log.msg("Unknown Oscillator token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }
         // Known tokens, in alphabetical order
@@ -1173,7 +1164,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     switch msg[msg.startIndex] {
       
     case "H", "h":   // Handle type
-      _api.connectionHandle = suffix
+      _api.connectionHandle = suffix.handle
       
     case "M", "m":   // Message Type
       parseMessage(suffix)
@@ -1188,7 +1179,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       _hardwareVersion = suffix
       
     default:    // Unknown Type
-      _log.msg("Unexpected message -  \(msg)", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg("Unexpected message: \(msg)", level: .warning, function: #function, file: #file, line: #line)
     }
   }
   /// Process outbound Tcp messages
@@ -1307,18 +1298,15 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     default:
       
       if command.hasPrefix(Panadapter.kCmd + "create") {
-        
         // ignore, Panadapter & Waterfall will be created when Status reply is seen
         break
         
       } else if command.hasPrefix("tnf " + "r") {
-
         // parse the reply
         let components = command.components(separatedBy: " ")
         
         // if it's valid and the Tnf has not been removed
         if components.count == 3 && _api.radio?.tnfs[components[2]] != nil{
-          
           // notify all observers
           NC.post(.tnfWillBeRemoved, object: _api.radio?.tnfs[components[2]] as Any?)
 
@@ -1327,27 +1315,22 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         }
         
       } else if command.hasPrefix(AudioStream.kStreamCreateCmd + "dax=") {
-        
         // TODO: add code
         break
         
       } else if command.hasPrefix(AudioStream.kStreamCreateCmd + "daxmic") {
-        
         // TODO: add code
         break
         
       } else if command.hasPrefix(AudioStream.kStreamCreateCmd + "daxtx") {
-        
         // TODO: add code
         break
         
       } else if command.hasPrefix(IqStream.kStreamCreateCmd + "daxiq") {
-        
         // TODO: add code
         break
         
       } else if command.hasPrefix(xLib6000.Slice.kCmd + "get_error"){
-        
         // save the errors, format: <rx_error_value>,<tx_error_value>
         sliceErrors = reply.valuesArray( delimiter: "," )
       }
@@ -1361,78 +1344,72 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///
   public func vitaParser(_ vitaPacket: Vita) {
     
-//    _streamQ.async { [unowned self ] in
-    
-      // Pass the stream to the appropriate object (checking for existence of the object first)
-      switch (vitaPacket.classCode) {
-        
-      case .daxAudio:
-        // Dax Microphone Audio
-        if let daxAudio = self.audioStreams[vitaPacket.streamId] {
-          daxAudio.vitaProcessor(vitaPacket)
-        }
-        // Dax Slice Audio
-        if let daxMicAudio = self.micAudioStreams[vitaPacket.streamId] {
-          daxMicAudio.vitaProcessor(vitaPacket)
-        }
-
-      case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
-        // Dax IQ
-        if let daxIq = self.iqStreams[vitaPacket.streamId] {
-
-          daxIq.vitaProcessor(vitaPacket)
-        }
-        
-      case .meter:
-        // Meter - unlike other streams, the Meter stream contains multiple Meters
-        //         and must be processed by a class method on the Meter object
-        Meter.vitaProcessor(vitaPacket)
-        
-      case .opus:
-        // Opus
-        if let opus = self.opusStreams[vitaPacket.streamId] {
-
-          if opus.isStreaming == false {
-            opus.isStreaming = true
-            // log the start of the stream
-            _log.msg("Opus Stream started: Stream Id = \(vitaPacket.streamId.hex)", level: .info, function: #function, file: #file, line: #line)
-          }
-          opus.vitaProcessor( vitaPacket )
-          
-//          Swift.print("\(vitaPacket.desc())")
-        }
-        
-      case .panadapter:
-        // Panadapter
-        if let panadapter = self.panadapters[vitaPacket.streamId] {
-          
-          if panadapter.isStreaming == false {
-            panadapter.isStreaming = true
-            // log the start of the stream
-            _log.msg("Panadapter Stream started: Stream Id = \(vitaPacket.streamId.hex)", level: .info, function: #function, file: #file, line: #line)
-          }
-          panadapter.vitaProcessor(vitaPacket)
-        }
-        
-      case .waterfall:
-        // Waterfall
-        if let waterfall = self.waterfalls[vitaPacket.streamId] {
-          
-          if waterfall.isStreaming == false {
-            waterfall.isStreaming = true
-            // log the start of the stream
-            _log.msg("Waterfall Stream started: Stream Id = \(vitaPacket.streamId.hex)", level: .info, function: #function, file: #file, line: #line)
-          }
-          waterfall.vitaProcessor(vitaPacket)
-        }
-        
-      default:
-        // log the error
-        _log.msg("UDP Stream error, no object: \(vitaPacket.classCode.description()) Stream Id = \(vitaPacket.streamId.hex)", level: .error, function: #function, file: #file, line: #line)
-        break
+    // Pass the stream to the appropriate object (checking for existence of the object first)
+    switch (vitaPacket.classCode) {
+      
+    case .daxAudio:
+      // Dax Microphone Audio
+      if let daxAudio = audioStreams[vitaPacket.streamId] {
+        daxAudio.vitaProcessor(vitaPacket)
       }
+      // Dax Slice Audio
+      if let daxMicAudio = micAudioStreams[vitaPacket.streamId] {
+        daxMicAudio.vitaProcessor(vitaPacket)
+      }
+      
+    case .daxIq24, .daxIq48, .daxIq96, .daxIq192:
+      // Dax IQ
+      if let daxIq = iqStreams[vitaPacket.streamId] {
+        
+        daxIq.vitaProcessor(vitaPacket)
+      }
+      
+    case .meter:
+      // Meter - unlike other streams, the Meter stream contains multiple Meters
+      //         and must be processed by a class method on the Meter object
+      Meter.vitaProcessor(vitaPacket)
+      
+    case .opus:
+      // Opus
+      if let opus = opusStreams[vitaPacket.streamId] {
+        
+        if opus.isStreaming == false {
+          opus.isStreaming = true
+          // log the start of the stream
+          _log.msg("Opus Stream started: Stream Id = \(vitaPacket.streamId.hex)", level: .info, function: #function, file: #file, line: #line)
+        }
+        opus.vitaProcessor( vitaPacket )
+      }
+      
+    case .panadapter:
+      // Panadapter
+      if let panadapter = panadapters[vitaPacket.streamId] {
+        
+        if panadapter.isStreaming == false {
+          panadapter.isStreaming = true
+          // log the start of the stream
+          _log.msg("Panadapter Stream started: Stream Id = \(vitaPacket.streamId.hex)", level: .info, function: #function, file: #file, line: #line)
+        }
+        panadapter.vitaProcessor(vitaPacket)
+      }
+      
+    case .waterfall:
+      // Waterfall
+      if let waterfall = waterfalls[vitaPacket.streamId] {
+        
+        if waterfall.isStreaming == false {
+          waterfall.isStreaming = true
+          // log the start of the stream
+          _log.msg("Waterfall Stream started: Stream Id = \(vitaPacket.streamId.hex)", level: .info, function: #function, file: #file, line: #line)
+        }
+        waterfall.vitaProcessor(vitaPacket)
+      }
+      
+    default:
+      // log the error
+      _log.msg("UDP Stream error, no object: \(vitaPacket.classCode.description()) Stream Id = \(vitaPacket.streamId.hex)", level: .error, function: #function, file: #file, line: #line)
     }
-//  }
+  }
 }
 
 extension Radio {

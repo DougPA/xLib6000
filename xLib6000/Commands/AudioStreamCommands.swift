@@ -41,7 +41,7 @@ extension AudioStream {
   public func remove(callback: ReplyHandler? = nil) -> Bool {
     
     // tell the Radio to remove a Stream
-    return Api.sharedInstance.sendWithCheck(AudioStream.kStreamRemoveCmd + "\(id.hex)", replyTo: callback)
+    return Api.sharedInstance.sendWithCheck(AudioStream.kStreamRemoveCmd + "\(streamId.hex)", replyTo: callback)
   }
 
   // ----------------------------------------------------------------------------
@@ -55,7 +55,7 @@ extension AudioStream {
   ///
   private func audioStreamCmd(_ token: String, _ value: Any) {
     
-    Api.sharedInstance.send(AudioStream.kCmd + "\(id.hex) slice \(_slice!.id) " + token + " \(value)")
+    Api.sharedInstance.send(AudioStream.kCmd + "\(streamId.hex) slice \(_slice!.id) " + token + " \(value)")
   }
   
   // ----------------------------------------------------------------------------

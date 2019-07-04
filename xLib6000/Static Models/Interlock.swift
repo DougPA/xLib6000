@@ -27,7 +27,7 @@ public final class Interlock                : NSObject, StaticModel {
   private let _api                          = Api.sharedInstance            // reference to the API singleton
   private let _log                          = Log.sharedInstance
   private let _q                            : DispatchQueue                 // Q for object synchronization
-  
+
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
   private var __accTxEnabled                = false                         //
@@ -85,10 +85,10 @@ public final class Interlock                : NSObject, StaticModel {
     // process each key/value pair, <key=value>
     for property in properties {
       
-      // Check for Unknown token
+      // Check for Unknown Keys
       guard let token = Token(rawValue: property.key)  else {
         // log it and ignore the Key
-        _log.msg("Unknown Interlock token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+        _log.msg("Unknown Interlock token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // Known tokens, in alphabetical order
@@ -110,9 +110,9 @@ public final class Interlock                : NSObject, StaticModel {
         didChangeValue(for: \.accTxReqEnabled)
 
       case .accTxReqPolarity:
-       willChangeValue(for: \.accTxReqPolarity)
-       _accTxReqPolarity = property.value.bValue
-       didChangeValue(for: \.accTxReqPolarity)
+        willChangeValue(for: \.accTxReqPolarity)
+        _accTxReqPolarity = property.value.bValue
+        didChangeValue(for: \.accTxReqPolarity)
 
       case .amplifier:
         willChangeValue(for: \.amplifier)

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import os.log
 
 ///  VITA header struct implementation
 ///
@@ -311,76 +310,47 @@ public class Vita {
       
       // YES, create a minimal RadioParameters with now as "lastSeen"
       let discoveredRadio = RadioParameters()
-      
-      // Payload is a series of strings of the form <key=value> separated by ' ' (space)
-      let payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize - 1, encoding: String.Encoding.ascii.rawValue)! as String
 
+      // Payload is a series of strings of the form <key=value> separated by ' ' (space)
+      var payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
+
+      // eliminate any Nulls at the end of the payload
+      payloadData = payloadData.trimmingCharacters(in: CharacterSet(charactersIn: "\0"))
+      
       // parse into a KeyValuesArray
       let properties = payloadData.keyValuesArray()
       
       // process each key/value pair, <key=value>
       for property in properties {
         
-        // check for unknown keys
+        // check for unknown Keys
         guard let token = DiscoveryToken(rawValue: property.key) else {
           // log it and ignore the Key
-          Log.sharedInstance.msg("Unknown token - \(property.key)", level: .debug, function: #function, file: #file, line: #line)
+          Log.sharedInstance.msg("Unknown Discovery token - \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
           continue
         }
         
         switch token {
           
-        case .callsign:
-          discoveredRadio.callsign = property.value
-          
-        case .discoveryVersion:
-          discoveredRadio.discoveryVersion = property.value
-          
-        case .firmwareVersion:
-          discoveredRadio.firmwareVersion = property.value
-          
-        case .fpcMac:
-          discoveredRadio.fpcMac = property.value
-          
-        case .inUseHost:
-          discoveredRadio.inUseHost = property.value
-          
-        case .inUseIp:
-          discoveredRadio.inUseIp = property.value
-          
-        case .maxLicensedVersion:
-          discoveredRadio.maxLicensedVersion = property.value
-          
-        case .model:
-          discoveredRadio.model = property.value
-          
-        case .nickname:
-          discoveredRadio.nickname = property.value
-          
-        case .port:
-          discoveredRadio.port = property.value.iValue
-          
-        case .publicIp:
-          discoveredRadio.publicIp = property.value
-          
-        case .radioLicenseId:
-          discoveredRadio.radioLicenseId = property.value
-          
-        case .requiresAdditionalLicense:
-          discoveredRadio.requiresAdditionalLicense = property.value.bValue
-          
-        case .serialNumber:
-          discoveredRadio.serialNumber = property.value
-          
-        case .status:
-          discoveredRadio.status = property.value
-          
-        case .wanConnected:
-          discoveredRadio.wanConnected = property.value.bValue
-          
+        case .callsign:                   discoveredRadio.callsign = property.value
+        case .discoveryVersion:           discoveredRadio.discoveryVersion = property.value
+        case .firmwareVersion:            discoveredRadio.firmwareVersion = property.value
+        case .fpcMac:                     discoveredRadio.fpcMac = property.value
+        case .inUseHost:                  discoveredRadio.inUseHost = property.value
+        case .inUseIp:                    discoveredRadio.inUseIp = property.value
+        case .maxLicensedVersion:         discoveredRadio.maxLicensedVersion = property.value
+        case .model:                      discoveredRadio.model = property.value
+        case .nickname:                   discoveredRadio.nickname = property.value
+        case .port:                       discoveredRadio.port = property.value.iValue
+        case .publicIp:                   discoveredRadio.publicIp = property.value
+        case .radioLicenseId:             discoveredRadio.radioLicenseId = property.value
+        case .requiresAdditionalLicense:  discoveredRadio.requiresAdditionalLicense = property.value.bValue
+        case .serialNumber:               discoveredRadio.serialNumber = property.value
+        case .status:                     discoveredRadio.status = property.value
+        case .wanConnected:               discoveredRadio.wanConnected = property.value.bValue
+        
         // satisfy the switch statement, not a real token
-        case .lastSeen:
-          break
+        case .lastSeen:                   break
         }
       }
       // is it a valid Discovery packet?
@@ -458,12 +428,6 @@ public class Vita {
 
     let date = Date(timeIntervalSinceReferenceDate: Double(integerTimestamp) )
 
-//    var payloadString = ""
-//    for i in 1...payloadSize {
-//      payloadString += String(format: "%02X", payloadData[i-1]) + " "
-//      if (i % 8) == 0 { payloadString += "  " }
-//      if (i % 16) == 0 { payloadString += "\n" }
-//    }
     let payloadString = hexDump(data: payloadData, len: payloadSize)
 
     let adjustedPacketSize = Int( (Float(packetSize) / 4.0).rounded(.up))
@@ -471,27 +435,34 @@ public class Vita {
     
     let timeStamp = (tsiType == .utc ? dateFormatter.string(from: date) : String(format: "%d", integerTimestamp))
     
-    return
-      "packetType           = \(packetType.description())\n" +
-      "classIdPresent       = \(classIdPresent)\n" +
-      "trailerPresent       = \(trailerPresent)\n" +
-      "tsi type             = \(tsiType.description())\n" +
-      "tsf type             = \(tsfType.description())\n" +
-      "sequence             = \(sequence)\n" +
-      "streamId             = \(streamId.hex)\n" +
-      "oui                  = \(oui == Vita.kFlexOui ? "Flex Radio" : "Unknown")\n" +
-      "informationClassCode = \(informationClassCode == Vita.kFlexInformationClassCode ? "Flex Radio" : "Unknown")\n" +
-      "classCode            = \(classCode.description())\n" +
-      "integerTimeStamp     = \(timeStamp)\n" +
-      "fracTimeStampMsb     = \(fracTimeStampMsb)\n" +
-      "fracTimeStampLsb     = \(fracTimeStampLsb)\n" +
-      "trailer              = \(trailerPresent ? trailer.hex : "None")\n" +
-      "payload:\n\(payloadString)\n" +
-      "----------------------------------------------\n" +
-      "headerSize           = \(headerSize) (bytes),  \(headerSize / 4) (UInt32)\n" +
-      "payloadSize          = \(payloadSize) (bytes), \(payloadSize / 4) (UInt32)\n" +
-      "packetSize           = \(packetSize) (bytes), \(adjustedPacketSize) (UInt32)\n" +
-      "\n\(warning)\n\n"
+    return """
+    packetType           = \(packetType.description())
+    classIdPresent       = \(classIdPresent)
+    trailerPresent       = \(trailerPresent)
+    tsi type             = \(tsiType.description())
+    tsf type             = \(tsfType.description())
+    sequence             = \(sequence)
+    streamId             = \(streamId.hex)
+    oui                  = \(oui == Vita.kFlexOui ? "Flex Radio" : "Unknown")
+    informationClassCode = \(informationClassCode == Vita.kFlexInformationClassCode ? "Flex Radio" : "Unknown")
+    classCode            = \(classCode.description())
+    integerTimeStamp     = \(timeStamp)
+    fracTimeStampMsb     = \(fracTimeStampMsb)
+    fracTimeStampLsb     = \(fracTimeStampLsb)
+    trailer              = \(trailerPresent ? trailer.hex : "None")
+    
+    payload:
+    
+    \(payloadString)
+    ----------------------------------------------
+    
+    headerSize           = \(headerSize) (bytes),  \(headerSize / 4) (UInt32)
+    payloadSize          = \(payloadSize) (bytes), \(payloadSize / 4) (UInt32)
+    packetSize           = \(packetSize) (bytes), \(adjustedPacketSize) (UInt32)
+    
+    \(warning)
+    
+    """
   }
 }
 
