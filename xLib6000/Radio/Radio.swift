@@ -453,17 +453,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       let keyValues = remainder.keyValuesArray()
       GuiClient.parseStatus(keyValues, radio: self, queue: _q)
 
-      // is my Client initialized now?
-      if let handle = keyValues[0].key.handle {
-        
-        if _api.guiClients[handle] != nil && !_clientInitialized {
-          // YES
-          _clientInitialized = true
-          
-          // Finish the UDP initialization & set the API state
-          _api.clientConnected()
-        }
-      }
+//      // is my Client initialized now?
+//      if let handle = keyValues[0].key.handle {
+//
+//        if _api.guiClients[handle] != nil && !_clientInitialized {
+//          // YES
+//          _clientInitialized = true
+//
+//          // Finish the UDP initialization & set the API state
+//          _api.clientConnected()
+//        }
+//      }
 
     case .cwx:
       // replace some characters to avoid parsing conflicts
@@ -620,6 +620,17 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       //      format: <name> <key=value> <key=value> ...<key=value>
       Xvtr.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
     }
+    
+    // check if we received a status message for our handle to see if our client is connected now
+    if !_clientInitialized && components[0].handle == _api.connectionHandle {
+      
+      // YES
+      _clientInitialized = true
+      
+      // Finish the UDP initialization & set the API state
+      _api.clientConnected()
+    }
+
   }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
   ///

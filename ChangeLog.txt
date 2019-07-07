@@ -1,10 +1,23 @@
 xLib6000 Change Log
 
+v2.5.1.2019_07_07
+
+AppExtensions.swift - added vars isV3, isV2 & isV1 to the Version struct
+Api.swift - in setupCommands(_:) (changes as per DL3LSM)
+Api.swift - in enum Command (changes as per DL3LSM)
+Api.swift - in clientConnected() (changes as per DL3LSM)
+Radio.swift - in parseStatus(_:) (changes as per DL3LSM)
+Radio.swift - added var _clientInitialized (changes as per DL3LSM)
+Panadapter.swift - moved PanadapterFrame class to this file
+Frames.swift - removed PanadapterFrame clas from this file
+Notifications.swift - changed radioFirmwareDowngradeRequired to radioDowngradeRequired
+Notifications.swift - added radioUpgradeRequired
+Api.swift - refactored checkFirmware()
+
+
 v2.5.1.2019_07_03
 
 Corrections and edits throughout to make v2.4.9 & v2.5.1 as similar as possible
-
-
 
 
 v2.5.1.2019_06_20

@@ -17,7 +17,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("2.5.1.2019_07_03")
+  public static let kVersion                = Version("2.5.1.2019_07_07")
   public static let kName                   = "xLib6000"
 
   public static let kDomainName             = "net.k3tzr"
@@ -178,8 +178,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       // check the versions
       checkFirmware()
       
-      // send the initial commands
-      sendCommands()
+//      // send the initial commands
+//      sendCommands()
       
       return true
     }
@@ -293,8 +293,38 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   
   /// A Client has been connected
   ///
+//  func clientConnected() {
+//
+//      // set the streaming UDP port
+//      if isWan {
+//        // Wan, establish a UDP port for the Data Streams
+//        let _ = _udp.bind(radioParameters: activeRadio!, isWan: true, clientHandle: connectionHandle)
+//
+//      } else {
+//        // Local
+//        send(Api.Command.clientUdpPort.rawValue + "\(localUDPPort)")
+//      }
+//      // start pinging
+//      if pingerEnabled {
+//
+//        let wanStatus = isWan ? "REMOTE" : "LOCAL"
+//        let p = (isWan ? activeRadio!.publicTlsPort : activeRadio!.port)
+//        _log.msg("Pinger started: \(activeRadio!.nickname) @ \(activeRadio!.publicIp), port \(p) \(wanStatus)", level: .info, function: #function, file: #file, line: #line)
+//        _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ)
+//      }
+//      // TCP & UDP connections established, inform observers
+//      NC.post(.clientDidConnect, object: activeRadio as Any?)
+//
+//      apiState = .clientConnected
+//  }
   func clientConnected() {
-
+    
+    // code to be executed after an IP Address has been obtained
+    func connectionCompletion() {
+      
+      // send the initial commands
+      sendCommands()
+      
       // set the streaming UDP port
       if isWan {
         // Wan, establish a UDP port for the Data Streams
@@ -314,10 +344,40 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       }
       // TCP & UDP connections established, inform observers
       NC.post(.clientDidConnect, object: activeRadio as Any?)
+    }
+    
+    _log.msg("Client connection established", level: .info, function: #function, file: #file, line: #line)
+    
+    // could this be a remote connection?
+    if radioVersion.major >= 2 {
       
-      apiState = .clientConnected
+      // YES, when connecting to a WAN radio, the public IP address of the connected
+      // client must be obtained from the radio.  This value is used to determine
+      // if audio streams from the radio are meant for this client.
+      // (IsAudioStreamStatusForThisClient() checks for LocalIP)
+      send("client ip", replyTo: clientIpReplyHandler)
+      
+      // take this off the socket receive queue
+      _workerQ.async { [unowned self] in
+        
+        // wait for the response
+        let time = DispatchTime.now() + DispatchTimeInterval.milliseconds(5000)
+        _ = self._clientIpSemaphore.wait(timeout: time)
+        
+        // complete the connection
+        connectionCompletion()
+      }
+      
+    } else {
+      
+      // NO, use the ip of the local interface
+      localIP = _tcp.interfaceIpAddress
+      
+      // complete the connection
+      connectionCompletion()
+    }
   }
-  
+
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
     
@@ -332,15 +392,25 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     radioVersion = Version(activeRadio!.firmwareVersion)
     // make sure they are valid
     // compare them
-    if radioVersion < Api.kVersion {
-      // Radio may need update
-      _log.msg("Radio firmware may need to be upgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+    switch (radioVersion, Api.kVersion) {
+      
+    case (let radio, let api) where radio == api:
+      break
 
-    } else if Api.kVersion < radioVersion {
-      // Radio may need downgrade
-      _log.msg("Radio firmware must be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
-      NC.post(.radioFirmwareDowngradeRequired, object: [Api.kVersion, radioVersion])
+    case (let radio, let api) where radio < api:
+      // Radio may need update
+      if api.isV3 && !radio.isV3 {
+        _log.msg("Radio must be upgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+        NC.post(.radioUpgradeRequired, object: [Api.kVersion, radioVersion])
+      } else {
+        _log.msg("Radio may need to be upgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+      }
+    default:
+      // Radio may need downgrade (radio > api)
+      _log.msg("Radio must be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+      NC.post(.radioDowngradeRequired, object: [Api.kVersion, radioVersion])
     }
+    
   }
   /// Send a command list to the Radio
   ///
@@ -401,8 +471,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         case .version:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .antList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .micList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-        case .clientGui:    if _isGui { array.append( (command.rawValue + " " + (_clientId?.uuidString ?? ""), false, delegate?.defaultReplyHandler) ) }
-        case .clientBind:   if !_isGui && _clientId != nil { array.append( (command.rawValue + " " + _clientId!.uuidString, false, nil) ) }
+        case .clientGui where Api.kVersion.isV3:    if _isGui { array.append( (command.rawValue + " " + (_clientId?.uuidString ?? ""), false, delegate?.defaultReplyHandler) ) }
+        case .clientGui where !Api.kVersion.isV3:   if _isGui { array.append( (command.rawValue, false, delegate?.defaultReplyHandler) ) }
+        case .clientBind where Api.kVersion.isV3:   if !_isGui && _clientId != nil { array.append( (command.rawValue + " client_id=" + _clientId!.uuidString, false, nil) ) }
 
         // ignore the following
         case .none, .allPrimary, .allSecondary, .allSubscription: break
@@ -646,6 +717,7 @@ extension Api {
     case allPrimary
     case allSecondary
     case allSubscription
+    case clientIp                           = "client ip"
     case clientUdpPort                      = "client udpport "
     case keepAliveEnabled                   = "keepalive_enable"
     
@@ -654,7 +726,6 @@ extension Api {
     case clientBind                         = "client bind"
     case clientDisconnect                   = "client disconnect"
     case clientGui                          = "client gui"
-    case clientIp                           = "client ip"
     case clientProgram                      = "client program "
 //    case clientLowBW                        = "client low_bw_connect"
     case clientStation                      = "client station "
