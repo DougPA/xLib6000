@@ -118,6 +118,7 @@ public final class Slice                    : NSObject, DynamicModel {
   private var __rttyShift                   = 0                             // Rtty Shift
   private var __rxAnt                       = ""                            // RX Antenna port for this slice
   private var __rxAntList                   = [String]()                    // Array of available Rx Antenna ports
+  private var __sliceLetter                 : String?                       // Radio assigned slice letter (V3 only)
   private var __step                        = 0                             // Frequency step value
   private var __squelchEnabled              = false                         // Squelch enabled
   private var __squelchLevel                = 0                             // Squelch level (0 - 100)
@@ -1076,6 +1077,10 @@ extension xLib6000.Slice {
     get { return _q.sync { __rxAntList } }
     set { _q.sync(flags: .barrier) { __rxAntList = newValue } } }
   
+  internal var _sliceLetter: String? {          // (V3 only)
+    get { return _q.sync { __sliceLetter } }
+    set { _q.sync(flags: .barrier) { __sliceLetter = newValue } } }
+  
   internal var _step: Int {
     get { return _q.sync { __step } }
     set { _q.sync(flags: .barrier) { __step = newValue } } }
@@ -1212,6 +1217,9 @@ extension xLib6000.Slice {
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
+  
+  @objc dynamic public var sliceLetter: String? {
+    return _sliceLetter }
   
 //  @objc dynamic public var meters: [String: Meter] {
 //    get { return _q.sync { _meters } }

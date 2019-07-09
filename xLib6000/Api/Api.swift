@@ -17,7 +17,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("2.4.9.2019_07_03")
+  public static let kVersion                = Version("2.4.9.2019_07_08")
   public static let kName                   = "xLib6000"
 
   public static let kDomainName             = "net.k3tzr"
@@ -83,7 +83,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   private var _radioFactory                 = RadioFactory()                // Radio Factory class
   private var _pinger                       : Pinger?                       // Pinger class
-  private var _clientName                   = ""
+  private var _clientId                     : UUID?                         // Unique Id (V3 only)
+  private var _clientName                   = ""                            // Client name
+  private var _clientStation                = ""                            // Station name (V3 only)
   private var _isGui                        = true                          // GUI enable
   private var _lowBW                        = false                         // low bandwidth connect
 
@@ -93,6 +95,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   //
   private var _localIP                      = "0.0.0.0"                     // client IP for radio
   private var _localUDPPort                 : UInt16 = 0                    // bound UDP port
+  private var _guiClients                   = [Handle:GuiClient]()          // Dictionary of Gui Clients (V3 only)
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
 
@@ -125,13 +128,21 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   /// - Parameters:
   ///     - selectedRadio:        a RadioParameters struct for the desired Radio
+  ///     - clientStation:        the name of the Station using this library (V3 only)
+  ///     - clientName:           the name of the Client using this library
+  ///     - clientId:             a UUID String (if any) (V3 only)
+  ///     - isGui:                whether this is a GUI connection
+  ///     - isWan:                whether this is a Wan connection
+  ///     - wanHandle:            Wan Handle (if any)
   ///     - primaryCmdTypes:      array of "primary" command types (defaults to .all)
   ///     - secondaryCmdTYpes:    array of "secondary" command types (defaults to .all)
   ///     - subscriptionCmdTypes: array of "subscription" commandtypes (defaults to .all)
   /// - Returns:                  Success / Failure
   ///
   public func connect(_ selectedRadio: RadioParameters,
+                      clientStation: String = "",
                       clientName: String,
+                      clientId: UUID? = nil,
                       isGui: Bool = true,
                       isWan: Bool = false,
                       wanHandle: String = "",
@@ -143,6 +154,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     guard apiState == .disconnected else { return false }
     
     _clientName = clientName
+    _clientId = clientId
+    _clientStation = clientStation
     _isGui = isGui
     self.isWan = isWan
     wanConnectionHandle = wanHandle
@@ -279,7 +292,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// A Client has been connected
   ///
   func clientConnected() {
-
+    
     // code to be executed after an IP Address has been obtained
     func connectionCompletion() {
       
@@ -305,12 +318,12 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       }
       // TCP & UDP connections established, inform observers
       NC.post(.clientDidConnect, object: activeRadio as Any?)
-      
-      apiState = .clientConnected
     }
-
+    
+    _log.msg("Client connection established", level: .info, function: #function, file: #file, line: #line)
+    
     // could this be a remote connection?
-    if Api.kVersion.major >= 2 {
+    if radioVersion.major >= 2 {
       
       // YES, when connecting to a WAN radio, the public IP address of the connected
       // client must be obtained from the radio.  This value is used to determine
@@ -338,7 +351,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       connectionCompletion()
     }
   }
-  
+
   // ----------------------------------------------------------------------------
   // MARK: - Private methods
     
@@ -353,14 +366,23 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     radioVersion = Version(activeRadio!.firmwareVersion)
     // make sure they are valid
     // compare them
-    if radioVersion < Api.kVersion {
-      // Radio may need update
-      _log.msg("Radio firmware may need to be upgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+    switch (radioVersion, Api.kVersion) {
+      
+    case (let radio, let api) where radio == api:
+      break
 
-    } else if Api.kVersion < radioVersion {
-      // Radio may need downgrade
-      _log.msg("Radio firmware must be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
-      NC.post(.radioFirmwareDowngradeRequired, object: [Api.kVersion, radioVersion])
+    case (let radio, let api) where radio < api:
+      // Radio may need update
+      if api.isV3 && !radio.isV3 {
+        _log.msg("Radio must be upgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+        NC.post(.radioUpgradeRequired, object: [Api.kVersion, radioVersion])
+      } else {
+        _log.msg("Radio may need to be upgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+      }
+    default:
+      // Radio may need downgrade (radio > api)
+      _log.msg("Radio must be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+      NC.post(.radioDowngradeRequired, object: [Api.kVersion, radioVersion])
     }
   }
   /// Send a command list to the Radio
@@ -400,34 +422,40 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
       // add all the specified commands
       for command in adjustedCommands {
-        
+
         switch command {
 
-        // conditionally send the following
-        case .setMtu:
-          if radioVersion.major == 2 && radioVersion.minor >= 3 {
-            // the MTU command is only used for radio firmware versions >= 2.3.x
-            array.append( (command.rawValue, false, nil) )
-          }
+        case .setMtu where radioVersion.major == 2 && radioVersion.minor >= 3:  array.append( (command.rawValue, false, nil) )
+        case .setMtu:                                 break
 
-        // add parameters to the following
-        case .clientProgram:  if _isGui { array.append( (command.rawValue + _clientName, false, nil) ) }
-          
-        // case .clientLowBW:  if _lowBW { array.append( (command.rawValue, false, nil) ) }
-          
+        case .clientProgram:                          if _isGui { array.append( (command.rawValue + _clientName, false, nil) ) }
+
+        case .clientStation where Api.kVersion.isV3:  if _isGui { array.append( (command.rawValue + _clientStation, false, nil) ) }
+        case .clientStation:                          break
+
+          // case .clientLowBW:  if _lowBW { array.append( (command.rawValue, false, nil) ) }
+
         // Capture the replies from the following
         case .meterList:    array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .info:         array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .version:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .antList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .micList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-        case .clientGui:    if _isGui { array.append( (command.rawValue, false, delegate?.defaultReplyHandler) ) }
-        
+
+        case .clientGui where Api.kVersion.isV3:      if _isGui { array.append( (command.rawValue + " " + (_clientId?.uuidString ?? ""), false, delegate?.defaultReplyHandler) ) }
+        case .clientGui:                              if _isGui { array.append( (command.rawValue, false, delegate?.defaultReplyHandler) ) }
+
+        case .clientBind where Api.kVersion.isV3:     if !_isGui && _clientId != nil { array.append( (command.rawValue + " client_id=" + _clientId!.uuidString, false, nil) ) }
+        case .clientBind:                             break
+          
+        case .subClient where Api.kVersion.isV3:      array.append( (command.rawValue, false, nil) )
+        case .subClient:                              break
+          
         // ignore the following
-        case .none, .allPrimary, .allSecondary, .allSubscription: break
+        case .none, .allPrimary, .allSecondary, .allSubscription:   break
 
         // all others
-        default:  array.append( (command.rawValue, false, nil) )
+        default:    array.append( (command.rawValue, false, nil) )
         }
       }
     }
@@ -638,6 +666,10 @@ extension Api {
   // ----------------------------------------------------------------------------
   // MARK: - Public properties (KVO compliant)
   
+  public var guiClients: [Handle:GuiClient] {
+    get { return _objectQ.sync { _guiClients } }
+    set { _objectQ.sync(flags: .barrier) { _guiClients = newValue } } }
+  
   public var localIP: String {
     get { return _objectQ.sync { _localIP } }
     set { _objectQ.sync(flags: .barrier) { _localIP = newValue } } }
@@ -661,28 +693,33 @@ extension Api {
     case allPrimary
     case allSecondary
     case allSubscription
+    case clientIp                           = "client ip"
     case clientUdpPort                      = "client udpport "
     case keepAliveEnabled                   = "keepalive_enable"
     
     // GROUP B: members of this group can be included in the command sets
     case antList                            = "ant list"
+    case clientBind                         = "client bind"
     case clientDisconnect                   = "client disconnect"
     case clientGui                          = "client gui"
-    case clientIp                           = "client ip"
-//    case clientLowBW                        = "client low_bw_connect"
     case clientProgram                      = "client program "
+//    case clientLowBW                        = "client low_bw_connect"
+    case clientStation                      = "client station "
     case eqRx                               = "eq rxsc info"
     case eqTx                               = "eq txsc info"
     case info
     case meterList                          = "meter list"
     case micList                            = "mic list"
+    case profileDisplay                     = "profile display info"
     case profileGlobal                      = "profile global info"
     case profileMic                         = "profile mic info"
     case profileTx                          = "profile tx info"
     case setMtu                             = "client set enforce_network_mtu=1 network_mtu=1500"
+    case setReducedDaxBw                    = "client set send_reduced_bw_dax=1"
     case subAmplifier                       = "sub amplifier all"
     case subAudioStream                     = "sub audio_stream all"
     case subAtu                             = "sub atu all"
+    case subClient                          = "sub client all"
     case subCwx                             = "sub cwx all"
     case subDax                             = "sub dax all"
     case subDaxIq                           = "sub daxiq all"
@@ -694,6 +731,7 @@ extension Api {
     case subRadio                           = "sub radio all"
     case subScu                             = "sub scu all"
     case subSlice                           = "sub slice all"
+    case subSpot                            = "sub spot all"
     case subTnf                             = "sub tnf all"
     case subTx                              = "sub tx all"
     case subUsbCable                        = "sub usb_cable all"
@@ -703,17 +741,15 @@ extension Api {
     // Note: Do not include GROUP A values in these return vales
     
     static func allPrimaryCommands() -> [Command] {
-//      return [.clientProgram, .clientLowBW, .clientGui]
-      return [.clientProgram, .clientGui]
-    }
-    static func allSecondaryCommands() -> [Command] {
-      return [.setMtu, .info, .version, .antList, .micList, .profileGlobal,
-              .profileTx, .profileMic, .eqRx, .eqTx]
+      return [.clientIp, .clientGui, .clientProgram, .clientStation, .clientBind, .info, .version, .antList, .micList, .profileGlobal, .profileTx, .profileMic, .profileDisplay]
     }
     static func allSubscriptionCommands() -> [Command] {
-      return [.subRadio, .subTx, .subAtu, .subPan, .subMeter, .subSlice, .subTnf, .subGps,
+      return [.subClient, .subTx, .subAtu, .subAmplifier, .subMeter, .subPan, .subSlice, .subGps,
               .subAudioStream, .subCwx, .subXvtr, .subMemories, .subDaxIq, .subDax,
-              .subUsbCable, .subAmplifier, .subFoundation, .subScu]
+              .subUsbCable, .subTnf, .subSpot]
+    }
+    static func allSecondaryCommands() -> [Command] {
+      return [.setMtu, .setReducedDaxBw, .clientStation]
     }
   }
     

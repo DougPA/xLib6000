@@ -61,6 +61,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   private var __bandwidth                   = 0                             // Bandwidth in Hz
   private var __bandZoomEnabled             = false                         //
   private var __center                      = 0                             // Center in Hz
+  private var __clientHandle                : Handle = 0                    // Client owning this Panadapter (V3 only)
   private var __daxIqChannel                = 0                             // DAX IQ channel number (0=none)
   private var __fps                         = 0                             // Refresh rate (frames/second)
   private var __loopAEnabled                = false                         // Enable LOOPA for RXA
@@ -464,6 +465,10 @@ extension Panadapter {
     get { return _q.sync { __center } }
     set { _q.sync(flags: .barrier) { __center = newValue } } }
   
+  internal var _clientHandle: Handle {          // (V3 only)
+    get { return _q.sync { __clientHandle } }
+    set { _q.sync(flags: .barrier) { __clientHandle = newValue } } }
+  
   internal var _daxIqChannel: Int {
     get { return _q.sync { __daxIqChannel } }
     set { _q.sync(flags: .barrier) { __daxIqChannel = newValue } } }
@@ -586,6 +591,9 @@ extension Panadapter {
   @objc dynamic public var antList: [String] {
     return _antList }
   
+  @objc dynamic public var clientHandle: UInt32 {       // (V3 only)
+    return _clientHandle }
+  
   @objc dynamic public var maxBw: Int {
     return _maxBw }
   
@@ -669,5 +677,131 @@ extension Panadapter {
     case n1mmAddress                = "n1mm_address"
     case n1mmPort                   = "n1mm_port"
     case n1mmRadio                  = "n1mm_radio"
+  }
+}
+/// Class containing Panadapter Stream data
+///
+///   populated by the Panadapter vitaHandler
+///
+public class PanadapterFrame {
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public properties
+  
+  public private(set) var startingBin       = 0                             // Index of first bin
+  public private(set) var numberOfBins      = 0                             // Number of bins
+  public private(set) var binSize           = 0                             // Bin size in bytes
+  public private(set) var totalBins         = 0                             // number of bins in the complete frame
+  public private(set) var receivedFrame     = 0                             // Frame number
+  public var bins                           = [UInt16]()                    // Array of bin values
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Private properties
+  
+  private var _log                          = Log.sharedInstance
+  
+  private struct PayloadHeaderOld {                                        // struct to mimic payload layout
+    var startingBin                         : UInt32
+    var numberOfBins                        : UInt32
+    var binSize                             : UInt32
+    var frameIndex                          : UInt32
+  }
+  private struct PayloadHeader {                                            // struct to mimic payload layout
+    var startingBin                         : UInt16
+    var numberOfBins                        : UInt16
+    var binSize                             : UInt16
+    var totalBins                           : UInt16
+    var frameIndex                          : UInt32
+  }
+  private var _expectedIndex                = 0
+  //  private var _binsProcessed                = 0
+  private var _byteOffsetToBins             = 0
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Initialization
+  
+  /// Initialize a PanadapterFrame
+  ///
+  /// - Parameter frameSize:    max number of Panadapter samples
+  ///
+  public init(frameSize: Int) {
+    
+    // allocate the bins array
+    self.bins = [UInt16](repeating: 0, count: frameSize)
+  }
+  
+  // ----------------------------------------------------------------------------
+  // MARK: - Public methods
+  
+  /// Accumulate Vita object(s) into a PanadapterFrame
+  ///
+  /// - Parameter vita:         incoming Vita object
+  /// - Returns:                true if entire frame processed
+  ///
+  public func accumulate(vita: Vita, expectedFrame: inout Int) -> Bool {
+    
+    let payloadPtr = UnsafeRawPointer(vita.payloadData)
+    
+    if Api.sharedInstance.radioVersion.major == 2 && Api.sharedInstance.radioVersion.minor >= 3 {
+      // 2.3.x or greater
+      // Bins are just beyond the payload
+      _byteOffsetToBins = MemoryLayout<PayloadHeader>.size
+      
+      // map the payload to the New Payload struct
+      let p = payloadPtr.bindMemory(to: PayloadHeader.self, capacity: 1)
+      
+      // byte swap and convert each payload component
+      startingBin = Int(CFSwapInt16BigToHost(p.pointee.startingBin))
+      numberOfBins = Int(CFSwapInt16BigToHost(p.pointee.numberOfBins))
+      binSize = Int(CFSwapInt16BigToHost(p.pointee.binSize))
+      totalBins = Int(CFSwapInt16BigToHost(p.pointee.totalBins))
+      receivedFrame = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
+      
+    } else {
+      // pre 2.3.x
+      // Bins are just beyond the payload
+      _byteOffsetToBins = MemoryLayout<PayloadHeaderOld>.size
+      
+      // map the payload to the Old Payload struct
+      let p = payloadPtr.bindMemory(to: PayloadHeaderOld.self, capacity: 1)
+      
+      // byte swap and convert each payload component
+      startingBin = Int(CFSwapInt32BigToHost(p.pointee.startingBin))
+      numberOfBins = Int(CFSwapInt32BigToHost(p.pointee.numberOfBins))
+      binSize = Int(CFSwapInt32BigToHost(p.pointee.binSize))
+      totalBins = numberOfBins
+      receivedFrame = Int(CFSwapInt32BigToHost(p.pointee.frameIndex))
+    }
+    // initial frame?
+    if expectedFrame == -1 { expectedFrame = receivedFrame }
+    
+    switch (expectedFrame, receivedFrame) {
+      
+    case (let expected, let received) where received < expected:
+      // from a previous group, ignore it
+      _log.msg("Ignored frame(s): expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
+      return false
+      
+    case (let expected, let received) where received > expected:
+      // from a later group, jump forward
+      _log.msg("Missing frame(s): expected = \(expected), received = \(received)", level: .warning, function: #function, file: #file, line: #line)
+      expectedFrame = received
+      fallthrough
+      
+    default:
+      // received == expected
+      // get a pointer to the Bins in the payload
+      let binsPtr = payloadPtr.advanced(by: _byteOffsetToBins).bindMemory(to: UInt16.self, capacity: numberOfBins)
+      
+      // Swap the byte ordering of the data & place it in the bins
+      for i in 0..<numberOfBins {
+        bins[i+startingBin] = CFSwapInt16BigToHost( binsPtr.advanced(by: i).pointee )
+      }
+      
+      // reset the count if the entire frame has been accumulated
+      if startingBin + numberOfBins == totalBins { numberOfBins = totalBins  ; expectedFrame += 1 }
+    }
+    // return true if the entire frame has been accumulated
+    return numberOfBins == totalBins
   }
 }

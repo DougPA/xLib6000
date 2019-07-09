@@ -30,7 +30,8 @@ public enum NotificationType : String {
   case globalProfileRemoved
   case globalProfileUpdated
   
-  case guiConnectionEstablished
+  case guiClientHasBeenAdded
+  case guiClientWillBeRemoved
   
   case iqStreamHasBeenAdded
   case iqStreamWillBeRemoved
@@ -63,8 +64,9 @@ public enum NotificationType : String {
   
   case radiosAvailable
   
-  case radioFirmwareDowngradeRequired
-  
+  case radioDowngradeRequired
+  case radioUpgradeRequired
+
   case sliceBecameActive
   case sliceHasBeenAdded
   case sliceWillBeRemoved

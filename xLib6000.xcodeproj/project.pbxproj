@@ -71,6 +71,7 @@
 		913F7F8C2066F05B00F35E9B /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 913F7F8B2066F05B00F35E9B /* README.md */; };
 		9143BD9B21FCDA0700C2CCBD /* KnownIssues.md in Resources */ = {isa = PBXBuildFile; fileRef = 9143BD9A21FCDA0700C2CCBD /* KnownIssues.md */; };
 		9148CEAD21D94AC400306FC0 /* WanServerCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */; };
+		9151821022D274F100DAD08E /* GuiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9151820F22D274F100DAD08E /* GuiClient.swift */; };
 		91612E41221E4F8D0002C4F9 /* Frames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91612E40221E4F8D0002C4F9 /* Frames.swift */; };
 		9185B087207FD11E004D4C40 /* xLib6000 Overview.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */; };
 		91A0ABF2209769B3008FDB3D /* Commands.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 91A0ABF1209769B2008FDB3D /* Commands.rtf */; };
@@ -146,6 +147,7 @@
 		913F7F8B2066F05B00F35E9B /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9143BD9A21FCDA0700C2CCBD /* KnownIssues.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = KnownIssues.md; sourceTree = "<group>"; };
 		9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WanServerCommands.swift; sourceTree = "<group>"; };
+		9151820F22D274F100DAD08E /* GuiClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GuiClient.swift; sourceTree = "<group>"; };
 		91612E40221E4F8D0002C4F9 /* Frames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Frames.swift; sourceTree = "<group>"; };
 		9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "xLib6000 Overview.pdf"; sourceTree = "<group>"; };
 		91A0ABF1209769B2008FDB3D /* Commands.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Commands.rtf; sourceTree = "<group>"; };
@@ -209,6 +211,7 @@
 				913EF01920669DA700AF99BE /* Amplifier.swift */,
 				913EF02020669DA700AF99BE /* AudioStream.swift */,
 				913EF01F20669DA700AF99BE /* Equalizer.swift */,
+				9151820F22D274F100DAD08E /* GuiClient.swift */,
 				913EF01620669DA700AF99BE /* IqStream.swift */,
 				913EF01820669DA700AF99BE /* Memory.swift */,
 				913EF01B20669DA700AF99BE /* Meter.swift */,
@@ -464,6 +467,7 @@
 				913EF07A20669DA700AF99BE /* AmplifierCommands.swift in Sources */,
 				913EF07720669DA700AF99BE /* ProfileCommands.swift in Sources */,
 				913EF08E20669DA700AF99BE /* FlexErrors.swift in Sources */,
+				9151821022D274F100DAD08E /* GuiClient.swift in Sources */,
 				913EF06320669DA700AF99BE /* Meter.swift in Sources */,
 				913EF08920669DA700AF99BE /* OpusCommands.swift in Sources */,
 				913EF08320669DA700AF99BE /* CwxCommands.swift in Sources */,

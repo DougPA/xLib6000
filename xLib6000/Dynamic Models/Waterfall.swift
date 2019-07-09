@@ -45,6 +45,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   private var __autoBlackEnabled            = false                         // State of auto black
   private var __autoBlackLevel              : UInt32 = 0                    // Radio generated black level
   private var __blackLevel                  = 0                             // Setting of black level (1 -> 100)
+  private var __clientHandle                : Handle = 0                    // Client owning this Waterfall (V3 only)
   private var __colorGain                   = 0                             // Setting of color gain (1 -> 100)
   private var __gradientIndex               = 0                             // Index of selected color gradient
   private var __lineDuration                = 0                             // Line duration (milliseconds)
@@ -246,6 +247,10 @@ extension Waterfall {
     get { return _q.sync { __blackLevel } }
     set { _q.sync(flags: .barrier) {__blackLevel = newValue } } }
   
+  internal var _clientHandle: Handle {          // (V3 only)
+    get { return _q.sync { __clientHandle } }
+    set { _q.sync(flags: .barrier) { __clientHandle = newValue } } }
+  
   internal var _colorGain: Int {
     get { return _q.sync { __colorGain } }
     set { _q.sync(flags: .barrier) {__colorGain = newValue } } }
@@ -267,6 +272,9 @@ extension Waterfall {
   
   @objc dynamic public var autoBlackLevel: UInt32 {
     return _autoBlackLevel }
+  
+  @objc dynamic public var clientHandle: Handle {         // (V3 only)
+    return _clientHandle }
   
   @objc dynamic public var panadapterId: PanadapterId {
     return _panadapterId }

@@ -54,17 +54,17 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   private var _ip                           = ""                            // IP Address of ???
   private var _port                         = 0                             // port number used by Opus
   private var _vita                         : Vita?                         // a Vita class
-  private var _rxPacketCount                = 0                             // Rx total packet count
-  private var _rxLostPacketCount            = 0                             // Rx lost packet count
-  private var _expectedFrame                : Int?                          // Rx sequence number
   private var _txSeq                        = 0                             // Tx sequence number
   private var _txSampleCount                = 0                             // Tx sample count
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
+  private var __expectedFrame               : Int?                          // Rx sequence number
   private var __rxEnabled                   = false                         // Opus for receive
-  private var __txEnabled                   = false                         // Opus for transmit
+  private var __rxLostPacketCount            = 0                             // Rx lost packet count
+  private var __rxPacketCount                = 0                             // Rx total packet count
   private var __rxStopped                   = false                         // Rx stream stopped
+  private var __txEnabled                   = false                         // Opus for transmit
   //
   private weak var _delegate                : StreamHandler?                // Delegate for Opus Data Stream
   //
@@ -253,7 +253,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       
       // from a later group, jump forward
       let lossPercent = String(format: "%04.2f", (Float(_rxLostPacketCount)/Float(_rxPacketCount)) * 100.0 )
-      _log.msg("Missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg("Opus Missing frame(s): expected \(expected), received \(received), loss = \(lossPercent) %", level: .warning, function: #function, file: #file, line: #line)
 
       // Pass an error frame (count == 0) to the Opus delegate
       delegate?.streamHandler( OpusFrame(payload: vita.payloadData, sampleCount: 0) )
@@ -277,9 +277,21 @@ extension Opus {
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
+  internal var _expectedFrame: Int? {
+    get { return _q.sync { __expectedFrame } }
+    set { _q.sync(flags: .barrier) { __expectedFrame = newValue } } }
+  
   internal var _rxEnabled: Bool {
     get { return _q.sync { __rxEnabled } }
     set { _q.sync(flags: .barrier) { __rxEnabled = newValue } } }
+  
+  internal var _rxLostPacketCount: Int {
+    get { return _q.sync { __rxLostPacketCount } }
+    set { _q.sync(flags: .barrier) { __rxLostPacketCount = newValue } } }
+  
+  internal var _rxPacketCount: Int {
+    get { return _q.sync { __rxPacketCount } }
+    set { _q.sync(flags: .barrier) { __rxPacketCount = newValue } } }
   
   internal var _txEnabled: Bool {
     get { return _q.sync { __txEnabled } }

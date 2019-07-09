@@ -477,6 +477,18 @@ public struct Version {
     return "\(major).\(minor).\(build).x"
   }
   
+  public var isV3 : Bool {
+    return major >= 2 && minor >= 5
+  }
+
+  public var isV2 : Bool {
+    return major >= 2 && minor < 5
+  }
+
+  public var isV1 : Bool {
+    return major == 1
+  }
+
   static func ==(lhs: Version, rhs: Version) -> Bool {
     return lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.build == rhs.build
   }

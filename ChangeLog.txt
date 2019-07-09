@@ -1,5 +1,24 @@
 xLib6000 Change Log
 
+v2.4.9.2019_07_08
+
+Corrections and edits throughout to make v2.4.9 & v2.5.1 as similar as possible
+
+
+
+v2.4.9.2019_07_07
+
+AppExtensions.swift - added vars isV3, isV2 & isV1 to the Verion struct
+Api.swift - made setupCommands(_:) consistent with v3 API (conditioned on version)
+Api.swift - in enum Command, moved clientIp to group A, added clientBind
+Api.swift - made clientConnected() consistent with v3 API
+Radio.swift - made parseStatus(_:) consistent with v3 API (conditioned on version)
+Radio.swift - added var _clientInitialized (only needed in v3 API)
+Opus.swift - made _rxLostPacketCount, _rxPacketCount and _expectedFrame thread safe
+Panadapter.swift - moved PanadapterFrame class to this file
+Frames.swift - removed PanadapterFrame clas from this file
+
+
 v2.4.9.2019_07_03
 
 Corrections and edits throughout to make v2.4.9 & v2.5.1 as similar as possible
