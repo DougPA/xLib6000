@@ -1,5 +1,14 @@
 xLib6000 Change Log
 
+v2.5.1.2019_07_08
+
+Corrections and edits throughout to make v2.4.9 & v2.5.1 as similar as possible
+*Stream.swift - corrections to all streams & stream commands
+Meter.swift - in streamHandler(_:) modified error msg for unknown units
+
+
+
+
 v2.5.1.2019_07_07
 
 AppExtensions.swift - added vars isV3, isV2 & isV1 to the Version struct

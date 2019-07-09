@@ -64,17 +64,21 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format:  <streamId, > <"type", type> <"dax_channel", channel> <"slice", number> <"dax_clients", number> <"client_handle", handle>
-    
+    // Format:  <streamId, > <"type", "dax_rx"> <"dax_channel", channel> <"slice", sliceNumber> <"dax_clients", number> <"client_handle", handle>
+    // Format:  <streamId, > <"removed", >
+
     //get the StreamId
     if let streamId =  keyValues[0].key.streamId {
       
       // does the Stream exist?
       if radio.daxRxAudioStreams[streamId] == nil {
         
-        //      // NO, is this stream for this client?
-        //      if !DaxRxAudioStream.isStatusForThisClient(keyValues) { return }
+        // exit if it has been removed
+        if inUse == false { return }
         
+        // exit if this stream is not for this client
+        if !DaxRxAudioStream.isStatusForThisClient( Array(keyValues.dropFirst(5)) ) { return }
+
         // create a new Stream & add it to the collection
         radio.daxRxAudioStreams[streamId] = DaxRxAudioStream(streamId: streamId, queue: queue)
       }
@@ -86,7 +90,7 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
-  /// Check if an Audio Stream belongs to us
+  /// Check if an Stream belongs to us
   ///
   /// - Parameters:
   ///   - keyValues:          a KeyValuesArray of the status message
@@ -98,48 +102,18 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
     // allow a Tester app to see all Streams
     guard Api.sharedInstance.testerModeEnabled == false else { return true }
     
-    var statusIpStr = ""
-    var statusPortStr = ""
+    var handle : Handle? = nil
     
     // search thru each key/value pair, <key=value>
     for property in properties {
       
       switch property.key.lowercased() {
-      case "ip":
-        statusIpStr = property.value
-      case "port":
-        statusPortStr = property.value
-      default:
-        break
+        
+      case "client_handle":       handle = property.value.handle
+      default:                    break
       }
     }
-    
-    if statusIpStr == "" || statusPortStr == "" {
-      return false
-    }
-    if !statusIpStr.isValidIP4() {
-      return false
-    }
-    guard let statusPort = UInt16(statusPortStr) else {
-      return false
-    }
-    
-    // if local check ip and port
-    // if remote check only ip
-    
-    // TODO: this is a temporary fix and a flaw in Flex way to think.. :-)
-    
-    if Api.sharedInstance.isWan {
-      if Api.sharedInstance.localIP == statusIpStr {
-        return true
-      }
-    } else {
-      if Api.sharedInstance.localIP == statusIpStr && Api.sharedInstance.localUDPPort == statusPort {
-        return true
-      }
-    }
-    
-    return false
+    return handle != nil && handle == Api.sharedInstance.connectionHandle
   }
   /// Find an AudioStream by DAX Channel
   ///

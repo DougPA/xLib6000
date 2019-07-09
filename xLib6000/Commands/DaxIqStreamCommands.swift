@@ -48,13 +48,23 @@ extension DaxIqStream {
   /// Remove this IQ Stream
   ///
   /// - Parameters:
-  ///   - id:                 IQ Stream Id
   ///   - callback:           ReplyHandler (optional)
+  /// - Returns:              Success / Failure
   ///
-  public func remove(callback: ReplyHandler? = nil) {
-
-    // tell the Radio to remove the Stream
-    Api.sharedInstance.send("stream remove \(streamId.hex)", replyTo: callback)
+  public func remove(callback: ReplyHandler? = nil) -> Bool {
+    
+    // tell the Radio to remove this Stream
+    if Api.sharedInstance.sendWithCheck("stream remove \(streamId.hex)", replyTo: callback) {
+      
+      // notify all observers
+      NC.post(.daxIqStreamWillBeRemoved, object: self as Any?)
+      
+      // remove the stream object
+      Api.sharedInstance.radio?.daxIqStreams[streamId] = nil
+      
+      return true
+    }
+    return false
   }
   /// Get error ???
   ///

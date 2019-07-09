@@ -43,6 +43,7 @@ extension DaxMicAudioStream {
   ///
   /// - Parameters:
   ///   - callback:           ReplyHandler (optional)
+  /// - Returns:              Success / Failure
   ///
   public func remove(callback: ReplyHandler? = nil) -> Bool {
     

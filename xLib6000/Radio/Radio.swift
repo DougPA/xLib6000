@@ -19,8 +19,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // MARK: - Static properties
   
   static let kApfCmd                        = "eq apf "                     // Text of command messages
-  static let kClientCmd                     = "client "
-  static let kClientSetCmd                  = "client set "
+  static let kClientCmd                     = "client "                     // (V3 only)
+  static let kClientSetCmd                  = "client set "                 // (V3 only)
   static let kCmd                           = "radio "
   static let kSetCmd                        = "radio set "
   static let kMixerCmd                      = "mixer "
@@ -57,6 +57,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   
   private var _api                          = Api.sharedInstance            // reference to the API singleton
   private var _radioInitialized = false
+  private var _clientInitialized            = false
   private var _hardwareVersion              : String?                       // ???
 
   // GCD Queue
@@ -88,7 +89,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   
   private var _gpsPresent                   = false
   private var _atuPresent                   = false
-  private var _clientInitialized            = false
   
   // individual values
   // A
@@ -101,11 +101,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __backlight                   = 0                             //
   private var __bandPersistenceEnabled      = false                         //
   private var __binauralRxEnabled           = false                         // Binaural enable
+  private var __boundClientId               : UUID?                         // The Client Id of this client's GUI (V3 only)
   // C
   private var __calFreq                     = 0                             // Calibration frequency
   private var __callsign                    = ""                            // Callsign
   private var __chassisSerial               = ""                            // Radio serial number (read only)
-  private var __boundClientId               : UUID?                         // The Client Id of this client's GUI
   private var __clientIp                    = ""                            // Ip address returned by "client ip" command
   // D
   private var __daxIqAvailable              = 0                             //
@@ -135,7 +135,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // L
   private var __lineoutGain                 = 0                             // Speaker gain (1-100)
   private var __lineoutMute                 = false                         // Speaker muted
-  private var __localPtt                    = false                         // PTT usage
+  private var __localPtt                    = false                         // PTT usage (V3 only)
   private var __location                    = ""                            // (read only)
   private var __locked                      = false                         //
   // M
@@ -169,10 +169,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __softwareVersion             = ""                            // (read only)
   private var __startCalibration            = false                         // true if a Calibration is in progress
   private var __state                       = ""                            //
-  private var __station                     = ""                            // Station name
   private var __staticGateway               = ""                            // Static Gateway address
   private var __staticIp                    = ""                            // Static IpAddress
   private var __staticNetmask               = ""                            // Static Netmask
+  private var __station                     = ""                            // Station name (V3 only)
   // T
   private var __tcxoPresent                 = false                         //
   private var __tnfsEnabled                 = false                         // TNF's enable
@@ -435,35 +435,32 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // FIXME: Need format(s)
       Amplifier.parseStatus(remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       
-//    case .audioStream:
-//      //      format: <AudioStreamId> <key=value> <key=value> ...<key=value>
-//      DaxRxAudioStream.parseStatus(remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
-      
     case .atu:
       //      format: <key=value> <key=value> ...<key=value>
       atu.parseProperties( remainder.keyValuesArray() )
       
+    case .audioStream where Api.kVersion.isV3:
+      _log.msg("Invalid Status token: \(msgType) for Version \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+
+    case .audioStream:
+      //      format: <AudioStreamId> <key=value> <key=value> ...<key=value>
+      DaxRxAudioStream.parseStatus(remainder.keyValuesArray(), radio: self, queue: _q)
+      
     case .client:
-      //      kv                0         1            2
-      //      format: client <handle> connected <client_id=ID> <program=Program> <station=Station> <local_ptt=0/1>
-      //      format: client <handle> disconnected <forced=0/1>
-
-//      Swift.print("Client status: \(remainder)")
-
+      // formats are different in V3 API
       let keyValues = remainder.keyValuesArray()
-      GuiClient.parseStatus(keyValues, radio: self, queue: _q)
+      if Api.kVersion.isV3 {
+        //      kv                0         1            2
+        //      format: client <handle> connected <client_id=ID> <program=Program> <station=Station> <local_ptt=0/1>
+        //      format: client <handle> disconnected <forced=0/1>
+        GuiClient.parseStatus(keyValues, radio: self, queue: _q)
 
-//      // is my Client initialized now?
-//      if let handle = keyValues[0].key.handle {
-//
-//        if _api.guiClients[handle] != nil && !_clientInitialized {
-//          // YES
-//          _clientInitialized = true
-//
-//          // Finish the UDP initialization & set the API state
-//          _api.clientConnected()
-//        }
-//      }
+      } else {
+        //      kv                0         1            2
+        //      format: client <handle> connected
+        //      format: client <handle> disconnected <forced=1/0>
+        parseClient(remainder.keyValuesArray(), radio: self, queue: _q)
+      }
 
     case .cwx:
       // replace some characters to avoid parsing conflicts
@@ -527,9 +524,12 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       //     format: <meterNumber.key=value>#<meterNumber.key=value>#...<meterNumber.key=value>
       Meter.parseStatus( remainder.keyValuesArray(delimiter: "#"), radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       
-//    case .micAudioStream:
-//      //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
-//      DaxMicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
+    case .micAudioStream where Api.kVersion.isV3:
+      _log.msg("Invalid Status token: \(msgType) for Version \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+
+    case .micAudioStream:
+      //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
+      DaxMicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q)
       
     case .mixer:
       _log.msg("Unprocessed \(msgType): \(remainder)", level: .warning, function: #function, file: #file, line: #line)
@@ -566,16 +566,16 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       switch keyValues[1].value {
       case "dax_iq":
         //     format: <streamId, > <"type"=value> <"dax_channel"=value> <"pan"=value> <"daxiq_rate"=value> <"client_handle"=value> <"active"=1/0>
-        DaxIqStream.parseStatus( keyValues, radio: self, queue: _q)
+        DaxIqStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       case "dax_mic":
         //     format: <streamId, > <"type"=value> <"client_handle"=value>
-        DaxMicAudioStream.parseStatus( keyValues, radio: self, queue: _q)
+        DaxMicAudioStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       case "dax_rx":
         //     format: <streamId, > <"type"=value> <"dax_channel"=value> <"slice"=value> <"dax_clients"=value> <"client_handle"=value>
-        DaxRxAudioStream.parseStatus( keyValues, radio: self, queue: _q)
+        DaxRxAudioStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       case "dax_tx":
         //     format: <streamId, > <"type"=value> <"client_handle"=value> <"dax_tx"=value>
-        DaxTxAudioStream.parseStatus( keyValues, radio: self, queue: _q)
+        DaxTxAudioStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       default:
         fatalError()
       }
@@ -601,9 +601,12 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .turf:
       _log.msg("Unprocessed \(msgType): \(remainder)", level: .warning, function: #function, file: #file, line: #line)
 
-//    case .txAudioStream:
-//      //      format: <TxAudioStreamId> <key=value> <key=value> ...<key=value>
-//      DaxTxAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
+    case .txAudioStream where Api.kVersion.isV3:
+      _log.msg("Invalid Status token: \(msgType) for Version \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+
+    case .txAudioStream:
+      //      format: <TxAudioStreamId> <key=value> <key=value> ...<key=value>
+      DaxTxAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q)
       
     case .usbCable:
       //      format:
@@ -620,17 +623,51 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       //      format: <name> <key=value> <key=value> ...<key=value>
       Xvtr.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
     }
-    
-    // check if we received a status message for our handle to see if our client is connected now
-    if !_clientInitialized && components[0].handle == _api.connectionHandle {
-      
-      // YES
-      _clientInitialized = true
-      
-      // Finish the UDP initialization & set the API state
-      _api.clientConnected()
+    if Api.kVersion.isV3 {
+      // check if we received a status message for our handle to see if our client is connected now
+      if !_clientInitialized && components[0].handle == _api.connectionHandle {
+        
+        // YES
+        _clientInitialized = true
+        
+        // Finish the UDP initialization & set the API state
+        _api.clientConnected()
+      }
     }
-
+  }
+  /// Parse a Client status message (pre V3 only)
+  ///
+  ///   executed on the parseQ
+  ///
+  /// - Parameters:
+  ///   - keyValues:      a KeyValuesArray
+  ///   - radio:          the current Radio class
+  ///   - queue:          a parse Queue for the object
+  ///   - inUse:          false = "to be deleted"
+  ///
+  private func parseClient(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
+    
+    guard keyValues.count >= 2 else {
+      _log.msg("Invalid client status", level: .warning, function: #function, file: #file, line: #line)
+      return
+    }
+    // guard that the message has my API Handle
+    guard _api.connectionHandle! == keyValues[0].key.handle else { return }
+    
+    // what is the message?
+    if keyValues[1].key == "connected" {
+      // Connected
+      _api.clientConnected()
+      
+    } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
+      // FIXME: Handle the disconnect?
+      // Disconnected
+      _log.msg("Disconnect, forced = \(keyValues[2].value)", level: .info, function: #function, file: #file, line: #line)
+      
+    } else {
+      // Unrecognized
+      _log.msg("Unprocessed Client message: \(keyValues[0].key)", level: .warning, function: #function, file: #file, line: #line)
+    }
   }
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
   ///
@@ -760,7 +797,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       _boundClientId = UUID(uuidString: property.key)
       break
     }
-    
   }
   /// Parse the Reply to a Client Ip command, reply format: <key=value> <key=value> ...<key=value>
   ///
@@ -947,12 +983,12 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
           _callsign = property.value
           didChangeValue(for: \.callsign)
 
-        case .daxIqAvailable:
+        case .daxIqAvailable:                     // (V3 only)
           willChangeValue(for: \.daxIqAvailable)
           _daxIqAvailable = property.value.iValue
           didChangeValue(for: \.daxIqAvailable)
           
-        case .daxIqCapacity:
+        case .daxIqCapacity:                     // (V3 only)
           willChangeValue(for: \.daxIqCapacity)
           _daxIqCapacity = property.value.iValue
           didChangeValue(for: \.daxIqCapacity)
@@ -1323,7 +1359,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // which command?
     switch command {
       
-    case Api.Command.clientGui.rawValue:
+    case Api.Command.clientGui.rawValue:          // (V3 only)
       // process the reply
       parseGuiReply( reply.keyValuesArray() )
       
@@ -1529,6 +1565,10 @@ extension Radio {
     get { return _q.sync { __binauralRxEnabled } }
     set { _q.sync(flags: .barrier) { __binauralRxEnabled = newValue } } }
   
+  internal var _boundClientId: UUID? {                          // (V3 only)
+    get { return _q.sync { __boundClientId } }
+    set { _q.sync(flags: .barrier) { __boundClientId = newValue } } }
+  
   internal var _calFreq: Int {
     get { return _q.sync { __calFreq } }
     set { _q.sync(flags: .barrier) { __calFreq = newValue } } }
@@ -1540,10 +1580,6 @@ extension Radio {
   internal var _chassisSerial: String {
     get { return _q.sync { __chassisSerial } }
     set { _q.sync(flags: .barrier) { __chassisSerial = newValue } } }
-  
-  internal var _boundClientId: UUID? {
-    get { return _q.sync { __boundClientId } }
-    set { _q.sync(flags: .barrier) { __boundClientId = newValue } } }
   
   internal var _clientIp: String {
     get { return _q.sync { __clientIp } }
@@ -1641,7 +1677,7 @@ extension Radio {
     get { return _q.sync { __lineoutMute } }
     set { _q.sync(flags: .barrier) { __lineoutMute = newValue } } }
   
-  internal var _localPtt: Bool {
+  internal var _localPtt: Bool {              // (V3 only)
     get { return _q.sync { __localPtt } }
     set { _q.sync(flags: .barrier) { __localPtt = newValue } } }
   
@@ -1745,10 +1781,6 @@ extension Radio {
     get { return _q.sync { __state } }
     set { _q.sync(flags: .barrier) { __state = newValue } } }
   
-  internal var _station: String {
-    get { return _q.sync { __station } }
-    set { _q.sync(flags: .barrier) { __station = newValue } } }
-  
   internal var _staticGateway: String {
     get { return _q.sync { __staticGateway } }
     set { _q.sync(flags: .barrier) { __staticGateway = newValue } } }
@@ -1760,6 +1792,10 @@ extension Radio {
   internal var _staticNetmask: String {
     get { return _q.sync { __staticNetmask } }
     set { _q.sync(flags: .barrier) { __staticNetmask = newValue } } }
+  
+  internal var _station: String {           // (V3 only)
+    get { return _q.sync { __station } }
+    set { _q.sync(flags: .barrier) { __station = newValue } } }
   
   internal var _tcxoPresent: Bool {
     get { return _q.sync { __tcxoPresent } }
@@ -1944,7 +1980,7 @@ extension Radio {
   // ----------------------------------------------------------------------------
   // MARK: - Tokens
   
-  /// Clients
+  /// Clients (V3 only)
   ///
   internal enum ClientToken : String {
     case host
@@ -1997,8 +2033,8 @@ extension Radio {
     case binauralRxEnabled                  = "binaural_rx"
     case calFreq                            = "cal_freq"
     case callsign
-    case daxIqAvailable                     = "daxiq_available"
-    case daxIqCapacity                      = "daxiq_capacity"
+    case daxIqAvailable                     = "daxiq_available"                 // (V3 only)
+    case daxIqCapacity                      = "daxiq_capacity"                  // (V3 only)
     case enforcePrivateIpEnabled            = "enforce_private_ip_connections"
     case freqErrorPpb                       = "freq_error_ppb"
     case frontSpeakerMute                   = "front_speaker_mute"
@@ -2057,7 +2093,7 @@ extension Radio {
   ///
   internal enum StatusToken : String {
     case amplifier
-//    case audioStream                        = "audio_stream"
+    case audioStream                        = "audio_stream"  // (pre V3 only)
     case atu
     case client
     case cwx
@@ -2069,7 +2105,7 @@ extension Radio {
     case interlock
     case memory
     case meter
-//    case micAudioStream                     = "mic_audio_stream"
+    case micAudioStream                     = "mic_audio_stream"  // (pre V3 only)
     case mixer
     case opusStream                         = "opus_stream"
     case profile
@@ -2079,7 +2115,7 @@ extension Radio {
     case tnf
     case transmit
     case turf
-//    case txAudioStream                      = "tx_audio_stream"
+    case txAudioStream                      = "tx_audio_stream"  // (pre V3 only)
     case usbCable                           = "usb_cable"
     case wan
     case waveform

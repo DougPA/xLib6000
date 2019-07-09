@@ -287,7 +287,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
     // check for unknown Units
     guard let token = Units(rawValue: units) else {
       // log it and ignore it
-      _log.msg("Meter \(desc) \(description) \(group) \(name) \(source): unknown units - \(units))", level: .warning, function: #function, file: #file, line: #line)
+      _log.msg("Meter \(desc) group = \(group), name = \(name), source = \(source), unknown units: \(units))", level: .warning, function: #function, file: #file, line: #line)
       return
     }
     var adjNewValue: Float = 0.0

@@ -71,16 +71,20 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format: <streamId, > <"daxiq", value> <"pan", panStreamId> <"rate", value> <"ip", ip> <"port", port> <"streaming", 1|0> ,"capacity", value> <"available", value>
-    
+    // Format:  <streamId, > <"type", "dax_iq"> <"daxiq_channel", channel> <"pan", panStreamId> <"daxiq_rate", rate> <"client_handle", handle>
+    // Format:  <streamId, > <"removed", >
+
     //get the StreamId (remove the "0x" prefix)
     if let streamId =  keyValues[0].key.streamId {
       
       // YES, does the Stream exist?
       if radio.daxIqStreams[streamId] == nil {
         
-        //      // NO, is this stream for this client?
-        //      if !DaxRxAudioStream.isStatusForThisClient(keyValues) { return }
+        // exit if it has been removed
+        if inUse == false { return }
+        
+        // exit if this stream is not for this client
+        if !DaxRxAudioStream.isStatusForThisClient( Array(keyValues.dropFirst(5)) ) { return }
         
         // create a new Stream & add it to the collection
         radio.daxIqStreams[streamId] = DaxIqStream(streamId: streamId, queue: queue)
@@ -158,6 +162,11 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
         _channel = property.value.iValue
         didChangeValue(for: \.channel)
 
+      case .isActive:
+        willChangeValue(for: \.isActive)
+        _isActive = property.value.bValue
+        didChangeValue(for: \.isActive)
+
       case .pan:
         willChangeValue(for: \.pan)
         _pan = property.value.streamId ?? 0
@@ -167,11 +176,6 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
         willChangeValue(for: \.rate)
         _rate = property.value.iValue
         didChangeValue(for: \.rate)
-
-      case .isActive:
-        willChangeValue(for: \.isActive)
-        _isActive = property.value.bValue
-        didChangeValue(for: \.isActive)
       }
     }
     // is the Stream initialized?

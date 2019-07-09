@@ -17,7 +17,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("2.5.1.2019_07_07")
+  public static let kVersion                = Version("2.5.1.2019_07_08")
   public static let kName                   = "xLib6000"
 
   public static let kDomainName             = "net.k3tzr"
@@ -83,9 +83,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   private var _radioFactory                 = RadioFactory()                // Radio Factory class
   private var _pinger                       : Pinger?                       // Pinger class
-  private var _clientId                     : UUID?                         //
-  private var _clientName                   = ""                            //
-  private var _clientStation                = ""                            //
+  private var _clientId                     : UUID?                         // Unique Id (V3 only)
+  private var _clientName                   = ""                            // Client name
+  private var _clientStation                = ""                            // Station name (V3 only)
   private var _isGui                        = true                          // GUI enable
   private var _lowBW                        = false                         // low bandwidth connect
 
@@ -95,7 +95,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   //
   private var _localIP                      = "0.0.0.0"                     // client IP for radio
   private var _localUDPPort                 : UInt16 = 0                    // bound UDP port
-  private var _guiClients                   = [Handle:GuiClient]()          // Dictionary of Gui Clients
+  private var _guiClients                   = [Handle:GuiClient]()          // Dictionary of Gui Clients (V3 only)
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
 
@@ -128,8 +128,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   ///
   /// - Parameters:
   ///     - selectedRadio:        a DiscoveredRadio class for the desired Radio
+  ///     - clientStation:        the name of the Station using this library (V3 only)
   ///     - clientName:           the name of the Client using this library
-  ///     - clientId:             a UUID String (if any)
+  ///     - clientId:             a UUID String (if any) (V3 only)
   ///     - isGui:                whether this is a GUI connection
   ///     - isWan:                whether this is a Wan connection
   ///     - wanHandle:            Wan Handle (if any)
@@ -139,9 +140,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   /// - Returns:                  Success / Failure
   ///
   public func connect(_ selectedRadio: DiscoveredRadio,
-                      clientStation: String,
+                      clientStation: String = "",
                       clientName: String,
-                      clientId: UUID?,
+                      clientId: UUID? = nil,
                       isGui: Bool = true,
                       isWan: Bool = false,
                       wanHandle: String = "",
@@ -177,9 +178,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       
       // check the versions
       checkFirmware()
-      
-//      // send the initial commands
-//      sendCommands()
       
       return true
     }
@@ -293,30 +291,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   
   /// A Client has been connected
   ///
-//  func clientConnected() {
-//
-//      // set the streaming UDP port
-//      if isWan {
-//        // Wan, establish a UDP port for the Data Streams
-//        let _ = _udp.bind(radioParameters: activeRadio!, isWan: true, clientHandle: connectionHandle)
-//
-//      } else {
-//        // Local
-//        send(Api.Command.clientUdpPort.rawValue + "\(localUDPPort)")
-//      }
-//      // start pinging
-//      if pingerEnabled {
-//
-//        let wanStatus = isWan ? "REMOTE" : "LOCAL"
-//        let p = (isWan ? activeRadio!.publicTlsPort : activeRadio!.port)
-//        _log.msg("Pinger started: \(activeRadio!.nickname) @ \(activeRadio!.publicIp), port \(p) \(wanStatus)", level: .info, function: #function, file: #file, line: #line)
-//        _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ)
-//      }
-//      // TCP & UDP connections established, inform observers
-//      NC.post(.clientDidConnect, object: activeRadio as Any?)
-//
-//      apiState = .clientConnected
-//  }
   func clientConnected() {
     
     // code to be executed after an IP Address has been obtained
@@ -410,7 +384,6 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
       _log.msg("Radio must be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
       NC.post(.radioDowngradeRequired, object: [Api.kVersion, radioVersion])
     }
-    
   }
   /// Send a command list to the Radio
   ///
@@ -449,37 +422,40 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
       // add all the specified commands
       for command in adjustedCommands {
-        
+
         switch command {
 
-        // conditionally send the following
-        case .setMtu:
-          if radioVersion.major == 2 && radioVersion.minor >= 3 {
-            // the MTU command is only used for radio firmware versions >= 2.3.x
-            array.append( (command.rawValue, false, nil) )
-          }
+        case .setMtu where radioVersion.major == 2 && radioVersion.minor >= 3:  array.append( (command.rawValue, false, nil) )
+        case .setMtu:                                 break
 
-        // add parameters to the following
-        case .clientProgram:  if _isGui { array.append( (command.rawValue + _clientName, false, nil) ) }
-        case .clientStation:  if _isGui { array.append( (command.rawValue + _clientStation, false, nil) ) }
-          
-        // case .clientLowBW:  if _lowBW { array.append( (command.rawValue, false, nil) ) }
-          
+        case .clientProgram:                          if _isGui { array.append( (command.rawValue + _clientName, false, nil) ) }
+
+        case .clientStation where Api.kVersion.isV3:  if _isGui { array.append( (command.rawValue + _clientStation, false, nil) ) }
+        case .clientStation:                          break
+
+          // case .clientLowBW:  if _lowBW { array.append( (command.rawValue, false, nil) ) }
+
         // Capture the replies from the following
         case .meterList:    array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .info:         array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .version:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .antList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .micList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-        case .clientGui where Api.kVersion.isV3:    if _isGui { array.append( (command.rawValue + " " + (_clientId?.uuidString ?? ""), false, delegate?.defaultReplyHandler) ) }
-        case .clientGui where !Api.kVersion.isV3:   if _isGui { array.append( (command.rawValue, false, delegate?.defaultReplyHandler) ) }
-        case .clientBind where Api.kVersion.isV3:   if !_isGui && _clientId != nil { array.append( (command.rawValue + " client_id=" + _clientId!.uuidString, false, nil) ) }
 
+        case .clientGui where Api.kVersion.isV3:      if _isGui { array.append( (command.rawValue + " " + (_clientId?.uuidString ?? ""), false, delegate?.defaultReplyHandler) ) }
+        case .clientGui:                              if _isGui { array.append( (command.rawValue, false, delegate?.defaultReplyHandler) ) }
+
+        case .clientBind where Api.kVersion.isV3:     if !_isGui && _clientId != nil { array.append( (command.rawValue + " client_id=" + _clientId!.uuidString, false, nil) ) }
+        case .clientBind:                             break
+          
+        case .subClient where Api.kVersion.isV3:      array.append( (command.rawValue, false, nil) )
+        case .subClient:                              break
+          
         // ignore the following
-        case .none, .allPrimary, .allSecondary, .allSubscription: break
+        case .none, .allPrimary, .allSecondary, .allSubscription:   break
 
         // all others
-        default:  array.append( (command.rawValue, false, nil) )
+        default:    array.append( (command.rawValue, false, nil) )
         }
       }
     }
@@ -774,7 +750,6 @@ extension Api {
     }
     static func allSecondaryCommands() -> [Command] {
       return [.setMtu, .setReducedDaxBw, .clientStation]
-
     }
   }
     

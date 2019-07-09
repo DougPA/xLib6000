@@ -45,7 +45,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   private var __autoBlackEnabled            = false                         // State of auto black
   private var __autoBlackLevel              : UInt32 = 0                    // Radio generated black level
   private var __blackLevel                  = 0                             // Setting of black level (1 -> 100)
-  private var __clientHandle                : Handle = 0                    // Client owning this Waterfall
+  private var __clientHandle                : Handle = 0                    // Client owning this Waterfall (V3 only)
   private var __colorGain                   = 0                             // Setting of color gain (1 -> 100)
   private var __daxIqChannel                = 0                             // DAX IQ channel number (0=none)
   private var __gradientIndex               = 0                             // Index of selected color gradient

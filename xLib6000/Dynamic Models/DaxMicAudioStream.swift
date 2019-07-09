@@ -47,7 +47,7 @@ public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
   
-  /// Parse a Mic AudioStream status message
+  /// Parse a DAX Mic AudioStream status message
   ///
   ///   StatusParser Protocol method, executes on the parseQ
   ///
@@ -58,17 +58,21 @@ public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
   ///   - inUse:          false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format:  <streamId, > <"in_use", 1|0> <"ip", ip> <"port", port>
-    
+    // Format:  <streamId, > <"type", "dax_mic"> <"client_handle", handle>
+    // Format:  <streamId, > <"removed", >
+
     // get the StreamId
     if let streamId = keyValues[0].key.streamId {
       
       // does the Stream exist?
       if radio.daxMicAudioStreams[streamId] == nil {
         
-        //      // NO, is this stream for this client?
-        //      if !DaxRxAudioStream.isStatusForThisClient(keyValues) { return }
+        // exit if it has been removed
+        if inUse == false { return }
         
+        // exit if this stream is not for this client
+        if !DaxRxAudioStream.isStatusForThisClient( Array(keyValues.dropFirst(2)) ) { return }
+
         // create a new Stream & add it to the collection
         radio.daxMicAudioStreams[streamId] = DaxMicAudioStream(streamId: streamId, queue: queue)
       }
