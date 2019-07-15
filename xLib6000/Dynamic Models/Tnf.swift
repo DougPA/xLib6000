@@ -260,7 +260,7 @@ public final class Tnf                      : NSObject, DynamicModel {
       }
     }
     // is the Tnf initialized?
-    if !_initialized && _frequency != 0 {
+    if _initialized == false && _frequency != 0 {
       
       // YES, the Radio (hardware) has acknowledged this Tnf
       _initialized = true

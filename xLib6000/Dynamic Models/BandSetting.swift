@@ -190,7 +190,7 @@ public final class BandSetting                : NSObject, DynamicModel {
       }
     }
     // is the BandSetting initialized?
-    if !_initialized {
+    if _initialized == false {
       
       // YES, the Radio (hardware) has acknowledged this BandSetting
       _initialized = true

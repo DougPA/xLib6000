@@ -196,7 +196,7 @@ public final class Xvtr                     : NSObject, DynamicModel {
       }
     }
     // is the waterfall initialized?
-    if !_initialized && _inUse {
+    if _initialized == false && _inUse {
       
       // YES, the Radio (hardware) has acknowledged this Waterfall
       _initialized = true

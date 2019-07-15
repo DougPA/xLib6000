@@ -447,20 +447,14 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       DaxRxAudioStream.parseStatus(remainder.keyValuesArray(), radio: self, queue: _q)
       
     case .client:
-      // formats are different in V3 API
-      let keyValues = remainder.keyValuesArray()
-      if Api.kVersion.isV3 {
-        //      kv                0         1            2
-        //      format: client <handle> connected <client_id=ID> <program=Program> <station=Station> <local_ptt=0/1>
-        //      format: client <handle> disconnected <forced=0/1>
-        GuiClient.parseStatus(keyValues, radio: self, queue: _q)
-
-      } else {
-        //      kv                0         1            2
-        //      format: client <handle> connected
-        //      format: client <handle> disconnected <forced=1/0>
-        parseClient(remainder.keyValuesArray(), radio: self, queue: _q)
-      }
+      // V3 AP
+      // format:  <client_handle, > <"connected", > <"client_id", clientId> <"program", program> <"station", station> <"local_ptt", 0/1>
+      // format:  <client_handle, > <"disconnected", > <"forced", 0/1> <"wan_validation_failed", 0/1> <"duplicate_client_id", 0/1>
+      
+      // pre V3
+      // format: <client_handle, > <"connected", >
+      // format: <client_handle, > <"disconnected", > <forced=1/0>
+      parseClient(remainder.keyValuesArray(), radio: self, queue: _q, inUse: remainder.contains(Api.kDisconnected) == false)
 
     case .cwx:
       // replace some characters to avoid parsing conflicts
@@ -561,7 +555,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       var keyValues = remainder.keyValuesArray()
       
       // ignore the removed status message
-      if keyValues[2].key == "removed" { return }
+      if keyValues[1].key == "removed" { return }
       
       switch keyValues[1].value {
       case "dax_iq":
@@ -576,6 +570,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       case "dax_tx":
         //     format: <streamId, > <"type"=value> <"client_handle"=value> <"dax_tx"=value>
         DaxTxAudioStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
+        
+        // FIXME: ??? remote_audio_rx & remote_audio_tx ???
+        
       default:
         fatalError()
       }
@@ -635,7 +632,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
     }
   }
-  /// Parse a Client status message (pre V3 only)
+  /// Parse a Client status message
   ///
   ///   executed on the parseQ
   ///
@@ -643,32 +640,181 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   ///   - keyValues:      a KeyValuesArray
   ///   - radio:          the current Radio class
   ///   - queue:          a parse Queue for the object
-  ///   - inUse:          false = "to be deleted"
+  ///   - inUse:          false = "disconnected"
   ///
-  private func parseClient(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
+  private func parseClient(_ properties: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     
-    guard keyValues.count >= 2 else {
+    guard properties.count >= 2 else {
       _log.msg("Invalid client status", level: .warning, function: #function, file: #file, line: #line)
       return
     }
-    // guard that the message has my API Handle
-    guard _api.connectionHandle! == keyValues[0].key.handle else { return }
     
-    // what is the message?
-    if keyValues[1].key == "connected" {
-      // Connected
-      _api.clientConnected()
+    // is there a valid handle"
+    if let handle = properties[0].key.handle {
       
-    } else if (keyValues[1].key == "disconnected" && keyValues[2].key == "forced") {
-      // FIXME: Handle the disconnect?
-      // Disconnected
-      _log.msg("Disconnect, forced = \(keyValues[2].value)", level: .info, function: #function, file: #file, line: #line)
-      
-    } else {
-      // Unrecognized
-      _log.msg("Unprocessed Client message: \(keyValues[0].key)", level: .warning, function: #function, file: #file, line: #line)
+      // is it In Use?
+      if inUse {
+        
+        // IN USE, i.e. connected, is it V3 API?
+        if Api.kVersion.isV3 {
+          // V3, parse
+          parseV3Connection(properties: properties, handle: handle)
+          
+        } else {
+          // pre V3, guard that the message has my API Handle
+          guard _api.connectionHandle! == properties[0].key.handle else { return }
+          
+          // YES, Finish the UDP initialization & set the API state
+          _api.clientConnected()
+        }
+        
+      } else {
+        // NOT IN USE, i.e. disconnected
+        if Api.kVersion.isV3 {
+          // V3 API
+          parseV3Disconnection(properties: properties, handle: handle)
+          if let guiClient = findGuiClientByHandle(handle) {
+//            removeGuiClient(guiClient)
+            NC.post(.guiClientHasBeenRemoved, object: guiClient as Any?)
+          }
+          
+        } else {
+          // pre V3 API
+        }
+      }
+        
+        
+//        if properties[2].key == "forced" {
+//        // FIXME: Handle the disconnect?
+//        // NO, Disconnected
+//        _log.msg("Disconnect, forced = \(properties[2].value)", level: .info, function: #function, file: #file, line: #line)
+//
+//      } else {
+//        // Unrecognized
+//        _log.msg("Unprocessed Client message: \(properties[0].key)", level: .warning, function: #function, file: #file, line: #line)
+//      }
     }
   }
+  
+  
+  
+  private func parseV3Connection(properties: KeyValuesArray, handle: Handle) {
+    var clientId : UUID?
+    var program = ""
+    var station = ""
+    var isLocalPtt = false
+    
+    // parse remaining properties
+    for property in properties.dropFirst(2) {
+      
+      // check for unknown Keys
+      guard let token = ClientTokenV3Connection(rawValue: property.key) else {
+        // log it and ignore this Key
+        _log.msg("Unknown Client Connection token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        continue
+      }
+      // Known keys, in alphabetical order
+      switch token {
+        
+      case .clientId:
+        clientId = UUID(uuidString: property.value)
+        
+      case .localPttEnabled:
+        isLocalPtt = property.value.bValue
+        
+      case .program:
+        program = property.value
+        
+      case .station:
+        station = property.value
+      }
+    }
+    // get the GuiClient (if any)
+    if let existingClient = findGuiClientByHandle(handle) {
+      existingClient.clientId = clientId
+      existingClient.program = program
+      existingClient.station = station
+      existingClient.isLocalPtt = isLocalPtt
+      
+      // notify all observers
+      NC.post(.guiClientHasBeenUpdated, object: existingClient as Any?)
+      
+    } else {
+      // none found, add one
+      let newGuiClient = GuiClient(handle: handle,
+                                   clientId: clientId,
+                                   program: program,
+                                   station: station,
+                                   isLocalPtt: isLocalPtt,
+                                   isThisClient: (_api.connectionHandle! == handle))
+      _api.activeRadio!.guiClients.append(newGuiClient)
+      
+      // notify all observers
+      NC.post(.guiClientHasBeenAdded, object: newGuiClient as Any?)
+    }
+    
+    // is the Gui Client initialized?
+    if _clientInitialized == false && clientId != nil {
+      
+      // YES
+      _clientInitialized = true
+    }
+
+  }
+
+  
+  private func parseV3Disconnection(properties: KeyValuesArray, handle: Handle) {
+    var duplicateClientId = false
+    var forced = false
+    var wanValidationFailed = false
+    
+    // parse remaining properties
+    for property in properties.dropFirst(2) {
+      
+      // check for unknown Keys
+      guard let token = ClientTokenV3Disconnection(rawValue: property.key) else {
+        // log it and ignore this Key
+        _log.msg("Unknown Client Disconnection token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        continue
+      }
+      // Known keys, in alphabetical order
+      switch token {
+        
+      case .duplicateClientId:
+        duplicateClientId = property.value.bValue
+        
+      case .forced:
+        forced = property.value.bValue
+        
+      case .wanValidationFailed:
+        wanValidationFailed = property.value.bValue
+      }
+      if duplicateClientId || forced || wanValidationFailed {
+        _log.msg("Disconnected with: \(forced ? "Forced ": "")\(duplicateClientId ? "DuplicateClientId ": "")\(wanValidationFailed ? "wanValidationFailed": "")" , level: .warning, function: #function, file: #file, line: #line)
+      }
+      if let existingClient = findGuiClientByHandle(handle) {
+        NC.post(.guiClientHasBeenRemoved, object: existingClient as Any?)
+      }
+    }
+  }
+  
+  
+  private func findGuiClientByHandle(_ handle: Handle) -> GuiClient? {
+    
+    guard let activeRadio = _api.activeRadio else { fatalError("No ActiveRadio") }
+    
+    // find an existing GuiClient
+    for i in 0..<activeRadio.guiClients.count {
+      if handle == activeRadio.guiClients[i].handle {
+        return activeRadio.guiClients[i]
+      }
+    }
+    // none found
+    return nil
+  }
+
+  
+  
   /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
   ///
   ///   executed on the parseQ
@@ -1982,13 +2128,16 @@ extension Radio {
   
   /// Clients (V3 only)
   ///
-  internal enum ClientToken : String {
-    case host
-    case id                             = "client_id"
-    case ip
+  internal enum ClientTokenV3Connection : String {
+    case clientId                       = "client_id"
     case localPttEnabled                = "local_ptt"
     case program
     case station
+  }
+  internal enum ClientTokenV3Disconnection : String {
+    case duplicateClientId              = "duplicate_client_id"
+    case forced
+    case wanValidationFailed            = "wan_validation_failed"
   }
   /// Types
   ///

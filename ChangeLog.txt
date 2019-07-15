@@ -1,12 +1,23 @@
-xLib6000 Change Log
+xLib6000 V3 Change Log
+
+v2.5.1.2019_07_15
+
+Api.swift - made clientName, clientId, clientStation, isGui, lowBw "public private(set)"
+Api.swift - removed public var guiClients
+RadioFactory.swift - refactored udpSocket(_:didReceive:fromAddress:withFilterContext:)
+Radio.swift - refactored parseClient(_:radio:queue:inUse:)
+Radio.swift - in parseStatus(_:) corrected .client and .stream cases
+Various - changed use of "!" to "== false" for clarity
+RadioCommands.swift - changes to match refactor of parseClient(_:radio:queue:inUse:)
+Vita.swift - added class parseGuiClients(handles:programs:stations:) and its usage
+Vita.swift - added class GuiClient
+
 
 v2.5.1.2019_07_08
 
 Corrections and edits throughout to make v2.4.9 & v2.5.1 as similar as possible
 *Stream.swift - corrections to all streams & stream commands
 Meter.swift - in streamHandler(_:) modified error msg for unknown units
-
-
 
 
 v2.5.1.2019_07_07
@@ -260,7 +271,7 @@ Waterfall.swift - renamed streamActive to isStreaming
 Opus.swift - added public var isStreaming
 Panadapter.swift - added detection of out-of-sequence packets
 Waterfall.swift - added detection of out-of-sequence packets
-Meter.swift - in parseProperties(_:) added '&& number != "" && units != ""' to if !_initialized
+Meter.swift - in parseProperties(_:) added '&& number != "" && units != ""' to if _initialized == false
 TcpManager.swift - correction to connect(radioParameters:isWan:)
 Api.swift - in tcpState(connected:host:port:error:) added guard for udp.bind success
 Api.swift - corrections to shutdown / disconnect processing

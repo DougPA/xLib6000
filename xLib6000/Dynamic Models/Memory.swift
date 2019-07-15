@@ -328,7 +328,7 @@ public final class Memory                   : NSObject, DynamicModel {
       }
     }
     // is the Memory initialized?
-    if !_initialized  {
+    if _initialized == false  {
       
       // YES, the Radio (hardware) has acknowledged this Memory
       _initialized = true

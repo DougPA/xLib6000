@@ -206,7 +206,7 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
       }
     }
     // is the waterfall initialized?
-    if !_initialized && panadapterId != 0 {
+    if _initialized == false && panadapterId != 0 {
       
       // YES, the Radio (hardware) has acknowledged this Waterfall
       _initialized = true

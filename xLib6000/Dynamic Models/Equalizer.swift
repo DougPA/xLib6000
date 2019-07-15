@@ -190,7 +190,7 @@ public final class Equalizer                : NSObject, DynamicModel {
       }
     }
     // is the Equalizer initialized?
-    if !_initialized {
+    if _initialized == false {
       // NO, the Radio (hardware) has acknowledged this Equalizer
       _initialized = true
       

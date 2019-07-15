@@ -263,7 +263,7 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
         units = property.value.lowercased()
       }
     }
-    if !_initialized && group != "" && units != "" {
+    if _initialized == false && group != "" && units != "" {
       
       // the Radio (hardware) has acknowledged this Meter
       _initialized = true

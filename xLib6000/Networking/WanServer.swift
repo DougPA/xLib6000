@@ -393,7 +393,7 @@ public final class WanServer                : NSObject, GCDAsyncSocketDelegate {
     
     for message in radioMessages where message != "" {
       
-      // create a minimal RadioParameters with now as "lastSeen"
+      // create a minimal DiscoveredRadio with now as "lastSeen"
       let radio = DiscoveredRadio()
       
       var publicTlsPortToUse = -1

@@ -165,7 +165,7 @@ public final class Amplifier                : NSObject, DynamicModel {
       }
     }
     // is the Amplifier initialized?
-    if !_initialized && _ip != "" && _port != 0 {
+    if _initialized == false && _ip != "" && _port != 0 {
       
       // YES, the Radio (hardware) has acknowledged this Amplifier
       _initialized = true

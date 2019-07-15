@@ -409,7 +409,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
       }
     }
     // is the Panadapter initialized?
-    if !_initialized && center != 0 && bandwidth != 0 && (minDbm != 0.0 || maxDbm != 0.0) {
+    if _initialized == false && center != 0 && bandwidth != 0 && (minDbm != 0.0 || maxDbm != 0.0) {
       
       // YES, the Radio (hardware) has acknowledged this Panadapter
       _initialized = true

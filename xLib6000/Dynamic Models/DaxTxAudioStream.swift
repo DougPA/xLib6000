@@ -211,7 +211,7 @@ public final class DaxTxAudioStream         : NSObject, DynamicModel {
       }
     }
     // is the AudioStream acknowledged by the radio?
-    if !_initialized && _clientHandle != 0 {
+    if _initialized == false && _clientHandle != 0 {
       
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true

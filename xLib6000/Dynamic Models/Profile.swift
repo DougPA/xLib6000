@@ -137,7 +137,7 @@ public final class Profile                  : NSObject, StaticModel {
       didChangeValue(for: \.selection)
     }
     // is the Profile initialized?
-    if !_initialized && _list.count > 0 {
+    if _initialized == false && _list.count > 0 {
       
       // YES, the Radio (hardware) has acknowledged this Panadapter
       _initialized = true

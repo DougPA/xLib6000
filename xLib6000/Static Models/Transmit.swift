@@ -358,7 +358,7 @@ public final class Transmit                 : NSObject, StaticModel {
       }
     }
     // is Transmit initialized?
-    if !_initialized {
+    if _initialized == false {
       // NO, the Radio (hardware) has acknowledged this Transmit
       _initialized = true
       

@@ -308,8 +308,8 @@ public class Vita {
     // is this a Discovery packet?
     if vita.classIdPresent && vita.classCode == .discovery {
       
-      // YES, create a minimal RadioParameters with now as "lastSeen"
-      let radio = DiscoveredRadio()
+      // YES, create a minimal DiscoveredRadio with now as "lastSeen"
+      let discoveredRadio = DiscoveredRadio()
 
       // Payload is a series of strings of the form <key=value> separated by ' ' (space)
       var payloadData = NSString(bytes: vita.payloadData, length: vita.payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
@@ -332,45 +332,89 @@ public class Vita {
         
         switch token {
           
-        case .availableClients:           radio.availableClients = property.value.iValue
-        case .availablePanadapters:       radio.availablePanadapters = property.value.iValue
-        case .availableSlices:            radio.availableSlices = property.value.iValue
-        case .callsign:                   radio.callsign = property.value
-        case .discoveryVersion:           radio.discoveryVersion = property.value
-        case .firmwareVersion:            radio.firmwareVersion = property.value
-        case .fpcMac:                     radio.fpcMac = property.value
-        case .guiClientHandles:           radio.guiClientHandles = property.value
-        case .guiClientHosts:             radio.guiClientHosts = property.value
-        case .guiClientIps:               radio.guiClientIps = property.value
-        case .guiClientPrograms:          radio.guiClientPrograms = property.value
-        case .guiClientStations:          radio.guiClientStations = property.value
-        case .inUseHost:                  radio.inUseHost = property.value
-        case .inUseIp:                    radio.inUseIp = property.value
-        case .licensedClients:            radio.licensedClients = property.value.iValue
-        case .maxLicensedVersion:         radio.maxLicensedVersion = property.value
-        case .maxPanadapters:             radio.maxPanadapters = property.value.iValue
-        case .maxSlices:                  radio.maxSlices = property.value.iValue
-        case .model:                      radio.model = property.value
-        case .nickname:                   radio.nickname = property.value
-        case .port:                       radio.port = property.value.iValue
-        case .publicIp:                   radio.publicIp = property.value
-        case .radioLicenseId:             radio.radioLicenseId = property.value
-        case .requiresAdditionalLicense:  radio.requiresAdditionalLicense = property.value.bValue
-        case .serialNumber:               radio.serialNumber = property.value
-        case .status:                     radio.status = property.value
-        case .wanConnected:               radio.wanConnected = property.value.bValue
+        case .availableClients:           discoveredRadio.availableClients = property.value.iValue
+        case .availablePanadapters:       discoveredRadio.availablePanadapters = property.value.iValue
+        case .availableSlices:            discoveredRadio.availableSlices = property.value.iValue
+        case .callsign:                   discoveredRadio.callsign = property.value
+        case .discoveryVersion:           discoveredRadio.discoveryVersion = property.value
+        case .firmwareVersion:            discoveredRadio.firmwareVersion = property.value
+        case .fpcMac:                     discoveredRadio.fpcMac = property.value
+        case .guiClientHandles:           discoveredRadio.guiClientHandles = property.value
+        case .guiClientHosts:             discoveredRadio.guiClientHosts = property.value
+        case .guiClientIps:               discoveredRadio.guiClientIps = property.value
+        case .guiClientPrograms:          discoveredRadio.guiClientPrograms = property.value
+        case .guiClientStations:          discoveredRadio.guiClientStations = property.value
+        case .inUseHost:                  discoveredRadio.inUseHost = property.value
+        case .inUseIp:                    discoveredRadio.inUseIp = property.value
+        case .licensedClients:            discoveredRadio.licensedClients = property.value.iValue
+        case .maxLicensedVersion:         discoveredRadio.maxLicensedVersion = property.value
+        case .maxPanadapters:             discoveredRadio.maxPanadapters = property.value.iValue
+        case .maxSlices:                  discoveredRadio.maxSlices = property.value.iValue
+        case .model:                      discoveredRadio.model = property.value
+        case .nickname:                   discoveredRadio.nickname = property.value
+        case .port:                       discoveredRadio.port = property.value.iValue
+        case .publicIp:                   discoveredRadio.publicIp = property.value
+        case .radioLicenseId:             discoveredRadio.radioLicenseId = property.value
+        case .requiresAdditionalLicense:  discoveredRadio.requiresAdditionalLicense = property.value.bValue
+        case .serialNumber:               discoveredRadio.serialNumber = property.value
+        case .status:                     discoveredRadio.status = property.value
+        case .wanConnected:               discoveredRadio.wanConnected = property.value.bValue
           
         // satisfy the switch statement, not a real token
         case .lastSeen:                   break
         }
       }
       // is it a valid Discovery packet?
-      if radio.publicIp != "" && radio.port != 0 && radio.model != "" && radio.serialNumber != "" {
-        // YES, return the Discovered radio data
-        return radio
+      if discoveredRadio.publicIp != "" && discoveredRadio.port != 0 && discoveredRadio.model != "" && discoveredRadio.serialNumber != "" {
+        
+        // YES, populate the guiClients property
+        discoveredRadio.guiClients = parseGuiClients( handles: discoveredRadio.guiClientHandles, programs: discoveredRadio.guiClientPrograms, stations: discoveredRadio.guiClientStations)
+        
+        // return the Discovered radio
+        return discoveredRadio
       }
     }
     // Not a Discovery packet
+    return nil
+  }
+  /// Parse GuiClient info
+  ///
+  /// - Parameters:
+  ///   - handles:          comma separated list of handles
+  ///   - programs:         comma separated list of programs
+  ///   - stations:         comma separated list of stations
+  /// - Returns:            an array of GuiClientx
+  ///
+  class func parseGuiClients(handles: String, programs: String, stations: String) -> [GuiClient] {
+    var guiClients = [GuiClient]()
+    
+    // guard that all values are non-empty
+    guard handles != "" && programs != "" && stations != "" else { return guiClients }
+    
+    // separate the values
+    let handlesArray = handles.components(separatedBy: ",")
+    let programsArray = programs.components(separatedBy: ",")
+    let stationsArray = stations.components(separatedBy: ",")
+    
+    // guard that there are an equal number of values
+    guard handlesArray.count == programsArray.count && programsArray.count == stationsArray.count else { return guiClients }
+    
+    // parse into the GuiClient struct
+    for i in 0..<handlesArray.count {
+      
+      // create a new GuiClient
+      guiClients.append( GuiClient(handle:   handlesArray[i].handle!,
+                                program:  programsArray[i],
+                                station:  stationsArray[i].replacingOccurrences(of: "\007f", with: " ")))
+    }
+    return guiClients
+  }
+  
+  class func findHandle(_ handle: Handle, in clients: [GuiClient]) -> Int? {
+    
+    for i in 0..<clients.count {
+      if handle == clients[i].handle { return i }
+    }
     return nil
   }
   
@@ -628,5 +672,38 @@ extension Vita {
         return "Discovery"
       }
     }
+  }
+}
+
+public class GuiClient        : Equatable {
+  
+  public var handle           : Handle
+  public var clientId         : UUID?
+  public var program          : String
+  public var station          : String
+  public var isAvailable      : Bool
+  public var isLocalPtt       : Bool
+  public var isThisClient     : Bool
+
+  public init(handle: Handle, clientId: UUID? = nil, program: String = "", station: String = "", isAvailable: Bool = false, isLocalPtt: Bool = false, isThisClient: Bool = false) {
+    self.handle = handle
+    self.clientId = clientId
+    self.program = program
+    self.station = station
+    self.isAvailable = isAvailable
+    self.isLocalPtt = isLocalPtt
+    self.isThisClient = isThisClient
+  }
+  
+  public static func ==(lhs: GuiClient, rhs: GuiClient) -> Bool {
+    
+    if lhs.clientId != rhs.clientId { return false }
+    if lhs.handle != rhs.handle { return false }
+    if lhs.program != rhs.program { return false }
+    if lhs.station != rhs.station { return false }
+    return true
+  }
+  public static func !=(lhs: GuiClient, rhs: GuiClient) -> Bool {
+    return !(lhs == rhs)
   }
 }

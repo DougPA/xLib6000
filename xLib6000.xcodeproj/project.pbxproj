@@ -72,7 +72,6 @@
 		9143BD9B21FCDA0700C2CCBD /* KnownIssues.md in Resources */ = {isa = PBXBuildFile; fileRef = 9143BD9A21FCDA0700C2CCBD /* KnownIssues.md */; };
 		9148A1D42258E2C500020663 /* BandSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9148A1D32258E2C500020663 /* BandSetting.swift */; };
 		9148A1D62258E9C100020663 /* BandSettingCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9148A1D52258E9C100020663 /* BandSettingCommands.swift */; };
-		9148A1D8225C2A9700020663 /* GuiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9148A1D7225C2A9700020663 /* GuiClient.swift */; };
 		9148CEAD21D94AC400306FC0 /* WanServerCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */; };
 		91612E41221E4F8D0002C4F9 /* Frames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91612E40221E4F8D0002C4F9 /* Frames.swift */; };
 		9185B087207FD11E004D4C40 /* xLib6000 Overview.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */; };
@@ -149,7 +148,6 @@
 		9143BD9A21FCDA0700C2CCBD /* KnownIssues.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = KnownIssues.md; sourceTree = "<group>"; };
 		9148A1D32258E2C500020663 /* BandSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandSetting.swift; sourceTree = "<group>"; };
 		9148A1D52258E9C100020663 /* BandSettingCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandSettingCommands.swift; sourceTree = "<group>"; };
-		9148A1D7225C2A9700020663 /* GuiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuiClient.swift; sourceTree = "<group>"; };
 		9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WanServerCommands.swift; sourceTree = "<group>"; };
 		91612E40221E4F8D0002C4F9 /* Frames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Frames.swift; sourceTree = "<group>"; };
 		9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "xLib6000 Overview.pdf"; sourceTree = "<group>"; };
@@ -217,7 +215,6 @@
 				913EF02020669DA700AF99BE /* DaxRxAudioStream.swift */,
 				913EF01D20669DA700AF99BE /* DaxTxAudioStream.swift */,
 				913EF01F20669DA700AF99BE /* Equalizer.swift */,
-				9148A1D7225C2A9700020663 /* GuiClient.swift */,
 				913EF01820669DA700AF99BE /* Memory.swift */,
 				913EF01B20669DA700AF99BE /* Meter.swift */,
 				913EF01E20669DA700AF99BE /* Opus.swift */,
@@ -472,7 +469,6 @@
 				913EF07A20669DA700AF99BE /* AmplifierCommands.swift in Sources */,
 				913EF07720669DA700AF99BE /* ProfileCommands.swift in Sources */,
 				913EF08E20669DA700AF99BE /* FlexErrors.swift in Sources */,
-				9148A1D8225C2A9700020663 /* GuiClient.swift in Sources */,
 				913EF06320669DA700AF99BE /* Meter.swift in Sources */,
 				913EF08920669DA700AF99BE /* OpusCommands.swift in Sources */,
 				913EF08320669DA700AF99BE /* CwxCommands.swift in Sources */,

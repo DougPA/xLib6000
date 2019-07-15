@@ -212,7 +212,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
      }
     }
     // the Radio (hardware) has acknowledged this Opus
-    if !_initialized && _ip != "" {
+    if _initialized == false && _ip != "" {
       
       // YES, the Radio (hardware) has acknowledged this Opus
       _initialized = true

@@ -196,7 +196,7 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
       }
     }    
     // if this is not yet initialized and inUse becomes true
-    if !_initialized && _clientHandle != 0 {
+    if _initialized == false && _clientHandle != 0 {
       
       // YES, the Radio (hardware) has acknowledged this Audio Stream
       _initialized = true

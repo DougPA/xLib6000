@@ -179,7 +179,7 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
       }
     }
     // is the Stream initialized?
-    if !_initialized && _clientHandle != 0 {
+    if _initialized == false && _clientHandle != 0 {
       
       // YES, the Radio (hardware) has acknowledged this Stream
       _initialized = true

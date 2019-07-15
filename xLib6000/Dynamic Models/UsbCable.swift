@@ -267,7 +267,7 @@ public final class UsbCable                 : NSObject, DynamicModel {
     }
     
     // is the waterfall initialized?
-    if !_initialized {
+    if _initialized == false {
       
       // YES, the Radio (hardware) has acknowledged this UsbCable
       _initialized = true

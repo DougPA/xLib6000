@@ -97,10 +97,10 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
           
           var deleteList = [Int]()
           
-          // check the timestamps of the UDPBroadcasts
-          for (i, radio) in self.discoveredRadios.enumerated() {
-            
-            let interval = abs(radio.lastSeen.timeIntervalSinceNow)
+          // check the timestamps of the Discovered radios
+          for i in 0..<self._discoveredRadios.count {
+
+            let interval = abs(self._discoveredRadios[i].lastSeen.timeIntervalSinceNow)
             
             // is it past expiration?
             if interval > notSeenInterval {
@@ -109,7 +109,8 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
               deleteList.append(i)
             
             } else {
-              radio.lastSeen = Date()
+              // NO, update the timestamp
+              self._discoveredRadios[i].lastSeen = Date()
             }
           }
           // are there any deletions?
@@ -117,10 +118,10 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
             
             // YES, remove the Radio(s)
             for index in deleteList.reversed() {
-              
-              self.discoveredRadios.remove(at: index)
+              // remove a Radio
+              self._discoveredRadios.remove(at: index)
             }
-            // send the updated list of radios to all observers
+            // send the list of radios to all observers
             NC.post(.radiosAvailable, object: self.discoveredRadios as Any?)
           }
         }
@@ -168,7 +169,7 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
       _timeoutTimer.resume()
     }
   }
-  /// send a Notification containing a list of current radios
+  /// force a Notification containing a list of current radios
   ///
   public func updateAvailableRadios() {
     
@@ -191,56 +192,43 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
   ///
   @objc public func udpSocket(_ sock: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext filterContext: Any?) {
     var knownRadio = false
-    
-    // local func to detect changes in status or clients
-    func hasChanged(_ previous: DiscoveredRadio, _ current: DiscoveredRadio ) -> Bool {
-      // is the status different?
-      if previous.status != current.status { return true }
 
-      // are the clients different?
-      if previous.guiClientHandles != current.guiClientHandles { return true }
-      if previous.guiClientHosts != current.guiClientHosts { return true }
-      if previous.guiClientIps != current.guiClientIps { return true }
-      if previous.guiClientPrograms != current.guiClientPrograms { return true }
-      if previous.guiClientStations != current.guiClientStations { return true }
-
-      return false
-    }
-    
     // VITA encoded Discovery packet?
     guard let vita = Vita.decodeFrom(data: data) else { return }
     
-    // parse the packet to obtain a DiscoveredRadio (updates the timestamp)
+    // parse the packet to obtain a RadioParameters (updates the timestamp)
     guard let discoveredRadio = Vita.parseDiscovery(vita) else { return }
     
-    // is it already in the DiscoverdRadios array? ( == compares serialNumbers )
-    if !discoveredRadios.contains(discoveredRadio) {
+    // is it already in the availableRadios array? ( == compares serialNumbers )
+    for (i, radio) in discoveredRadios.enumerated() where radio == discoveredRadio {
       
-      // NO, add it to discoveredRadios
-      discoveredRadios.append(discoveredRadio)
-      GuiClient.parseDiscoveryClients(discoveredRadio, queue: _radiosQ)
+      let previousStatus = discoveredRadios[i].status
       
-      // send the updated array of Discovered Radios to all observers
-      NC.post(.radiosAvailable, object: discoveredRadios as Any?)
+      // YES, update the existing entry
+      discoveredRadios[i] = discoveredRadio
       
-    } else {
+      // indicate it was a known radio
+      knownRadio = true
       
-      for (i, _) in discoveredRadios.enumerated()  {
+      // has a known Radio's Status changed?
+      if knownRadio && previousStatus != discoveredRadio.status {
         
-        if discoveredRadios[i] == discoveredRadio {
-          
-          // has its status or clients changed?
-          if hasChanged( discoveredRadios[i], discoveredRadio) {
-            
-            // YES, update the existing entry
-            discoveredRadios[i] = discoveredRadio
-            GuiClient.parseDiscoveryClients(discoveredRadio, queue: _radiosQ)
-            
-            // YES, send the updated array of Discovered Radios to all observers
-            NC.post(.radiosAvailable, object: discoveredRadios as Any?)
-          }
-        }
+        // YES, send the updated array of radio dictionaries to all observers
+        NC.post(.radiosAvailable, object: discoveredRadios as Any?)
+        
+        Swift.print("Known: changed")
       }
+    }
+    // Is it a known radio?
+    if knownRadio == false {
+      
+      // NO, add it to the array
+      discoveredRadios.append(discoveredRadio)
+      
+      // send the updated array of radio dictionaries to all observers
+      NC.post(.radiosAvailable, object: discoveredRadios as Any?)
+
+      Swift.print("Unknown: added")
     }
   }
 }
@@ -259,11 +247,12 @@ public class DiscoveredRadio : Equatable {
   public var discoveryVersion               = ""                            // e.g. 2.0.0.1
   public var firmwareVersion                = ""                            // Radio firmware version (e.g. 2.0.1.17)
   public var fpcMac                         = ""                            // ??
-  public var guiClientHandles               = ""
+  public var guiClients                     = [GuiClient]()
+  public var guiClientHandles               : String = ""
+  public var guiClientPrograms              : String = ""
+  public var guiClientStations              : String = ""
   public var guiClientHosts                 = ""
   public var guiClientIps                   = ""
-  public var guiClientPrograms              = ""
-  public var guiClientStations              = ""
   public var inUseHost                      = ""                            // -- Deprecated --
   public var inUseIp                        = ""                            // -- Deprecated --
   public var isPortForwardOn                = false
@@ -303,7 +292,7 @@ public class DiscoveredRadio : Equatable {
     Stations:\t\(guiClientStations)
     """
   }
-
+    
   // ----------------------------------------------------------------------------
   // MARK: - Static methods
   

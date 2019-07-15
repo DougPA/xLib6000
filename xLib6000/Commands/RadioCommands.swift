@@ -118,7 +118,7 @@ extension Radio {
   ///   - token:      the parse token
   ///   - value:      the new value
   ///
-  private func clientCmd( _ token: ClientToken, _ value: Any) {
+  private func clientCmd( _ token: ClientTokenV3Connection, _ value: Any) {
     
     Api.sharedInstance.send(Radio.kClientCmd + token.rawValue + " \(value)")
   }
@@ -128,7 +128,7 @@ extension Radio {
   ///   - token:      the parse token
   ///   - value:      the new value
   ///
-  private func clientSetCmd( _ token: ClientToken, _ value: Any) {
+  private func clientSetCmd( _ token: ClientTokenV3Connection, _ value: Any) {
     
     Api.sharedInstance.send(Radio.kClientSetCmd + token.rawValue + "=\(value)")
   }
