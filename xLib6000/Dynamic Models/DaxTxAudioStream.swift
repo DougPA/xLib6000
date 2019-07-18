@@ -55,23 +55,23 @@ public final class DaxTxAudioStream         : NSObject, DynamicModel {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
+  class func parseStatus(_ properties: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_tx"> <"client_handle", handle> <"dax_tx", isTransmitChannel>
     
     //get the StreamId
-    if let streamId = keyValues[0].key.streamId {
+    if let streamId = properties[0].key.streamId {
       
       // does the Stream exist?
       if radio.daxTxAudioStreams[streamId] == nil {
         
         // exit if this stream is not for this client
-        if isForThisClient(handle: keyValues[3].value ) == false { return }
+        if isForThisClient( properties ) == false { return }
         
         // create a new Stream & add it to the collection
         radio.daxTxAudioStreams[streamId] = DaxTxAudioStream(streamId: streamId, queue: queue)
       }
       // pass the remaining key values to parsing
-      radio.daxTxAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      radio.daxTxAudioStreams[streamId]!.parseProperties( Array(properties.dropFirst(1)) )
     }
   }
   

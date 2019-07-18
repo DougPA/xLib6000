@@ -70,23 +70,23 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
   ///   - queue:          a parse Queue for the object
   ///   - inUse:          false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
+  class func parseStatus(_ properties: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_iq"> <"daxiq_channel", channel> <"pan", panStreamId> <"daxiq_rate", rate> <"client_handle", handle>
 
     //get the StreamId (remove the "0x" prefix)
-    if let streamId =  keyValues[0].key.streamId {
+    if let streamId =  properties[0].key.streamId {
       
       // does the Stream exist?
       if radio.daxIqStreams[streamId] == nil {
         
         // exit if this stream is not for this client
-        if isForThisClient(handle: keyValues[6].value ) == false { return }
-        
+        if isForThisClient( properties ) == false { return }
+
         // create a new Stream & add it to the collection
         radio.daxIqStreams[streamId] = DaxIqStream(streamId: streamId, queue: queue)
       }
       // pass the remaining key values to parsing
-      radio.daxIqStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      radio.daxIqStreams[streamId]!.parseProperties( Array(properties.dropFirst(1)) )
     }
   }
 

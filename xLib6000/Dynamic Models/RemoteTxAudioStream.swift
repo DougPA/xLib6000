@@ -74,23 +74,23 @@ public final class RemoteTxAudioStream      : NSObject, DynamicModel {
   ///   - queue:              a parse Queue for the object
   ///   - inUse:              false = "to be deleted"
   ///
-  class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
+  class func parseStatus(_ properties: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     // Format:  <streamId, > <"type", "remote_audio_tx"> <"compression", "1"|"0"> <"client_handle", handle> <"ip", value>
 
     // get the Stream Id
-    if let streamId =  keyValues[0].key.streamId {
+    if let streamId =  properties[0].key.streamId {
       
       // does the Stream exist?
       if radio.remoteTxAudioStreams[streamId] == nil {
         
         // exit if this stream is not for this client
-        if isForThisClient(handle: keyValues[3].value ) == false { return }
-        
+        if isForThisClient( properties ) == false { return }
+
         // create a new Stream & add it to the collection
         radio.remoteTxAudioStreams[streamId] = RemoteTxAudioStream(streamId: streamId, queue: queue)
       }
       // pass the remaining key values to parsing
-      radio.remoteTxAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(2)) )
+      radio.remoteTxAudioStreams[streamId]!.parseProperties( Array(properties.dropFirst(2)) )
     }
   }
 
