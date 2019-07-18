@@ -59,20 +59,16 @@ public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_mic"> <"client_handle", handle>
-    // Format:  <streamId, > <"removed", >
-
+    
     // get the StreamId
     if let streamId = keyValues[0].key.streamId {
       
       // does the Stream exist?
       if radio.daxMicAudioStreams[streamId] == nil {
         
-        // exit if it has been removed
-        if inUse == false { return }
-        
         // exit if this stream is not for this client
-        if !DaxRxAudioStream.isStatusForThisClient( Array(keyValues.dropFirst(2)) ) { return }
-
+        if isForThisClient(handle: keyValues[3].value ) == false { return }
+        
         // create a new Stream & add it to the collection
         radio.daxMicAudioStreams[streamId] = DaxMicAudioStream(streamId: streamId, queue: queue)
       }
@@ -80,7 +76,7 @@ public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
       radio.daxMicAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
     }
   }
-  
+
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -139,9 +135,9 @@ public final class DaxMicAudioStream        : NSObject, DynamicModelWithStream {
   }
   /// Process the Mic Audio Stream Vita struct
   ///
-  ///   VitaProcessor protocol method, executes on the streamQ
+  ///   VitaProcessor protocol method, called by Radio, executes on the streamQ
   ///      The payload of the incoming Vita struct is converted to a MicAudioStreamFrame and
-  ///      passed to the Mic Audio Stream Handler, called by Radio
+  ///      passed to the Mic Audio Stream Handler
   ///
   /// - Parameters:
   ///   - vitaPacket:         a Vita struct

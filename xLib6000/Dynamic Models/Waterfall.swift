@@ -217,9 +217,9 @@ public final class Waterfall                : NSObject, DynamicModelWithStream {
   }
   /// Process the Waterfall Vita struct
   ///
-  ///   VitaProcessor protocol method, executes on the streamQ
+  ///   VitaProcessor protocol method, called by Radio, executes on the streamQ
   ///      The payload of the incoming Vita struct is converted to a WaterfallFrame and
-  ///      passed to the Waterfall Stream Handler, called by Radio
+  ///      passed to the Waterfall Stream Handler
   ///
   /// - Parameters:
   ///   - vita:       a Vita struct

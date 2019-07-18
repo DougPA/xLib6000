@@ -65,20 +65,16 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_rx"> <"dax_channel", channel> <"slice", sliceNumber> <"dax_clients", number> <"client_handle", handle>
-    // Format:  <streamId, > <"removed", >
-
+    
     //get the StreamId
     if let streamId =  keyValues[0].key.streamId {
       
       // does the Stream exist?
       if radio.daxRxAudioStreams[streamId] == nil {
         
-        // exit if it has been removed
-        if inUse == false { return }
-        
         // exit if this stream is not for this client
-        if !DaxRxAudioStream.isStatusForThisClient( Array(keyValues.dropFirst(5)) ) { return }
-
+        if isForThisClient(handle: keyValues[6].value ) == false { return }
+        
         // create a new Stream & add it to the collection
         radio.daxRxAudioStreams[streamId] = DaxRxAudioStream(streamId: streamId, queue: queue)
       }
@@ -97,25 +93,22 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
   ///
   /// - Returns:              result of the check
   ///
-  public class func isStatusForThisClient(_ properties: KeyValuesArray) -> Bool {
-    
+  public class func isStatusForThisClient(_ handleString: String) -> Bool {
+
     // allow a Tester app to see all Streams
     guard Api.sharedInstance.testerModeEnabled == false else { return true }
-    
-    var handle : Handle? = nil
-    
-    // search thru each key/value pair, <key=value>
-    for property in properties {
-      
-      switch property.key.lowercased() {
-        
-      case "client_handle":       handle = property.value.handle
-      default:                    break
-      }
+
+    // convert to the UInt32 form
+    if let handle = handleString.handle {
+      // true if they match
+      return handle == Api.sharedInstance.connectionHandle
+
+    } else {
+      // otherwise false
+      return false
     }
-    return handle != nil && handle == Api.sharedInstance.connectionHandle
   }
-  /// Find an AudioStream by DAX Channel
+  /// Find a DaxRxAudioStream by DAX Channel
   ///
   /// - Parameter channel:    Dax channel number
   /// - Returns:              a DaxRxAudioStream (if any)
@@ -207,9 +200,9 @@ public final class DaxRxAudioStream         : NSObject, DynamicModelWithStream {
   }
   /// Process the AudioStream Vita struct
   ///
-  ///   VitaProcessor Protocol method, executes on the streamQ
+  ///   VitaProcessor Protocol method, called by Radio, executes on the streamQ
   ///      The payload of the incoming Vita struct is converted to an AudioStreamFrame and
-  ///      passed to the Audio Stream Handler, called by Radio
+  ///      passed to the Audio Stream Handler
   ///
   /// - Parameters:
   ///   - vita:       a Vita struct

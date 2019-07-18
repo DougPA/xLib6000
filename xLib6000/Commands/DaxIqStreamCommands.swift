@@ -16,23 +16,10 @@ extension DaxIqStream {
   // ----------------------------------------------------------------------------
   // MARK: - Class methods that send Commands
 
-  /// Create an IQ Stream
+  /// Create a DaxIQStream
   ///
   /// - Parameters:
   ///   - channel:            DAX channel number
-  ///   - callback:           ReplyHandler (optional)
-  /// - Returns:              Success / Failure
-  ///
-//  public class func create(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
-//
-//    return Api.sharedInstance.sendWithCheck(kStreamCreateCmd + "daxiq" + "=\(channel)", replyTo: callback)
-//  }
-  /// Create an IQ Stream
-  ///
-  /// - Parameters:
-  ///   - channel:            DAX channel number
-  ///   - ip:                 ip address
-  ///   - port:               port number
   ///   - callback:           ReplyHandler (optional)
   /// - Returns:              Success / Failure
   ///
@@ -45,26 +32,21 @@ extension DaxIqStream {
   // ----------------------------------------------------------------------------
   // MARK: - Instance methods that send Commands
 
-  /// Remove this IQ Stream
+  /// Remove this DaxIqStream
   ///
-  /// - Parameters:
-  ///   - callback:           ReplyHandler (optional)
-  /// - Returns:              Success / Failure
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              success / failure
   ///
   public func remove(callback: ReplyHandler? = nil) -> Bool {
     
+    // notify all observers
+    NC.post(.daxIqStreamWillBeRemoved, object: self as Any?)
+
+    // remove the stream
+    Api.sharedInstance.radio?.daxIqStreams[streamId] = nil
+
     // tell the Radio to remove this Stream
-    if Api.sharedInstance.sendWithCheck("stream remove \(streamId.hex)", replyTo: callback) {
-      
-      // notify all observers
-      NC.post(.daxIqStreamWillBeRemoved, object: self as Any?)
-      
-      // remove the stream object
-      Api.sharedInstance.radio?.daxIqStreams[streamId] = nil
-      
-      return true
-    }
-    return false
+    return Api.sharedInstance.sendWithCheck("stream remove \(streamId.hex)", replyTo: callback)
   }
   /// Get error ???
   ///

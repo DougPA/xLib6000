@@ -1,5 +1,23 @@
 xLib6000 V3 Change Log
 
+v2.5.1.2019_07_17
+
+RadioFactory.swift - removed debug print statement
+Radio.swift - in parseStatus(_:) added remote_audio_rx and tx cases (not fully implemented)
+Radio.swift - in parseStatus(_:) replaced fatalError() with _log.msg(....)
+Opus.swift - removed
+OpusCommands.swift - removed
+RemoteRxAudioStream.swift - added
+RemoteRxAudioStreamCommands.swift - added
+RemoteTxAudioStream.swift - added
+RemoteTxAudioStreamCommands.swift - added
+DaxRxAudioStream.swift - removed func isStatusForThisClient(_:)
+AppExtensions.swift - added func isForThisClient(_:) to replace isStatusForThisClient(_:)
+ALL Streams - changed the way streams are removed
+Notifications.swift - added remoteRxAudioStreamHasBeenAdded & remoteRxAudioStreamWillBeRemoved
+Notifications.swift - added remoteTxAudioStreamHasBeenAdded & remoteTxAudioStreamWillBeRemoved
+
+
 v2.5.1.2019_07_15
 
 Api.swift - made clientName, clientId, clientStation, isGui, lowBw "public private(set)"

@@ -72,19 +72,15 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_iq"> <"daxiq_channel", channel> <"pan", panStreamId> <"daxiq_rate", rate> <"client_handle", handle>
-    // Format:  <streamId, > <"removed", >
 
     //get the StreamId (remove the "0x" prefix)
     if let streamId =  keyValues[0].key.streamId {
       
-      // YES, does the Stream exist?
+      // does the Stream exist?
       if radio.daxIqStreams[streamId] == nil {
         
-        // exit if it has been removed
-        if inUse == false { return }
-        
         // exit if this stream is not for this client
-        if !DaxRxAudioStream.isStatusForThisClient( Array(keyValues.dropFirst(5)) ) { return }
+        if isForThisClient(handle: keyValues[6].value ) == false { return }
         
         // create a new Stream & add it to the collection
         radio.daxIqStreams[streamId] = DaxIqStream(streamId: streamId, queue: queue)
@@ -93,7 +89,7 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
       radio.daxIqStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
     }
   }
-  
+
   // ------------------------------------------------------------------------------
   // MARK: - Class methods
   
@@ -190,9 +186,9 @@ public final class DaxIqStream              : NSObject, DynamicModelWithStream {
   }
   /// Process the IqStream Vita struct
   ///
-  ///   VitaProcessor Protocol method, executes on the streamQ
+  ///   VitaProcessor Protocol method, called by Radio, executes on the streamQ
   ///      The payload of the incoming Vita struct is converted to an IqStreamFrame and
-  ///      passed to the IQ Stream Handler, called by Radio
+  ///      passed to the IQ Stream Handler
   ///
   /// - Parameters:
   ///   - vita:       a Vita struct

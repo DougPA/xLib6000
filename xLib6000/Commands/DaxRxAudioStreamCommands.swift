@@ -16,7 +16,7 @@ extension DaxRxAudioStream {
   // ----------------------------------------------------------------------------
   // MARK: - Class methods that send Commands
 
-  /// Create an Audio Stream
+  /// Create a DaxRxAudioStream
   ///
   /// - Parameters:
   ///   - channel:            DAX channel number
@@ -32,26 +32,21 @@ extension DaxRxAudioStream {
   // ----------------------------------------------------------------------------
   // MARK: - Instance methods that send Commands
 
-  /// Remove this Audio Stream
+  /// Remove this DaxRxAudioStream
   ///
-  /// - Parameters:
-  ///   - callback:           ReplyHandler (optional)
-  /// - Returns:              Success / Failure
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              success / failure
   ///
   public func remove(callback: ReplyHandler? = nil) -> Bool {
     
+    // notify all observers
+    NC.post(.daxRxAudioStreamWillBeRemoved, object: self as Any?)
+    
+    // remove the stream
+    Api.sharedInstance.radio?.daxRxAudioStreams[streamId] = nil
+    
     // tell the Radio to remove this Stream
-    if Api.sharedInstance.sendWithCheck("stream remove \(streamId.hex)", replyTo: callback) {
-      
-      // notify all observers
-      NC.post(.daxRxAudioStreamWillBeRemoved, object: self as Any?)
-      
-      // remove the stream object
-      Api.sharedInstance.radio?.daxRxAudioStreams[streamId] = nil
-      
-      return true
-    }
-    return false
+    return Api.sharedInstance.sendWithCheck("stream remove \(streamId.hex)", replyTo: callback)
   }
 
   // ----------------------------------------------------------------------------

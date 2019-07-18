@@ -420,7 +420,7 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   }
   /// Process the Panadapter Vita struct
   ///
-  ///   VitaProcessor protocol method, executes on the streamQ
+  ///   VitaProcessor protocol method, called by Radio, executes on the streamQ
   ///      The payload of the incoming Vita struct is converted to a PanadapterFrame and
   ///      passed to the Panadapter Stream Handler
   ///

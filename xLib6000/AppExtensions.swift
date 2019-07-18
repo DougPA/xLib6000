@@ -530,3 +530,19 @@ public func hexDump(data: [UInt8], len: Int) -> String {
   return string
 }
 
+public func isForThisClient(handle handleString: String) -> Bool {
+  
+  // allow a Tester app to see all Streams
+  guard Api.sharedInstance.testerModeEnabled == false else { return true }
+  
+  // convert to the UInt32 form
+  if let handle = handleString.handle {
+    // true if they match
+    return handle == Api.sharedInstance.connectionHandle
+    
+  } else {
+    // otherwise false
+    return false
+  }
+}
+

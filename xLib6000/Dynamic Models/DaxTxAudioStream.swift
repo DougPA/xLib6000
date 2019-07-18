@@ -57,20 +57,16 @@ public final class DaxTxAudioStream         : NSObject, DynamicModel {
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
     // Format:  <streamId, > <"type", "dax_tx"> <"client_handle", handle> <"dax_tx", isTransmitChannel>
-    // Format:  <streamId, > <"removed", >
-
+    
     //get the StreamId
     if let streamId = keyValues[0].key.streamId {
       
-      // YES, does the Stream exist?
+      // does the Stream exist?
       if radio.daxTxAudioStreams[streamId] == nil {
         
-        // exit if it has been removed
-        if inUse == false { return }
-        
         // exit if this stream is not for this client
-        if !DaxRxAudioStream.isStatusForThisClient( Array(keyValues.dropFirst(2)) ) { return }
-
+        if isForThisClient(handle: keyValues[3].value ) == false { return }
+        
         // create a new Stream & add it to the collection
         radio.daxTxAudioStreams[streamId] = DaxTxAudioStream(streamId: streamId, queue: queue)
       }

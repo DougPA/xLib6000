@@ -68,24 +68,25 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
   //
   // object collections
-  private var _amplifiers                   = [AmplifierId: Amplifier]()      // Dictionary of Amplifiers
-  private var _bandSettings                 = [BandId: BandSetting]()         // Dictionary of Band Settings
-  private var _equalizers                   = [Equalizer.EqType: Equalizer]() // Dictionary of Equalizers
-  private var _daxIqStreams                 = [StreamId: DaxIqStream]()       // Dictionary of Dax Iq streams
-  private var _daxMicAudioStreams           = [StreamId: DaxMicAudioStream]() // Dictionary of MicAudio streams
-  private var _daxRxAudioStreams            = [StreamId: DaxRxAudioStream]()  // Dictionary of Audio streams
-  private var _daxTxAudioStreams            = [StreamId: DaxTxAudioStream]()  // Dictionary of Tx Audio streams
-  private var _memories                     = [MemoryId: Memory]()            // Dictionary of Memories
-  private var _meters                       = [MeterNumber: Meter]()          // Dictionary of Meters
-  private var _opusStreams                  = [OpusId: Opus]()                // Dictionary of Opus Streams
-  private var _panadapters                  = [PanadapterId: Panadapter]()    // Dictionary of Panadapters
-  private var _profiles                     = [ProfileId: Profile]()          // Dictionary of Profiles
-  private var _replyHandlers                = [SequenceId: ReplyTuple]()      // Dictionary of pending replies
-  private var _slices                       = [SliceId: Slice]()              // Dictionary of Slices
-  private var _tnfs                         = [TnfId: Tnf]()                  // Dictionary of Tnfs
-  private var _usbCables                    = [UsbCableId: UsbCable]()        // Dictionary of UsbCables
-  private var _waterfalls                   = [WaterfallId: Waterfall]()      // Dictionary of Waterfalls
-  private var _xvtrs                        = [XvtrId: Xvtr]()                // Dictionary of Xvtrs
+  private var _amplifiers                   = [AmplifierId: Amplifier]()                // Dictionary of Amplifiers
+  private var _bandSettings                 = [BandId: BandSetting]()                   // Dictionary of Band Settings
+  private var _equalizers                   = [Equalizer.EqType: Equalizer]()           // Dictionary of Equalizers
+  private var _daxIqStreams                 = [StreamId: DaxIqStream]()                 // Dictionary of Dax Iq streams
+  private var _daxMicAudioStreams           = [StreamId: DaxMicAudioStream]()           // Dictionary of MicAudio streams
+  private var _daxRxAudioStreams            = [StreamId: DaxRxAudioStream]()            // Dictionary of Audio streams
+  private var _daxTxAudioStreams            = [StreamId: DaxTxAudioStream]()            // Dictionary of Tx Audio streams
+  private var _memories                     = [MemoryId: Memory]()                      // Dictionary of Memories
+  private var _meters                       = [MeterNumber: Meter]()                    // Dictionary of Meters
+  private var _panadapters                  = [PanadapterId: Panadapter]()              // Dictionary of Panadapters
+  private var _profiles                     = [ProfileId: Profile]()                    // Dictionary of Profiles
+  private var _remoteRxAudioStreams         = [RemoteRxStreamId: RemoteRxAudioStream]() // Dictionary of RxRemoteAudioStreams
+  private var _remoteTxAudioStreams         = [RemoteTxStreamId: RemoteTxAudioStream]() // Dictionary of TxRemoteAudioStreams
+  private var _replyHandlers                = [SequenceId: ReplyTuple]()                // Dictionary of pending replies
+  private var _slices                       = [SliceId: Slice]()                        // Dictionary of Slices
+  private var _tnfs                         = [TnfId: Tnf]()                            // Dictionary of Tnfs
+  private var _usbCables                    = [UsbCableId: UsbCable]()                  // Dictionary of UsbCables
+  private var _waterfalls                   = [WaterfallId: Waterfall]()                // Dictionary of Waterfalls
+  private var _xvtrs                        = [XvtrId: Xvtr]()                          // Dictionary of Xvtrs
   
   private var _gpsPresent                   = false
   private var _atuPresent                   = false
@@ -220,6 +221,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // ----- remove all objects -----
     //      NOTE: order is important
     
+    _log.msg("Shutdown started", level: .info, function: #function, file: #file, line: #line)
+    
     // notify all observers, then remove
     daxIqStreams.forEach( { NC.post(.daxIqStreamWillBeRemoved, object: $0.value as Any?) } )
     daxIqStreams.removeAll()
@@ -233,8 +236,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     daxTxAudioStreams.forEach( { NC.post(.daxTxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
     daxTxAudioStreams.removeAll()
     
-    opusStreams.forEach( { NC.post(.opusRxWillBeRemoved, object: $0.value as Any?) } )
-    opusStreams.removeAll()
+    remoteRxAudioStreams.forEach( { NC.post(.remoteRxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    remoteRxAudioStreams.removeAll()
+    
+    remoteTxAudioStreams.forEach( { NC.post(.remoteTxAudioStreamWillBeRemoved, object: $0.value as Any?) } )
+    remoteTxAudioStreams.removeAll()
     
     tnfs.forEach( { NC.post(.tnfWillBeRemoved, object: $0.value as Any?) } )
     tnfs.removeAll()
@@ -444,8 +450,10 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
     case .audioStream:
       //      format: <AudioStreamId> <key=value> <key=value> ...<key=value>
-      DaxRxAudioStream.parseStatus(remainder.keyValuesArray(), radio: self, queue: _q)
-      
+      // DaxRxAudioStream.parseStatus(remainder.keyValuesArray(), radio: self, queue: _q)
+      // FIXME: < V3 case needed
+      break
+
     case .client:
       // V3 AP
       // format:  <client_handle, > <"connected", > <"client_id", clientId> <"program", program> <"station", station> <"local_ptt", 0/1>
@@ -523,14 +531,21 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 
     case .micAudioStream:
       //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
-      DaxMicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q)
-      
+      // DaxMicAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q)
+      // FIXME: < V3 case needed
+      break
+
     case .mixer:
       _log.msg("Unprocessed \(msgType): \(remainder)", level: .warning, function: #function, file: #file, line: #line)
 
+    case .opusStream where Api.kVersion.isV3:
+      _log.msg("Invalid Status token: \(msgType) for Version \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+
     case .opusStream:
       //     format: <opusId> <key=value> <key=value> ...<key=value>
-      Opus.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q)
+      //      RemoteRxAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q)
+      // FIXME: < V3 case needed
+      break
       
     case .profile:
       //     format: global list=<value>^<value>^...<value>^
@@ -550,31 +565,33 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       xLib6000.Slice.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q, inUse: !remainder.contains(Api.kNotInUse))
       
     case .stream:
-      //     format: <streamId, > <key=value> <key=value> ...<key=value>
-      //     format: <streamId, > <"removed",>
+      //     daxIq          format: <streamId, > <"type"="dax_iq"> <"daxiq_channel"=value> <"pan"=value> <"daxiq_rate"=value> <"client_handle"=value> <"active"="1"|"0">
+      //     daxMicAudio    format: <streamId, > <"type"="dax_mic"> <"client_handle"=value>
+      //     daxRxAudio     format: <streamId, > <"type"="dax_rx"> <"dax_channel"=value> <"slice"=value> <"dax_clients"=value> <"client_handle"=value>
+      //     daxTxAudio     format: <streamId, > <"type"="dax_tx"> <"client_handle"=value> <"dax_tx"=value>
+      //     remoteAudioRx  format: <streamId, > <"type"="remote_audio_rx"> <"compression"="none"|"opus"> <"client_handle"=value> <"ip", ip>
+      //     remoteAudioTx  format: <streamId, > <"type"="remote_audio_tx"> <"compression"="none"|"opus"> <"client_handle"=value> <"ip", ip>
+
+      //     removal        format: <streamId, > <"removed",>
       var keyValues = remainder.keyValuesArray()
       
       // ignore the removed status message
-      if keyValues[1].key == "removed" { return }
+      if keyValues[1].key == Api.kRemoved { return }
       
-      switch keyValues[1].value {
-      case "dax_iq":
-        //     format: <streamId, > <"type"=value> <"dax_channel"=value> <"pan"=value> <"daxiq_rate"=value> <"client_handle"=value> <"active"=1/0>
-        DaxIqStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
-      case "dax_mic":
-        //     format: <streamId, > <"type"=value> <"client_handle"=value>
-        DaxMicAudioStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
-      case "dax_rx":
-        //     format: <streamId, > <"type"=value> <"dax_channel"=value> <"slice"=value> <"dax_clients"=value> <"client_handle"=value>
-        DaxRxAudioStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
-      case "dax_tx":
-        //     format: <streamId, > <"type"=value> <"client_handle"=value> <"dax_tx"=value>
-        DaxTxAudioStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
+      // check for unknown Keys
+      guard let token = StreamV3Token(rawValue: keyValues[1].value) else {
+        // log it and ignore this Key
+        _log.msg("Unknown Stream token: \(keyValues[1].value)", level: .warning, function: #function, file: #file, line: #line)
+        return
+      }
+      switch token {
         
-        // FIXME: ??? remote_audio_rx & remote_audio_tx ???
-        
-      default:
-        fatalError()
+      case .daxIq:          DaxIqStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
+      case .daxMicAudio:    DaxMicAudioStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
+      case .daxRxAudio:     DaxRxAudioStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
+      case .daxTxAudio:     DaxTxAudioStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
+      case .remoteRxAudio:  RemoteRxAudioStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
+      case .remoteTxAudio:  RemoteTxAudioStream.parseStatus( keyValues, radio: self, queue: _q, inUse: !remainder.contains(Api.kRemoved))
       }
       
     case .tnf:
@@ -729,6 +746,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         station = property.value
       }
     }
+    
+    // the GuiClient may exist even though no guiClientHasBeenAdded
+    // notification has been sent due to the arrival of UDP Discovery packets
+    // concurrent with the arrival of TCP client status packets 
+
     // get the GuiClient (if any)
     if let existingClient = findGuiClientByHandle(handle) {
       existingClient.clientId = clientId
@@ -1631,16 +1653,16 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       //         and must be processed by a class method on the Meter object
       Meter.vitaProcessor(vitaPacket)
       
-    case .opus:
-      // Opus
-      if let opus = opusStreams[vitaPacket.streamId] {
+    case .remoteRx:
+      // remoteRxAudioStream
+      if let remoteRxAudioStream = remoteRxAudioStreams[vitaPacket.streamId] {
         
-        if opus.isStreaming == false {
-          opus.isStreaming = true
+        if remoteRxAudioStream.isStreaming == false {
+          remoteRxAudioStream.isStreaming = true
           // log the start of the stream
-          _log.msg("Opus Stream started: Stream Id = \(vitaPacket.streamId.hex)", level: .info, function: #function, file: #file, line: #line)
+          _log.msg("remoteRxAudioStream started: Stream Id = \(vitaPacket.streamId.hex)", level: .info, function: #function, file: #file, line: #line)
         }
-        opus.vitaProcessor( vitaPacket )
+        remoteRxAudioStream.vitaProcessor( vitaPacket )
       }
       
     case .panadapter:
@@ -2087,10 +2109,6 @@ extension Radio {
     get { return _q.sync { _meters } }
     set { _q.sync(flags: .barrier) { _meters = newValue } } }
   
-  public var opusStreams: [OpusId: Opus] {
-    get { return _q.sync { _opusStreams } }
-    set { _q.sync(flags: .barrier) { _opusStreams = newValue } } }
-  
   public var panadapters: [PanadapterId: Panadapter] {
     get { return _q.sync { _panadapters } }
     set { _q.sync(flags: .barrier) { _panadapters = newValue } } }
@@ -2102,6 +2120,14 @@ extension Radio {
   public var replyHandlers: [SequenceId: ReplyTuple] {
     get { return _q.sync { _replyHandlers } }
     set { _q.sync(flags: .barrier) { _replyHandlers = newValue } } }
+  
+  public var remoteRxAudioStreams: [RemoteRxStreamId: RemoteRxAudioStream] {
+    get { return _q.sync { _remoteRxAudioStreams } }
+    set { _q.sync(flags: .barrier) { _remoteRxAudioStreams = newValue } } }
+  
+  public var remoteTxAudioStreams: [RemoteTxStreamId: RemoteTxAudioStream] {
+    get { return _q.sync { _remoteTxAudioStreams } }
+    set { _q.sync(flags: .barrier) { _remoteTxAudioStreams = newValue } } }
   
   public var slices: [SliceId: Slice] {
     get { return _q.sync { _slices } }
@@ -2138,6 +2164,14 @@ extension Radio {
     case duplicateClientId              = "duplicate_client_id"
     case forced
     case wanValidationFailed            = "wan_validation_failed"
+  }
+  internal enum StreamV3Token : String {
+    case daxIq                          = "dax_iq"
+    case daxMicAudio                    = "dax_mic"
+    case daxRxAudio                     = "dax_rx"
+    case daxTxAudio                     = "dax_tx"
+    case remoteRxAudio                  = "remote_audio_rx"
+    case remoteTxAudio                  = "remote_audio_tx"
   }
   /// Types
   ///

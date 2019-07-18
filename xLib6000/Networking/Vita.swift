@@ -640,7 +640,7 @@ extension Vita {
     case meter                              = 0x8002
     case panadapter                         = 0x8003
     case waterfall                          = 0x8004
-    case opus                               = 0x8005
+    case remoteRx                           = 0x8005
     case daxIq24                            = 0x02e3
     case daxIq48                            = 0x02e4
     case daxIq96                            = 0x02e5
@@ -656,8 +656,8 @@ extension Vita {
         return "Panadapter"
       case .waterfall:
         return "Waterfall"
-      case .opus:
-        return "Opus"
+      case .remoteRx:
+        return "RemoteRx"
       case .daxIq24:
         return "DaxIq24"
       case .daxIq48:

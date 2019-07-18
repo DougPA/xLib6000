@@ -1,5 +1,5 @@
 //
-//  Opus.swift
+//  RemoteRxAudioStream.swift
 //  xLib6000
 //
 //  Created by Douglas Adams on 2/9/16.
@@ -8,17 +8,17 @@
 
 import Foundation
 
-public typealias OpusId = StreamId
+public typealias RemoteRxStreamId = StreamId
 
-/// Opus Class implementation
+/// RemoteRxAudioStream Class implementation
 ///
-///      creates an Opus instance to be used by a Client to support the
-///      processing of a stream of Audio to/from the Radio. Opus
-///      objects are added / removed by the incoming TCP messages. Opus
-///      objects periodically receive/send Opus Audio in a UDP stream.
-///      They are collected in the opusStreams collection on the Radio object.
+///      creates an RemoteRxAudioStream instance to be used by a Client to support the
+///      processing of a stream of Audio from the Radio. RemoteRxAudioStream objects
+///      are added / removed by the incoming TCP messages. RemoteRxAudioStream objects
+///      periodically receive Audio in a UDP stream. They are collected in the
+///      RemoteRxAudioStreams collection on the Radio object.
 ///
-public final class Opus                     : NSObject, DynamicModelWithStream {
+public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
   
   // ------------------------------------------------------------------------------
   // MARK: - Static properties
@@ -29,18 +29,15 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   public static let elementSize             = MemoryLayout<Float>.size
   public static let isInterleaved           = true
   public static let application             = 2049
-  public static let rxStreamId              : UInt32 = 0x4a000000
-  public static let txStreamId              : UInt32 = 0x4b000000
   
-  static let kCmd                           = "remote_audio "               // Command prefixes
-  static let kStreamCreateCmd               = "stream create "
-  static let kStreamRemoveCmd               = "stream remove "
+  public static let kOpus                   = "opus"
+  public static let kUncompressed           = "none"
 
   // ------------------------------------------------------------------------------
   // MARK: - Public properties
   
   public var isStreaming                    = false
-  public private(set) var streamId          : OpusId                        // The Opus StreamId
+  public private(set) var streamId          : RemoteRxStreamId              // The RxRemoteAudioStream StreamId
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
@@ -50,9 +47,6 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   private let _q                            : DispatchQueue                 // Q for object synchronization
   private var _initialized                  = false                         // True if initialized by Radio hardware
 
-  private var _clientHandle                 : UInt32 = 0                    //
-  private var _ip                           = ""                            // IP Address of ???
-  private var _port                         = 0                             // port number used by Opus
   private var _vita                         : Vita?                         // a Vita class
   private var _rxPacketCount                = 0                             // Rx total packet count
   private var _rxLostPacketCount            = 0                             // Rx lost packet count
@@ -62,9 +56,9 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
   //
-  private var __rxEnabled                   = false                         // Opus for receive
-  private var __txEnabled                   = false                         // Opus for transmit
-  private var __rxStopped                   = false                         // Rx stream stopped
+  private var __clientHandle                : Handle = 0
+  private var __compression                 = RemoteRxAudioStream.kUncompressed
+  private var __ip                          = ""
   //
   private weak var _delegate                : StreamHandler?                // Delegate for Opus Data Stream
   //
@@ -73,7 +67,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   // ------------------------------------------------------------------------------
   // MARK: - Protocol class methods
   
-  /// Parse an Opus status message
+  /// Parse an RemoteRxAudioStream status message
   ///
   ///   StatusParser Protocol method, executes on the parseQ
   ///
@@ -84,33 +78,37 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   ///   - inUse:              false = "to be deleted"
   ///
   class func parseStatus(_ keyValues: KeyValuesArray, radio: Radio, queue: DispatchQueue, inUse: Bool = true) {
-    // Format:  <streamId, > <"ip", ip> <"port", port> <"opus_rx_stream_stopped", 1|0>  <"rx_on", 1|0> <"tx_on", 1|0>
+    // Format:  <streamId, > <"type", "remote_audio_rx"> <"compression", "none"|"opus"> <"client_handle", handle> <"ip", ip>
     
-    // get the Opus Id (without the "0x" prefix)
-    //        let opusId = String(keyValues[0].key.characters.dropFirst(2))
-    if let streamId =  keyValues[0].key.streamId {
+    // get the Stream Id
+    if let streamId = keyValues[0].key.streamId {
       
-      // does the Opus exist?
-      if  radio.opusStreams[streamId] == nil {
+      // does the Stream exist?
+      if  radio.remoteRxAudioStreams[streamId] == nil {
         
-        // NO, create a new Opus & add it to the OpusStreams collection
-        radio.opusStreams[streamId] = Opus(streamId: streamId, queue: queue)
+        // exit if this stream is not for this client
+        if isForThisClient(handle: keyValues[3].value ) == false { return }
+        
+        // create a new Stream & add it to the collection
+        radio.remoteRxAudioStreams[streamId] = RemoteRxAudioStream(streamId: streamId, queue: queue)
+        
+        Swift.print("streamId = \(radio.remoteRxAudioStreams[streamId]!.streamId.hex)")
       }
-      // pass the key values to Opus for parsing  (dropping the Id)
-      radio.opusStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(1)) )
+      // pass the remaining key values to parsing
+      radio.remoteRxAudioStreams[streamId]!.parseProperties( Array(keyValues.dropFirst(2)) )
     }
   }
 
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
-  /// Initialize Opus
+  /// Initialize RemoteRxAudioStream
   ///
   /// - Parameters:
   ///   - id:                 an Opus Stream id
   ///   - queue:              Concurrent queue
   ///
-  init(streamId: OpusId, queue: DispatchQueue) {
+  init(streamId: RemoteRxStreamId, queue: DispatchQueue) {
     
     self.streamId = streamId
     _q = queue
@@ -119,48 +117,11 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
     
     isStreaming = false
   }
-  
-  // ------------------------------------------------------------------------------
-  // MARK: - Public instance methods
-  
-  /// Send Opus encoded TX audio to the Radio (hardware)
-  ///
-  /// - Parameters:
-  ///   - buffer:             array of encoded audio samples
-  /// - Returns:              success / failure
-  ///
-  public func sendTxAudio(buffer: [UInt8], samples: Int) {
-    
-    if _api.radio?.interlock.state == "TRANSMITTING" {
-    
-      // get an OpusTx Vita
-      if _vita == nil { _vita = Vita(type: .opusTx, streamId: Opus.txStreamId) }
-    
-      // create new array for payload (interleaved L/R samples)
-      _vita!.payloadData = buffer
-      
-      // set the length of the packet
-      _vita!.payloadSize = samples                                              // 8-Bit encoded samples
-      _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size    // payload size + header size
-      
-      // set the sequence number
-      _vita!.sequence = _txSeq
-
-      // encode the Vita class as data and send to radio
-      if let data = Vita.encodeAsData(_vita!) {
-        
-        // send packet to radio
-        _api.sendVitaData(data)
-      }
-      // increment the sequence number (mod 16)
-      _txSeq = (_txSeq + 1) % 16
-    }
-  }
-  
+ 
   // ------------------------------------------------------------------------------
   // MARK: - Protocol instance methods
   
-  ///  Parse Opus key/value pairs
+  ///  Parse RemoteRxAudioStream key/value pairs
   ///
   ///   PropertiesParser Protocol method, executes on the parseQ
   ///
@@ -174,7 +135,7 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
       // check for unknown Keys
       guard let token = Token(rawValue: property.key) else {
         // log it and ignore the Key
-        _log.msg("Unknown Opus token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
+        _log.msg("Unknown RemoteRxAudioStream token: \(property.key) = \(property.value)", level: .warning, function: #function, file: #file, line: #line)
         continue
       }
       // known Keys, in alphabetical order
@@ -182,50 +143,35 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
         
       case .clientHandle:        
         willChangeValue(for: \.clientHandle)
-        _clientHandle = UInt32(String(property.value.dropFirst(2)), radix: 16) ?? 0
+        _clientHandle = property.value.handle ?? 0
         didChangeValue(for: \.clientHandle)
 
-      case .ipAddress:
+      case .compression:
+        willChangeValue(for: \.compression)
+        _compression = property.value.lowercased()
+        didChangeValue(for: \.compression)
+      
+      case .ip:
         willChangeValue(for: \.ip)
-        _ip = property.value.trimmingCharacters(in: CharacterSet.whitespaces)
+        _ip = property.value
         didChangeValue(for: \.ip)
-
-      case .port:
-        willChangeValue(for: \.port)
-        _port = property.value.iValue
-        didChangeValue(for: \.port)
-
-      case .rxEnabled:
-        willChangeValue(for: \.rxEnabled)
-        _rxEnabled = property.value.bValue
-        didChangeValue(for: \.rxEnabled)
-
-      case .txEnabled:
-        willChangeValue(for: \.txEnabled)
-        _txEnabled = property.value.bValue
-        didChangeValue(for: \.txEnabled)
-
-      case .rxStopped:
-        willChangeValue(for: \.rxStopped)
-        _rxStopped = property.value.bValue
-        didChangeValue(for: \.rxStopped)
      }
     }
-    // the Radio (hardware) has acknowledged this Opus
-    if _initialized == false && _ip != "" {
+    // the Radio (hardware) has acknowledged this RxRemoteAudioStream
+    if _initialized == false && _clientHandle != 0 {
       
-      // YES, the Radio (hardware) has acknowledged this Opus
+      // YES, the Radio (hardware) has acknowledged this RxRemoteAudioStream
       _initialized = true
       
       // notify all observers
-      NC.post(.opusRxHasBeenAdded, object: self as Any?)
+      NC.post(.remoteRxAudioStreamHasBeenAdded, object: self as Any?)
     }
   }
-  /// Receive Opus encoded RX audio
+  /// Receive RxRemoteAudioStream audio
   ///
-  ///   VitaProcessor protocol method, executes on the streamQ
+  ///   VitaProcessor protocol method, called by Radio ,executes on the streamQ
   ///       The payload of the incoming Vita struct is converted to an OpusFrame and
-  ///       passed to the Opus Stream Handler where it is decoded, called by Radio
+  ///       passed to the delegate's Stream Handler
   ///
   /// - Parameters:
   ///   - vita:               an Opus Vita struct
@@ -272,41 +218,22 @@ public final class Opus                     : NSObject, DynamicModelWithStream {
   }
 }
 
-extension Opus {
+extension RemoteRxAudioStream {
   
   // ----------------------------------------------------------------------------
   // MARK: - Internal properties
   
-  internal var _rxEnabled: Bool {
-    get { return _q.sync { __rxEnabled } }
-    set { _q.sync(flags: .barrier) { __rxEnabled = newValue } } }
+  internal var _clientHandle: Handle {
+    get { return _q.sync { __clientHandle } }
+    set { _q.sync(flags: .barrier) { __clientHandle = newValue } } }
   
-  internal var _txEnabled: Bool {
-    get { return _q.sync { __txEnabled } }
-    set { _q.sync(flags: .barrier) { __txEnabled = newValue } } }
-  
-  private var _rxStopped: Bool {
-    get { return _q.sync { __rxStopped } }
-    set { _q.sync(flags: .barrier) { __rxStopped = newValue } } }
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Public properties (KVO compliant)
-  
-  @objc dynamic public var clientHandle: UInt32 {
-    get { return _clientHandle }
-    set { if _clientHandle != newValue { _clientHandle = newValue } } }
-  
-  @objc dynamic public var ip: String {
-    get { return _ip }
-    set { if _ip != newValue { _ip = newValue } } }
-
-  @objc dynamic public var port: Int {
-    get { return _port }
-    set { if _port != newValue { _port = newValue } } }
-
-  @objc dynamic public var rxStopped: Bool {
-    get { return _rxStopped }
-    set { if _rxStopped != newValue { _rxStopped = newValue } } }
+  internal var _compression: String {
+    get { return _q.sync { __compression } }
+    set { _q.sync(flags: .barrier) { __compression = newValue } } }
+    
+  internal var _ip: String {
+    get { return _q.sync { __ip } }
+    set { _q.sync(flags: .barrier) { __ip = newValue } } }
   
   // ----------------------------------------------------------------------------
   // MARK: - NON Public properties (KVO compliant)
@@ -314,6 +241,18 @@ extension Opus {
   public var delegate: StreamHandler? {
     get { return _q.sync { _delegate } }
     set { _q.sync(flags: .barrier) { _delegate = newValue } } }
+
+  @objc dynamic public var clientHandle: Handle {
+    get { return _clientHandle  }
+    set { if _clientHandle != newValue { _clientHandle = newValue} } }
+  
+  @objc dynamic public var compression: String {
+    get { return _compression  }
+    set { if _compression != newValue { _compression = newValue} } }
+  
+  @objc dynamic public var ip: String {
+    get { return _ip  }
+    set { if _ip != newValue { _ip = newValue} } }
   
   // ----------------------------------------------------------------------------
   // MARK: - Tokens
@@ -322,11 +261,8 @@ extension Opus {
   ///
   internal enum Token : String {
     case clientHandle         = "client_handle"
-    case ipAddress            = "ip"
-    case port
-    case rxEnabled            = "rx_on"
-    case txEnabled            = "tx_on"
-    case rxStopped            = "opus_rx_stream_stopped"
+    case compression
+    case ip
   }
 }
 

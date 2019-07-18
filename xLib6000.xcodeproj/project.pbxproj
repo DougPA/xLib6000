@@ -20,7 +20,7 @@
 		913EF06320669DA700AF99BE /* Meter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01B20669DA700AF99BE /* Meter.swift */; };
 		913EF06420669DA700AF99BE /* Slice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01C20669DA700AF99BE /* Slice.swift */; };
 		913EF06520669DA700AF99BE /* DaxTxAudioStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01D20669DA700AF99BE /* DaxTxAudioStream.swift */; };
-		913EF06620669DA700AF99BE /* Opus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01E20669DA700AF99BE /* Opus.swift */; };
+		913EF06620669DA700AF99BE /* RemoteRxAudioStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01E20669DA700AF99BE /* RemoteRxAudioStream.swift */; };
 		913EF06720669DA700AF99BE /* Equalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01F20669DA700AF99BE /* Equalizer.swift */; };
 		913EF06820669DA700AF99BE /* DaxRxAudioStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF02020669DA700AF99BE /* DaxRxAudioStream.swift */; };
 		913EF06A20669DA700AF99BE /* xLib6000.h in Headers */ = {isa = PBXBuildFile; fileRef = 913EF02220669DA700AF99BE /* xLib6000.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -53,7 +53,7 @@
 		913EF08620669DA700AF99BE /* MemoryCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04120669DA700AF99BE /* MemoryCommands.swift */; };
 		913EF08720669DA700AF99BE /* XvtrCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04220669DA700AF99BE /* XvtrCommands.swift */; };
 		913EF08820669DA700AF99BE /* InterlockCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04320669DA700AF99BE /* InterlockCommands.swift */; };
-		913EF08920669DA700AF99BE /* OpusCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04420669DA700AF99BE /* OpusCommands.swift */; };
+		913EF08920669DA700AF99BE /* RemoteRxAudioStreamCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04420669DA700AF99BE /* RemoteRxAudioStreamCommands.swift */; };
 		913EF08A20669DA700AF99BE /* PanadapterCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04520669DA700AF99BE /* PanadapterCommands.swift */; };
 		913EF08D20669DA700AF99BE /* Notifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04A20669DA700AF99BE /* Notifications.swift */; };
 		913EF08E20669DA700AF99BE /* FlexErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04B20669DA700AF99BE /* FlexErrors.swift */; };
@@ -73,6 +73,8 @@
 		9148A1D42258E2C500020663 /* BandSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9148A1D32258E2C500020663 /* BandSetting.swift */; };
 		9148A1D62258E9C100020663 /* BandSettingCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9148A1D52258E9C100020663 /* BandSettingCommands.swift */; };
 		9148CEAD21D94AC400306FC0 /* WanServerCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */; };
+		9151821A22DE237D00DAD08E /* RemoteTxAudioStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9151821922DE237C00DAD08E /* RemoteTxAudioStream.swift */; };
+		9151821C22DE458700DAD08E /* RemoteTxAudioStreamCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9151821B22DE458700DAD08E /* RemoteTxAudioStreamCommands.swift */; };
 		91612E41221E4F8D0002C4F9 /* Frames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91612E40221E4F8D0002C4F9 /* Frames.swift */; };
 		9185B087207FD11E004D4C40 /* xLib6000 Overview.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */; };
 		91A0ABF2209769B3008FDB3D /* Commands.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 91A0ABF1209769B2008FDB3D /* Commands.rtf */; };
@@ -95,7 +97,7 @@
 		913EF01B20669DA700AF99BE /* Meter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Meter.swift; sourceTree = "<group>"; };
 		913EF01C20669DA700AF99BE /* Slice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Slice.swift; sourceTree = "<group>"; };
 		913EF01D20669DA700AF99BE /* DaxTxAudioStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DaxTxAudioStream.swift; sourceTree = "<group>"; };
-		913EF01E20669DA700AF99BE /* Opus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Opus.swift; sourceTree = "<group>"; };
+		913EF01E20669DA700AF99BE /* RemoteRxAudioStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteRxAudioStream.swift; sourceTree = "<group>"; };
 		913EF01F20669DA700AF99BE /* Equalizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Equalizer.swift; sourceTree = "<group>"; };
 		913EF02020669DA700AF99BE /* DaxRxAudioStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DaxRxAudioStream.swift; sourceTree = "<group>"; };
 		913EF02120669DA700AF99BE /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -129,7 +131,7 @@
 		913EF04120669DA700AF99BE /* MemoryCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MemoryCommands.swift; sourceTree = "<group>"; };
 		913EF04220669DA700AF99BE /* XvtrCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XvtrCommands.swift; sourceTree = "<group>"; };
 		913EF04320669DA700AF99BE /* InterlockCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterlockCommands.swift; sourceTree = "<group>"; };
-		913EF04420669DA700AF99BE /* OpusCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpusCommands.swift; sourceTree = "<group>"; };
+		913EF04420669DA700AF99BE /* RemoteRxAudioStreamCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteRxAudioStreamCommands.swift; sourceTree = "<group>"; };
 		913EF04520669DA700AF99BE /* PanadapterCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PanadapterCommands.swift; sourceTree = "<group>"; };
 		913EF04A20669DA700AF99BE /* Notifications.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notifications.swift; sourceTree = "<group>"; };
 		913EF04B20669DA700AF99BE /* FlexErrors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlexErrors.swift; sourceTree = "<group>"; };
@@ -149,6 +151,8 @@
 		9148A1D32258E2C500020663 /* BandSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandSetting.swift; sourceTree = "<group>"; };
 		9148A1D52258E9C100020663 /* BandSettingCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandSettingCommands.swift; sourceTree = "<group>"; };
 		9148CEAC21D94AC400306FC0 /* WanServerCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WanServerCommands.swift; sourceTree = "<group>"; };
+		9151821922DE237C00DAD08E /* RemoteTxAudioStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteTxAudioStream.swift; sourceTree = "<group>"; };
+		9151821B22DE458700DAD08E /* RemoteTxAudioStreamCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteTxAudioStreamCommands.swift; sourceTree = "<group>"; };
 		91612E40221E4F8D0002C4F9 /* Frames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Frames.swift; sourceTree = "<group>"; };
 		9185B086207FD11E004D4C40 /* xLib6000 Overview.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "xLib6000 Overview.pdf"; sourceTree = "<group>"; };
 		91A0ABF1209769B2008FDB3D /* Commands.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Commands.rtf; sourceTree = "<group>"; };
@@ -217,9 +221,10 @@
 				913EF01F20669DA700AF99BE /* Equalizer.swift */,
 				913EF01820669DA700AF99BE /* Memory.swift */,
 				913EF01B20669DA700AF99BE /* Meter.swift */,
-				913EF01E20669DA700AF99BE /* Opus.swift */,
 				913EF01520669DA700AF99BE /* Panadapter.swift */,
 				913EF02B20669DA700AF99BE /* Profile.swift */,
+				913EF01E20669DA700AF99BE /* RemoteRxAudioStream.swift */,
+				9151821922DE237C00DAD08E /* RemoteTxAudioStream.swift */,
 				913EF01C20669DA700AF99BE /* Slice.swift */,
 				913EF01420669DA700AF99BE /* Tnf.swift */,
 				913EF01320669DA700AF99BE /* UsbCable.swift */,
@@ -266,10 +271,11 @@
 				913EF04320669DA700AF99BE /* InterlockCommands.swift */,
 				913EF04120669DA700AF99BE /* MemoryCommands.swift */,
 				913EF03C20669DA700AF99BE /* MeterCommands.swift */,
-				913EF04420669DA700AF99BE /* OpusCommands.swift */,
 				913EF04520669DA700AF99BE /* PanadapterCommands.swift */,
 				913EF03220669DA700AF99BE /* ProfileCommands.swift */,
 				913EF03D20669DA700AF99BE /* RadioCommands.swift */,
+				913EF04420669DA700AF99BE /* RemoteRxAudioStreamCommands.swift */,
+				9151821B22DE458700DAD08E /* RemoteTxAudioStreamCommands.swift */,
 				913EF03620669DA700AF99BE /* SliceCommands.swift */,
 				913EF03820669DA700AF99BE /* TnfCommands.swift */,
 				913EF03B20669DA700AF99BE /* TransmitCommands.swift */,
@@ -433,9 +439,11 @@
 				913EF05C20669DA700AF99BE /* Tnf.swift in Sources */,
 				913EF07C20669DA700AF99BE /* DaxRxAudioStreamCommands.swift in Sources */,
 				913EF08020669DA700AF99BE /* TransmitCommands.swift in Sources */,
+				9151821A22DE237D00DAD08E /* RemoteTxAudioStream.swift in Sources */,
 				9148CEAD21D94AC400306FC0 /* WanServerCommands.swift in Sources */,
 				913EF08520669DA700AF99BE /* DaxMicAudioStreamCommands.swift in Sources */,
 				913EF08420669DA700AF99BE /* EqualizerCommands.swift in Sources */,
+				9151821C22DE458700DAD08E /* RemoteTxAudioStreamCommands.swift in Sources */,
 				913EF05E20669DA700AF99BE /* DaxIqStream.swift in Sources */,
 				913EF07F20669DA700AF99BE /* DaxTxAudioStreamCommands.swift in Sources */,
 				913EF08F20669DA700AF99BE /* UdpManager.swift in Sources */,
@@ -470,7 +478,7 @@
 				913EF07720669DA700AF99BE /* ProfileCommands.swift in Sources */,
 				913EF08E20669DA700AF99BE /* FlexErrors.swift in Sources */,
 				913EF06320669DA700AF99BE /* Meter.swift in Sources */,
-				913EF08920669DA700AF99BE /* OpusCommands.swift in Sources */,
+				913EF08920669DA700AF99BE /* RemoteRxAudioStreamCommands.swift in Sources */,
 				913EF08320669DA700AF99BE /* CwxCommands.swift in Sources */,
 				913EF05A20669DA700AF99BE /* Xvtr.swift in Sources */,
 				913EF08120669DA700AF99BE /* MeterCommands.swift in Sources */,
@@ -478,7 +486,7 @@
 				913EF07D20669DA700AF99BE /* TnfCommands.swift in Sources */,
 				913EF05D20669DA700AF99BE /* Panadapter.swift in Sources */,
 				913EF07320669DA700AF99BE /* Cwx.swift in Sources */,
-				913EF06620669DA700AF99BE /* Opus.swift in Sources */,
+				913EF06620669DA700AF99BE /* RemoteRxAudioStream.swift in Sources */,
 				913EF09020669DA700AF99BE /* TcpManager.swift in Sources */,
 				913EF07620669DA700AF99BE /* UsbCableCommands.swift in Sources */,
 				913EF07520669DA700AF99BE /* Atu.swift in Sources */,

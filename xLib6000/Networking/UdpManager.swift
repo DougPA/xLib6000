@@ -279,7 +279,7 @@ final class UdpManager                      : NSObject, GCDAsyncUdpSocketDelegat
             self?._delegate?.udpStreamHandler(vita)
           }
 
-        } else if classCode == Vita.PacketClassCode.opus {
+        } else if classCode == Vita.PacketClassCode.remoteRx {
 
           if let vita = Vita.decodeFrom(data: data) {
 

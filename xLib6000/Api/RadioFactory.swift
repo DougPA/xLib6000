@@ -215,8 +215,6 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
         
         // YES, send the updated array of radio dictionaries to all observers
         NC.post(.radiosAvailable, object: discoveredRadios as Any?)
-        
-        Swift.print("Known: changed")
       }
     }
     // Is it a known radio?
@@ -227,8 +225,6 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
       
       // send the updated array of radio dictionaries to all observers
       NC.post(.radiosAvailable, object: discoveredRadios as Any?)
-
-      Swift.print("Unknown: added")
     }
   }
 }

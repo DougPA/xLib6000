@@ -16,7 +16,7 @@ extension DaxMicAudioStream {
   // ----------------------------------------------------------------------------
   // MARK: - Class methods that send Commands
 
-  /// Create a Mic Audio Stream
+  /// Create a DaxMicAudioStream
   ///
   /// - Parameter callback:   ReplyHandler (optional)
   /// - Returns:              Success / Failure
@@ -39,25 +39,20 @@ extension DaxMicAudioStream {
   // ----------------------------------------------------------------------------
   // MARK: - Instance methods that send Commands
 
-  /// Remove this Mic Audio Stream
+  /// Remove this DaxMicAudioStream
   ///
-  /// - Parameters:
-  ///   - callback:           ReplyHandler (optional)
-  /// - Returns:              Success / Failure
+  /// - Parameter callback:   ReplyHandler (optional)
+  /// - Returns:              success / failure
   ///
   public func remove(callback: ReplyHandler? = nil) -> Bool {
     
+    // notify all observers
+    NC.post(.daxMicAudioStreamWillBeRemoved, object: self as Any?)
+    
+    // remove the stream
+    Api.sharedInstance.radio?.daxMicAudioStreams[streamId] = nil
+    
     // tell the Radio to remove this Stream
-    if Api.sharedInstance.sendWithCheck("stream remove \(streamId.hex)", replyTo: callback) {
-      
-      // notify all observers
-      NC.post(.daxMicAudioStreamWillBeRemoved, object: self as Any?)
-      
-      // remove the stream object
-      Api.sharedInstance.radio?.daxMicAudioStreams[streamId] = nil
-      
-      return true
-    }
-    return false
+    return Api.sharedInstance.sendWithCheck("stream remove \(streamId.hex)", replyTo: callback)
   }
 }
