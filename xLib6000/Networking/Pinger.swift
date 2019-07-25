@@ -24,9 +24,6 @@ final class Pinger {
   private var _lastPingRxTime               : Date!                         // Time of the last ping response
   private var _pingFirstResponse            = true
   
-  private let kKeepAlive                    = "keepalive enable"
-  private let kPing                         = "ping"
-
   // ----------------------------------------------------------------------------
   // MARK: - Initialization
   
@@ -74,7 +71,7 @@ final class Pinger {
   private func startPingTimer() {
     
     // tell the Radio to expect pings
-    Api.sharedInstance.send(kKeepAlive)
+    Api.sharedInstance.send("keepalive enable")
     
     // fake the first response
     _lastPingRxTime = Date(timeIntervalSinceNow: 0)
@@ -106,7 +103,7 @@ final class Pinger {
       } else {
         
         // NO, send another Ping
-        Api.sharedInstance.send(self.kPing, replyTo: self.pingReply)
+        Api.sharedInstance.send("ping", replyTo: self.pingReply)
       }
     }
     

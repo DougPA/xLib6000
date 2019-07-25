@@ -19,10 +19,6 @@ public final class Transmit                 : NSObject, StaticModel {
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let kTuneCmd                       = "transmit "                   // command prefixes
-  static let kSetCmd                        = "transmit set "
-  static let kCwCmd                         = "cw "
-  static let kMicCmd                        = "mic "
   static let kMinPitch                      = 100
   static let kMaxPitch                      = 6_000
   static let kMinWpm                        = 5

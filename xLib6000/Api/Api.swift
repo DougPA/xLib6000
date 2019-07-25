@@ -17,7 +17,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("2.5.1.2019_07_??")
+  public static let kVersion                = Version("2.5.1.2019_07_25")
   public static let kName                   = "xLib6000"
 
   public static let kDomainName             = "net.k3tzr"
@@ -425,37 +425,25 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         switch command {
 
         case .setMtu where radioVersion.major == 2 && radioVersion.minor >= 3:  array.append( (command.rawValue, false, nil) )
-        case .setMtu:                                 break
-
-        case .clientProgram:                          if isGui { array.append( (command.rawValue + clientProgram, false, nil) ) }
-
-        case .clientStation where Api.kVersion.isV3:  if isGui { array.append( (command.rawValue + clientStation, false, nil) ) }
-        case .clientStation:                          break
-
-          // case .clientLowBW:  if _lowBW { array.append( (command.rawValue, false, nil) ) }
-
-        // Capture the replies from the following
-        case .meterList:    array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-        case .info:         array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-        case .version:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-        case .antList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-        case .micList:      array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
-
-        case .clientGui where Api.kVersion.isV3 && clientId != nil:    if isGui { array.append( (command.rawValue + " " + (clientId!.uuidString), false, nil) ) }
-        case .clientGui where Api.kVersion.isV3:                        if isGui { array.append( (command.rawValue, false, delegate?.defaultReplyHandler) ) }
-        case .clientGui:                                                if isGui { array.append( (command.rawValue, false, nil) ) }
-
-//        case .clientBind where Api.kVersion.isV3 && _isGui == false:    if !_isGui && _clientId != nil { array.append( (command.rawValue + " client_id=" + _clientId!.uuidString, false, nil) ) }
-        case .clientBind:                             break
-          
-        case .subClient where Api.kVersion.isV3:      array.append( (command.rawValue, false, nil) )
-        case .subClient:                              break
-          
-        // ignore the following
-        case .none, .allPrimary, .allSecondary, .allSubscription:   break
-
-        // all others
-        default:    array.append( (command.rawValue, false, nil) )
+        case .setMtu:                                                           break
+        case .clientProgram:                                                    array.append( (command.rawValue + clientProgram, false, nil) )
+        case .clientStation where Api.kVersion.isV3 && isGui:                   array.append( (command.rawValue + clientStation, false, nil) )
+        case .clientStation:                                                    break
+        case .clientLowBW where lowBW:                                          array.append( (command.rawValue, false, nil) )
+        case .meterList:                                                        array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
+        case .info:                                                             array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
+        case .version:                                                          array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
+        case .antList:                                                          array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
+        case .micList:                                                          array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
+        case .clientGui where Api.kVersion.isV3 && isGui && clientId != nil:    array.append( (command.rawValue + " " + (clientId!.uuidString), false, nil) )
+        case .clientGui where Api.kVersion.isV3 && isGui:                       array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
+        case .clientGui where isGui:                                            array.append( (command.rawValue, false, nil) )
+        case .clientBind where Api.kVersion.isV3 && !isGui && clientId != nil:  array.append( (command.rawValue + " client_id=" + clientId!.uuidString, false, nil) )
+        case .clientBind:                                                       break
+        case .subClient where Api.kVersion.isV3:                                array.append( (command.rawValue, false, nil) )
+        case .subClient:                                                        break
+        case .none, .allPrimary, .allSecondary, .allSubscription:               break
+        default:                                                                array.append( (command.rawValue, false, nil) )
         }
       }
     }
@@ -699,7 +687,7 @@ extension Api {
     case clientDisconnect                   = "client disconnect"
     case clientGui                          = "client gui"
     case clientProgram                      = "client program "
-//    case clientLowBW                        = "client low_bw_connect"
+    case clientLowBW                        = "client low_bw_connect"
     case clientStation                      = "client station "
     case eqRx                               = "eq rxsc info"
     case eqTx                               = "eq txsc info"
@@ -712,6 +700,7 @@ extension Api {
     case profileTx                          = "profile tx info"
     case setMtu                             = "client set enforce_network_mtu=1 network_mtu=1500"
     case setReducedDaxBw                    = "client set send_reduced_bw_dax=1"
+    case sliceList                          = "slice list"
     case subAmplifier                       = "sub amplifier all"
     case subAudioStream                     = "sub audio_stream all"
     case subAtu                             = "sub atu all"

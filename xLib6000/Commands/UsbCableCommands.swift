@@ -27,7 +27,7 @@ extension UsbCable {
   public func remove(callback: ReplyHandler? = nil) -> Bool {
     
     // tell the Radio to remove a USB Cable
-    return Api.sharedInstance.sendWithCheck(UsbCable.kCmd + "remove" + " \(id)")
+    return Api.sharedInstance.sendWithCheck("usb_cable remove" + " \(id)")
   }
 
   // ----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ extension UsbCable {
   ///
   private func usbCableCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(UsbCable.kSetCmd + "\(id) " + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("usb_cable set \(id) " + token.rawValue + "=\(value)")
   }
   
   // ----------------------------------------------------------------------------

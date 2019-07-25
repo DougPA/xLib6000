@@ -25,7 +25,7 @@ extension Tnf {
   public class func create(frequency: String, callback: ReplyHandler? = nil) {
     
     // tell the Radio to create a Tnf
-    Api.sharedInstance.send(Tnf.kCreateCmd + "freq" + "=\(frequency)", replyTo: callback)
+    Api.sharedInstance.send("tnf create freq" + "=\(frequency)", replyTo: callback)
   }
   
   // ----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ extension Tnf {
   public func remove(callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove the Tnf
-    Api.sharedInstance.send(Tnf.kRemoveCmd + " \(id)", replyTo: callback)
+    Api.sharedInstance.send("tnf remove  \(id)", replyTo: callback)
     
     // notify all observers
     NC.post(.tnfWillBeRemoved, object: self as Any?)
@@ -60,7 +60,7 @@ extension Tnf {
   ///
   private func tnfCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Tnf.kSetCmd + "\(id) " + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("tnf set \(id) " + token.rawValue + "=\(value)")
   }
   
   // ----------------------------------------------------------------------------

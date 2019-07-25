@@ -28,6 +28,6 @@ extension WanServer {
   public class func smartlinkConfigure(tcpPort: Int, udpPort: Int, callback: ReplyHandler? = nil) {
     
     // set the Radio's SmartLink port usage
-    Api.sharedInstance.send(WanServer.kSetCmd + "public_tls_port" + "=\(tcpPort)" + " public_udp_port" + "=\(udpPort)", replyTo: callback)
+    Api.sharedInstance.send("wan set public_tls_port" + "=\(tcpPort)" + " public_udp_port" + "=\(udpPort)", replyTo: callback)
   }
 }

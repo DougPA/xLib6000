@@ -16,56 +16,14 @@ extension BandSetting {
   // ----------------------------------------------------------------------------
   // MARK: - Class methods that send Commands
   
-//  /// Create an Amplifier record
-//  ///
-//  /// - Parameters:
-//  ///   - ip:             Ip Address (dotted-decimal STring)
-//  ///   - port:           Port number
-//  ///   - model:          Model
-//  ///   - serialNumber:   Serial number
-//  ///   - antennaPairs:   antenna pairs
-//  ///   - callback:       ReplyHandler (optional)
-//  ///
-//  public class func create(ip: String, port: Int, model: String, serialNumber: String, antennaPairs: String, callback: ReplyHandler? = nil) {
-//
-//    // TODO: add code
-//  }
   
   // ----------------------------------------------------------------------------
   // MARK: - Instance methods that send Commands
   
-  /// Remove a BandSetting
-  ///
-  /// - Parameter callback:   ReplyHandler (optional)
-  ///
-  public func remove(callback: ReplyHandler? = nil) {
-    
-    // TODO: add code
-  }
-//  /// Change the Amplifier Mode
-//  ///
-//  /// - Parameters:
-//  ///   - mode:           mode (String)
-//  ///   - callback:       ReplyHandler (optional)
-//  ///
-//  public func setMode(_ mode: Bool, callback: ReplyHandler? = nil) {
-//
-//    // TODO: add code
-//  }
   
   // ----------------------------------------------------------------------------
   // MARK: - Private methods - Command helper methods
   
-//  /// Set an Amplifier property on the Radio
-//  ///
-//  /// - Parameters:
-//  ///   - token:      the parse token
-//  ///   - value:      the new value
-//  ///
-//  private func amplifierCmd(_ token: Token, _ value: Any) {
-//
-//    Api.sharedInstance.send(Amplifier.kSetCmd + "\(id) " + token.rawValue + "=\(value)")
-//  }
   
   // ----------------------------------------------------------------------------
   // MARK: - Properties (KVO compliant) that send Commands

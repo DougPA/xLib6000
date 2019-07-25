@@ -1,9 +1,13 @@
 xLib6000 V3 Change Log
 
-v2.5.1.2019_07_??
+v2.5.1.2019_07_25
 
 AppExtensions.swift - refactored isForThisClient(_:) to parse properties looking for the client handle
 All Streams - modified to use changed isForThisClient(_:)
+RadioFactory.swift - changed == for DiscoveredRadio to include model
+Various - removed static command definitions, replaced with literal strings
+Vita.swift - removed GuiClient class
+GuiClient.swift - added
 
 
 

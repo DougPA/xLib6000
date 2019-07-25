@@ -23,7 +23,7 @@ extension Atu {
   public func atuClear(callback: ReplyHandler? = nil) {
     
     // tell the Radio to clear the ATU
-    Api.sharedInstance.send(Atu.kClearCmd, replyTo: callback)
+    Api.sharedInstance.send("atu clear" , replyTo: callback)
   }
   /// Start the ATU
   ///
@@ -32,7 +32,7 @@ extension Atu {
   public func atuStart(callback: ReplyHandler? = nil) {
     
     // tell the Radio to start the ATU
-    Api.sharedInstance.send(Atu.kStartCmd, replyTo: callback)
+    Api.sharedInstance.send("atu start", replyTo: callback)
   }
   /// Bypass the ATU
   ///
@@ -41,7 +41,7 @@ extension Atu {
   public func atuBypass(callback: ReplyHandler? = nil) {
     
     // tell the Radio to bypass the ATU
-    Api.sharedInstance.send(Atu.kBypassCmd, replyTo: callback)
+    Api.sharedInstance.send("atu bypass", replyTo: callback)
   }
   
   // ----------------------------------------------------------------------------
@@ -55,7 +55,7 @@ extension Atu {
   ///
   private func atuCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Atu.kCmd + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("atu " + token.rawValue + "=\(value)")
   }
   
   // ----------------------------------------------------------------------------

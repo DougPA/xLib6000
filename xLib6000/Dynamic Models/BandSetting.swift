@@ -99,7 +99,7 @@ public final class BandSetting                : NSObject, DynamicModel {
   /// Initialize a BandSetting
   ///
   /// - Parameters:
-  ///   - id:                 an Xvtr Id
+  ///   - id:                 an Band Id
   ///   - queue:              Concurrent queue
   ///
   public init(id: BandId, queue: DispatchQueue) {
@@ -253,7 +253,7 @@ extension BandSetting {
   // ----------------------------------------------------------------------------
   // MARK: - Tokens
   
-  /// Properties acc_txreq_enable
+  /// BandSetting Properties
   ///
   internal enum Token : String {
     case accTxEnabled                       = "acc_tx_enabled"

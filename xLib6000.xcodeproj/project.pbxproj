@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		910A95A722E75C8E0055B180 /* GuiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 910A95A622E75C8E0055B180 /* GuiClient.swift */; };
 		913ECFE9226F543000804D69 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913ECFE8226F543000804D69 /* Log.swift */; };
 		913EF05A20669DA700AF99BE /* Xvtr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01220669DA700AF99BE /* Xvtr.swift */; };
 		913EF05B20669DA700AF99BE /* UsbCable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF01320669DA700AF99BE /* UsbCable.swift */; };
@@ -83,6 +84,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		910A95A622E75C8E0055B180 /* GuiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuiClient.swift; sourceTree = "<group>"; };
 		913ECFE8226F543000804D69 /* Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		913EF00620669D6400AF99BE /* xLib6000.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = xLib6000.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		913EF01220669DA700AF99BE /* Xvtr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Xvtr.swift; sourceTree = "<group>"; };
@@ -316,6 +318,7 @@
 			children = (
 				913EF05420669DA700AF99BE /* Api.swift */,
 				913EF05320669DA700AF99BE /* RadioFactory.swift */,
+				910A95A622E75C8E0055B180 /* GuiClient.swift */,
 			);
 			path = Api;
 			sourceTree = "<group>";
@@ -473,6 +476,7 @@
 				913EF08720669DA700AF99BE /* XvtrCommands.swift in Sources */,
 				913EF05B20669DA700AF99BE /* UsbCable.swift in Sources */,
 				913EF08820669DA700AF99BE /* InterlockCommands.swift in Sources */,
+				910A95A722E75C8E0055B180 /* GuiClient.swift in Sources */,
 				913EF09320669DA700AF99BE /* WanServer.swift in Sources */,
 				913EF07A20669DA700AF99BE /* AmplifierCommands.swift in Sources */,
 				913EF07720669DA700AF99BE /* ProfileCommands.swift in Sources */,

@@ -199,7 +199,7 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
     // parse the packet to obtain a RadioParameters (updates the timestamp)
     guard let discoveredRadio = Vita.parseDiscovery(vita) else { return }
     
-    // is it already in the availableRadios array? ( == compares serialNumbers )
+    // is it already in the availableRadios array?
     for (i, radio) in discoveredRadios.enumerated() where radio == discoveredRadio {
       
       let previousStatus = discoveredRadios[i].status
@@ -299,7 +299,7 @@ public class DiscoveredRadio : Equatable {
   ///   - rhs:            Another value to compare.
   ///
   public static func ==(lhs: DiscoveredRadio, rhs: DiscoveredRadio) -> Bool {
-    return lhs.serialNumber == rhs.serialNumber
+    return lhs.serialNumber == rhs.serialNumber && lhs.model == rhs.model
   }
 }
 

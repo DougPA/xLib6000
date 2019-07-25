@@ -35,6 +35,6 @@ extension Meter {
   public class func listRequest(callback: ReplyHandler? = nil) {
     
     // ask the Radio for a list of Meters
-    Api.sharedInstance.send(Api.Command.meterList.rawValue, replyTo: callback)
+    Api.sharedInstance.send("meter list", replyTo: callback)
   }
 }

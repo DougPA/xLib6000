@@ -16,19 +16,6 @@ import Foundation
 public final class Radio                    : NSObject, StaticModel, ApiDelegate {
 
   // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kApfCmd                        = "eq apf "                     // Text of command messages
-  static let kClientCmd                     = "client "                     // (V3 only)
-  static let kClientSetCmd                  = "client set "                 // (V3 only)
-  static let kCmd                           = "radio "
-  static let kSetCmd                        = "radio set "
-  static let kMixerCmd                      = "mixer "
-  static let kUptimeCmd                     = "radio uptime"
-  static let kLicenseCmd                    = "license "
-  static let kXmitCmd                       = "xmit "
-
-  // ----------------------------------------------------------------------------
   // MARK: - Public properties (Read Only)
   
   public private(set) var uptime            = 0
@@ -1551,11 +1538,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       // save the list
       micList = reply.valuesArray(  delimiter: "," )
       
-    case xLib6000.Slice.kListCmd:
+    case Api.Command.sliceList.rawValue:
       // save the list
       sliceList = reply.valuesArray()
       
-    case Radio.kUptimeCmd:
+    case "radio uptime":
       // save the returned Uptime (seconds)
       uptime = Int(reply) ?? 0
       
@@ -1577,7 +1564,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       
     default:
       
-      if command.hasPrefix(Panadapter.kCmd + "create") {
+      if command.hasPrefix("dispaly pan create") {
         // ignore, Panadapter & Waterfall will be created when Status reply is seen
         break
         
@@ -1614,7 +1601,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
 //        // TODO: add code
 //        break
 //
-      } else if command.hasPrefix(xLib6000.Slice.kCmd + "get_error"){
+      } else if command.hasPrefix("slice get_error"){
         // save the errors, format: <rx_error_value>,<tx_error_value>
         sliceErrors = reply.valuesArray( delimiter: "," )
       }

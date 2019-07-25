@@ -15,11 +15,6 @@ import Foundation
 ///      updated by the incoming TCP messages.
 ///
 public final class Interlock                : NSObject, StaticModel {
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kCmd                           = "interlock "
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties

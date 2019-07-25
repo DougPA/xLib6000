@@ -20,13 +20,6 @@ public typealias TnfId = String
 public final class Tnf                      : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kCreateCmd                     = "tnf create "                 // Command prefixes
-  static let kRemoveCmd                     = "tnf remove "
-  static let kSetCmd                        = "tnf set "
-  
-  // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   public private(set) var id                : TnfId                         // Id that uniquely identifies this Tnf

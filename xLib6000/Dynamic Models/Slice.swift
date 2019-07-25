@@ -22,15 +22,6 @@ public final class Slice                    : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let kCreateCmd                     = "slice create "               // Command prefixes
-  static let kRemoveCmd                     = "slice remove "
-  static let kCmd                           = "slice "
-  static let kSetCmd                        = "slice set "
-  static let kTuneCmd                       = "slice tune "
-  static let kAudioCmd                      = "audio client 0 slice "
-  static let kFilterCmd                     = "filt "
-  static let kListCmd                       = "slice list"
-  
   static let kMinOffset                     = -99_999                       // frequency offset range
   static let kMaxOffset                     = 99_999
   
@@ -39,7 +30,7 @@ public final class Slice                    : NSObject, DynamicModel {
   
   public private(set) var id                : SliceId = ""                  // Id that uniquely identifies this Slice
   @objc dynamic public var agcNames         = AgcMode.names()               // Names of AGC modes
-  @objc dynamic public let daxChoices       = Api.kDaxChannels               // Names of DAX channels
+  @objc dynamic public let daxChoices       = Api.kDaxChannels              // Names of DAX channels
 
   // ----------------------------------------------------------------------------
   // MARK: - Private properties

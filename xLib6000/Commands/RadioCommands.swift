@@ -23,7 +23,7 @@ extension Radio {
   public func antennaListRequest(callback: ReplyHandler? = nil) {
     
     // ask the Radio to send a list of antennas
-    Api.sharedInstance.send(Api.Command.antList.rawValue, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+    Api.sharedInstance.send("ant list", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
   }
   /// Identify a low Bandwidth connection
   ///
@@ -32,7 +32,7 @@ extension Radio {
   public func clientLowBandwidthConnect(callback: ReplyHandler? = nil) {
     
     // tell the Radio to limit the connection bandwidth
-   Api.sharedInstance.send(Api.Command.clientProgram.rawValue + "low_bw_connect", replyTo: callback)
+   Api.sharedInstance.send("client program low_bw_connect", replyTo: callback)
   }
   /// Turn off persistence
   ///
@@ -41,7 +41,7 @@ extension Radio {
   public func clientPersistenceOff(callback: ReplyHandler? = nil) {
     
     // tell the Radio to turn off persistence
-   Api.sharedInstance.send(Api.Command.clientProgram.rawValue + "start_persistence off", replyTo: callback)
+   Api.sharedInstance.send("client program start_persistence off", replyTo: callback)
   }
   /// Key CW
   ///
@@ -52,7 +52,7 @@ extension Radio {
   public func cwKeyImmediate(state: Bool, callback: ReplyHandler? = nil) {
     
     // tell the Radio to change the keydown state
-   Api.sharedInstance.send(Transmit.kCwCmd + "key immediate" + " \(state.as1or0)", replyTo: callback)
+   Api.sharedInstance.send("cw key immediate" + " \(state.as1or0)", replyTo: callback)
   }
   
   /// Refresh the Radio License
@@ -63,7 +63,7 @@ extension Radio {
   public func refreshLicense(callback: ReplyHandler? = nil) {
     
     // ask the Radio for its license info
-    return Api.sharedInstance.send(Radio.kLicenseCmd + "refresh", replyTo: callback)
+    return Api.sharedInstance.send("license refresh", replyTo: callback)
   }
   /// Set Static Network properties on the Radio
   ///
@@ -71,7 +71,7 @@ extension Radio {
   ///
   public func staticNetParamsSet(callback: ReplyHandler? = nil) {
     
-    Api.sharedInstance.send(Radio.kCmd + "static_net_params" + " " + RadioStaticNet.ip.rawValue + "=\(staticIp) " + RadioStaticNet.gateway.rawValue + "=\(staticGateway) " + RadioStaticNet.netmask.rawValue + "=\(staticNetmask)")
+    Api.sharedInstance.send("radio static_net_params" + " " + RadioStaticNet.ip.rawValue + "=\(staticIp) " + RadioStaticNet.gateway.rawValue + "=\(staticGateway) " + RadioStaticNet.netmask.rawValue + "=\(staticNetmask)")
   }
   /// Reset the Static Net Params
   ///
@@ -80,7 +80,7 @@ extension Radio {
   public func staticNetParamsReset(callback: ReplyHandler? = nil) {
     
     // tell the Radio to reset the Static Net Params
-   Api.sharedInstance.send(Radio.kCmd + "static_net_params" + " reset", replyTo: callback)
+   Api.sharedInstance.send("radio static_net_params" + " reset", replyTo: callback)
   }
   /// Reboot the Radio
   ///
@@ -89,14 +89,14 @@ extension Radio {
   public func rebootRequest(callback: ReplyHandler? = nil) {
     
     // tell the Radio to reboot
-   Api.sharedInstance.send(Radio.kCmd + "reboot", replyTo: callback)
+   Api.sharedInstance.send("radio reboot", replyTo: callback)
   }
   /// Request the elapsed uptime
   ///
   public func uptimeRequest(callback: ReplyHandler? = nil) {
     
     // ask the Radio for the elapsed uptime
-   Api.sharedInstance.send(Radio.kUptimeCmd, replyTo: callback == nil ? defaultReplyHandler : callback)
+   Api.sharedInstance.send("radio uptime", replyTo: callback == nil ? defaultReplyHandler : callback)
   }
   
   // ----------------------------------------------------------------------------
@@ -110,7 +110,7 @@ extension Radio {
   ///
   private func apfCmd( _ token: EqApfToken, _ value: Any) {
     
-   Api.sharedInstance.send(Radio.kApfCmd + token.rawValue + "=\(value)")
+   Api.sharedInstance.send("eq apf " + token.rawValue + "=\(value)")
   }
   /// Set a Client property on the Radio
   ///
@@ -120,7 +120,7 @@ extension Radio {
   ///
   private func clientCmd( _ token: ClientTokenV3Connection, _ value: Any) {
     
-    Api.sharedInstance.send(Radio.kClientCmd + token.rawValue + " \(value)")
+    Api.sharedInstance.send("client " + token.rawValue + " \(value)")
   }
   /// Set a Client property on the Radio
   ///
@@ -130,7 +130,7 @@ extension Radio {
   ///
   private func clientSetCmd( _ token: ClientTokenV3Connection, _ value: Any) {
     
-    Api.sharedInstance.send(Radio.kClientSetCmd + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("client set " + token.rawValue + "=\(value)")
   }
   /// Set a Mixer property on the Radio
   ///
@@ -142,7 +142,7 @@ extension Radio {
     // NOTE: commands use this format when the Token received does not match the Token sent
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
 
-   Api.sharedInstance.send(Radio.kMixerCmd + token + " \(value)")
+   Api.sharedInstance.send("mixer " + token + " \(value)")
   }
   /// Set a Radio property on the Radio
   ///
@@ -152,13 +152,13 @@ extension Radio {
   ///
   private func radioSetCmd( _ token: RadioToken, _ value: Any) {
     
-   Api.sharedInstance.send(Radio.kSetCmd + token.rawValue + "=\(value)")
+   Api.sharedInstance.send("radio set " + token.rawValue + "=\(value)")
   }
   private func radioSetCmd( _ token: String, _ value: Any) {
     // NOTE: commands use this format when the Token received does not match the Token sent
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
 
-    Api.sharedInstance.send(Radio.kSetCmd + token + "=\(value)")
+    Api.sharedInstance.send("radio set " + token + "=\(value)")
   }
   /// Set a Radio property on the Radio
   ///
@@ -168,12 +168,12 @@ extension Radio {
   ///
   private func radioCmd( _ token: RadioToken, _ value: Any) {
     
-   Api.sharedInstance.send(Radio.kCmd + token.rawValue + " \(value)")
+   Api.sharedInstance.send("radio " + token.rawValue + " \(value)")
   }
   private func radioCmd( _ token: String, _ value: Any) {
     // NOTE: commands use this format when the Token received does not match the Token sent
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    Api.sharedInstance.send(Radio.kCmd + token + " \(value)")
+    Api.sharedInstance.send("radio " + token + " \(value)")
   }
   /// Set a Radio Filter property on the Radio
   ///
@@ -183,7 +183,7 @@ extension Radio {
   ///
   private func radioFilterCmd( _ token1: RadioFilterSharpness,  _ token2: RadioFilterSharpness, _ value: Any) {
     
-   Api.sharedInstance.send(Radio.kCmd + "filter_sharpness" + " " + token1.rawValue + " " + token2.rawValue + "=\(value)")
+   Api.sharedInstance.send("radio filter_sharpness" + " " + token1.rawValue + " " + token2.rawValue + "=\(value)")
   }
   /// Set Xmit on the Radio
   ///
@@ -193,7 +193,7 @@ extension Radio {
   ///
   private func xmitCmd(_ value: Any) {
     
-    Api.sharedInstance.send(Radio.kXmitCmd + "\(value)")
+    Api.sharedInstance.send("xmit \(value)")
   }
 
   // ----------------------------------------------------------------------------

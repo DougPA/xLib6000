@@ -20,14 +20,6 @@ public typealias MemoryId = String
 public final class Memory                   : NSObject, DynamicModel {
   
   // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kCreateCmd                     = "memory create"               // Command prefixes
-  static let kRemoveCmd                     = "memory remove "
-  static let kSetCmd                        = "memory set "
-  static let kApplyCmd                      = "memory apply "
-  
-  // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   public private(set) var id                : MemoryId                      // Id that uniquely identifies this Memory

@@ -26,7 +26,7 @@ extension Equalizer {
   public class func equalizerInfo(_ eqType: String, callback:  ReplyHandler? = nil) -> Bool {
     
     // ask the Radio for the selected Equalizer settings
-    return Api.sharedInstance.sendWithCheck(Equalizer.kCmd + eqType + " info", replyTo: callback)
+    return Api.sharedInstance.sendWithCheck("eq " + eqType + " info", replyTo: callback)
   }
 
   // ----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ extension Equalizer {
   ///
   private func eqCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Equalizer.kCmd + id + " " + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("eq " + id + " " + token.rawValue + "=\(value)")
   }
   /// Set an Equalizer property on the Radio
   ///
@@ -51,7 +51,7 @@ extension Equalizer {
   private func eqCmd( _ token: String, _ value: Any) {
     // NOTE: commands use this format when the Token received does not match the Token sent
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    Api.sharedInstance.send(Equalizer.kCmd + id + " " + token + "=\(value)")
+    Api.sharedInstance.send("eq " + id + " " + token + "=\(value)")
   }
 
   // ----------------------------------------------------------------------------

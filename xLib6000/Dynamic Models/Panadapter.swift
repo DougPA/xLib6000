@@ -25,10 +25,6 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
   // MARK: - Static properties
   
   static let kMaxBins                       = 5120
-  static let kCreateCmd                     = "display pan create"          // Command prefixes
-  static let kRemoveCmd                     = "display pan remove "
-  static let kCmd                           = "display pan "
-  static let kSetCmd                        = "display panafall set "
   
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

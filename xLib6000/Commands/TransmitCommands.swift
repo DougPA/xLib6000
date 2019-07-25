@@ -24,7 +24,7 @@ extension Transmit {
   ///
   private func tuneCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Transmit.kTuneCmd + token.rawValue + " \(value)")
+    Api.sharedInstance.send("transmit " + token.rawValue + " \(value)")
   }
   /// Set a Transmit property on the Radio
   ///
@@ -34,7 +34,7 @@ extension Transmit {
   ///
   private func transmitCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Transmit.kSetCmd + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("transmit set " + token.rawValue + "=\(value)")
   }
   /// Set a Transmit property on the Radio
   ///
@@ -45,7 +45,7 @@ extension Transmit {
   private func transmitCmd(_ token: String, _ value: Any) {
     // NOTE: commands use this format when the Token received does not match the Token sent
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    Api.sharedInstance.send(Transmit.kSetCmd + token + "=\(value)")
+    Api.sharedInstance.send("transmit set " + token + "=\(value)")
   }
   /// Set a CW property on the Radio
   ///
@@ -55,12 +55,12 @@ extension Transmit {
   ///
   private func cwCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Transmit.kCwCmd + token.rawValue + " \(value)")
+    Api.sharedInstance.send("cw " + token.rawValue + " \(value)")
   }
   // alternate form for commands that do not use the Token raw value in outgoing messages
   private func cwCmd(_ token: String, _ value: Any) {
     
-    Api.sharedInstance.send(Transmit.kCwCmd + token + " \(value)")
+    Api.sharedInstance.send("cw " + token + " \(value)")
   }
   /// Set a MIC property on the Radio
   ///
@@ -70,12 +70,12 @@ extension Transmit {
   ///
   private func micCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Transmit.kMicCmd + token.rawValue + " \(value)")
+    Api.sharedInstance.send("mic " + token.rawValue + " \(value)")
   }
   // alternate form for commands that do not use the Token raw value in outgoing messages
   private func micCmd(_ token: String, _ value: Any) {
     
-    Api.sharedInstance.send(Transmit.kMicCmd + token + " \(value)")
+    Api.sharedInstance.send("mic " + token + " \(value)")
   }
   
   // ----------------------------------------------------------------------------

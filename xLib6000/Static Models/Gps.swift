@@ -55,7 +55,7 @@ public final class Gps                      : NSObject, StaticModel {
   public class func gpsInstall(callback: ReplyHandler? = nil) {
     
     // tell the Radio to install the GPS device
-    Api.sharedInstance.send(kGpsCmd + "install", replyTo: callback)
+    Api.sharedInstance.send("radio gps install", replyTo: callback)
   }
   /// Gps Un-Install
   ///
@@ -65,7 +65,7 @@ public final class Gps                      : NSObject, StaticModel {
   public class func gpsUnInstall(callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove the GPS device
-    Api.sharedInstance.send(kGpsCmd + "uninstall", replyTo: callback)
+    Api.sharedInstance.send("radio gps uninstall", replyTo: callback)
   }
 
   // ------------------------------------------------------------------------------

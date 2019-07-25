@@ -21,13 +21,6 @@ public typealias ProfileName                 = String
 public final class Profile                  : NSObject, StaticModel {
 
   // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  public static let kGlobal                 = "global"
-  public static let kMic                    = "mic"
-  public static let kTx                     = "tx"
-
-  // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   public private(set) var id                : ProfileId!

@@ -33,7 +33,7 @@ extension DaxMicAudioStream {
   public class func listRequest(callback: ReplyHandler? = nil) {
     
     // ask the Radio for a list of Mic Sources
-    Api.sharedInstance.send(Api.Command.micList.rawValue, replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+    Api.sharedInstance.send("mic list", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
   }
 
   // ----------------------------------------------------------------------------

@@ -13,10 +13,6 @@ import Foundation
 
 extension Xvtr {
   
-  static let kCreateCmd                     = "xvtr create"                 // Command prefixes
-  static let kRemoveCmd                     = "xvtr remove "
-  static let kSetCmd                        = "xvtr set "
-  
   // ----------------------------------------------------------------------------
   // MARK: - Class methods that send Commands
 
@@ -28,7 +24,7 @@ extension Xvtr {
   public class func create(callback: ReplyHandler? = nil) -> Bool {
     
     // tell the Radio to create a USB Cable
-    return Api.sharedInstance.sendWithCheck(Xvtr.kCreateCmd , replyTo: callback)
+    return Api.sharedInstance.sendWithCheck("xvtr create" , replyTo: callback)
   }
   
   // ----------------------------------------------------------------------------
@@ -42,7 +38,7 @@ extension Xvtr {
   public func remove(callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove a XVTR
-    Api.sharedInstance.send(Xvtr.kRemoveCmd + "\(id)", replyTo: callback)
+    Api.sharedInstance.send("xvtr remove \(id)", replyTo: callback)
   }
 
   // ----------------------------------------------------------------------------
@@ -56,7 +52,7 @@ extension Xvtr {
   ///
   private func xvtrCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Xvtr.kSetCmd + "\(id) " + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("xvtr set \(id) " + token.rawValue + "=\(value)")
   }
   
   // ----------------------------------------------------------------------------

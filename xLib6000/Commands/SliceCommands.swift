@@ -27,7 +27,7 @@ extension xLib6000.Slice {
   public class func create(frequency: Int, antenna: String, mode: String, callback: ReplyHandler? = nil) {
     if Api.sharedInstance.radio!.availableSlices > 0 {
       // tell the Radio to create a Slice
-      Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "\(frequency.hzToMhz) \(antenna) \(mode)", replyTo: callback)
+      Api.sharedInstance.send("slice create \(frequency.hzToMhz) \(antenna) \(mode)", replyTo: callback)
     }
   }
   /// Create a new Slice
@@ -40,7 +40,7 @@ extension xLib6000.Slice {
   public class func create(panadapter: Panadapter, frequency: Int = 0, callback: ReplyHandler? = nil) {
     if Api.sharedInstance.radio!.availableSlices > 0 {
       // tell the Radio to create a Slice
-      Api.sharedInstance.send(xLib6000.Slice.kCreateCmd + "pan" + "=\(panadapter.streamId.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz)")", replyTo: callback)
+      Api.sharedInstance.send("slice create pan" + "=\(panadapter.streamId.hex) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz)")", replyTo: callback)
     }
   }
   /// Remove the specified Slice
@@ -49,7 +49,7 @@ extension xLib6000.Slice {
   ///
   public class func removeSlice(id: SliceId) {
     // tell the Radio to remove the Slice
-    Api.sharedInstance.send(xLib6000.Slice.kRemoveCmd + id)
+    Api.sharedInstance.send("slice remove " + id)
   }
 
   // ----------------------------------------------------------------------------
@@ -63,7 +63,7 @@ extension xLib6000.Slice {
   public func remove(callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove a Slice
-    Api.sharedInstance.send(xLib6000.Slice.kRemoveCmd + " \(id)", replyTo: callback)
+    Api.sharedInstance.send("slice remove \(id)", replyTo: callback)
   }
   /// Requent the Slice frequency error values
   ///
@@ -74,7 +74,7 @@ extension xLib6000.Slice {
   public func errorRequest(_ id: SliceId, callback: ReplyHandler? = nil) {
     
     // ask the Radio for the current frequency error
-    Api.sharedInstance.send(xLib6000.Slice.kCmd + "get_error" + " \(id)", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+    Api.sharedInstance.send("slice get_error" + " \(id)", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
   }
   /// Request a list of slice Stream Id's
   ///
@@ -83,16 +83,16 @@ extension xLib6000.Slice {
   public func listRequest(callback: ReplyHandler? = nil) {
     
     // ask the Radio for a list of Slices
-    Api.sharedInstance.send(xLib6000.Slice.kCmd + "list", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
+    Api.sharedInstance.send("slice list", replyTo: callback == nil ? Api.sharedInstance.radio!.defaultReplyHandler : callback)
   }
   public func setRecord(_ value: Bool) {
     
-    Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) record=\(value.as1or0)")
+    Api.sharedInstance.send("slice set \(id) record=\(value.as1or0)")
   }
   
   public func setPlay(_ value: Bool) {
     
-    Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "\(id) play=\(value.as1or0)")
+    Api.sharedInstance.send("slice set \(id) play=\(value.as1or0)")
   }
 
   // ----------------------------------------------------------------------------
@@ -105,7 +105,7 @@ extension xLib6000.Slice {
   ///
   private func sliceTuneCmd(_ value: Any) {
     
-    Api.sharedInstance.send(xLib6000.Slice.kTuneCmd + "0x\(id) \(value) autopan=\(_autoPan.as1or0)")
+    Api.sharedInstance.send("slice tune 0x\(id) \(value) autopan=\(_autoPan.as1or0)")
   }
   /// Set a Slice Lock property on the Radio
   ///
@@ -114,7 +114,7 @@ extension xLib6000.Slice {
   ///
   private func sliceLock(_ value: String) {
     
-    Api.sharedInstance.send(xLib6000.Slice.kCmd + value + " 0x\(id)")
+    Api.sharedInstance.send("slice " + value + " 0x\(id)")
   }
   /// Set a Slice property on the Radio
   ///
@@ -124,7 +124,7 @@ extension xLib6000.Slice {
   ///
   private func sliceCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(xLib6000.Slice.kSetCmd + "0x\(id) " + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("slice set 0x\(id) " + token.rawValue + "=\(value)")
   }
   /// Set an Audio property on the Radio
   ///
@@ -135,7 +135,7 @@ extension xLib6000.Slice {
   private func audioCmd(_ token: String, value: Any) {
     // NOTE: commands use this format when the Token received does not match the Token sent
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    Api.sharedInstance.send(xLib6000.Slice.kAudioCmd + "0x\(id) " + token + " \(value)")
+    Api.sharedInstance.send("audio client 0 slice 0x\(id) " + token + " \(value)")
   }
   /// Set a Filter property on the Radio
   ///
@@ -144,7 +144,7 @@ extension xLib6000.Slice {
   ///
   private func filterCmd(low: Any, high: Any) {
     
-    Api.sharedInstance.send(xLib6000.Slice.kFilterCmd + "0x\(id)" + " \(low)" + " \(high)")
+    Api.sharedInstance.send("filt 0x\(id)" + " \(low)" + " \(high)")
   }
   
   // ----------------------------------------------------------------------------

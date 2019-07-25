@@ -64,7 +64,7 @@ extension Amplifier {
   ///
   private func amplifierCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Amplifier.kSetCmd + "\(id) " + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("amplifier set \(id) " + token.rawValue + "=\(value)")
   }
   
   // ----------------------------------------------------------------------------

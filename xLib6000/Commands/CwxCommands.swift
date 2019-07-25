@@ -19,14 +19,14 @@ extension Cwx {
   /// Clear the character buffer
   ///
   public func clearBuffer() {
-    Api.sharedInstance.send(Cwx.kCmd + "clear")
+    Api.sharedInstance.send("cwx clear")
   }
   /// Erase "n" characters
   ///
   /// - Parameter numberOfChars:  number of characters to erase
   ///
   public func erase(numberOfChars: Int) {
-    Api.sharedInstance.send(Cwx.kCmd + "erase \(numberOfChars)")
+    Api.sharedInstance.send("cwx erase \(numberOfChars)")
   }
   /// Erase "n" characters
   ///
@@ -35,7 +35,7 @@ extension Cwx {
   ///   - radioIndex:             ???
   ///
   public func erase(numberOfChars: Int, radioIndex: Int) {
-    Api.sharedInstance.send(Cwx.kCmd + "erase \(numberOfChars)" + " \(radioIndex)")
+    Api.sharedInstance.send("cwx erase \(numberOfChars)" + " \(radioIndex)")
   }
   /// Insert a string of Cw, optionally with a block
   ///
@@ -51,11 +51,11 @@ extension Cwx {
     
     if let block = block {
       
-      Api.sharedInstance.send(Cwx.kInsertCmd + "\(index) \"" + msg + "\" \(block)", replyTo: replyHandler)
+      Api.sharedInstance.send("cwx insert \(index) \"" + msg + "\" \(block)", replyTo: replyHandler)
       
     } else {
       
-      Api.sharedInstance.send(Cwx.kInsertCmd + "\(index) \"" + msg + "\"", replyTo: replyHandler)
+      Api.sharedInstance.send("cwx insert \(index) \"" + msg + "\"", replyTo: replyHandler)
     }
   }
   /// Save the specified Cwx Macro and tell the Radio (hardware)
@@ -75,7 +75,7 @@ extension Cwx {
     
     macros[index] = msg
     
-    Api.sharedInstance.send(Cwx.kMacroCmd + "save \(index+1)" + " \"" + msg + "\"")
+    Api.sharedInstance.send("cwx macro save \(index+1)" + " \"" + msg + "\"")
     
     return true
   }
@@ -92,11 +92,11 @@ extension Cwx {
     
     if let block = block {
       
-      Api.sharedInstance.send(Cwx.kSendCmd + "\"" + msg + "\" \(block)", replyTo: replyHandler)
+      Api.sharedInstance.send("cwx send \"" + msg + "\" \(block)", replyTo: replyHandler)
       
     } else {
       
-      Api.sharedInstance.send(Cwx.kSendCmd + "\"" + msg + "\"", replyTo: replyHandler)
+      Api.sharedInstance.send("cwx send \"" + msg + "\"", replyTo: replyHandler)
     }
   }
   /// Send the specified Cwx Macro
@@ -111,11 +111,11 @@ extension Cwx {
     
     if let block = block {
       
-      Api.sharedInstance.send(Cwx.kMacroCmd + "send \(index) \(block)", replyTo: replyHandler)
+      Api.sharedInstance.send("cwx macro send \(index) \(block)", replyTo: replyHandler)
       
     } else {
       
-      Api.sharedInstance.send(Cwx.kMacroCmd + "send \(index)", replyTo: replyHandler)
+      Api.sharedInstance.send("cwx macro send \(index)", replyTo: replyHandler)
     }
   }
   
@@ -130,7 +130,7 @@ extension Cwx {
   ///
   private func cwxCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Cwx.kCmd + token.rawValue + " \(value)")
+    Api.sharedInstance.send("cwx " + token.rawValue + " \(value)")
   }
   /// Set a Cwx property on the Radio
   ///
@@ -141,7 +141,7 @@ extension Cwx {
   private func cwxCmd(_ token: String, _ value: Any) {
     // NOTE: commands use this format when the Token received does not match the Token sent
     //      e.g. see EqualizerCommands.swift where "63hz" is received vs "63Hz" must be sent
-    Api.sharedInstance.send(Cwx.kCmd + token + " \(value)")
+    Api.sharedInstance.send("cwx " + token + " \(value)")
   }
   
   // ----------------------------------------------------------------------------

@@ -17,14 +17,6 @@ import Foundation
 public final class Cwx                      : NSObject, StaticModel {
 
   // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kCmd                           = "cwx "                        // Command prefixes
-  static let kInsertCmd                     = "cwx insert "
-  static let kMacroCmd                      = "cwx macro "
-  static let kSendCmd                       = "cwx send "
-
-  // ----------------------------------------------------------------------------
   // MARK: - Public properties
   
   public var messageQueuedEventHandler      : ((_ sequence: Int, _ bufferIndex: Int) -> Void)?

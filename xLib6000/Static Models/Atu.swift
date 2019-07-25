@@ -17,14 +17,6 @@ import Foundation
 public final class Atu                      : NSObject, StaticModel {
 
   // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kClearCmd                      = "atu clear"                   // Command prefixes
-  static let kStartCmd                      = "atu start"
-  static let kBypassCmd                     = "atu bypass"
-  static let kCmd                           = "atu "
-
-  // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
   private let _api                          = Api.sharedInstance            // reference to the API singleton

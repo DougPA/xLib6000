@@ -23,7 +23,7 @@ extension Memory {
   public class func create(callback: ReplyHandler? = nil) {
     
     // tell the Radio to create a Memory
-    Api.sharedInstance.send(Memory.kCreateCmd, replyTo: callback)
+    Api.sharedInstance.send("memory create", replyTo: callback)
   }
 
   // ----------------------------------------------------------------------------
@@ -36,7 +36,7 @@ extension Memory {
   public func apply(id: MemoryId, callback: ReplyHandler? = nil) {
     
     // tell the Radio to apply the Memory
-    Api.sharedInstance.send(Memory.kApplyCmd + "\(id)", replyTo: callback)
+    Api.sharedInstance.send("memory apply \(id)", replyTo: callback)
   }
   /// Remove a Memory
   ///
@@ -47,7 +47,7 @@ extension Memory {
   public func remove(_ id: MemoryId, callback: ReplyHandler? = nil) {
     
     // tell the Radio to remove the Memory
-    Api.sharedInstance.send(Memory.kRemoveCmd + "\(id)", replyTo: callback)
+    Api.sharedInstance.send("memory remove \(id)", replyTo: callback)
   }
 
   public func select() {
@@ -66,7 +66,7 @@ extension Memory {
   ///
   private func memCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Memory.kSetCmd + "\(id) " + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("memory set \(id) " + token.rawValue + "=\(value)")
   }
 
   // ----------------------------------------------------------------------------

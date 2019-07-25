@@ -18,14 +18,7 @@ public typealias UsbCableId = String
 ///      collected in the usbCables collection on the Radio object.
 ///
 public final class UsbCable                 : NSObject, DynamicModel {
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kCmd                           = "usb_cable "                  // Command prefixes
-  static let kSetCmd                        = "usb_cable set "
-  static let kSetBitCmd                     = "usb_cable set bit "
-  
+ 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties
   

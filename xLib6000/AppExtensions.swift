@@ -468,31 +468,31 @@ public struct Version {
       revision = "x"
     }
   }
-  
+  // complete
   public var string : String {
     return "\(major).\(minor).\(build).\(revision)"
   }
-  
+  // ignore the revision
   public var shortString : String {
     return "\(major).\(minor).\(build).x"
   }
-  
+  // 2.5.1 or higher
   public var isV3 : Bool {
     return major >= 2 && minor >= 5
   }
-  
+  // 2.0.0 to 2.4.9
   public var isV2 : Bool {
     return major >= 2 && minor < 5
   }
-  
+  // all 1.x.x
   public var isV1 : Bool {
     return major == 1
   }
-  
+  // model & serial
   static func ==(lhs: Version, rhs: Version) -> Bool {
     return lhs.major == rhs.major && lhs.minor == rhs.minor && lhs.build == rhs.build
   }
-  
+  // lhs < rhs
   static func <(lhs: Version, rhs: Version) -> Bool {
     
     switch (lhs, rhs) {
@@ -530,10 +530,18 @@ public func hexDump(data: [UInt8], len: Int) -> String {
   return string
 }
 
+/// Determine if status is for this client
+///
+/// - Parameter properties:   a collectio of Key Values
+/// - Returns:                true if a match
+///
 public func isForThisClient(_ properties: KeyValuesArray) -> Bool {
   
   // allow a Tester app to see all Streams
   guard Api.sharedInstance.testerModeEnabled == false else { return true }
+  
+  // make sure we have a connection
+  guard Api.sharedInstance.connectionHandle != nil else { return false }
   
   // find the handle property
   for property in properties where property.key == DaxRxAudioStream.Token.clientHandle.rawValue {
@@ -542,5 +550,3 @@ public func isForThisClient(_ properties: KeyValuesArray) -> Bool {
   }
   return false
 }
-
-

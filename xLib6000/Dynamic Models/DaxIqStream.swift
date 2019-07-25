@@ -18,13 +18,6 @@ import Accelerate
 ///      in the daxIqStreams collection on the Radio object.
 ///
 public final class DaxIqStream              : NSObject, DynamicModelWithStream {
- 
-  // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kCmd                           = "dax iq "                     // Command prefixes
-  static let kStreamCreateCmd               = "stream create "
-  static let kStreamRemoveCmd               = "stream remove "
 
   // ------------------------------------------------------------------------------
   // MARK: - Public properties

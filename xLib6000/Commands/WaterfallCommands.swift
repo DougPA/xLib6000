@@ -40,7 +40,7 @@ extension Waterfall {
   ///
   private func waterfallCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Waterfall.kSetCmd + "\(streamId.hex) " + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("display waterfall set \(streamId.hex) " + token.rawValue + "=\(value)")
   }
   
   // ----------------------------------------------------------------------------

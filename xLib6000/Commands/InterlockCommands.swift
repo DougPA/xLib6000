@@ -24,7 +24,7 @@ extension Interlock {
   ///
   private func interlockCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send(Interlock.kCmd + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("interlock " + token.rawValue + "=\(value)")
   }
   
   // ----------------------------------------------------------------------------

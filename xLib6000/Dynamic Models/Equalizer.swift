@@ -21,11 +21,6 @@ public typealias EqualizerId = String
 ///            The "sc" version is the standard for API Version 1.4 and greater
 ///
 public final class Equalizer                : NSObject, DynamicModel {
-  
-  // ----------------------------------------------------------------------------
-  // MARK: - Static properties
-  
-  static let kCmd                           = "eq "                         // Command prefixes
 
   // ----------------------------------------------------------------------------
   // MARK: - Public properties

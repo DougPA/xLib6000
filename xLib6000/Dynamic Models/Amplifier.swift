@@ -22,7 +22,6 @@ public final class Amplifier                : NSObject, DynamicModel {
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  static let kSetCmd                        = "amplifier set "              // Command prefixes
   static let kOperate                       = "OPERATE"
   static let kStandby                       = "STANDBY"
 
