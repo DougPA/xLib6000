@@ -91,8 +91,6 @@ public final class RemoteRxAudioStream      : NSObject, DynamicModelWithStream {
 
         // create a new Stream & add it to the collection
         radio.remoteRxAudioStreams[streamId] = RemoteRxAudioStream(streamId: streamId, queue: queue)
-        
-        Swift.print("streamId = \(radio.remoteRxAudioStreams[streamId]!.streamId.hex)")
       }
       // pass the remaining key values to parsing
       radio.remoteRxAudioStreams[streamId]!.parseProperties( Array(properties.dropFirst(2)) )

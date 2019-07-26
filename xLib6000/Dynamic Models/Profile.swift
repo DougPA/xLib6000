@@ -59,7 +59,13 @@ public final class Profile                  : NSObject, StaticModel {
     
     // get the Profile Id
     let profileId = String(components[0])
-    
+
+    // check for unknown Keys
+    guard let _ = Group(rawValue: profileId) else {
+      // log it and ignore the Key
+      Log.sharedInstance.msg("Unknown Profile group: \(profileId)", level: .warning, function: #function, file: #file, line: #line)
+      return
+    }
     // remove the Id from the KeyValues
     var adjustedKeyValues = keyValues
     adjustedKeyValues[0].key = String(components[1])
@@ -115,16 +121,15 @@ public final class Profile                  : NSObject, StaticModel {
       return
     }
     // Known keys, in alphabetical order
-    if token == Profile.Token.list {
+    switch token {
       
+    case .list:
       willChangeValue(for: \.list)
       _list = Array(properties[1].key.valuesArray( delimiter: "^" ))
       if _list.last == "" { _list = Array(_list.dropLast()) }
       didChangeValue(for: \.list)
-    }
-    
-    if token  == Profile.Token.selection {
-      
+
+    case.selection:
       willChangeValue(for: \.selection)
       _selection = (properties.count > 1 ? properties[1].key : "")
       didChangeValue(for: \.selection)
@@ -164,6 +169,13 @@ extension Profile {
   // ----------------------------------------------------------------------------
   // MARK: - Tokens
   
+  /// Types
+  ///
+  public enum Group : String {
+    case global
+    case mic
+    case tx
+  }
   /// Properties
   ///
   public enum Token: String {
