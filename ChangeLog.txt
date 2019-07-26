@@ -8,7 +8,7 @@ RadioFactory.swift - changed == for DiscoveredRadio to include model
 Various - removed static command definitions, replaced with literal strings
 Vita.swift - removed GuiClient class
 GuiClient.swift - added
-
+Profile.swift - added check for correct profile type in class parseStatus(_:radio:queue:inUse:)
 
 
 v2.5.1.2019_07_17
