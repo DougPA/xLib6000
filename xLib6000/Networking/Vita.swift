@@ -404,8 +404,8 @@ public class Vita {
       
       // create a new GuiClient
       guiClients.append( GuiClient(handle:   handlesArray[i].handle!,
-                                program:  programsArray[i],
-                                station:  stationsArray[i].replacingOccurrences(of: "\007f", with: " ")))
+                                   program:  programsArray[i],
+                                   station:  stationsArray[i].replacingOccurrences(of: "\007f", with: " ")))
     }
     return guiClients
   }

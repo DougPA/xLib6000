@@ -17,7 +17,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("2.5.1.2019_07_25")
+  public static let kVersion                = Version("2.5.1.2019_07_30")
   public static let kName                   = "xLib6000"
 
   public static let kDomainName             = "net.k3tzr"
@@ -43,8 +43,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   public var apiState                       : Api.State! {
     didSet { _log.msg( "Api state = \(apiState.rawValue)", level: .debug, function: #function, file: #file, line: #line)}}
 
-  public var discoveredRadios               : [DiscoveredRadio] {           // Radios discovered
-    return _radioFactory.discoveredRadios }
+//  public var discoveredRadios               : [DiscoveredRadio] {           // Radios discovered
+//    return _radioFactory.discoveredRadios }
   public private(set) var clientId          : UUID?                         // Unique Id (V3 only)
   public private(set) var clientProgram     = ""                            // Client name
   public private(set) var clientStation     = ""                            // Station name (V3 only)
@@ -86,7 +86,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   private let _parseQ                       = DispatchQueue(label: Api.kName + ".parseQ", qos: .userInteractive)
   private let _workerQ                      = DispatchQueue(label: Api.kName + ".workerQ")
 
-  private var _radioFactory                 = RadioFactory()                // Radio Factory class
+//  private var _radioFactory                 = Discovery.sharedInstance      // Radio Factory class
   private var _pinger                       : Pinger?                       // Pinger class
 
   private let _log                          = Log.sharedInstance
@@ -118,6 +118,9 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
     
     // set the initial State
     apiState = .disconnected
+    
+    // start Discovery
+    let _ = Discovery.sharedInstance
   }
 
   // ----------------------------------------------------------------------------
@@ -125,11 +128,49 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
   /// Connect to a Radio
   ///
+  ///   Definitions
+  ///     Client:   The application using a radio
+  ///     Api:      The intermediary between the Client and a Radio (e.g. FlexLib, xLib6000, etc.)
+  ///     Radio:    The physical radio (e.g. a Flex-6500)
+  ///
+  ///   There are 5 scenarios:
+  ///
+  ///     1. The Client connects as a Gui, ClientId is known
+  ///         The Client passes clientId = <ClientId>, isGui = true to the Api
+  ///         The Api sends a "client gui <ClientId>" command to the Radio
+  ///
+  ///     2. The Client connects as a Gui, ClientId is NOT known
+  ///         The Client passes clientId = nil, isGui = true to the Api
+  ///         The Api sends a "client gui" command to the Radio
+  ///         The Radio generates a ClientId
+  ///         The Client receives GuiClientHasBeenAdded / Removed / Updated notification(s)
+  ///         The Client finds the desired ClientId
+  ///         The Client persists the ClientId (if desired))
+  ///
+  ///     3. The Client connects as a non-Gui, binding is desired, ClientId is known
+  ///         The Client passes clientId = <ClientId>, isGui = false to the Api
+  ///         The Api sends a "client bind <ClientId>" command to the Radio
+  ///
+  ///     4. The Client connects as a non-Gui, binding is desired, ClientId is NOT known
+  ///         The Client passes clientId = nil, isGui = false to the Api
+  ///         The Client receives GuiClientHasBeenAdded / Removed / Updated notification(s)
+  ///         The Client finds the desired ClientId
+  ///         The Client sets the boundClientId property on the radio class of the Api
+  ///         The radio class causes a "client bind client_id=<ClientId>" command to be sent to the Radio
+  ///         The Client persists the ClientId (if desired))
+  ///
+  ///     5. The Client connects as a non-Gui, binding is NOT desired
+  ///         The Client passes clientId = nil, isGui = false to the Api
+  ///
+  ///     Scenarios 2 & 4 are typically executed once which then allows the Client to use scenarios 1 & 4
+  ///     for all subsequent connections (if the Client has persisted the ClientId)
+  ///
+  ///
   /// - Parameters:
   ///     - selectedRadio:        a DiscoveredRadio class for the desired Radio
   ///     - clientStation:        the name of the Station using this library (V3 only)
   ///     - clientName:           the name of the Client using this library
-  ///     - clientId:             a UUID String (if any) (V3 only)
+  ///     - clientId:             a UUID (if known) (V3 only)
   ///     - isGui:                whether this is a GUI connection
   ///     - isWan:                whether this is a Wan connection
   ///     - wanHandle:            Wan Handle (if any)
@@ -436,8 +477,8 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         case .antList:                                                          array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .micList:                                                          array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .clientGui where Api.kVersion.isV3 && isGui && clientId != nil:    array.append( (command.rawValue + " " + (clientId!.uuidString), false, nil) )
-        case .clientGui where Api.kVersion.isV3 && isGui:                       array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
         case .clientGui where isGui:                                            array.append( (command.rawValue, false, nil) )
+        case .clientGui where !isGui:                                            break
         case .clientBind where Api.kVersion.isV3 && !isGui && clientId != nil:  array.append( (command.rawValue + " client_id=" + clientId!.uuidString, false, nil) )
         case .clientBind:                                                       break
         case .subClient where Api.kVersion.isV3:                                array.append( (command.rawValue, false, nil) )
@@ -726,7 +767,7 @@ extension Api {
     // Note: Do not include GROUP A values in these return vales
     
     static func allPrimaryCommands() -> [Command] {
-      return [.clientIp, .clientGui, .clientProgram, .clientStation, .clientBind, .info, .version, .antList, .micList, .profileGlobal, .profileTx, .profileMic, .profileDisplay]
+      return [.clientGui, .clientProgram, .clientStation, .clientBind, .info, .version, .antList, .micList, .profileGlobal, .profileTx, .profileMic, .profileDisplay]
     }
     static func allSubscriptionCommands() -> [Command] {
       return [.subClient, .subTx, .subAtu, .subAmplifier, .subMeter, .subPan, .subSlice, .subGps,

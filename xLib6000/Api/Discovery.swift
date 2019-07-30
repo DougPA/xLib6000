@@ -1,5 +1,5 @@
 //
-//  RadioFactory.swift
+//  Discovery.swift
 //  CommonCode
 //
 //  Created by Douglas Adams on 5/13/15
@@ -8,12 +8,12 @@
 
 import Foundation
 
-/// RadioFactory implementation
+/// Discovery implementation
 ///
 ///      listens for the udp broadcasts announcing the presence of a Flex-6000
 ///      Radio, reports changes to the list of available radios
 ///
-public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegate {
+public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegate {
   
   typealias IpAddress                       = String                        // dotted decimal form
 
@@ -23,7 +23,7 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
   public private(set) var discoveredRadios: [DiscoveredRadio] {
     get { return _radiosQ.sync { _discoveredRadios } }
     set { _radiosQ.sync(flags: .barrier) { _discoveredRadios = newValue } } }
-  
+
   // ----------------------------------------------------------------------------
   // MARK: - Private properties
   
@@ -31,32 +31,35 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
   private var _timeoutTimer                 : DispatchSourceTimer!          // timer fired every "checkInterval"
   
   // GCD Queues
-  private let _discoveryQ                   = DispatchQueue(label: "RadioFactory" + ".discoveryQ")
-  private var _timerQ                       = DispatchQueue(label: "RadioFactory" + ".timerQ")
-  private let _radiosQ                      = DispatchQueue(label: "RadioFactory" + ".radiosQ", attributes: .concurrent)
+  private let _udpQ                         = DispatchQueue(label: "Discovery" + ".udpQ")
+  private var _timerQ                       = DispatchQueue(label: "Discovery" + ".timerQ")
+  private let _radiosQ                      = DispatchQueue(label: "Discovery" + ".radiosQ", attributes: .concurrent)
 
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS -----
   //
   private var _discoveredRadios              = [DiscoveredRadio]()          // Array of Discovered Radios
   //
   // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS -----
-
-  // ----------------------------------------------------------------------------
-  // MARK: - Initialization
   
-  /// Initialize a RadioFactory
+  // ----------------------------------------------------------------------------
+  // MARK: - Singleton
+  
+  /// Provide access to the API singleton
+  ///
+  @objc dynamic public static var sharedInstance = Discovery()
+  
+  /// Initialize Discovery
   ///
   /// - Parameters:
   ///   - discoveryPort:        port number
   ///   - checkInterval:        how often to check
   ///   - notSeenInterval:      timeout interval
   ///
-  public init(discoveryPort: UInt16 = 4992, checkInterval: TimeInterval = 1.0, notSeenInterval: TimeInterval = 3.0) {
-    
+  private init(discoveryPort: UInt16 = 4992, checkInterval: TimeInterval = 1.0, notSeenInterval: TimeInterval = 3.0) {
     super.init()
     
     // create a Udp socket
-    _udpSocket = GCDAsyncUdpSocket( delegate: self, delegateQueue: _discoveryQ )
+    _udpSocket = GCDAsyncUdpSocket( delegate: self, delegateQueue: _udpQ )
     
     // if created
     if let sock = _udpSocket {
@@ -99,7 +102,7 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
           
           // check the timestamps of the Discovered radios
           for i in 0..<self._discoveredRadios.count {
-
+            
             let interval = abs(self._discoveredRadios[i].lastSeen.timeIntervalSinceNow)
             
             // is it past expiration?
@@ -107,7 +110,7 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
               
               // YES, add to the delete list
               deleteList.append(i)
-            
+              
             } else {
               // NO, update the timestamp
               self._discoveredRadios[i].lastSeen = Date()
@@ -122,7 +125,7 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
               self._discoveredRadios.remove(at: index)
             }
             // send the list of radios to all observers
-            NC.post(.radiosAvailable, object: self.discoveredRadios as Any?)
+            NC.post(.discoveredRadios, object: self.discoveredRadios as Any?)
           }
         }
         
@@ -174,7 +177,7 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
   public func updateAvailableRadios() {
     
     // send the current list of radios to all observers
-    NC.post(.radiosAvailable, object: self.discoveredRadios as Any?)
+    NC.post(.discoveredRadios, object: self.discoveredRadios as Any?)
   }
   
   // ----------------------------------------------------------------------------
@@ -214,7 +217,7 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
       if knownRadio && previousStatus != discoveredRadio.status {
         
         // YES, send the updated array of radio dictionaries to all observers
-        NC.post(.radiosAvailable, object: discoveredRadios as Any?)
+        NC.post(.discoveredRadios, object: discoveredRadios as Any?)
       }
     }
     // Is it a known radio?
@@ -224,7 +227,7 @@ public final class RadioFactory             : NSObject, GCDAsyncUdpSocketDelegat
       discoveredRadios.append(discoveredRadio)
       
       // send the updated array of radio dictionaries to all observers
-      NC.post(.radiosAvailable, object: discoveredRadios as Any?)
+      NC.post(.discoveredRadios, object: discoveredRadios as Any?)
     }
   }
 }

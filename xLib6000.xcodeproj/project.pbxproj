@@ -63,7 +63,7 @@
 		913EF09120669DA700AF99BE /* Vita.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF04F20669DA700AF99BE /* Vita.swift */; };
 		913EF09220669DA700AF99BE /* Pinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05020669DA700AF99BE /* Pinger.swift */; };
 		913EF09320669DA700AF99BE /* WanServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05120669DA700AF99BE /* WanServer.swift */; };
-		913EF09420669DA700AF99BE /* RadioFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05320669DA700AF99BE /* RadioFactory.swift */; };
+		913EF09420669DA700AF99BE /* Discovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05320669DA700AF99BE /* Discovery.swift */; };
 		913EF09520669DA700AF99BE /* Api.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05420669DA700AF99BE /* Api.swift */; };
 		913EF09620669DA700AF99BE /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05620669DA700AF99BE /* GCDAsyncUdpSocket.m */; };
 		913EF09720669DA700AF99BE /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 913EF05720669DA700AF99BE /* GCDAsyncSocket.m */; };
@@ -142,7 +142,7 @@
 		913EF04F20669DA700AF99BE /* Vita.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vita.swift; sourceTree = "<group>"; };
 		913EF05020669DA700AF99BE /* Pinger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pinger.swift; sourceTree = "<group>"; };
 		913EF05120669DA700AF99BE /* WanServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WanServer.swift; sourceTree = "<group>"; };
-		913EF05320669DA700AF99BE /* RadioFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadioFactory.swift; sourceTree = "<group>"; };
+		913EF05320669DA700AF99BE /* Discovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Discovery.swift; sourceTree = "<group>"; };
 		913EF05420669DA700AF99BE /* Api.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Api.swift; sourceTree = "<group>"; };
 		913EF05620669DA700AF99BE /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
 		913EF05720669DA700AF99BE /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
@@ -317,7 +317,7 @@
 			isa = PBXGroup;
 			children = (
 				913EF05420669DA700AF99BE /* Api.swift */,
-				913EF05320669DA700AF99BE /* RadioFactory.swift */,
+				913EF05320669DA700AF99BE /* Discovery.swift */,
 				910A95A622E75C8E0055B180 /* GuiClient.swift */,
 			);
 			path = Api;
@@ -384,7 +384,7 @@
 		913EEFFD20669D6400AF99BE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1030;
 				ORGANIZATIONNAME = "Douglas Adams";
 				TargetAttributes = {
 					913EF00520669D6400AF99BE = {
@@ -460,7 +460,7 @@
 				913EF06720669DA700AF99BE /* Equalizer.swift in Sources */,
 				913EF09120669DA700AF99BE /* Vita.swift in Sources */,
 				9148A1D62258E9C100020663 /* BandSettingCommands.swift in Sources */,
-				913EF09420669DA700AF99BE /* RadioFactory.swift in Sources */,
+				913EF09420669DA700AF99BE /* Discovery.swift in Sources */,
 				913EF06020669DA700AF99BE /* Memory.swift in Sources */,
 				913EF07B20669DA700AF99BE /* SliceCommands.swift in Sources */,
 				913EF08220669DA700AF99BE /* RadioCommands.swift in Sources */,
@@ -628,6 +628,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = EE5B8TYXGA;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -652,6 +653,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = EE5B8TYXGA;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";

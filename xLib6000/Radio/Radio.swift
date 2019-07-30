@@ -89,7 +89,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
   private var __backlight                   = 0                             //
   private var __bandPersistenceEnabled      = false                         //
   private var __binauralRxEnabled           = false                         // Binaural enable
-  private var __boundClientId               : UUID?                         // The Client Id of this client's GUI (V3 only)
+  private var __boundClientId               : UUID?                         // For a non-Gui client, the Client Id it is bound to, if any (V3 only)
   // C
   private var __calFreq                     = 0                             // Calibration frequency
   private var __callsign                    = ""                            // Callsign
@@ -677,10 +677,8 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         if Api.kVersion.isV3 {
           // V3 API
           parseV3Disconnection(properties: properties, handle: handle)
-          if let guiClient = findGuiClientByHandle(handle) {
-//            removeGuiClient(guiClient)
-            NC.post(.guiClientHasBeenRemoved, object: guiClient as Any?)
-          }
+          removeGuiClient(with: handle)
+          NC.post(.guiClientHasBeenRemoved, object: handle as Any?)
           
         } else {
           // pre V3 API
@@ -700,10 +698,23 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     }
   }
   
-  
+  private func removeGuiClient(with handle: Handle) {
+    
+    guard let activeRadio = _api.activeRadio else { fatalError("No ActiveRadio") }
+    
+    // find the GuiClient
+    for (i, guiClient) in activeRadio.guiClients.enumerated() {
+      if guiClient.handle == handle {
+        activeRadio.guiClients.remove(at: i)
+        return
+      }
+    }
+    // none found
+    return
+  }
   
   private func parseV3Connection(properties: KeyValuesArray, handle: Handle) {
-    var clientId : UUID?
+    var clientId : String?
     var program = ""
     var station = ""
     var isLocalPtt = false
@@ -721,7 +732,7 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       switch token {
         
       case .clientId:
-        clientId = UUID(uuidString: property.value)
+        clientId = property.value
         
       case .localPttEnabled:
         isLocalPtt = property.value.bValue
@@ -733,42 +744,39 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         station = property.value
       }
     }
+    var guiClient = findGuiClient(with: handle)
     
-    // the GuiClient may exist even though no guiClientHasBeenAdded
-    // notification has been sent due to the arrival of UDP Discovery packets
-    // concurrent with the arrival of TCP client status packets 
+    // is there a Gui Client with this handle?
+    //    may have been added by Discovery (without a ClientId)
+    if guiClient != nil {
+      // YES, update it
+      guiClient!.program = program
+      guiClient!.station = station
+      guiClient!.isLocalPtt = isLocalPtt
+      guiClient!.isThisClient = (_api.connectionHandle! == handle)
 
-    // get the GuiClient (if any)
-    if let existingClient = findGuiClientByHandle(handle) {
-      existingClient.clientId = clientId
-      existingClient.program = program
-      existingClient.station = station
-      existingClient.isLocalPtt = isLocalPtt
-      
-      // notify all observers
-      NC.post(.guiClientHasBeenUpdated, object: existingClient as Any?)
+      // does it contain a ClientId?
+      if guiClient!.clientId == nil {
+        // NO, add it
+        guiClient!.clientId = clientId
+
+        // notify all observers
+        NC.post(.guiClientHasBeenAdded, object: guiClient as Any?)
+      }
       
     } else {
-      // none found, add one
-      let newGuiClient = GuiClient(handle: handle,
-                                   clientId: clientId,
-                                   program: program,
-                                   station: station,
-                                   isLocalPtt: isLocalPtt,
-                                   isThisClient: (_api.connectionHandle! == handle))
-      _api.activeRadio!.guiClients.append(newGuiClient)
-      
-      // notify all observers
-      NC.post(.guiClientHasBeenAdded, object: newGuiClient as Any?)
-    }
-    
-    // is the Gui Client initialized?
-    if _clientInitialized == false && clientId != nil {
-      
-      // YES
-      _clientInitialized = true
-    }
+      // NO, add one
+      guiClient = GuiClient(handle: handle,
+                            clientId: clientId,
+                            program: program,
+                            station: station,
+                            isLocalPtt: isLocalPtt,
+                            isThisClient: (_api.connectionHandle! == handle))
+      _api.activeRadio!.guiClients.append(guiClient!)
 
+      // notify all observers
+      NC.post(.guiClientHasBeenAdded, object: guiClient as Any?)
+    }
   }
 
   
@@ -801,22 +809,38 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       if duplicateClientId || forced || wanValidationFailed {
         _log.msg("Disconnected with: \(forced ? "Forced ": "")\(duplicateClientId ? "DuplicateClientId ": "")\(wanValidationFailed ? "wanValidationFailed": "")" , level: .warning, function: #function, file: #file, line: #line)
       }
-      if let existingClient = findGuiClientByHandle(handle) {
-        NC.post(.guiClientHasBeenRemoved, object: existingClient as Any?)
-      }
+      removeGuiClient(with: handle)
+      NC.post(.guiClientHasBeenRemoved, object: handle as Any?)
     }
   }
   
   
-  private func findGuiClientByHandle(_ handle: Handle) -> GuiClient? {
+  private func findGuiClient(with handle: Handle) -> GuiClient? {
     
     guard let activeRadio = _api.activeRadio else { fatalError("No ActiveRadio") }
     
     // find an existing GuiClient
-    for i in 0..<activeRadio.guiClients.count {
-      if handle == activeRadio.guiClients[i].handle {
-        return activeRadio.guiClients[i]
+    for guiClient in activeRadio.guiClients {
+      
+//      Swift.print("guiClient.handle = \(guiClient.handle), handle = \(handle)")
+      
+      if guiClient.handle == handle {
+        return guiClient
       }
+    }
+    // none found
+    return nil
+  }
+  
+  
+  private func findGuiClient(with clientId: String) -> GuiClient? {
+    
+    guard let activeRadio = _api.activeRadio else { fatalError("No ActiveRadio") }
+    
+    // find an existing GuiClient
+    for guiClient in activeRadio.guiClients where guiClient.clientId == clientId {
+      
+      return guiClient
     }
     // none found
     return nil
@@ -937,22 +961,22 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
       }
     }
   }
-  /// Parse the Reply to a Client Gui command, reply format: <key=value> <key=value> ...<key=value>
-  ///
-  ///   executed on the parseQ
-  ///
-  /// - Parameters:
-  ///   - keyValues:          a KeyValuesArray
-  ///
-  private func parseGuiReply(_ properties: KeyValuesArray) {
-    
-    // only v3 returns a Client Id
-    for property in properties {
-      // save the returned ID
-      _boundClientId = UUID(uuidString: property.key)
-      break
-    }
-  }
+//  /// Parse the Reply to a Client Gui command, reply format: <key=value> <key=value> ...<key=value>
+//  ///
+//  ///   executed on the parseQ
+//  ///
+//  /// - Parameters:
+//  ///   - keyValues:          a KeyValuesArray
+//  ///
+//  private func parseGuiReply(_ properties: KeyValuesArray) {
+//
+//    // only v3 returns a Client Id
+//    for property in properties {
+//      // save the returned ID
+//      _myClientId = UUID(uuidString: property.key)
+//      break
+//    }
+//  }
   /// Parse the Reply to a Client Ip command, reply format: <key=value> <key=value> ...<key=value>
   ///
   ///   executed on the parseQ
@@ -1514,9 +1538,9 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // which command?
     switch command {
       
-    case Api.Command.clientGui.rawValue:          // (V3 only)
-      // process the reply
-      parseGuiReply( reply.keyValuesArray() )
+//    case Api.Command.clientGui.rawValue:          // (V3 only)
+//      // process the reply
+//      parseGuiReply( reply.keyValuesArray() )
       
     case Api.Command.clientIp.rawValue:
       // process the reply

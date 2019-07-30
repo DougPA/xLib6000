@@ -11,14 +11,14 @@ import Foundation
 public class GuiClient        : Equatable {
   
   public var handle           : Handle
-  public var clientId         : UUID?
+  public var clientId         : String?
   public var program          : String
   public var station          : String
   public var isAvailable      : Bool
   public var isLocalPtt       : Bool
   public var isThisClient     : Bool
   
-  public init(handle: Handle, clientId: UUID? = nil, program: String = "", station: String = "", isAvailable: Bool = false, isLocalPtt: Bool = false, isThisClient: Bool = false) {
+  public init(handle: Handle, clientId: String? = nil, program: String = "", station: String = "", isAvailable: Bool = false, isLocalPtt: Bool = false, isThisClient: Bool = false) {
     self.handle = handle
     self.clientId = clientId
     self.program = program

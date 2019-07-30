@@ -32,6 +32,8 @@ public enum NotificationType : String {
   case daxTxAudioStreamHasBeenAdded
   case daxTxAudioStreamWillBeRemoved
   
+  case discoveredRadios
+  
   case equalizerHasBeenAdded
   
   case globalProfileChanged
@@ -65,8 +67,6 @@ public enum NotificationType : String {
   case radioHasBeenAdded
   case radioWillBeRemoved
   case radioHasBeenRemoved
-  
-  case radiosAvailable
   
   case radioDowngradeRequired
   case radioUpgradeRequired

@@ -225,6 +225,10 @@ extension Radio {
     get {  return _binauralRxEnabled }
     set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; radioSetCmd( .binauralRxEnabled, newValue.as1or0) } } }
   
+  @objc dynamic public var boundClientId: UUID? {
+    get {  return _boundClientId }
+    set { if _boundClientId != newValue { _boundClientId = newValue ; if let clientId = newValue?.uuidString { Api.sharedInstance.send("client bind client_id=\(clientId)") }} } }
+  
   @objc dynamic public var calFreq: Int {
     get {  return _calFreq }
     set { if _calFreq != newValue { _calFreq = newValue ; radioSetCmd( .calFreq, newValue.hzToMhz) } } }
@@ -232,10 +236,6 @@ extension Radio {
   @objc dynamic public var callsign: String {
     get {  return _callsign }
     set { if _callsign != newValue { _callsign = newValue ; radioCmd( .callsign, newValue) } } }
-  
-  @objc dynamic public var boundClientId: UUID? {
-    get {  return _boundClientId }
-    set { if _boundClientId != newValue { _boundClientId = newValue } } }
   
   @objc dynamic public var enforcePrivateIpEnabled: Bool {
     get {  return _enforcePrivateIpEnabled }
@@ -305,6 +305,10 @@ extension Radio {
     get { return _muteLocalAudio }
     set { if _muteLocalAudio != newValue { _muteLocalAudio = newValue ; radioSetCmd( "mute_local_audio", newValue.as1or0) } } }
   
+//  @objc dynamic public var myClientId: UUID? {
+//    get {  return _myClientId }
+//    set { if _myClientId != newValue { _myClientId = newValue } } }
+//  
   @objc dynamic public var nickname: String {
     get {  return _nickname }
     set { if _nickname != newValue { _nickname = newValue ; radioCmd("name", newValue) } } }
