@@ -2,8 +2,8 @@
 ## Mac implementation of the FlexRadio (TM) series 6000 software defined radios API (FlexLib)
 
 ### Built on:
-*  macOS 10.14.4 (Deployment Target of macOS 10.12)
-*  Xcode 10.2(10E1001)
+*  macOS 10.14.6 (Deployment Target of macOS 10.11)
+*  Xcode 10.3(10G8)
 *  Swift 5.0
 
 
