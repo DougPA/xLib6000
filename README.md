@@ -19,7 +19,7 @@
 
 
 
-THIS IS MY INITIAL WORK ON v3 COMPATIBILITY, IT IS NOT A COMPLETE, WORKING v3 IMPLEMENTATION
+## THIS IS MY INITIAL WORK ON v3 COMPATIBILITY, IT IS NOT A COMPLETE, WORKING v3 IMPLEMENTATION
 
 
 
@@ -31,19 +31,19 @@ differences between the Windows and macOS environments and system services.
 The "xLib6000 Overview.pdf" file in the Documentation folder contains an overview of the structure of this framework  
 and an explanation of the Tcp and Udp data flows.  
 
-If you want to learn more about the 6000 series API, please take a look at the xAPITester project. It uses this framework.
+If you want to learn more about the 6000 series API using a simple app (that uses this framework), please click the following:
 
-* https://github.com/DougPA/xAPITester
+[![K3TZR](https://img.shields.io/badge/K3TZR-xAPITester-informational)]( https://github.com/DougPA/xAPITester)
 
-For an example of a SmartSDR-like client for the Mac, please take a look at the xSDR6000 project. It uses this framework.
 
-* https://github.com/DougPA/xSDR6000
+For an example of a SmartSDR-like client for the Mac (that uses this framework), please click the following:
 
-If you require a Mac version of DAX and/or CAT, please see.
+[![K3TZR](https://img.shields.io/badge/K3TZR-xSDR6000-informational)]( https://github.com/DougPA/xSDR6000)
+
+
+If you require a Mac version of DAX and/or CAT  (that uses this framework), please click the following.
 
 [![DL3LSM](https://img.shields.io/badge/DL3LSM-xDAX-informational)](https://dl3lsm.blogspot.com)
-
-* https://dl3lsm.blogspot.com
 
 
 ## Builds
