@@ -1,8 +1,8 @@
 # xLib6000 v3
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-
-![Swift 5.0](https://img.shields.io/badge/Swift-5.0-orange.svg?style=flat)
+![Swift](https://img.shields.io/badge/Swift-5.0-orange.svg?style=flat)
+![Flex](https://img.shields.io/badge/Flex_Versions-v2.4_v2.5_v3.x-blue.svg)
 
 ## Mac implementation of the FlexRadio (TM) series 6000 software defined radios API (FlexLib)
 
@@ -57,6 +57,8 @@ douglas.adams@me.com
 
 
 ## Credits
+
+![Flex](https://img.shields.io/badge/Cocoa_Async_Socket-v7.6.3-blue.svg?link=http://left&link=https://github.com/robbiehanson/CocoaAsyncSocket)
 
 Version 7.6.3 of CocoaAsyncSocket is embedded in this project as source code. It can be found on GitHub at:  
 
