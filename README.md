@@ -41,6 +41,8 @@ For an example of a SmartSDR-like client for the Mac, please take a look at the 
 
 If you require a Mac version of DAX and/or CAT, please see.
 
+![xDAX(https://img.shields.io/badge/DL3LSM-xDAX_XCAT-informational)](https://dl3lsm.blogspot.com)
+
 * https://dl3lsm.blogspot.com
 
 
@@ -58,9 +60,9 @@ douglas.adams@me.com
 
 ## Credits
 
-[![CocoaAsyncSocket](https://img.shields.io/badge/CocoaAsyncSocket-v7.6.3-yellow.svg)](https://github.com/robbiehanson/CocoaAsyncSocket)
+[![CocoaAsyncSocket](https://img.shields.io/badge/CocoaAsyncSocket-v7.6.3-informational)](https://github.com/robbiehanson/CocoaAsyncSocket)
 
- CocoaAsyncSocket is embedded in this project as source code
+ CocoaAsyncSocket is embedded in this project as source code. It provides TCP and UDP connectivity.
 
 
 ## Known Issues
