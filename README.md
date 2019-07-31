@@ -6,8 +6,8 @@
 *  Xcode 10.3(10G8)
 *  Swift 5.0
 
-[![badge-language]][swift.org]
-[![badge-license]][license]
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]
+
 
 *Works with all Radios with Version 2.5.1 or more ( i.e. >=2.5.1.x and 3.x.x )
 
