@@ -3,7 +3,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 
-## Mac implementation of the FlexRadio (TM) series 6000 software defined radios API (FlexLib)
+## Mac implementation of the FlexRadio (TM) series 6000 API (FlexLib)
 
 ### Built on:
 *  ![MacOS](https://img.shields.io/badge/macOS-10.14.6-orange.svg?style=flat)
