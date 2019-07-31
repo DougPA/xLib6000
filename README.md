@@ -1,12 +1,14 @@
 # xLib6000 v3
+
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
+
 ## Mac implementation of the FlexRadio (TM) series 6000 software defined radios API (FlexLib)
 
 ### Built on:
 *  macOS 10.14.6 (Deployment Target of macOS 10.11)
 *  Xcode 10.3(10G8)
 *  Swift 5.0
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]
 
 
 *Works with all Radios with Version 2.5.1 or more ( i.e. >=2.5.1.x and 3.x.x )
