@@ -14,6 +14,7 @@ Api.swift - removed discoveredRadios var (use Discovery singleton)
 Api.swift - added initialization of Discovery in init()
 RadioCommands.swift - added sending of "client bind client_id=\(clientId)" on boundClientId
 GuiClient.swift - changed clientId var from UUID? to String?
+AppExtensions.swift - in struct Version added isV3M (V3 with Multiflex)
 
 
 v2.5.1.2019_07_25

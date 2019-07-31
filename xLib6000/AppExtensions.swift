@@ -476,15 +476,19 @@ public struct Version {
   public var shortString : String {
     return "\(major).\(minor).\(build).x"
   }
-  // 2.5.1 or higher
-  public var isV3 : Bool {
-    return major >= 2 && minor >= 5
+  // 3.0.0 or higher, v3 API with MultiFlex
+  public var isV3M : Bool {
+    return major >= 3
   }
-  // 2.0.0 to 2.4.9
+  // 2.5.1 or higher, v3 API without Multiflex
+  public var isV3 : Bool {
+    return major == 2 && minor >= 5
+  }
+  // 2.0.0 to 2.4.9, v2 API
   public var isV2 : Bool {
     return major >= 2 && minor < 5
   }
-  // all 1.x.x
+  // all 1.x.x, v1 API
   public var isV1 : Bool {
     return major == 1
   }
