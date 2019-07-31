@@ -58,11 +58,9 @@ douglas.adams@me.com
 
 ## Credits
 
-[![CocoaAsyncSocket:v7.6.3](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/robbiehanson/CocoaAsyncSocket)
+[![CocoaAsyncSocket](https://img.shields.io/badge/CocoaAsyncSocket-v7.6.3-yellow.svg)](https://github.com/robbiehanson/CocoaAsyncSocket)
 
-Version 7.6.3 of CocoaAsyncSocket is embedded in this project as source code. It can be found on GitHub at:  
-
-* https://github.com/robbiehanson/CocoaAsyncSocket
+ CocoaAsyncSocket is embedded in this project as source code
 
 
 ## Known Issues
