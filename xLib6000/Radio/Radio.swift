@@ -822,8 +822,6 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     // find an existing GuiClient
     for guiClient in activeRadio.guiClients {
       
-//      Swift.print("guiClient.handle = \(guiClient.handle), handle = \(handle)")
-      
       if guiClient.handle == handle {
         return guiClient
       }

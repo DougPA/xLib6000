@@ -174,7 +174,7 @@ public final class Discovery                : NSObject, GCDAsyncUdpSocketDelegat
   }
   /// force a Notification containing a list of current radios
   ///
-  public func updateAvailableRadios() {
+  public func updateDiscoveredRadios() {
     
     // send the current list of radios to all observers
     NC.post(.discoveredRadios, object: self.discoveredRadios as Any?)

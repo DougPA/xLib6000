@@ -1,5 +1,10 @@
 xLib6000 V3 Change Log
 
+v2.5.1.2019_08_01
+
+Discovery.swift - renamed updateAvailableRadios() to updateDiscoveredRadios()
+
+
 v2.5.1.2019_07_30
 
 Turned off code signing
