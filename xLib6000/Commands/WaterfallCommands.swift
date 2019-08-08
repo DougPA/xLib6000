@@ -13,8 +13,6 @@ import Foundation
 
 extension Waterfall {
   
-  static let kSetCmd                        = "display panafall set "       // Command prefixes
-  
   // ----------------------------------------------------------------------------
   // MARK: - Class methods that send Commands
   
@@ -26,7 +24,7 @@ extension Waterfall {
   ///
   public class func waterfallIqChannel(_ streamId: WaterfallId, channel: Int) {
     
-    Api.sharedInstance.send("display waterfall set \(streamId) daxiq_channel=\(channel)", replyTo: nil)
+    Api.sharedInstance.send("display panafall set \(streamId) daxiq_channel=\(channel)", replyTo: nil)
   }
 
   // ----------------------------------------------------------------------------
@@ -40,7 +38,7 @@ extension Waterfall {
   ///
   private func waterfallCmd(_ token: Token, _ value: Any) {
     
-    Api.sharedInstance.send("display waterfall set \(streamId.hex) " + token.rawValue + "=\(value)")
+    Api.sharedInstance.send("display panafall set \(streamId.hex) " + token.rawValue + "=\(value)")
   }
   
   // ----------------------------------------------------------------------------
