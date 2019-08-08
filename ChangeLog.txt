@@ -1,5 +1,10 @@
 xLib6000 V3 Change Log
 
+v2.5.1.2019_08_07
+
+xLib6000 scheme - unchecked "allow debugging when using document versions browser"
+
+
 v2.5.1.2019_08_01
 
 Discovery.swift - renamed updateAvailableRadios() to updateDiscoveredRadios()
