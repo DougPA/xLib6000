@@ -68,8 +68,8 @@ public enum NotificationType : String {
   case radioWillBeRemoved
   case radioHasBeenRemoved
   
-  case radioDowngradeRequired
-  case radioUpgradeRequired
+  case radioDowngrade
+  case radioUpgrade
 
   case remoteRxAudioStreamHasBeenAdded
   case remoteRxAudioStreamWillBeRemoved

@@ -147,9 +147,17 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       // does it exist?
       if let meter = radio.meters[number] {
         
-        // notify all observers
-        NC.post(.meterWillBeRemoved, object: meter as Any?)
-        
+        // is it a Slice meter?
+        if meter.source == Meter.Source.slice.rawValue {
+          
+          // notify all observers
+          NC.post(NotificationType.sliceMeterWillBeRemoved, object: self as Any?)
+          
+        } else {
+          
+          // notify all observers
+          NC.post(NotificationType.meterWillBeRemoved, object: self as Any?)
+        }
         // remove it
         radio.meters[number] = nil
       }
@@ -268,8 +276,17 @@ public final class Meter                    : NSObject, DynamicModel, StreamHand
       // the Radio (hardware) has acknowledged this Meter
       _initialized = true
       
-      // notify all observers
-      NC.post(.meterHasBeenAdded, object: self as Any?)
+      // is it a Slice meter?
+      if source == Meter.Source.slice.rawValue {
+        
+        // notify all observers
+        NC.post(.sliceMeterHasBeenAdded, object: self as Any?)
+        
+      } else {
+      
+        // notify all observers
+        NC.post(.meterHasBeenAdded, object: self as Any?)
+      }
     }
   }
   /// Process the UDP Stream Data for Meters

@@ -17,7 +17,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("2.5.1.2019_08_07")
+  public static let kVersion                = Version("2.5.1.2019_08_19")
   public static let kName                   = "xLib6000"
 
   public static let kDomainName             = "net.k3tzr"
@@ -413,16 +413,13 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
 
     case (let radio, let api) where radio < api:
       // Radio may need update
-      if api.isV3 && !radio.isV3 {
-        _log.msg("Radio must be upgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
-        NC.post(.radioUpgradeRequired, object: [Api.kVersion, radioVersion])
-      } else {
-        _log.msg("Radio may need to be upgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
-      }
+      _log.msg("Radio version: \(radioVersion.string) less than API version: \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+      NC.post(.radioUpgrade, object: [Api.kVersion, radioVersion])
+
     default:
       // Radio may need downgrade (radio > api)
-      _log.msg("Radio must be downgraded: Radio version = \(radioVersion.string), API supports version = \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
-      NC.post(.radioDowngradeRequired, object: [Api.kVersion, radioVersion])
+      _log.msg("Radio version: \(radioVersion.string) greater than API version: \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+      NC.post(.radioDowngrade, object: [Api.kVersion, radioVersion])
     }
   }
   /// Send a command list to the Radio
@@ -468,7 +465,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         case .setMtu where radioVersion.major == 2 && radioVersion.minor >= 3:  array.append( (command.rawValue, false, nil) )
         case .setMtu:                                                           break
         case .clientProgram:                                                    array.append( (command.rawValue + clientProgram, false, nil) )
-        case .clientStation where Api.kVersion.isV3 && isGui:                   array.append( (command.rawValue + clientStation, false, nil) )
+        case .clientStation where radioVersion.isV3 && isGui:                   array.append( (command.rawValue + clientStation, false, nil) )
         case .clientStation:                                                    break
         case .clientLowBW where lowBW:                                          array.append( (command.rawValue, false, nil) )
         case .meterList:                                                        array.append( (command.rawValue, false, delegate?.defaultReplyHandler) )
@@ -481,7 +478,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
         case .clientGui where !isGui:                                            break
         case .clientBind where Api.kVersion.isV3 && !isGui && clientId != nil:  array.append( (command.rawValue + " client_id=" + clientId!.uuidString, false, nil) )
         case .clientBind:                                                       break
-        case .subClient where Api.kVersion.isV3:                                array.append( (command.rawValue, false, nil) )
+        case .subClient where radioVersion.isV3:                                array.append( (command.rawValue, false, nil) )
         case .subClient:                                                        break
         case .none, .allPrimary, .allSecondary, .allSubscription:               break
         default:                                                                array.append( (command.rawValue, false, nil) )

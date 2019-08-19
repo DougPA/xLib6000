@@ -286,7 +286,12 @@ public final class Panadapter               : NSObject, DynamicModelWithStream {
         _clientHandle = property.value.handle ?? 0
         didChangeValue(for: \.clientHandle)
         
-      case .daxIqChannel:
+      case .daxIq:                                              // V2
+        willChangeValue(for: \.daxIqChannel)
+        _daxIqChannel = property.value.iValue
+        didChangeValue(for: \.daxIqChannel)
+        
+      case .daxIqChannel:                                       // V3
         willChangeValue(for: \.daxIqChannel)
         _daxIqChannel = property.value.iValue
         didChangeValue(for: \.daxIqChannel)
@@ -649,7 +654,8 @@ extension Panadapter {
     case bandZoomEnabled            = "band_zoom"
     case center
     case clientHandle               = "client_handle"
-    case daxIqChannel               = "daxiq_channel"
+    case daxIq                      = "daxiq"                   // V2
+    case daxIqChannel               = "daxiq_channel"           // V3
     case fps
     case loopAEnabled               = "loopa"
     case loopBEnabled               = "loopb"

@@ -525,13 +525,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
     case .mixer:
       _log.msg("Unprocessed \(msgType): \(remainder)", level: .warning, function: #function, file: #file, line: #line)
 
-    case .opusStream where Api.kVersion.isV3:
-      _log.msg("Invalid Status token: \(msgType) for Version \(Api.kVersion.shortString)", level: .warning, function: #function, file: #file, line: #line)
+    case .opusStream where _api.radioVersion.isV2:
+      RemoteRxAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q)
 
     case .opusStream:
       //     format: <opusId> <key=value> <key=value> ...<key=value>
-      //      RemoteRxAudioStream.parseStatus( remainder.keyValuesArray(), radio: self, queue: _q)
-      // FIXME: < V3 case needed
       break
       
     case .profile:
