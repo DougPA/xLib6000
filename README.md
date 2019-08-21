@@ -4,6 +4,7 @@
 
 
 ## Mac implementation of the FlexRadio (TM) series 6000 API (FlexLib)
+##      For Radios with Version 2.5.1 or higher
 
 ### Built on:
 *  ![MacOS](https://img.shields.io/badge/macOS-10.14.6-orange.svg?style=flat)
