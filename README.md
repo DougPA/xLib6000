@@ -1,4 +1,4 @@
-# xLib6000
+# xLib6000 - deprecated
 ## Mac implementation of the FlexRadio (TM) series 6000 software defined radios API (FlexLib)
 
 Builds on macOS 10.13.3 using XCode 9.2 (9c40b) using Swift 4 with a Deployment
