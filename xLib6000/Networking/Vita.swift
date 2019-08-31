@@ -389,7 +389,7 @@ public class Vita {
     var guiClients = [GuiClient]()
     
     // guard that all values are non-empty
-    guard handles != "" && programs != "" && stations != "" else { return guiClients }
+//    guard handles != "" && programs != "" && stations != "" else { return guiClients }
     
     // separate the values
     let handlesArray = handles.components(separatedBy: ",")
