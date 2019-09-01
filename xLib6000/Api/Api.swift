@@ -17,7 +17,7 @@ public final class Api                      : NSObject, TcpManagerDelegate, UdpM
   // ----------------------------------------------------------------------------
   // MARK: - Static properties
   
-  public static let kVersion                = Version("2.5.1.2019_08_31")
+  public static let kVersion                = Version("2.5.1.2019_09_01")
   public static let kName                   = "xLib6000"
 
   public static let kDomainName             = "net.k3tzr"

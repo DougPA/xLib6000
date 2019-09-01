@@ -659,9 +659,11 @@ public final class Radio                    : NSObject, StaticModel, ApiDelegate
         
         // IN USE, i.e. connected, is it V3 API?
         if Api.kVersion.isV3 {
-          // V3, parse
-          parseV3Connection(properties: properties, handle: handle)
-          
+          // V3, is the status for a Gui-client?, otherwise ignore it
+          if properties.count > 2 {
+            // YES, it's a Gui-client status
+            parseV3Connection(properties: properties, handle: handle)
+          }
         } else {
           // pre V3, guard that the message has my API Handle
           guard _api.connectionHandle! == properties[0].key.handle else { return }
