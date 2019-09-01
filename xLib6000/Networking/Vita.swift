@@ -389,15 +389,15 @@ public class Vita {
     var guiClients = [GuiClient]()
     
     // guard that all values are non-empty
-//    guard handles != "" && programs != "" && stations != "" else { return guiClients }
+//    guard handles.contains(",") || programs != "" && stations != "" else { return guiClients }
     
     // separate the values
     let handlesArray = handles.components(separatedBy: ",")
     let programsArray = programs.components(separatedBy: ",")
     let stationsArray = stations.components(separatedBy: ",")
     
-    // guard that there are an equal number of values
-    guard handlesArray.count == programsArray.count && programsArray.count == stationsArray.count else { return guiClients }
+    // guard that there is at least one value and there are an equal number of values
+    guard handlesArray.count != 0 && handlesArray.count == programsArray.count && programsArray.count == stationsArray.count else { return guiClients }
     
     // parse into the GuiClient struct
     for i in 0..<handlesArray.count {
